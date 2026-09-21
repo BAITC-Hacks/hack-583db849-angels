@@ -1,0 +1,32 @@
+# Who must review what. The last matching line wins.
+#
+# A pull request's author can never be its own code-owner review, so every area
+# lists a second owner: the tech lead reviews backend and ML, and Nauryzbek or
+# Beknur review the tech lead's areas. See "Who owns the shared files" in
+# CONTRIBUTING.md.
+
+# Anything not listed below: any teammate may review.
+*                        @mmeirbek @Yedil-Nauryzbek @Beksqwz
+
+# Frontend — Meiyrbek; reviewed by Nauryzbek or Beknur.
+/apps/web/               @mmeirbek @Yedil-Nauryzbek @Beksqwz
+
+# Backend — Nauryzbek; reviewed by the tech lead.
+/apps/api/               @Yedil-Nauryzbek @mmeirbek
+/docker-compose.yml      @Yedil-Nauryzbek @mmeirbek
+
+# ML — Beknur; reviewed by the tech lead.
+/services/ml/            @Beksqwz @mmeirbek
+/config/                 @Beksqwz @mmeirbek
+/seed/                   @Beksqwz @mmeirbek
+/fixtures/               @Beksqwz @mmeirbek
+
+# Root workspace, CI and project documents — Meiyrbek; reviewed by Nauryzbek or Beknur.
+/package.json            @mmeirbek @Yedil-Nauryzbek @Beksqwz
+/pnpm-workspace.yaml     @mmeirbek @Yedil-Nauryzbek @Beksqwz
+/.github/                @mmeirbek @Yedil-Nauryzbek @Beksqwz
+/docs/                   @mmeirbek @Yedil-Nauryzbek @Beksqwz
+/README.md               @mmeirbek @Yedil-Nauryzbek @Beksqwz
+/CONTRIBUTING.md         @mmeirbek @Yedil-Nauryzbek @Beksqwz
+/AGENTS.md               @mmeirbek @Yedil-Nauryzbek @Beksqwz
+/CLAUDE.md               @mmeirbek @Yedil-Nauryzbek @Beksqwz
