@@ -22,7 +22,7 @@ Three people, three personal branches per slice, and a `main` that nobody touche
    ```
 5. **Contract first.** A slice begins with one small pull request that only adds the contract — NestJS DTOs, Pydantic schemas, generated types, mock fixtures. Once it is merged, all three parts are built in parallel against it, and the frontend works on mocks until the real endpoint lands.
 6. **Keep pull requests small and reviewable.** One pull request is one coherent outcome. Say in the description what it does, how to check it, and what it deliberately leaves out.
-7. **Nobody merges their own pull request without a review from someone else.** The tech lead's pull requests are reviewed by Nauryzbek or Beknur.
+7. **Meiyrbek approves every pull request before it is merged.** `.github/CODEOWNERS` names only him, so GitHub accepts no other approval. He merges his own pull requests himself, once the checks pass. Anyone may still review, comment and ask for changes on any pull request — that is welcome; it just does not unlock the merge.
 8. **Keep your branch current.** Rebase on `main` before asking for review:
    ```bash
    git fetch origin
