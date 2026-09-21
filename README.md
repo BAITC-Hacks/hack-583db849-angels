@@ -59,4 +59,6 @@ The plan is agreed and the repository is being set up. There is no runnable code
 
 Nobody pushes to `main`. Every change arrives through a pull request from a personal branch. The rules are in [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
+Coding agents (Claude Code, Codex and others) follow [`AGENTS.md`](AGENTS.md).
+
 Only synthetic data is used anywhere in this repository.
