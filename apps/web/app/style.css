@@ -1,0 +1,571 @@
+@import 'tailwindcss';
+
+/*
+ * Palette source: docs/references/GovTech Camp - inVision U - AI Leader ID.pdf.
+ * Decompressing the deck's content streams and counting colour operators gives
+ * the brand lime #c1f01d (84 uses), the cream ground #fffde9, #131313 and the
+ * pastel accents reused here for report statuses.
+ *
+ * Both themes ship. Light is the product default; the inline script in
+ * app/layout.tsx always resolves a concrete data-theme before first paint, so
+ * the prefers-color-scheme block below only covers a no-JS visitor.
+ */
+
+:root {
+  --ground: #fffde9;
+  --surface: #ffffff;
+  --raised: #f6f4e4;
+  --overlay: #ececdf;
+
+  --ink: #131313;
+  --ink-2: #4b4b42;
+  --ink-3: #85837a;
+
+  --line: #e2e0cd;
+  --line-strong: #cbc9b4;
+
+  /* #c1f01d on cream is ~1.4:1 — fill only. Accent text uses --brand-ink. */
+  --brand: #c1f01d;
+  --brand-hover: #aad70f;
+  --brand-ink: #55700a;
+  --on-brand: #131313;
+  --brand-soft: #eefab4;
+
+  --st-high: #55700a;
+  --st-mid: #a15c2c;
+  --st-low: #b3261e;
+  --st-model: #6b5bbf;
+  --st-evidence: #2a6f75;
+  --st-flag: #c2502f;
+
+  --chip-review: #c9edee;
+  --chip-model: #b4afee;
+  --chip-flag: #ff8e6f;
+  --chip-sky: #cfe1f3;
+  --chip-ink: #1d1d18;
+
+  --elev-sm: 0 1px 2px rgb(19 19 19 / 0.05);
+  --elev: 0 18px 44px -30px rgb(19 19 19 / 0.45);
+  --brand-glow: 0 1px 2px rgb(19 19 19 / 0.08);
+  --brand-glow-lg: 0 6px 18px -8px rgb(85 112 10 / 0.45);
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --ground: #131313;
+    --surface: #191919;
+    --raised: #1f1f1f;
+    --overlay: #242424;
+
+    --ink: #f7f6ee;
+    --ink-2: #aeaca0;
+    --ink-3: #726f66;
+
+    --line: #2a2a26;
+    --line-strong: #3d3d36;
+
+    --brand: #c8f000;
+    --brand-hover: #9bbb00;
+    --brand-ink: #c8f000;
+    --on-brand: #0c0c0c;
+    --brand-soft: #2a3300;
+
+    --st-high: #c8f000;
+    --st-mid: #f5a623;
+    --st-low: #ef5350;
+    --st-model: #9b95e0;
+    --st-evidence: #6fb2b5;
+    --st-flag: #ff8e6f;
+
+    --chip-review: #17383b;
+    --chip-model: #2a2550;
+    --chip-flag: #4a1d10;
+    --chip-sky: #1b2c3b;
+    --chip-ink: #f2f1e6;
+
+    --elev-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+    --elev: 0 18px 44px -30px rgb(0 0 0 / 0.9);
+    --brand-glow: 0 0 18px rgb(200 240 0 / 0.22);
+    --brand-glow-lg: 0 0 36px rgb(200 240 0 / 0.32);
+
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --ground: #131313;
+  --surface: #191919;
+  --raised: #1f1f1f;
+  --overlay: #242424;
+
+  --ink: #f7f6ee;
+  --ink-2: #aeaca0;
+  --ink-3: #726f66;
+
+  --line: #2a2a26;
+  --line-strong: #3d3d36;
+
+  --brand: #c8f000;
+  --brand-hover: #9bbb00;
+  --brand-ink: #c8f000;
+  --on-brand: #0c0c0c;
+  --brand-soft: #2a3300;
+
+  --st-high: #c8f000;
+  --st-mid: #f5a623;
+  --st-low: #ef5350;
+  --st-model: #9b95e0;
+  --st-evidence: #6fb2b5;
+  --st-flag: #ff8e6f;
+
+  --chip-review: #17383b;
+  --chip-model: #2a2550;
+  --chip-flag: #4a1d10;
+  --chip-sky: #1b2c3b;
+  --chip-ink: #f2f1e6;
+
+  --elev-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --elev: 0 18px 44px -30px rgb(0 0 0 / 0.9);
+  --brand-glow: 0 0 18px rgb(200 240 0 / 0.22);
+  --brand-glow-lg: 0 0 36px rgb(200 240 0 / 0.32);
+
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg-base: var(--ground);
+  --color-bg-surface: var(--surface);
+  --color-bg-elevated: var(--raised);
+  --color-bg-overlay: var(--overlay);
+
+  --color-text-primary: var(--ink);
+  --color-text-secondary: var(--ink-2);
+  --color-text-muted: var(--ink-3);
+
+  --color-border-subtle: var(--line);
+  --color-border-strong: var(--line-strong);
+
+  --color-brand-green: var(--brand);
+  --color-brand-dim: var(--brand-hover);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-soft: var(--brand-soft);
+  --color-on-brand: var(--on-brand);
+
+  --color-status-high: var(--st-high);
+  --color-status-mid: var(--st-mid);
+  --color-status-low: var(--st-low);
+  --color-status-flag: var(--st-flag);
+  --color-status-ai: var(--st-model);
+  --color-status-evidence: var(--st-evidence);
+
+  --color-chip-review: var(--chip-review);
+  --color-chip-model: var(--chip-model);
+  --color-chip-flag: var(--chip-flag);
+  --color-chip-sky: var(--chip-sky);
+  --color-chip-ink: var(--chip-ink);
+
+  --radius-panel: 1.25rem;
+  --radius-control: 0.7rem;
+
+  --shadow-elev-sm: var(--elev-sm);
+  --shadow-elev: var(--elev);
+  --shadow-green-sm: var(--brand-glow);
+  --shadow-green: var(--brand-glow);
+  --shadow-green-lg: var(--brand-glow-lg);
+
+  /*
+   * GT Walsheim is the approved typeface but it is a licensed Grilli Type face
+   * that cannot be fetched from a CDN. Onest is the closest freely available
+   * geometric grotesque; swapping in the licensed files later is this one line
+   * plus a next/font/local call in app/fonts.ts.
+   */
+  --font-sans: var(--font-onest), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial,
+    sans-serif;
+  /*
+   * One level of indirection, because Tailwind inlines a theme value into every
+   * utility it generates: `font-mono` would carry a fixed family list and no
+   * later override could reach it. Pointing at a variable keeps the utility
+   * dynamic, so a later override of --font-mono-stack reaches every label.
+   */
+  --font-mono: var(--font-mono-stack);
+}
+
+:root {
+  --font-mono-stack: var(--font-jetbrains-mono), ui-monospace, 'SFMono-Regular', monospace;
+}
+
+body {
+  @apply m-0 bg-bg-base font-sans text-text-primary antialiased;
+}
+
+@utility bg-grid-pattern {
+  background-image:
+    linear-gradient(to right, color-mix(in oklab, var(--color-text-primary) 6%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklab, var(--color-text-primary) 6%, transparent) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+@utility text-balance-tight {
+  text-wrap: balance;
+  letter-spacing: -0.022em;
+}
+
+/*
+ * The two marks in a forced-choice block. They are utilities rather than plain
+ * classes so `peer-checked:` can switch them: the real radio input stays in the
+ * markup, keyboard and screen reader included, and only its appearance moves
+ * here.
+ *
+ * Most and least differ in fill, not only in colour — the difference has to
+ * survive a monochrome screen and the reader who cannot tell lime from red.
+ */
+@utility choice-mark {
+  display: block;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--line-strong);
+  background: var(--surface);
+  transition:
+    background-color 140ms ease-out,
+    border-color 140ms ease-out,
+    box-shadow 140ms ease-out;
+}
+
+@utility choice-mark-most {
+  border-color: var(--brand-ink);
+  background: var(--brand);
+  box-shadow: inset 0 0 0 3px var(--surface);
+}
+
+@utility choice-mark-least {
+  border-color: var(--ink-3);
+  background: repeating-linear-gradient(
+    135deg,
+    var(--ink-3) 0 2px,
+    var(--surface) 2px 4px
+  );
+}
+
+/*
+ * Theme-scoped visibility for the theme toggle's two icons. Plain CSS rather
+ * than a utility so it can key off the same three states the token blocks use:
+ * no attribute (no JS), an explicit light choice, and an explicit dark choice.
+ */
+.theme-dark-only {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .theme-light-only {
+    display: none;
+  }
+
+  :root:not([data-theme='light']) .theme-dark-only {
+    display: block;
+  }
+}
+
+:root[data-theme='dark'] .theme-light-only {
+  display: none;
+}
+
+:root[data-theme='dark'] .theme-dark-only {
+  display: block;
+}
+
+:root[data-theme='light'] .theme-light-only {
+  display: block;
+}
+
+:root[data-theme='light'] .theme-dark-only {
+  display: none;
+}
+
+/*
+ * The pixel wordmark is painted complete and only fades in, so a screenshot,
+ * a frozen animation frame or a reduced-motion visitor always sees the finished
+ * mark rather than a half-drawn one.
+ */
+.pixel-wordmark {
+  opacity: 0.7;
+  transition: opacity 700ms ease-out;
+}
+
+.pixel-wordmark.is-revealed {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pixel-wordmark {
+    opacity: 1;
+    transition: none;
+  }
+}
+
+/*
+ * Theme switching rides a View Transition: the outgoing snapshot stays put and
+ * the incoming one is revealed by a circle growing from the toggle (the radius
+ * animation lives in ThemeToggle, which knows where the button is). Killing the
+ * default cross-fade is what makes the wipe read as one moving edge.
+ */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 0;
+}
+
+::view-transition-new(root) {
+  z-index: 1;
+}
+
+/*
+ * Header dropdowns. The panel keeps its layout and only animates opacity and a
+ * small lift, and its rows stagger in behind it — the movement Ashby's nav uses
+ * to make a panel feel like it unfolds rather than appears. visibility is what
+ * keeps a closed panel out of the tab order.
+ */
+.nav-panel {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition:
+    opacity 160ms ease-out,
+    transform 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s linear 200ms;
+}
+
+.nav-panel.is-open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  transition:
+    opacity 160ms ease-out,
+    transform 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s;
+}
+
+.nav-item {
+  opacity: 0;
+  transform: translateY(-4px);
+  transition:
+    opacity 180ms ease-out,
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.nav-panel.is-open .nav-item {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: calc(40ms + var(--i) * 45ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-panel,
+  .nav-panel.is-open,
+  .nav-item,
+  .nav-panel.is-open .nav-item {
+    transition: none;
+    transform: none;
+  }
+}
+
+/*
+ * Landing motion.
+ *
+ * The reveal state is driven by components/motion/Reveal.tsx, which only marks
+ * an element pending when it starts below the fold. Nothing here can hide
+ * content on its own: without the data attribute the element is simply visible,
+ * so no JavaScript, a failed observer or reduced motion all render the page
+ * complete.
+ */
+@keyframes reveal-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .enter > * {
+    animation: reveal-rise 640ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .enter > *:nth-child(1) { animation-delay: 30ms; }
+  .enter > *:nth-child(2) { animation-delay: 90ms; }
+  .enter > *:nth-child(3) { animation-delay: 150ms; }
+  .enter > *:nth-child(4) { animation-delay: 210ms; }
+  .enter > *:nth-child(5) { animation-delay: 270ms; }
+  .enter > *:nth-child(6) { animation-delay: 330ms; }
+
+  [data-reveal='pending']:not(.reveal-stagger),
+  [data-reveal='pending'].reveal-stagger > * {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  [data-reveal='in']:not(.reveal-stagger),
+  [data-reveal='in'].reveal-stagger > * {
+    animation: reveal-rise 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  [data-reveal='in'].reveal-stagger > *:nth-child(2) { animation-delay: 60ms; }
+  [data-reveal='in'].reveal-stagger > *:nth-child(3) { animation-delay: 120ms; }
+  [data-reveal='in'].reveal-stagger > *:nth-child(4) { animation-delay: 180ms; }
+  [data-reveal='in'].reveal-stagger > *:nth-child(5) { animation-delay: 240ms; }
+  [data-reveal='in'].reveal-stagger > *:nth-child(6) { animation-delay: 300ms; }
+  [data-reveal='in'].reveal-stagger > *:nth-child(7) { animation-delay: 360ms; }
+  [data-reveal='in'].reveal-stagger > *:nth-child(8) { animation-delay: 420ms; }
+  [data-reveal='in'].reveal-stagger > *:nth-child(9) { animation-delay: 480ms; }
+}
+
+/* Hover feedback for anything that behaves like a card. */
+.lift {
+  transition:
+    transform 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 200ms ease-out,
+    box-shadow 200ms ease-out;
+}
+
+@media (hover: hover) {
+  .lift:hover {
+    transform: translateY(-2px);
+    border-color: var(--line-strong);
+    box-shadow: var(--elev);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lift,
+  .lift:hover {
+    transform: none;
+    transition: none;
+  }
+}
+
+/* details/summary keeps its native behaviour; only the disclosure marker goes. */
+.faq summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq summary:focus-visible {
+  outline: 2px solid var(--brand-ink);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .faq[open] > p {
+    animation: reveal-rise 260ms ease-out both;
+  }
+
+  /* Dividers between questions must not jump while an answer opens. */
+  .faq {
+    transition: background-color 160ms ease-out;
+  }
+
+  .faq:hover {
+    background-color: var(--raised);
+  }
+}
+
+/*
+ * Photo marquee. The track holds the same strip twice and travels exactly half
+ * its width, so the second copy lands where the first began and the loop has no
+ * seam. Every cell is the same width with a border instead of a gap — a gap
+ * would make that half-width land between copies.
+ */
+/*
+ * The band scrolls rather than animating a transform: a scroll position is what
+ * a swipe, a trackpad and the arrow keys already know how to move, so the
+ * gestures come from the browser and PhotoRail only has to keep the drift going.
+ */
+.photo-band {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  /* Both axes: the horizontal pan is ours, and the page must still scroll
+     vertically when the gesture starts on a photograph. */
+  touch-action: pan-x pan-y;
+  overscroll-behavior-x: contain;
+  cursor: grab;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 3%, #000 97%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 3%, #000 97%, transparent);
+}
+
+.photo-band::-webkit-scrollbar {
+  display: none;
+}
+
+.photo-band.is-dragging {
+  cursor: grabbing;
+}
+
+.photo-band img {
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+/*
+ * The applicant journey rail. The connector carries the progress of the stage
+ * it leaves, so the rail answers "how much is left" without a second widget.
+ */
+.journey-node {
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  flex: none;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  transition:
+    background-color 200ms ease-out,
+    border-color 200ms ease-out,
+    color 200ms ease-out;
+}
+
+.journey-step:hover .journey-node {
+  border-color: var(--brand-ink);
+}
+
+.journey-line {
+  position: relative;
+  display: none;
+  height: 2px;
+  flex: 1 1 auto;
+  min-width: 1.5rem;
+  border-radius: 2px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.journey-line-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  display: block;
+  background: var(--brand);
+  transition: width 400ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (min-width: 720px) {
+  .journey-line {
+    display: block;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .journey-node,
+  .journey-line-fill {
+    transition: none;
+  }
+}
