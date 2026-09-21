@@ -42,7 +42,16 @@ Conventional Commits, in English, saying what changed and why: `feat: stream the
 - Model output is validated against a schema. On invalid output: one retry, then a clear error.
 - Personal data never leaves the API towards the ML service: everything goes through `toLLMView()`.
 
+## Budget
+
+- Everyone works with `GATEWAY_MODE=replay` by default: answers come from `fixtures/cassettes/` and cost nothing.
+- Live calls run only on separate OpenAI project keys, each with its own spending limit — Meiyrbek's and Beknur's. Nauryzbek works on replay.
+- Every task in `config/models.json` has a per-request cost limit, and the gateway refuses everything past `BUDGET_USD_CAP`.
+
 ## Secrets and data
 
-- API keys live only in `.env`, which is never committed. `.env.example` lists every variable with a placeholder. The keys are held by Meiyrbek.
-- Only synthetic candidates, anywhere — code, fixtures, screenshots, demos.
+This repository is public, so a mistake here is published the moment it is pushed.
+
+- API keys live only in `.env`, which is never committed. `.env.example` lists every variable with no values. The keys are held by Meiyrbek.
+- GitHub secret scanning and push protection are on: a push containing a key is refused by the server. The foundation slice adds a second secret scan to CI.
+- Only synthetic candidates, anywhere — code, fixtures, screenshots, demos. Recordings of a real person's voice are never committed.
