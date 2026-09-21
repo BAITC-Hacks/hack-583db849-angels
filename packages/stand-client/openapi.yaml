@@ -1,0 +1,1930 @@
+openapi: 3.1.0
+info:
+  title: AI Leader ID API
+  version: 0.2.0
+  license:
+    name: Proprietary
+    identifier: LicenseRef-Proprietary
+  description: |
+    Canonical P0 HTTP contract. S0 health, S1 identity, S2 versioned
+    application-draft, and S3 timed forced-choice operations are approved. S2 and
+    S3 have no technical implementation yet. Extend this file before implementing
+    video, submission, scoring, commission, feedback, or methodology endpoints.
+    The pitch environment uses synthetic applicants and a real API.
+servers:
+  - url: /
+    description: Relative to NEXT_PUBLIC_API_URL
+tags:
+  - name: Health
+    description: Service availability checks.
+  - name: Auth
+    description: Applicant identity, session, and profile operations.
+  - name: Application cycles
+    description: Approved S2 application-cycle operations.
+  - name: Applications
+    description: Approved S2 versioned application-draft operations.
+  - name: Forced-choice test
+    description: Approved S3 timed forced-choice attempt operations.
+security:
+  - accessCookie: []
+paths:
+  /health:
+    get:
+      tags: [Health]
+      operationId: getHealth
+      x-review-status: APPROVED
+      summary: Check API health
+      security: []
+      responses:
+        '200':
+          description: API process is reachable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+              example:
+                status: ok
+  /auth/register:
+    post:
+      tags: [Auth]
+      operationId: registerApplicant
+      x-review-status: APPROVED
+      summary: Register an applicant with synthetic identity data in the pitch environment
+      security: []
+      x-creates-role: APPLICANT
+      description: |
+        Public registration creates only an APPLICANT account and immediately starts
+        a session. Email verification is outside P0. IIN is format-checked,
+        encrypted before database storage, and never returned in this response.
+        Existing email or IIN values return the same neutral error and must not be
+        disclosed to the caller.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterApplicantRequest'
+            example:
+              email: contract-registration@example.test
+              iin: '900000000000'
+              fullName: Contract Registration Applicant
+              birthYear: 2000
+              password: synthetic-demo-passphrase
+      responses:
+        '201':
+          description: Applicant created and signed in
+          headers:
+            Set-Cookie:
+              $ref: '#/components/headers/AuthenticationCookies'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthSession'
+        '400':
+          $ref: '#/components/responses/RegistrationBadRequest'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /auth/login:
+    post:
+      tags: [Auth]
+      operationId: login
+      x-review-status: APPROVED
+      summary: Sign in with email and password
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            example:
+              email: applicant@example.test
+              password: synthetic-demo-passphrase
+      responses:
+        '200':
+          description: Session created
+          headers:
+            Set-Cookie:
+              $ref: '#/components/headers/AuthenticationCookies'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthSession'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/InvalidCredentials'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      operationId: refreshSession
+      x-review-status: APPROVED
+      summary: Rotate the refresh token and create a new short-lived access session
+      description: |
+        Requires the refresh-token cookie and CSRF header. The server rotates the
+        opaque refresh token, validates its PostgreSQL-backed session, and renews its
+        seven-day TTL. The response never exposes either token in JSON.
+      security:
+        - refreshCookie: []
+          csrfToken: []
+      responses:
+        '200':
+          description: Session refreshed
+          headers:
+            Set-Cookie:
+              $ref: '#/components/headers/AuthenticationCookies'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthSession'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '403':
+          $ref: '#/components/responses/CsrfValidationFailed'
+  /auth/logout:
+    post:
+      tags: [Auth]
+      operationId: logout
+      x-review-status: APPROVED
+      summary: End all active sessions for the current user
+      description: |
+        Logout is conditional on the refresh cookie, and the condition is the
+        whole point of this operation (D-018, CON-017).
+
+        With no refresh cookie present the request is anonymous and idempotent:
+        the server answers 204 without requiring CSRF, because there is no
+        session to protect and nothing an attacker could achieve by forcing it.
+        A caller that already lost its cookies must be able to finish logging
+        out.
+
+        With a refresh cookie present — valid, invalid or expired — CSRF
+        validation is required and a failure is 403. The check happens before
+        the cookie is resolved, so a caller cannot learn whether the session was
+        still live by comparing responses.
+
+        Every 204 clears the authentication cookies. A valid session
+        additionally revokes every active session for that user. The response
+        never reveals whether a session existed, whether it was expired, or whom
+        it belonged to.
+
+        A 403 changes nothing: cookies are left in place and no session is
+        revoked. Clearing them on a failed CSRF check would let a forged request
+        log a user out, which is the attack the check exists to prevent.
+      security:
+        - {}
+        - refreshCookie: []
+          csrfToken: []
+      responses:
+        '204':
+          description: |
+            Authentication cookies cleared. Returned for an anonymous call, for a
+            valid session whose sessions were all revoked, and for a cookie that
+            no longer resolves to one — the three are indistinguishable by design.
+          headers:
+            Set-Cookie:
+              $ref: '#/components/headers/ClearedAuthenticationCookies'
+        '403':
+          $ref: '#/components/responses/CsrfValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /auth/me:
+    get:
+      tags: [Auth]
+      operationId: getCurrentUser
+      x-review-status: APPROVED
+      summary: Get the current user's non-sensitive profile
+      security:
+        - accessCookie: []
+      responses:
+        '200':
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPublic'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /application-cycles/active:
+    get:
+      tags: [Application cycles]
+      operationId: getActiveApplicationCycle
+      x-review-status: APPROVED
+      summary: Get the active cycle and published form version for a new draft
+      description: |
+        The absence of an active cycle is a normal product state with the stable
+        code NO_ACTIVE_APPLICATION_CYCLE. It must remain distinguishable from an
+        authentication, network, or server failure.
+      x-roles: [APPLICANT]
+      responses:
+        '200':
+          description: Active cycle
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActiveCycle'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NoActiveApplicationCycle'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /applications:
+    post:
+      tags: [Applications]
+      operationId: createDraftApplication
+      x-review-status: APPROVED
+      summary: Create one draft for the active cycle
+      x-roles: [APPLICANT]
+      description: |
+        The server binds the active cycle's immutable published form version.
+        Test, video-prompt, and methodology bindings belong to later slices and
+        are not part of the S2 draft contract. A second application for the same
+        applicant and cycle returns APPLICATION_ALREADY_EXISTS rather than
+        creating a duplicate.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateApplicationRequest'
+            example:
+              cycleId: 11111111-1111-4111-8111-111111111111
+      security:
+        - accessCookie: []
+          csrfToken: []
+      responses:
+        '201':
+          description: Draft created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationDraft'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NoActiveApplicationCycle'
+        '409':
+          $ref: '#/components/responses/ApplicationAlreadyExists'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /applications/current:
+    get:
+      tags: [Applications]
+      operationId: getCurrentApplication
+      x-review-status: APPROVED
+      summary: Resume the applicant's application in the active cycle
+      x-roles: [APPLICANT]
+      description: |
+        Returns the applicant's draft together with the exact immutable form
+        version bound when the draft was created. If the authenticated applicant
+        has no draft in the active cycle, the API returns APPLICATION_NOT_FOUND.
+      responses:
+        '200':
+          description: Current application
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationDraft'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ApplicationNotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /applications/{applicationId}/answers:
+    parameters:
+      - $ref: '#/components/parameters/ApplicationId'
+    patch:
+      tags: [Applications]
+      operationId: saveDraftAnswers
+      x-review-status: APPROVED
+      summary: Save a partial set of answers to the bound form version
+      x-roles: [APPLICANT]
+      description: |
+        Only the owner may change a DRAFT. The API validates question IDs and
+        answer types and values against the application's bound form version.
+        Supplied answer keys are merged; omitted keys remain unchanged. A null,
+        blank trimmed text value, or empty multi-select value removes the stored
+        answer. Submission completeness is checked by a later submission
+        operation, not here. expectedRevision prevents stale autosave requests
+        from silently overwriting newer work.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaveAnswersRequest'
+            example:
+              formVersionId: 22222222-2222-4222-8222-222222222222
+              expectedRevision: 3
+              answers:
+                current_education_status: undergraduate
+                intended_study_area: Product management
+                expected_graduation_year: 2027
+                city_region: Almaty
+      security:
+        - accessCookie: []
+          csrfToken: []
+      responses:
+        '200':
+          description: Updated draft with an incremented revision
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationDraft'
+        '400':
+          $ref: '#/components/responses/DraftAnswerBadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ApplicationNotFound'
+        '409':
+          $ref: '#/components/responses/DraftConflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /applications/{applicationId}/test-attempt:
+    parameters:
+      - $ref: '#/components/parameters/ApplicationId'
+    post:
+      tags: [Forced-choice test]
+      operationId: createTestAttempt
+      x-review-status: APPROVED
+      x-roles: [APPLICANT]
+      summary: Create the application's only forced-choice attempt
+      description: |
+        Creates exactly one attempt for the authenticated applicant's owned DRAFT
+        application. The server selects the immutable published TestVersion from
+        the application's own ApplicationCycle, persists one randomized block order
+        and one randomized statement order per block, and never uses the currently
+        active global cycle as a substitute. S2 answers may still be empty or
+        incomplete; S5 owns final completeness validation. Creating an attempt does
+        not start the first block timer and does not change Application.revision.
+      security:
+        - accessCookie: []
+          csrfToken: []
+      responses:
+        '201':
+          description: Attempt created; no block timer has started yet
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestAttemptSummary'
+        '400':
+          $ref: '#/components/responses/S3ValidationFailed'
+        '401':
+          $ref: '#/components/responses/S3Unauthorized'
+        '403':
+          $ref: '#/components/responses/S3MutationForbidden'
+        '404':
+          $ref: '#/components/responses/S3ApplicationNotFound'
+        '409':
+          $ref: '#/components/responses/S3CreateAttemptConflict'
+        '500':
+          $ref: '#/components/responses/S3InternalError'
+    get:
+      tags: [Forced-choice test]
+      operationId: getTestAttempt
+      x-review-status: APPROVED
+      x-roles: [APPLICANT]
+      summary: Get forced-choice attempt progress without answers or scores
+      description: |
+        Returns the attempt owned through the supplied application. Missing,
+        not-yet-created, and foreign attempts use the same TEST_ATTEMPT_NOT_FOUND
+        response. The response does not contain the active block text; the client
+        uses startOrResumeCurrentTestBlock to obtain it without resetting its timer.
+      security:
+        - accessCookie: []
+      responses:
+        '200':
+          description: Attempt progress
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestAttemptSummary'
+        '400':
+          $ref: '#/components/responses/S3ValidationFailed'
+        '401':
+          $ref: '#/components/responses/S3Unauthorized'
+        '403':
+          $ref: '#/components/responses/S3ReadForbidden'
+        '404':
+          $ref: '#/components/responses/S3TestAttemptNotFound'
+        '500':
+          $ref: '#/components/responses/S3InternalError'
+  /test-attempts/{attemptId}/current-block:
+    parameters:
+      - $ref: '#/components/parameters/TestAttemptId'
+    post:
+      tags: [Forced-choice test]
+      operationId: startOrResumeCurrentTestBlock
+      x-review-status: APPROVED
+      x-roles: [APPLICANT]
+      summary: Start or resume the current timed block
+      description: |
+        Idempotently returns the already-active block or starts its deadline once.
+        If the prior active deadline has passed, the same transaction records that
+        block as TIMED_OUT, increments TestAttempt.revision once, and starts the next
+        block unless the attempt is now complete. Repeated calls never reset a
+        deadline and never increment revision merely for starting a block. A
+        completed attempt returns currentBlock null. serverTime lets the browser
+        render against server time instead of trusting its device clock.
+      security:
+        - accessCookie: []
+          csrfToken: []
+      responses:
+        '200':
+          description: Current block, or completed progress with no current block
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentTestBlockResponse'
+        '400':
+          $ref: '#/components/responses/S3ValidationFailed'
+        '401':
+          $ref: '#/components/responses/S3Unauthorized'
+        '403':
+          $ref: '#/components/responses/S3MutationForbidden'
+        '404':
+          $ref: '#/components/responses/S3TestAttemptNotFound'
+        '409':
+          $ref: '#/components/responses/S3AdvanceAttemptConflict'
+        '500':
+          $ref: '#/components/responses/S3InternalError'
+  /test-attempts/{attemptId}/blocks/{blockId}/response:
+    parameters:
+      - $ref: '#/components/parameters/TestAttemptId'
+      - $ref: '#/components/parameters/TestBlockId'
+    put:
+      tags: [Forced-choice test]
+      operationId: submitCurrentTestBlockResponse
+      x-review-status: APPROVED
+      x-roles: [APPLICANT]
+      summary: Resolve the current block with one most/least pair or a timeout
+      description: |
+        Before expiry, stores one MOST_LIKE_ME and one different LEAST_LIKE_ME
+        statement for the active block. At or after the server deadline it stores
+        TIMED_OUT instead and returns that terminal outcome with 200; no late answer
+        is retained. An exact retry of an already-answered pair returns its stored
+        result, and any retry of a timed-out block returns TIMED_OUT. A different
+        pair for an answered block returns TEST_BLOCK_LOCKED. The attempt's bound
+        TestVersion is authoritative, so the client does not submit a version ID.
+        This operation increments TestAttempt.revision once per newly terminal
+        block and never changes Application.revision or starts the next timer.
+      security:
+        - accessCookie: []
+          csrfToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitTestBlockRequest'
+            example:
+              expectedRevision: 0
+              mostStatementId: statement_01_a
+              leastStatementId: statement_01_b
+      responses:
+        '200':
+          description: Stored ANSWERED or TIMED_OUT terminal result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmitTestBlockResponse'
+        '400':
+          $ref: '#/components/responses/S3SubmitBlockBadRequest'
+        '401':
+          $ref: '#/components/responses/S3Unauthorized'
+        '403':
+          $ref: '#/components/responses/S3MutationForbidden'
+        '404':
+          $ref: '#/components/responses/S3TestAttemptNotFound'
+        '409':
+          $ref: '#/components/responses/S3SubmitBlockConflict'
+        '500':
+          $ref: '#/components/responses/S3InternalError'
+components:
+  securitySchemes:
+    accessCookie:
+      type: apiKey
+      in: cookie
+      name: __Host-invision_access
+      description: |
+        HttpOnly, Secure, SameSite=Strict cookie containing a short-lived signed
+        access token. Its session identifier must resolve to an active PostgreSQL session.
+    refreshCookie:
+      type: apiKey
+      in: cookie
+      name: __Host-invision_refresh
+      description: |
+        HttpOnly, Secure, SameSite=Strict opaque refresh-token cookie. Only a hash
+        is stored in PostgreSQL. It is rotated on every refresh and has a seven-day
+        TTL. Redis is not authoritative for authentication or authorization.
+    csrfToken:
+      type: apiKey
+      in: header
+      name: X-CSRF-Token
+      description: |
+        Required with the authentication cookie on state-changing endpoints. Its
+        value must equal the non-HttpOnly __Host-invision_csrf cookie set by the API.
+  headers:
+    AuthenticationCookies:
+      description: |
+        Sets three cookies: __Host-invision_access (HttpOnly, Secure,
+        SameSite=Strict, Path=/, Max-Age=900); __Host-invision_refresh (HttpOnly,
+        Secure, SameSite=Strict, Path=/, Max-Age=604800); and
+        __Host-invision_csrf (Secure, SameSite=Strict, Path=/, readable by the
+        frontend). Local development uses documented non-__Host equivalents over
+        HTTP only.
+      schema:
+        type: string
+    ClearedAuthenticationCookies:
+      description: Clears the access, refresh, and CSRF cookies with Max-Age=0.
+      schema:
+        type: string
+    RetryAfter:
+      description: Seconds until the caller may retry this rate-limited operation.
+      schema:
+        type: integer
+        minimum: 1
+  parameters:
+    ApplicationId:
+      name: applicationId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    TestAttemptId:
+      name: attemptId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    TestBlockId:
+      name: blockId
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/TestBlockId'
+  responses:
+    BadRequest:
+      description: Invalid input
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationError'
+          example:
+            code: VALIDATION_ERROR
+            message: Request fields are invalid.
+            details: {}
+            traceId: req_demo_001
+    RegistrationBadRequest:
+      description: |
+        Invalid request fields or a neutral registration failure. A duplicate email
+        or IIN must return code REGISTRATION_FAILED with no field-level details;
+        callers must not learn which identifier is already registered.
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/ValidationError'
+              - $ref: '#/components/schemas/RegistrationFailedError'
+          examples:
+            invalidFields:
+              value:
+                code: VALIDATION_ERROR
+                message: Request fields are invalid.
+                details:
+                  fields:
+                    email: [Must be a valid email address.]
+                traceId: req_demo_001
+            neutralRegistrationFailure:
+              value:
+                code: REGISTRATION_FAILED
+                message: We could not create an account with these details.
+                details: {}
+                traceId: req_demo_007
+    Unauthorized:
+      description: Sign-in required or credentials invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedError'
+          example:
+            code: UNAUTHORIZED
+            message: Authentication is required.
+            details: {}
+            traceId: req_demo_002
+    InvalidCredentials:
+      description: Invalid sign-in credentials
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InvalidCredentialsError'
+          example:
+            code: INVALID_CREDENTIALS
+            message: We could not sign you in. Check your email and password and try again.
+            details: {}
+            traceId: req_demo_008
+    CsrfValidationFailed:
+      description: Required CSRF token is absent or invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CsrfValidationFailedError'
+          example:
+            code: CSRF_VALIDATION_FAILED
+            message: The request could not be verified.
+            details: {}
+            traceId: req_demo_010
+    Forbidden:
+      description: Role, assignment, or ownership does not permit this operation
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ForbiddenError'
+          example:
+            code: FORBIDDEN
+            message: Access is denied.
+            details: {}
+            traceId: req_demo_003
+    NoActiveApplicationCycle:
+      description: No application cycle currently accepts new drafts
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NoActiveApplicationCycleError'
+          example:
+            code: NO_ACTIVE_APPLICATION_CYCLE
+            message: Applications are not currently open.
+            details: {}
+            traceId: req_demo_011
+    ApplicationNotFound:
+      description: |
+        Application not found. The same response is used when an application
+        exists but is not owned by the authenticated applicant.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApplicationNotFoundError'
+          example:
+            code: APPLICATION_NOT_FOUND
+            message: Application was not found.
+            details: {}
+            traceId: req_demo_012
+    ApplicationAlreadyExists:
+      description: The applicant already has an application in this cycle
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApplicationAlreadyExistsError'
+          example:
+            code: APPLICATION_ALREADY_EXISTS
+            message: An application already exists for this cycle.
+            details: {}
+            traceId: req_demo_013
+    DraftAnswerBadRequest:
+      description: A supplied draft answer does not match the bound form
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/UnknownQuestionError'
+              - $ref: '#/components/schemas/InvalidAnswerTypeError'
+              - $ref: '#/components/schemas/InvalidAnswerValueError'
+          examples:
+            unknownQuestion:
+              value:
+                code: UNKNOWN_QUESTION
+                message: An answer references an unknown question.
+                details:
+                  questionId: unknown_question
+                traceId: req_demo_014
+            invalidAnswerType:
+              value:
+                code: INVALID_ANSWER_TYPE
+                message: An answer has the wrong type.
+                details:
+                  questionId: expected_graduation_year
+                traceId: req_demo_015
+            invalidAnswerValue:
+              value:
+                code: INVALID_ANSWER_VALUE
+                message: An answer is not valid for this question.
+                details:
+                  questionId: specialty
+                traceId: req_demo_016
+    DraftConflict:
+      description: The draft cannot be updated in its current state
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/ApplicationNotEditableError'
+              - $ref: '#/components/schemas/FormVersionMismatchError'
+              - $ref: '#/components/schemas/DraftRevisionConflictError'
+          examples:
+            applicationNotEditable:
+              value:
+                code: APPLICATION_NOT_EDITABLE
+                message: The application can no longer be edited.
+                details: {}
+                traceId: req_demo_017
+            formVersionMismatch:
+              value:
+                code: FORM_VERSION_MISMATCH
+                message: The form version does not match this application.
+                details: {}
+                traceId: req_demo_018
+            revisionConflict:
+              value:
+                code: DRAFT_REVISION_CONFLICT
+                message: A newer version of this draft is already saved.
+                details:
+                  currentRevision: 4
+                traceId: req_demo_019
+    RateLimited:
+      description: Too many authentication requests
+      headers:
+        Retry-After:
+          $ref: '#/components/headers/RetryAfter'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RateLimitedError'
+          example:
+            code: RATE_LIMITED
+            message: Try again later.
+            details: {}
+            traceId: req_demo_006
+    InternalError:
+      description: Unexpected server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalErrorResponse'
+          example:
+            code: INTERNAL_ERROR
+            message: An unexpected error occurred. Try again later.
+            details: {}
+            traceId: req_demo_009
+    S3ValidationFailed:
+      description: A path or request value is malformed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/S3ValidationError'
+          example:
+            code: VALIDATION_ERROR
+            message: Request fields are invalid.
+            details: {}
+            traceId: req_s3_001
+    S3Unauthorized:
+      description: An active access session is required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/S3UnauthorizedError'
+          example:
+            code: UNAUTHORIZED
+            message: Authentication is required.
+            details: {}
+            traceId: req_s3_002
+    S3ReadForbidden:
+      description: The authenticated role cannot use this applicant operation
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/S3ReadForbiddenError'
+          example:
+            code: FORBIDDEN
+            message: Access is denied.
+            details: {}
+            traceId: req_s3_003
+    S3MutationForbidden:
+      description: The role is forbidden or the same-origin CSRF check failed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/S3MutationForbiddenError'
+          examples:
+            forbiddenRole:
+              value:
+                code: FORBIDDEN
+                message: Access is denied.
+                details: {}
+                traceId: req_s3_004
+            csrfFailure:
+              value:
+                code: CSRF_VALIDATION_FAILED
+                message: The request could not be verified.
+                details: {}
+                traceId: req_s3_005
+    S3ApplicationNotFound:
+      description: |
+        Application not found. The same response is used when the application
+        exists but belongs to another applicant.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/S3ApplicationNotFoundError'
+          example:
+            code: APPLICATION_NOT_FOUND
+            message: Application was not found.
+            details: {}
+            traceId: req_s3_006
+    S3TestAttemptNotFound:
+      description: |
+        Test attempt not found. The same response is used for an absent attempt
+        and an attempt owned by another applicant.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/S3TestAttemptNotFoundError'
+          example:
+            code: TEST_ATTEMPT_NOT_FOUND
+            message: Test attempt was not found.
+            details: {}
+            traceId: req_s3_007
+    S3CreateAttemptConflict:
+      description: The application cannot create a new attempt
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/S3CreateAttemptConflictError'
+          examples:
+            applicationNotEditable:
+              value:
+                code: APPLICATION_NOT_EDITABLE
+                message: The application can no longer be edited.
+                details: {}
+                traceId: req_s3_008
+            versionNotConfigured:
+              value:
+                code: TEST_VERSION_NOT_CONFIGURED
+                message: A test is not configured for this application cycle.
+                details: {}
+                traceId: req_s3_009
+            attemptAlreadyExists:
+              value:
+                code: TEST_ATTEMPT_ALREADY_EXISTS
+                message: A test attempt already exists for this application.
+                details: {}
+                traceId: req_s3_010
+    S3AdvanceAttemptConflict:
+      description: An in-progress attempt cannot advance because its application is not editable
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/S3AdvanceAttemptConflictError'
+          example:
+            code: APPLICATION_NOT_EDITABLE
+            message: The application can no longer be edited.
+            details: {}
+            traceId: req_s3_011
+    S3SubmitBlockBadRequest:
+      description: The most/least selection is malformed or does not belong to the current block
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/S3SubmitBlockBadRequestError'
+          examples:
+            sameSelection:
+              value:
+                code: SAME_MOST_AND_LEAST
+                message: Most-like and least-like selections must be different.
+                details: {}
+                traceId: req_s3_012
+            unknownStatement:
+              value:
+                code: UNKNOWN_TEST_STATEMENT
+                message: A selected statement is not in the current block.
+                details: {}
+                traceId: req_s3_013
+    S3SubmitBlockConflict:
+      description: The block cannot accept this response in its current state
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/S3SubmitBlockConflictError'
+          examples:
+            applicationNotEditable:
+              value:
+                code: APPLICATION_NOT_EDITABLE
+                message: The application can no longer be edited.
+                details: {}
+                traceId: req_s3_014
+            blockNotCurrent:
+              value:
+                code: TEST_BLOCK_NOT_CURRENT
+                message: This is not the current test block.
+                details: {}
+                traceId: req_s3_015
+            blockLocked:
+              value:
+                code: TEST_BLOCK_LOCKED
+                message: This test block is already locked.
+                details: {}
+                traceId: req_s3_016
+            revisionConflict:
+              value:
+                code: TEST_REVISION_CONFLICT
+                message: Test progress has changed. Reload the current block.
+                details:
+                  currentRevision: 3
+                traceId: req_s3_017
+    S3InternalError:
+      description: Unexpected server error with no private test content disclosed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/S3InternalError'
+          example:
+            code: INTERNAL_ERROR
+            message: An unexpected error occurred. Try again later.
+            details: {}
+            traceId: req_s3_018
+  schemas:
+    Health:
+      type: object
+      additionalProperties: false
+      required: [status]
+      properties:
+        status:
+          type: string
+          const: ok
+    ApiError:
+      type: object
+      additionalProperties: false
+      required: [code, message, traceId]
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+          additionalProperties: true
+        traceId:
+          type: string
+    ValidationError:
+      allOf:
+        - $ref: '#/components/schemas/ApiError'
+        - type: object
+          properties:
+            code:
+              const: VALIDATION_ERROR
+    RegistrationFailedError:
+      allOf:
+        - $ref: '#/components/schemas/ApiError'
+        - type: object
+          properties:
+            code:
+              const: REGISTRATION_FAILED
+    UnauthorizedError:
+      allOf:
+        - $ref: '#/components/schemas/ApiError'
+        - type: object
+          properties:
+            code:
+              const: UNAUTHORIZED
+    InvalidCredentialsError:
+      allOf:
+        - $ref: '#/components/schemas/ApiError'
+        - type: object
+          properties:
+            code:
+              const: INVALID_CREDENTIALS
+    CsrfValidationFailedError:
+      allOf:
+        - $ref: '#/components/schemas/ApiError'
+        - type: object
+          properties:
+            code:
+              const: CSRF_VALIDATION_FAILED
+    ForbiddenError:
+      allOf:
+        - $ref: '#/components/schemas/ApiError'
+        - type: object
+          properties:
+            code:
+              const: FORBIDDEN
+    NoActiveApplicationCycleError:
+      allOf:
+        - $ref: '#/components/schemas/ApiError'
+        - type: object
+          properties:
+            code:
+              const: NO_ACTIVE_APPLICATION_CYCLE
+    ApplicationNotFoundError:
+      allOf:
+        - $ref: '#/components/schemas/ApiError'
+        - type: object
+          properties:
+            code:
+              const: APPLICATION_NOT_FOUND
+    ApplicationAlreadyExistsError:
+      allOf:
+        - $ref: '#/components/schemas/ApiError'
+        - type: object
+          properties:
+            code:
+              const: APPLICATION_ALREADY_EXISTS
+    UnknownQuestionError:
+      allOf:
+        - $ref: '#/components/schemas/ApiError'
+        - type: object
+          properties:
+            code:
+              const: UNKNOWN_QUESTION
+    InvalidAnswerTypeError:
+      allOf:
+        - $ref: '#/components/schemas/ApiError'
+        - type: object
+          properties:
+            code:
+              const: INVALID_ANSWER_TYPE
+    InvalidAnswerValueError:
+      allOf:
+        - $ref: '#/components/schemas/ApiError'
+        - type: object
+          properties:
+            code:
+              const: INVALID_ANSWER_VALUE
+    ApplicationNotEditableError:
+      allOf:
+        - $ref: '#/components/schemas/ApiError'
+        - type: object
+          properties:
+            code:
+              const: APPLICATION_NOT_EDITABLE
+    FormVersionMismatchError:
+      allOf:
+        - $ref: '#/components/schemas/ApiError'
+        - type: object
+          properties:
+            code:
+              const: FORM_VERSION_MISMATCH
+    DraftRevisionConflictError:
+      allOf:
+        - $ref: '#/components/schemas/ApiError'
+        - type: object
+          properties:
+            code:
+              const: DRAFT_REVISION_CONFLICT
+    RateLimitedError:
+      allOf:
+        - $ref: '#/components/schemas/ApiError'
+        - type: object
+          properties:
+            code:
+              const: RATE_LIMITED
+    InternalErrorResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiError'
+        - type: object
+          properties:
+            code:
+              const: INTERNAL_ERROR
+    S3ValidationError:
+      allOf:
+        - $ref: '#/components/schemas/ApiError'
+        - type: object
+          properties:
+            code:
+              type: string
+              const: VALIDATION_ERROR
+    S3UnauthorizedError:
+      allOf:
+        - $ref: '#/components/schemas/ApiError'
+        - type: object
+          properties:
+            code:
+              type: string
+              const: UNAUTHORIZED
+    S3ReadForbiddenError:
+      allOf:
+        - $ref: '#/components/schemas/ApiError'
+        - type: object
+          properties:
+            code:
+              type: string
+              const: FORBIDDEN
+    S3MutationForbiddenError:
+      oneOf:
+        - allOf:
+            - $ref: '#/components/schemas/ApiError'
+            - type: object
+              properties:
+                code:
+                  type: string
+                  const: FORBIDDEN
+        - allOf:
+            - $ref: '#/components/schemas/ApiError'
+            - type: object
+              properties:
+                code:
+                  type: string
+                  const: CSRF_VALIDATION_FAILED
+    S3ApplicationNotFoundError:
+      allOf:
+        - $ref: '#/components/schemas/ApiError'
+        - type: object
+          properties:
+            code:
+              type: string
+              const: APPLICATION_NOT_FOUND
+    S3TestAttemptNotFoundError:
+      allOf:
+        - $ref: '#/components/schemas/ApiError'
+        - type: object
+          properties:
+            code:
+              type: string
+              const: TEST_ATTEMPT_NOT_FOUND
+    S3CreateAttemptConflictError:
+      oneOf:
+        - allOf:
+            - $ref: '#/components/schemas/ApiError'
+            - type: object
+              properties:
+                code:
+                  type: string
+                  const: APPLICATION_NOT_EDITABLE
+        - allOf:
+            - $ref: '#/components/schemas/ApiError'
+            - type: object
+              properties:
+                code:
+                  type: string
+                  const: TEST_VERSION_NOT_CONFIGURED
+        - allOf:
+            - $ref: '#/components/schemas/ApiError'
+            - type: object
+              properties:
+                code:
+                  type: string
+                  const: TEST_ATTEMPT_ALREADY_EXISTS
+    S3AdvanceAttemptConflictError:
+      allOf:
+        - $ref: '#/components/schemas/ApiError'
+        - type: object
+          properties:
+            code:
+              type: string
+              const: APPLICATION_NOT_EDITABLE
+    S3SubmitBlockBadRequestError:
+      oneOf:
+        - allOf:
+            - $ref: '#/components/schemas/ApiError'
+            - type: object
+              properties:
+                code:
+                  type: string
+                  const: VALIDATION_ERROR
+        - allOf:
+            - $ref: '#/components/schemas/ApiError'
+            - type: object
+              properties:
+                code:
+                  type: string
+                  const: SAME_MOST_AND_LEAST
+        - allOf:
+            - $ref: '#/components/schemas/ApiError'
+            - type: object
+              properties:
+                code:
+                  type: string
+                  const: UNKNOWN_TEST_STATEMENT
+    S3SubmitBlockConflictError:
+      oneOf:
+        - allOf:
+            - $ref: '#/components/schemas/ApiError'
+            - type: object
+              properties:
+                code:
+                  type: string
+                  const: APPLICATION_NOT_EDITABLE
+        - allOf:
+            - $ref: '#/components/schemas/ApiError'
+            - type: object
+              properties:
+                code:
+                  type: string
+                  const: TEST_BLOCK_NOT_CURRENT
+        - allOf:
+            - $ref: '#/components/schemas/ApiError'
+            - type: object
+              properties:
+                code:
+                  type: string
+                  const: TEST_BLOCK_LOCKED
+        - allOf:
+            - $ref: '#/components/schemas/ApiError'
+            - type: object
+              properties:
+                code:
+                  type: string
+                  const: TEST_REVISION_CONFLICT
+    S3InternalError:
+      allOf:
+        - $ref: '#/components/schemas/ApiError'
+        - type: object
+          properties:
+            code:
+              type: string
+              const: INTERNAL_ERROR
+    RegisterApplicantRequest:
+      type: object
+      additionalProperties: false
+      required: [email, iin, fullName, birthYear, password]
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 254
+          description: Trimmed and normalized to lowercase before uniqueness checks.
+        iin:
+          type: string
+          pattern: '^[0-9]{12}$'
+          description: |
+            Synthetic 12-digit IIN for pitch data. The API validates format only;
+            it does not perform government identity verification. Never returned or
+            written to routine logs.
+        fullName:
+          type: string
+          minLength: 2
+          maxLength: 120
+          description: Trimmed single display-name field; no first/last-name parsing is imposed.
+        birthYear:
+          type: integer
+          minimum: 1900
+          x-server-validation: birthYear <= currentCalendarYear - 18
+          description: |
+            Identity data, excluded from scoring. The server requires a year no
+            later than the current calendar year minus 18; exact birthday validation
+            is impossible without collecting a full birth date.
+        password:
+          type: string
+          format: password
+          writeOnly: true
+          minLength: 15
+          maxLength: 128
+          description: Single-factor passphrase; no character-composition rule.
+    LoginRequest:
+      type: object
+      additionalProperties: false
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 254
+          description: Trimmed and normalized to lowercase before lookup.
+        password:
+          type: string
+          format: password
+          writeOnly: true
+    UserPublic:
+      type: object
+      additionalProperties: false
+      required: [id, email, fullName, role, createdAt]
+      example:
+        id: 33333333-3333-4333-8333-333333333333
+        email: applicant@example.test
+        fullName: Demo Applicant
+        role: APPLICANT
+        createdAt: '2026-09-17T12:00:00Z'
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        fullName:
+          type: string
+        role:
+          $ref: '#/components/schemas/Role'
+        createdAt:
+          type: string
+          format: date-time
+          description: Account creation time. Birth year and IIN are never returned.
+    Role:
+      type: string
+      enum: [APPLICANT, INTERVIEWER, ADMISSION_COMMISSION, METHODOLOGY_OWNER, SYSTEM_ADMIN]
+    AuthSession:
+      type: object
+      additionalProperties: false
+      required: [user, accessExpiresAt]
+      example:
+        user:
+          id: 33333333-3333-4333-8333-333333333333
+          email: applicant@example.test
+          fullName: Demo Applicant
+          role: APPLICANT
+          createdAt: '2026-09-17T12:00:00Z'
+        accessExpiresAt: '2026-09-17T12:15:00Z'
+      properties:
+        user:
+          $ref: '#/components/schemas/UserPublic'
+        accessExpiresAt:
+          type: string
+          format: date-time
+          description: Expiry time of the access cookie. The refresh token remains HttpOnly.
+    ActiveCycle:
+      type: object
+      additionalProperties: false
+      required: [id, name, formVersion]
+      example:
+        id: 11111111-1111-4111-8111-111111111111
+        name: Synthetic pitch cycle
+        formVersion:
+          id: 22222222-2222-4222-8222-222222222222
+          version: 1
+          title: Synthetic applicant profile
+          description: Synthetic, non-scoring factual demo form; not official admissions methodology.
+          publishedAt: '2026-09-17T12:00:00Z'
+          questions:
+            - id: current_education_status
+              label: Current education status
+              type: SINGLE_SELECT
+              required: false
+              options:
+                - value: secondary_school
+                  label: Secondary school
+                - value: technical_vocational
+                  label: Technical or vocational college
+                - value: undergraduate
+                  label: Undergraduate programme
+                - value: graduate
+                  label: Graduate programme
+                - value: other
+                  label: Other
+            - id: intended_study_area
+              label: Intended study area or specialty
+              type: TEXT
+              required: false
+              constraints:
+                maxLength: 160
+            - id: expected_graduation_year
+              label: Expected graduation year
+              type: NUMBER
+              required: false
+              constraints:
+                minimum: 1900
+                maximum: 2100
+            - id: city_region
+              label: Current city or region
+              helpText: Reference information only; it is not used for scoring.
+              type: TEXT
+              required: false
+              constraints:
+                maxLength: 160
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          minLength: 1
+          maxLength: 160
+        formVersion:
+          $ref: '#/components/schemas/FormVersion'
+    FormVersion:
+      type: object
+      additionalProperties: false
+      required: [id, version, title, publishedAt, questions]
+      properties:
+        id:
+          type: string
+          format: uuid
+        version:
+          type: integer
+          minimum: 1
+        title:
+          type: string
+          minLength: 1
+          maxLength: 160
+        description:
+          type: string
+          maxLength: 1000
+        publishedAt:
+          type: string
+          format: date-time
+        questions:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/FormQuestion'
+    FormQuestion:
+      type: object
+      additionalProperties: false
+      required: [id, label, type, required]
+      properties:
+        id:
+          type: string
+          pattern: '^[a-z][a-z0-9_]{0,63}$'
+          description: Stable within a form version and used as the answer key.
+        label:
+          type: string
+          minLength: 1
+          maxLength: 300
+        type:
+          type: string
+          enum: [TEXT, TEXTAREA, NUMBER, DATE, SINGLE_SELECT, MULTI_SELECT]
+        required:
+          type: boolean
+          description: Enforced during S5 submission, not partial S2 draft saves.
+        helpText:
+          type: string
+          maxLength: 1000
+        constraints:
+          $ref: '#/components/schemas/FormQuestionConstraints'
+        options:
+          type: array
+          minItems: 2
+          maxItems: 100
+          description: Required only for SINGLE_SELECT and MULTI_SELECT questions.
+          items:
+            $ref: '#/components/schemas/FormOption'
+    FormQuestionConstraints:
+      type: object
+      additionalProperties: false
+      description: |
+        Only constraints applicable to the question type are allowed. The server
+        validates range ordering and configured safety limits before publication.
+      properties:
+        minLength:
+          type: integer
+          minimum: 0
+        maxLength:
+          type: integer
+          minimum: 1
+        minimum:
+          type: number
+        maximum:
+          type: number
+        minDate:
+          type: string
+          format: date
+        maxDate:
+          type: string
+          format: date
+        minSelections:
+          type: integer
+          minimum: 0
+        maxSelections:
+          type: integer
+          minimum: 1
+    FormOption:
+      type: object
+      additionalProperties: false
+      required: [value, label]
+      properties:
+        value:
+          type: string
+          pattern: '^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,63}$'
+          description: Stable value stored in application answers.
+        label:
+          type: string
+          minLength: 1
+          maxLength: 200
+    CreateApplicationRequest:
+      type: object
+      additionalProperties: false
+      required: [cycleId]
+      properties:
+        cycleId:
+          type: string
+          format: uuid
+    ApplicationStatus:
+      type: string
+      enum: [DRAFT, SUBMITTED, PROCESSING, PROCESSING_FAILED, COMMISSION_REVIEW, DECIDED]
+    ApplicationDraft:
+      type: object
+      additionalProperties: false
+      required: [id, cycleId, formVersion, status, revision, answers, createdAt, updatedAt]
+      example:
+        id: 55555555-5555-4555-8555-555555555555
+        cycleId: 11111111-1111-4111-8111-111111111111
+        formVersion:
+          id: 22222222-2222-4222-8222-222222222222
+          version: 1
+          title: Synthetic applicant profile
+          description: Synthetic, non-scoring factual demo form; not official admissions methodology.
+          publishedAt: '2026-09-17T12:00:00Z'
+          questions:
+            - id: current_education_status
+              label: Current education status
+              type: SINGLE_SELECT
+              required: false
+              options:
+                - value: secondary_school
+                  label: Secondary school
+                - value: technical_vocational
+                  label: Technical or vocational college
+                - value: undergraduate
+                  label: Undergraduate programme
+                - value: graduate
+                  label: Graduate programme
+                - value: other
+                  label: Other
+            - id: intended_study_area
+              label: Intended study area or specialty
+              type: TEXT
+              required: false
+              constraints:
+                maxLength: 160
+            - id: expected_graduation_year
+              label: Expected graduation year
+              type: NUMBER
+              required: false
+              constraints:
+                minimum: 1900
+                maximum: 2100
+            - id: city_region
+              label: Current city or region
+              helpText: Reference information only; it is not used for scoring.
+              type: TEXT
+              required: false
+              constraints:
+                maxLength: 160
+        status: DRAFT
+        revision: 4
+        answers:
+          current_education_status: undergraduate
+          intended_study_area: Product management
+          expected_graduation_year: 2027
+          city_region: Almaty
+        createdAt: '2026-09-17T12:05:00Z'
+        updatedAt: '2026-09-17T12:10:00Z'
+      properties:
+        id:
+          type: string
+          format: uuid
+        cycleId:
+          type: string
+          format: uuid
+        formVersion:
+          $ref: '#/components/schemas/FormVersion'
+        status:
+          allOf:
+            - $ref: '#/components/schemas/ApplicationStatus'
+            - type: string
+              const: DRAFT
+          description: S2 application-draft operations return only DRAFT applications.
+        revision:
+          type: integer
+          minimum: 0
+        answers:
+          $ref: '#/components/schemas/DraftAnswers'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    StoredAnswerValue:
+      description: |
+        Stored shape selected by the bound question type: string for text, date,
+        or single-select; number for NUMBER; unique string array for MULTI_SELECT.
+        The server validates the value against the bound question definition.
+      oneOf:
+        - type: string
+        - type: number
+        - type: array
+          uniqueItems: true
+          items:
+            type: string
+    DraftAnswers:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/StoredAnswerValue'
+      description: Stored non-null values keyed by question ID.
+    DraftAnswerPatchValue:
+      description: A stored answer value, or null to remove the existing answer.
+      oneOf:
+        - $ref: '#/components/schemas/StoredAnswerValue'
+        - type: 'null'
+    DraftAnswerPatch:
+      type: object
+      minProperties: 1
+      additionalProperties:
+        $ref: '#/components/schemas/DraftAnswerPatchValue'
+    SaveAnswersRequest:
+      type: object
+      additionalProperties: false
+      required: [formVersionId, expectedRevision, answers]
+      properties:
+        formVersionId:
+          type: string
+          format: uuid
+          description: Must match the immutable form version bound to the draft.
+        expectedRevision:
+          type: integer
+          minimum: 0
+          description: Last server revision observed by the client.
+        answers:
+          $ref: '#/components/schemas/DraftAnswerPatch'
+    TestBlockId:
+      type: string
+      pattern: '^[a-z][a-z0-9_]{0,63}$'
+      description: Stable neutral block identifier; it must not encode a competency or weight.
+    TestStatementId:
+      type: string
+      pattern: '^[a-z][a-z0-9_]{0,63}$'
+      description: Stable neutral statement identifier; it must not encode a competency or weight.
+    TestVersionSummary:
+      type: object
+      additionalProperties: false
+      required: [id, version, title, publishedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        version:
+          type: integer
+          minimum: 1
+        title:
+          type: string
+          minLength: 1
+          maxLength: 160
+        description:
+          type: string
+          maxLength: 1000
+        publishedAt:
+          type: string
+          format: date-time
+      description: Public metadata only. Test blocks, competency mappings and weights are excluded.
+    TestAttemptStatus:
+      type: string
+      enum: [IN_PROGRESS, COMPLETED]
+    TestAttemptSummary:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - applicationId
+        - testVersion
+        - status
+        - totalBlocks
+        - answeredBlocks
+        - timedOutBlocks
+        - currentBlockNumber
+        - revision
+        - startedAt
+        - completedAt
+      example:
+        id: 77777777-7777-4777-8777-777777777777
+        applicationId: 55555555-5555-4555-8555-555555555555
+        testVersion:
+          id: 66666666-6666-4666-8666-666666666666
+          version: 1
+          title: Synthetic forced-choice demo
+          description: Synthetic prototype content; not validated admissions science.
+          publishedAt: '2026-09-21T00:00:00Z'
+        status: IN_PROGRESS
+        totalBlocks: 10
+        answeredBlocks: 0
+        timedOutBlocks: 0
+        currentBlockNumber: 1
+        revision: 0
+        startedAt: '2026-09-21T00:05:00Z'
+        completedAt: null
+      properties:
+        id:
+          type: string
+          format: uuid
+        applicationId:
+          type: string
+          format: uuid
+        testVersion:
+          $ref: '#/components/schemas/TestVersionSummary'
+        status:
+          $ref: '#/components/schemas/TestAttemptStatus'
+        totalBlocks:
+          type: integer
+          minimum: 1
+        answeredBlocks:
+          type: integer
+          minimum: 0
+        timedOutBlocks:
+          type: integer
+          minimum: 0
+          description: Factual timeout count; interpretation belongs to S6a.
+        currentBlockNumber:
+          description: One-based randomized position, or null when status is COMPLETED.
+          oneOf:
+            - type: integer
+              minimum: 1
+            - type: 'null'
+        revision:
+          type: integer
+          minimum: 0
+          description: |
+            Test-attempt revision only. It starts at zero and increments exactly
+            once per block that becomes ANSWERED or TIMED_OUT. It never reuses or
+            changes Application.revision.
+        startedAt:
+          type: string
+          format: date-time
+        completedAt:
+          description: Completion time, or null while status is IN_PROGRESS.
+          oneOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+    ForcedChoiceStatement:
+      type: object
+      additionalProperties: false
+      required: [id, text]
+      properties:
+        id:
+          $ref: '#/components/schemas/TestStatementId'
+        text:
+          type: string
+          minLength: 1
+          maxLength: 500
+    CurrentTestBlock:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - position
+        - prompt
+        - statements
+        - timeLimitSeconds
+        - startedAt
+        - expiresAt
+      properties:
+        id:
+          $ref: '#/components/schemas/TestBlockId'
+        position:
+          type: integer
+          minimum: 1
+          description: One-based position in this attempt's persisted randomized block order.
+        prompt:
+          type: string
+          minLength: 1
+          maxLength: 500
+        statements:
+          type: array
+          minItems: 4
+          maxItems: 4
+          description: Persisted randomized order for this attempt; private mappings are omitted.
+          items:
+            $ref: '#/components/schemas/ForcedChoiceStatement'
+        timeLimitSeconds:
+          type: integer
+          minimum: 10
+          maximum: 600
+        startedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+          description: Absolute server deadline; at or after this instant timeout wins.
+    CurrentTestBlockResponse:
+      type: object
+      additionalProperties: false
+      required: [attempt, currentBlock, serverTime, timedOutOnThisRequest]
+      example:
+        attempt:
+          id: 77777777-7777-4777-8777-777777777777
+          applicationId: 55555555-5555-4555-8555-555555555555
+          testVersion:
+            id: 66666666-6666-4666-8666-666666666666
+            version: 1
+            title: Synthetic forced-choice demo
+            description: Synthetic prototype content; not validated admissions science.
+            publishedAt: '2026-09-21T00:00:00Z'
+          status: IN_PROGRESS
+          totalBlocks: 10
+          answeredBlocks: 0
+          timedOutBlocks: 0
+          currentBlockNumber: 1
+          revision: 0
+          startedAt: '2026-09-21T00:05:00Z'
+          completedAt: null
+        currentBlock:
+          id: block_01
+          position: 1
+          prompt: When a group discussion becomes difficult, I...
+          statements:
+            - id: statement_01_a
+              text: Help participants hear one another even when views differ.
+            - id: statement_01_b
+              text: Wait for the disagreement to settle before becoming involved.
+            - id: statement_01_c
+              text: Bring the discussion back to the task that needs to be solved.
+            - id: statement_01_d
+              text: Make sure my own view is not lost in the discussion.
+          timeLimitSeconds: 45
+          startedAt: '2026-09-21T00:06:00Z'
+          expiresAt: '2026-09-21T00:06:45Z'
+        serverTime: '2026-09-21T00:06:00Z'
+        timedOutOnThisRequest: false
+      properties:
+        attempt:
+          $ref: '#/components/schemas/TestAttemptSummary'
+        currentBlock:
+          description: Active public block, or null after the attempt completes.
+          oneOf:
+            - $ref: '#/components/schemas/CurrentTestBlock'
+            - type: 'null'
+        serverTime:
+          type: string
+          format: date-time
+          description: Server clock sample used to render the countdown without trusting device time.
+        timedOutOnThisRequest:
+          type: boolean
+          description: True only when this call terminalized the prior active block as TIMED_OUT.
+    SubmitTestBlockRequest:
+      type: object
+      additionalProperties: false
+      required: [expectedRevision, mostStatementId, leastStatementId]
+      properties:
+        expectedRevision:
+          type: integer
+          minimum: 0
+          description: Last TestAttempt.revision observed by the client.
+        mostStatementId:
+          $ref: '#/components/schemas/TestStatementId'
+        leastStatementId:
+          $ref: '#/components/schemas/TestStatementId'
+    TestBlockOutcome:
+      type: string
+      enum: [ANSWERED, TIMED_OUT]
+    SubmitTestBlockResult:
+      type: object
+      additionalProperties: false
+      required: [blockId, outcome, resolvedAt]
+      properties:
+        blockId:
+          $ref: '#/components/schemas/TestBlockId'
+        outcome:
+          $ref: '#/components/schemas/TestBlockOutcome'
+        resolvedAt:
+          type: string
+          format: date-time
+      description: Terminal result only; selected statement IDs are not echoed.
+    SubmitTestBlockResponse:
+      type: object
+      additionalProperties: false
+      required: [attempt, result, serverTime]
+      example:
+        attempt:
+          id: 77777777-7777-4777-8777-777777777777
+          applicationId: 55555555-5555-4555-8555-555555555555
+          testVersion:
+            id: 66666666-6666-4666-8666-666666666666
+            version: 1
+            title: Synthetic forced-choice demo
+            description: Synthetic prototype content; not validated admissions science.
+            publishedAt: '2026-09-21T00:00:00Z'
+          status: IN_PROGRESS
+          totalBlocks: 10
+          answeredBlocks: 1
+          timedOutBlocks: 0
+          currentBlockNumber: 2
+          revision: 1
+          startedAt: '2026-09-21T00:05:00Z'
+          completedAt: null
+        result:
+          blockId: block_01
+          outcome: ANSWERED
+          resolvedAt: '2026-09-21T00:06:20Z'
+        serverTime: '2026-09-21T00:06:20Z'
+      properties:
+        attempt:
+          $ref: '#/components/schemas/TestAttemptSummary'
+        result:
+          $ref: '#/components/schemas/SubmitTestBlockResult'
+        serverTime:
+          type: string
+          format: date-time
