@@ -192,7 +192,15 @@ seed/candidates/c/  …the same files…
 seed/quality-history.json   interview questions and score history for M5
 ```
 
-Candidates A, B and C have fixed UUIDs so every part can refer to them. Their `profile` blocks are synthetic, and obviously so.
+Candidates A, B and C have fixed ids, so every part refers to the same person:
+
+| Candidate | `candidateId` |
+| --- | --- |
+| A | `00000000-0000-4000-8000-00000000000a` |
+| B | `00000000-0000-4000-8000-00000000000b` |
+| C | `00000000-0000-4000-8000-00000000000c` |
+
+Their `profile` blocks are synthetic, and obviously so.
 
 ### Cassettes — `fixtures/cassettes/`
 
