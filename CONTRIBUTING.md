@@ -31,6 +31,55 @@ Three people, three personal branches per slice, and a `main` that nobody touche
    ```
    Force-pushing your *own* branch is fine; force-pushing anything else is not.
 
+## Order of work
+
+Slices are done in priority order, and each of us works down our own column:
+
+| Slice | Web — Meiyrbek | API — Nauryzbek | ML — Beknur |
+| --- | --- | --- | --- |
+| 01 · F0 Foundation | #2 | #3 | #4 |
+| 02 · M2a Simulator, text | #5 | #6 | #7 |
+| 03 · M3 Judge | #8 | #9 | #10 |
+| 04 · M1 Brief | #11 | #12 | #13 |
+| 05 · M4 Interview draft | #14 | #15 | #16 |
+| 06 · M5 Quality Guard | #17 | #18 | #19 |
+| 07 · M2b Simulator, voice | #20 | #21 | #22 |
+| 08 · Demo | #23 | #24 | #25 |
+
+- **Within a slice the three parts run in parallel.** The API contract pull request comes first; everyone builds against it.
+- **Work ahead by one slice at most.** Waiting for a review on slice 02 is a good moment to start 03 — not 06.
+- **F0 (#2, #3, #4) is merged in the first two days**, before anything else: every later slice stands on it.
+- **A slice is finished when all three parts are in `main`** and the slice runs end to end. Then its milestone closes.
+
+## Merge every day
+
+A pull request is merged as soon as it is ready — never saved up for the end.
+
+Integration on the last day is how a project like this fails: three people build for a week on their own assumptions about each other's contracts, and on the final evening nothing fits. Merging daily keeps `main` runnable at every moment, so there is always a demo of whatever is done.
+
+That only works if pull requests are small. Aim for a few hundred changed lines at most, so a review takes minutes and happens the same day.
+
+## Issues
+
+There is one issue per slice per part, #2 to #25. The title says which: `02-M2a · API · simulations module…` — slice number, slice, part, the work.
+
+- **`Refs #N`** in a pull request that does part of an issue, such as the contract. **`Closes #N`** only in the pull request that finishes it: GitHub closes the issue automatically when that pull request is merged. Nobody closes issues by hand.
+- **The plan comes first.** `docs/PLAN.md` is the one source of truth. When the plan changes, the change goes into `docs/PLAN.md` through a pull request first, and the issues are edited to match after. Two documents that disagree are worse than one that is slightly out of date.
+- **Issues are never deleted.** One that is no longer needed is closed as *not planned*, with one line saying why. When slices move, check the "Depends on" lines in the issues that point at them.
+- **Offline, keep working in your branch.** Issues cannot be updated on the train; bring them up to date when the network is back.
+- **A bug found during integration gets its own issue**, labelled with the part it belongs to.
+
+## Who owns the shared files
+
+A few files are touched by everyone. Each has one owner; anyone else changes it only through a pull request that owner reviews.
+
+| File | Owner |
+| --- | --- |
+| Root `package.json`, `pnpm-workspace.yaml`, `.github/workflows/*` | Meiyrbek |
+| `docker-compose.yml`, `apps/api/prisma/schema.prisma` | Nauryzbek |
+| `services/ml/**`, `config/**` (rubric, models, scenarios, prompts), `seed/**`, `fixtures/**` | Beknur |
+| `docs/PLAN.md`, `README.md`, `CONTRIBUTING.md` | Meiyrbek |
+
 ## Commits
 
 Conventional Commits, in English, saying what changed and why: `feat: stream the character's reply while it is being synthesised`, `fix: refuse the draft before the interviewer's scores exist`. Not `update`, `changes` or `final`.
