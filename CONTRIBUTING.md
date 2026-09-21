@@ -59,6 +59,20 @@ Integration on the last day is how a project like this fails: three people build
 
 That only works if pull requests are small. Aim for a few hundred changed lines at most, so a review takes minutes and happens the same day.
 
+## Local verification
+
+CI runs lint, types, tests and the build. It does not start the stack, so anything that only breaks when the parts talk to each other reaches `main` unnoticed unless someone runs it.
+
+- **Before opening a pull request that touches the API, the database, Docker or an integration between parts**, run its tests and checks locally.
+- **If `docker-compose.yml` exists, bring the stack up, check it and bring it down:**
+  ```bash
+  docker compose up --build -d
+  docker compose ps          # every service up and healthy
+  # call each service's health endpoint and the endpoints you changed
+  docker compose down
+  ```
+- **Write the commands and their results in the pull request, under "How it was checked".** "Works on my machine" is not a result; `POST /v1/simulations → 201` is.
+
 ## Issues
 
 There is one issue per slice per part, #2 to #25. The title says which: `02-M2a · API · simulations module…` — slice number, slice, part, the work.
