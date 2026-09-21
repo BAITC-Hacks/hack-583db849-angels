@@ -78,7 +78,7 @@ The whole API budget is about $20.
 - **Default to `GATEWAY_MODE=replay`.** Tests, CI and routine development run on recorded responses in `fixtures/cassettes/`.
 - **Never make live calls in a loop, in tests or in CI.** Live calls happen only when a human asks for them, on a key with its own spending limit.
 - **Never commit `.env` or a key.** This repository is public, and push protection will refuse a key anyway.
-- Part of the team works offline on a train. Anything you build must run with `GATEWAY_MODE=replay` and no network.
+- Everything on the demo path must run with `GATEWAY_MODE=replay` and no network: the pitch cannot depend on the venue's Wi-Fi.
 
 ## Data
 

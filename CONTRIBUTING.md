@@ -66,7 +66,6 @@ There is one issue per slice per part, #2 to #25. The title says which: `02-M2a 
 - **`Refs #N`** in a pull request that does part of an issue, such as the contract. **`Closes #N`** only in the pull request that finishes it: GitHub closes the issue automatically when that pull request is merged. Nobody closes issues by hand.
 - **The plan comes first.** `docs/PLAN.md` is the one source of truth. When the plan changes, the change goes into `docs/PLAN.md` through a pull request first, and the issues are edited to match after. Two documents that disagree are worse than one that is slightly out of date.
 - **Issues are never deleted.** One that is no longer needed is closed as *not planned*, with one line saying why. When slices move, check the "Depends on" lines in the issues that point at them.
-- **Offline, keep working in your branch.** Issues cannot be updated on the train; bring them up to date when the network is back.
 - **A bug found during integration gets its own issue**, labelled with the part it belongs to.
 
 ## Who owns the shared files
