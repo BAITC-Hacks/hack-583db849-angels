@@ -50,7 +50,7 @@ Provider keys exist only in the ML service's environment. Neither `web` nor `api
 The API inVision calls, served by `api`.
 
 - **Base path** `/v1`. JSON in and out, field names in `camelCase`.
-- **Authentication.** Every request carries `X-API-Key`. The key maps to one role: `interviewer`, `commission` or `admin`. Missing or unknown key — `401`; known key, wrong role — `403`.
+- **Authentication.** Every request carries `X-API-Key`, except `GET /v1/health`. The key maps to one role: `platform`, `interviewer`, `commission` or `admin`. `platform` is the key inVision's own system uses for candidate-facing calls. Missing or unknown key — `401`; known key, wrong role — `403`.
 - **Idempotency.** Every creating `POST` accepts `Idempotency-Key`. The same key with the same body returns the resource created the first time, with its original status. The same key with a different body — `409` with code `IDEMPOTENCY_KEY_REUSED`. Keys are kept for 24 hours.
 - **Errors** always have one shape, and clients branch on `code`, never on `message`:
   ```json
@@ -61,18 +61,19 @@ The API inVision calls, served by `api`.
 
 ### Who may call what
 
-| Endpoint group | `interviewer` | `commission` | `admin` |
-| --- | --- | --- | --- |
-| M1 briefs | yes | yes | yes |
-| M2 simulations | yes | yes | yes |
-| M3 assessments — create, read scores | — | yes | yes |
-| M3 candidate feedback | yes | yes | yes |
-| M4 interviewer scores and draft | yes | read | yes |
-| M5 quality checks | — | yes | yes |
+| Endpoint group | `platform` | `interviewer` | `commission` | `admin` |
+| --- | --- | --- | --- | --- |
+| Candidates — create, list | yes | yes | yes | yes |
+| M1 briefs | — | yes | yes | yes |
+| M2 simulations | yes | yes | yes | yes |
+| M3 assessments — create, read scores | — | — | yes | yes |
+| M3 candidate feedback | yes | yes | yes | yes |
+| M4 interviews, interviewer scores, draft | — | yes | read | yes |
+| M5 quality checks | — | — | yes | yes |
 
-An interviewer never sees the AI's scores: they score blind, and M4 shows the draft only after their own scores are saved. The candidate-feedback endpoint never returns a score, whoever calls it: inVision relays it to the candidate.
+An interviewer never sees the AI's scores: they score blind, and M4 shows the draft only after their own scores are saved. `platform` can never read a score, a brief or a draft, so the candidate cannot reach one through inVision's system. The candidate-feedback endpoint never returns a score, whoever calls it: inVision relays it to the candidate.
 
-The endpoints themselves are listed in [`PLAN.md`](PLAN.md), section 4. Each slice adds its exact request and response schemas in its contract pull request.
+The endpoints, DTOs and error codes are in [`contracts/api.md`](contracts/api.md); the internal ML endpoints and models are in [`contracts/ml.md`](contracts/ml.md), with a JSON example of every call in [`contracts/examples/`](contracts/examples/). Each slice's contract pull request turns its part into code.
 
 ## 5. Internal ML API
 
@@ -81,6 +82,7 @@ Called only by `api`. Every request carries `X-Internal-Token: $ML_INTERNAL_TOKE
 | Endpoint | From slice | Purpose |
 | --- | --- | --- |
 | `GET /internal/v1/health` | F0 | liveness |
+| `GET /internal/v1/scenarios`, `/{scenarioId}` | M2a | the public part of a scenario |
 | `POST /internal/v1/simulation/turn` | F0 stub, M2a real | the character's next line for a candidate turn |
 | `POST /internal/v1/simulation/assessment` | F0 stub, M3 real | scores, English metrics, interview questions, candidate feedback |
 | `POST /internal/v1/brief` | F0 stub, M1 real | the interviewer brief |
@@ -152,6 +154,7 @@ In `ml`, the Pydantic model has no `profile` field and sets `extra="forbid"`: a 
 | `test_item` | a `test.answers[].itemId` |
 | `simulation_turn` | a `turnId` |
 | `interview_note` | an interview note id |
+| `interview_question` | a question the interviewer asked (M5) |
 
 ### `DriveScore`
 

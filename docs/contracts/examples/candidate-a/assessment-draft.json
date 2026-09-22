@@ -1,0 +1,70 @@
+{
+  "interviewId": "6f1c2a0e-0000-4000-8000-00000000a004",
+  "createdAt": "2026-09-26T10:40:02Z",
+  "scores": [
+    {
+      "competency": "D",
+      "score": 2,
+      "confidence": "medium",
+      "rationale": "Recovery is framed as cutting scope; the team itself does not come into it.",
+      "evidence": [
+        {
+          "source": "interview_note",
+          "sourceId": "note_4",
+          "quote": "We cut scope and move on."
+        }
+      ]
+    },
+    {
+      "competency": "R",
+      "score": 3,
+      "confidence": "medium",
+      "rationale": "Names a cost of their own rule and proposes a concrete limit for it.",
+      "evidence": [
+        {
+          "source": "interview_note",
+          "sourceId": "note_5",
+          "quote": "named slower merges and suggested a 24-hour review limit"
+        }
+      ]
+    },
+    {
+      "competency": "I",
+      "score": null,
+      "confidence": null,
+      "rationale": null,
+      "evidence": []
+    },
+    {
+      "competency": "V",
+      "score": 2,
+      "confidence": "low",
+      "rationale": "One story, where following the rule outweighs the person; fairness to the teammate is not raised.",
+      "evidence": [
+        {
+          "source": "interview_note",
+          "sourceId": "note_3",
+          "quote": "I felt bad, but rules are rules."
+        },
+        {
+          "source": "interview_note",
+          "sourceId": "note_2",
+          "quote": "Did not mention fairness to Dana."
+        }
+      ]
+    },
+    {
+      "competency": "E",
+      "score": 4,
+      "confidence": "high",
+      "rationale": "Restates a complete plan with owners and a checkpoint, unprompted.",
+      "evidence": [
+        {
+          "source": "interview_note",
+          "sourceId": "note_1",
+          "quote": "Candidate repeated the plan: owners, deadline, full run on Thursday."
+        }
+      ]
+    }
+  ]
+}
