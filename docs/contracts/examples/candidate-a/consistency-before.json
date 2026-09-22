@@ -1,0 +1,83 @@
+{
+  "candidateId": "00000000-0000-4000-8000-00000000000a",
+  "stage": "before",
+  "createdAt": "2026-09-25T08:00:00Z",
+  "items": [
+    {
+      "itemId": "c_01",
+      "topic": "english",
+      "claim": {
+        "text": "Rates their English as C2.",
+        "evidence": [
+          {
+            "source": "application_field",
+            "sourceId": "english_self",
+            "quote": "C2."
+          }
+        ]
+      },
+      "observation": {
+        "text": "The simulation’s speech measured B2; the certificate is IELTS 6.5 (B2).",
+        "evidence": [],
+        "metric": {
+          "name": "cefrEstimate",
+          "value": "B2",
+          "source": "simulation"
+        }
+      },
+      "status": "discrepancy",
+      "whatToDo": "Hold the first minutes of the interview in English on an unprepared topic, and ask inVision to check the certificate.",
+      "askInInterview": "In English and without preparing: tell me about the last thing you built and what went wrong."
+    },
+    {
+      "itemId": "c_02",
+      "topic": "other",
+      "claim": {
+        "text": "Says they ask everyone before deciding.",
+        "evidence": [
+          {
+            "source": "application_field",
+            "sourceId": "motivation",
+            "quote": "I always ask everyone's opinion before I decide anything."
+          }
+        ]
+      },
+      "observation": {
+        "text": "In the test they chose deciding quickly and explaining later.",
+        "evidence": [
+          {
+            "source": "test_item",
+            "sourceId": "block_03",
+            "quote": "I prefer to decide quickly and explain my reasons later."
+          }
+        ],
+        "metric": null
+      },
+      "status": "discrepancy",
+      "whatToDo": "Ask for a recent decision and exactly how it was made.",
+      "askInInterview": "Walk me through the last decision you made for a team. Who did you ask first?"
+    },
+    {
+      "itemId": "c_03",
+      "topic": "invision_knowledge",
+      "claim": {
+        "text": "Wants to study at inVision U.",
+        "evidence": [
+          {
+            "source": "application_field",
+            "sourceId": "motivation",
+            "quote": "inVision U is where I can learn to do this at a bigger scale."
+          }
+        ]
+      },
+      "observation": {
+        "text": "Nothing in the application or the simulation shows what they know about inVision U.",
+        "evidence": [],
+        "metric": null
+      },
+      "status": "unverified",
+      "whatToDo": "Check what they know about the programme and why this university.",
+      "askInInterview": "What do you know about how inVision U teaches, and which part of it made you apply?"
+    }
+  ]
+}

@@ -89,8 +89,9 @@ Called only by `api`. Every request carries `X-Internal-Token: $ML_INTERNAL_TOKE
 | `POST /internal/v1/simulation/turn` | F0 stub, M2a real | the character's next line for a candidate turn |
 | `POST /internal/v1/simulation/assessment` | F0 stub, M3 real | scores, English metrics, interview questions, candidate feedback |
 | `POST /internal/v1/brief` | F0 stub, M1 real | the interviewer brief |
-| `POST /internal/v1/transcribe` | M4, M2b, S | audio → turns by speaker; video never, audio track only |
-| `POST /internal/v1/speech` | M2b | the character's voice |
+| `POST /internal/v1/transcribe` | M2a, M4, S | audio → turns by speaker; video never, audio track only |
+| `POST /internal/v1/speech` | M2a | the character's voice |
+| `POST /internal/v1/consistency` | C | claimed against measured, before and after the interview |
 | `POST /internal/v1/surprise-question` | S | a question from the candidate's application |
 | `GET /internal/v1/usage` | admin | live and replayed calls, spend and cap |
 | `POST /internal/v1/interview/draft` | M4 | draft from the interview transcript |

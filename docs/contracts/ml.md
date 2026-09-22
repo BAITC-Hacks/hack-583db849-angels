@@ -18,13 +18,13 @@ What `api` sends to the ML service and what it expects back. It is derived from 
    - `seed/candidates/{a,b,c}/` in the layout of `docs/SPEC.md`, section 8. Candidate A's `snapshot.json` is in `examples/candidate-a/`; B and C follow `docs/PLAN.md`, section 6.
    - `config/rubric.drive.json`.
 3. **F0 — the gateway,** in `replay` by default.
-4. **M2 — the real `turn`:** the scenario engine, director and actor, `config/scenarios/conflict-resolution.json` first.
+4. **M2 — the real `turn`, by voice:** Deepgram transcription and voice through the gateway, the mini-ML matcher, the scenario engine and the actor, with the first scenario in `config/scenarios/`. Voice is the input now, so this is on the critical path.
 5. **M3 — the real `assessment`:** the judge, English metrics, candidate feedback.
 6. **M1 — the real `brief`.**
 7. **M4 — `transcribe` and `interview/draft`.** One transcription endpoint serves the interview (two speakers), the surprise answer and voice turns (one speaker).
 8. **Admin — `GET /internal/v1/usage`:** live and replayed calls and spend, from the gateway's cost log.
 9. **M5 — `quality-check`,** draft shapes in the examples.
-10. **M2b — `speech`** (the character's voice), and **S — `surprise-question`.**
+10. **M2b — scenarios 2–10**, each through the quality bench before it becomes `ready`; **C — `consistency`**; **S — `surprise-question`.**
 
 ## Endpoints
 
@@ -39,7 +39,8 @@ Every request carries `X-Internal-Token`. Responses are the result object itself
 | `POST` | `/internal/v1/simulation/assessment` | `AssessmentRequest` → `AssessmentResult` | `ml/simulation-assessment.*` |
 | `POST` | `/internal/v1/brief` | `BriefRequest` → `BriefResult` | `ml/brief.*` |
 | `POST` | `/internal/v1/transcribe` | `TranscribeRequest` → `TranscribeResult` | `ml/transcribe.*` |
-| `POST` | `/internal/v1/speech` | `SpeechRequest` → `audio/mpeg` (M2b) | |
+| `POST` | `/internal/v1/speech` | `SpeechRequest` → `audio/mpeg` | |
+| `POST` | `/internal/v1/consistency` | `ConsistencyRequest` → `ConsistencyResult` (C) | `ml/consistency-*.json` |
 | `POST` | `/internal/v1/surprise-question` | `SurpriseRequest` → `SurpriseResult` (S) | `ml/surprise-question.*` |
 | `GET` | `/internal/v1/usage` | → `Usage` | `ml/usage.response.json` |
 | `POST` | `/internal/v1/interview/draft` | `DraftRequest` → `DraftResult` | `ml/interview-draft.*` |
@@ -47,7 +48,15 @@ Every request carries `X-Internal-Token`. Responses are the result object itself
 
 **The opening line.** `api` calls `simulation/turn` with an empty `turns` list; you return the character's first line.
 
-**Who assigns what.** `api` assigns every `turnId` and stores the turns. You return only the character's text and the director's decision.
+**Who assigns what.** `api` assigns every `turnId` and stores the turns, and picks the scenario from `GET /internal/v1/scenarios` (only `ready` ones). You return only the character's text and the director's decision.
+
+**How a turn is decided — the mini-ML.** The turn's text is already transcribed. You:
+1. embed it with a local sentence-embedding model (for example `all-MiniLM-L6-v2`, baked into the image, $0);
+2. compare it with the example phrases of each answer type in the current beat of `config/scenarios/<id>.json`;
+3. take the best type above the scenario's `matchThreshold`, else the beat's `fallback`;
+4. move to that branch's next beat and let the actor (OpenAI) write the character's line for its `characterIntent`.
+
+The matched type, its similarity and the branch go into `DirectorDecision` — logged, never shown to the candidate. **The matcher only steers the story; it never scores.** Every branch lets the candidate show all five competencies.
 
 ## Rules the screens rely on
 
@@ -74,7 +83,9 @@ Each of these is visible on a screen, and a mistake here shows up in the demo.
 7. **English is separate.**
    - `EnglishMetrics` is computed by code;
    - grammar never moves a D.R.I.V.E. score;
-   - in `text` mode `wordsPerMinute` and `fillerRate` are `null` — there was no speech to measure.
+   - the simulation is spoken, so every measure exists; only an accommodated text simulation has `wordsPerMinute` and `fillerRate` as `null`.
+7a. **Consistency compares, it does not judge.** Each item pairs what the candidate claimed (with its quote) with what was observed (a quote or a measured value, such as `cefrEstimate: "B2"` from the simulation), gives a status and a recommendation for people. It never says anything about admitting anyone. `after` reads the interview transcript and is only requested once the interviewer's scores are saved.
+7b. **The brief covers three topics beyond D.R.I.V.E.:** what the candidate knows about inVision U, how good their English is, and whether the motivation is serious. At least one question per focus.
 8. **Every competency left at `null` gets a live-interview question** in `interviewQuestions`. The report's test expects it.
 9. **No personal data.**
    - `CandidateView` has no `profile` and forbids extra fields;
@@ -191,6 +202,49 @@ class Character(Strict):
     wants: str
 
 
+class AnswerType(Strict):
+    """One kind of answer the candidate may give in a beat, recognised by the mini-ML from its examples."""
+
+    answerTypeId: str
+    description: str
+    examples: Annotated[list[str], Field(min_length=3)]
+    next: str                              # the beat this branch leads to, or "end"
+    characterIntent: str                   # what the actor should do in this branch
+
+
+class Beat(Strict):
+    beatId: str
+    goal: str
+    competencies: list[Competency]
+    answerTypes: Annotated[list[AnswerType], Field(min_length=3, max_length=5)]
+    fallback: AnswerType                   # below the threshold
+    maxTurns: int
+
+
+class ScenarioConfig(Strict):
+    """config/scenarios/<id>.json. Only the public fields leave the service, as ScenarioBrief."""
+
+    scenarioId: str
+    status: Literal["draft", "ready"]      # ready only after the quality bench
+    title: str
+    situation: str
+    yourRole: str
+    goal: str
+    character: Character
+    hiddenMotive: str
+    voice: str
+    matchThreshold: Annotated[float, Field(ge=0, le=1)]
+    expectedMinutes: int
+    maxCandidateTurns: int
+    beats: Annotated[list[Beat], Field(min_length=5, max_length=7)]
+
+    @model_validator(mode="after")
+    def every_competency_can_show(self) -> "ScenarioConfig":
+        if {c for beat in self.beats for c in beat.competencies} != {"D", "R", "I", "V", "E"}:
+            raise ValueError("a scenario lets the candidate show all five competencies")
+        return self
+
+
 class ScenarioBrief(Strict):
     """The public part of a scenario. The hidden motive and the beats stay inside the service."""
 
@@ -202,6 +256,7 @@ class ScenarioBrief(Strict):
     character: Character
     expectedMinutes: int
     maxCandidateTurns: int
+    status: Literal["draft", "ready"]
 
 
 # ---- POST /internal/v1/simulation/turn
@@ -218,9 +273,13 @@ class TurnRequest(Strict):
 
 
 class DirectorDecision(Strict):
+    """Logged for audit, never shown to the candidate."""
+
     beat: str
+    matchedAnswerType: str                 # the fallback's id when nothing matched
+    similarity: Annotated[float, Field(ge=-1, le=1)] | None   # None for the opening line
     nextBeat: str
-    reason: str                            # logged for audit, never shown to the candidate
+    reason: str
 
 
 class TurnResult(Strict):
@@ -242,7 +301,7 @@ class TurnResult(Strict):
 class AssessmentRequest(Strict):
     candidateId: str
     scenarioId: str
-    mode: Literal["text", "voice"]
+    mode: Literal["voice", "text"]         # text only with an accommodation
     turns: list[Turn]
 
 
@@ -276,19 +335,47 @@ class AssessmentResult(Strict):
 
 class BriefRequest(Strict):
     candidate: CandidateView
+    simulationEnglish: EnglishMetrics | None = None     # once the simulation is assessed
+
+
+BriefFocus = Literal["D", "R", "I", "V", "E", "invision_knowledge", "english", "motivation"]
 
 
 class BriefQuestion(Strict):
-    competency: Competency
+    focus: BriefFocus
     question: str
     why: str
     evidence: list[Evidence]               # empty when the application is silent — that is why it is asked
 
 
-class BriefFlag(Strict):
-    title: str
-    ask: str
-    sources: Annotated[list[Evidence], Field(min_length=2, max_length=2)]
+ConsistencyTopic = Literal["english", "invision_knowledge", "motivation", "experience", "achievements", "other"]
+
+
+class Claim(Strict):
+    text: str
+    evidence: list[Evidence]
+
+
+class Metric(Strict):
+    name: Literal["wordsPerMinute", "fillerRate", "meanTurnLength", "lexicalDiversity", "grammarErrorsPer100Words", "cefrEstimate"]
+    value: str | float
+    source: Literal["simulation", "surprise", "interview"]
+
+
+class Observation(Strict):
+    text: str
+    evidence: list[Evidence]
+    metric: Metric | None
+
+
+class ConsistencyItem(Strict):
+    itemId: str
+    topic: ConsistencyTopic
+    claim: Claim
+    observation: Observation
+    status: Literal["consistent", "discrepancy", "unverified", "confirmed", "resolved"]
+    whatToDo: str                          # a recommendation for people, never a decision
+    askInInterview: str | None             # before the interview only
 
 
 class BriefTopic(Strict):
@@ -310,10 +397,18 @@ class BriefEnglish(Strict):
 
 class BriefResult(Strict):
     summary: str
-    questions: list[BriefQuestion]         # at least one per competency
-    flags: list[BriefFlag]
+    questions: list[BriefQuestion]         # at least one per focus
+    consistency: list[ConsistencyItem]     # the before stage
     clarify: list[BriefTopic]
     english: BriefEnglish
+
+    @field_validator("questions")
+    @classmethod
+    def every_focus_asked(cls, questions: list[BriefQuestion]) -> list[BriefQuestion]:
+        needed = {"D", "R", "I", "V", "E", "invision_knowledge", "english", "motivation"}
+        if not needed <= {q.focus for q in questions}:
+            raise ValueError("the brief asks at least one question per focus")
+        return questions
 
 
 # ---- POST /internal/v1/interview/draft
@@ -369,7 +464,21 @@ class DraftResult(Strict):
         return all_five(scores)
 
 
-# ---- POST /internal/v1/speech (M2b)
+# ---- POST /internal/v1/consistency (C)
+
+class ConsistencyRequest(Strict):
+    stage: Literal["before", "after"]
+    candidate: CandidateView
+    simulationEnglish: EnglishMetrics | None = None
+    simulationTurns: list[Turn] = []
+    interviewTranscript: list[InterviewTurn] = []   # after only; never the interviewer's scores
+
+
+class ConsistencyResult(Strict):
+    items: list[ConsistencyItem]
+
+
+# ---- POST /internal/v1/speech
 
 class SpeechRequest(Strict):
     text: str

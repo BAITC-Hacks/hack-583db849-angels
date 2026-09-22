@@ -38,12 +38,12 @@ Slices are done in priority order, and each of us works down our own column:
 | Slice | Web — Meiyrbek | API — Aibek | ML — Nauryzbek |
 | --- | --- | --- | --- |
 | 01 · F0 Foundation | #2 | #3 | #4 |
-| 02 · M2a Simulator, text | #5 | #6 | #7 |
+| 02 · M2a Simulator, voice | #5 | #6 | #7 |
 | 03 · M3 Judge | #8 | #9 | #10 |
 | 04 · M1 Brief | #11 | #12 | #13 |
 | 05 · M4 Interview draft | #14 | #15 | #16 |
 | 06 · M5 Quality Guard | #17 | #18 | #19 |
-| 07 · M2b Simulator, voice | #20 | #21 | #22 |
+| 07 · M2b Scenario pool (10 scenarios) | #20 | #21 | #22 |
 | 08 · Demo | #23 | #24 | #25 |
 
 - **Within a slice the three parts run in parallel.** The API contract pull request comes first; everyone builds against it.
