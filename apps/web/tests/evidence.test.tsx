@@ -50,7 +50,7 @@ describe('evidence components', () => {
   it('names every kind of source', () => {
     expect(sourceLabel({ kind: 'application_field', id: 'motivation' })).toBe('Application · motivation');
     expect(sourceLabel({ kind: 'test_item', id: 'block_03' })).toBe('Test · block_03');
-    expect(sourceLabel({ kind: 'interview_note', id: 'note_2' })).toBe('Interview note · note_2');
+    expect(sourceLabel({ kind: 'interview_note', id: 'note_2' })).toBe('Interview note 2');
   });
 
   it('keeps English apart from leadership and shows gaps as dashes', () => {
