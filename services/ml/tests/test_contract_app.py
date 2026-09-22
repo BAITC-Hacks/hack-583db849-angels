@@ -26,6 +26,8 @@ def test_f0_openapi_exposes_the_routes_used_by_the_api_adapter() -> None:
 
     assert {
         "/internal/v1/health",
+        "/internal/v1/scenarios",
+        "/internal/v1/scenarios/{scenarioId}",
         "/internal/v1/simulation/turn",
         "/internal/v1/simulation/assessment",
         "/internal/v1/brief",
