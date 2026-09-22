@@ -40,6 +40,7 @@ export type DemoEventCode =
   | 'transcript-ready'
   | 'scores-saved'
   | 'draft-ready'
+  | 'accommodation-changed'
   | 'demo-reset';
 
 export interface DemoEvent {
@@ -49,8 +50,19 @@ export interface DemoEvent {
   candidate: CandidateCode | null;
 }
 
+/**
+ * Typing instead of speaking, switched on by staff for one candidate — no
+ * microphone, or a speech difficulty. It is recorded with a reason, shows up
+ * in the report, and changes nothing about how the conversation is read.
+ */
+export interface Accommodation {
+  textMode: boolean;
+  reason: string;
+}
+
 export interface World {
   candidates: Record<CandidateCode, CandidateProgress>;
+  accommodations: Record<CandidateCode, Accommodation>;
   events: DemoEvent[];
 }
 
@@ -74,8 +86,14 @@ function fresh(code: CandidateCode): CandidateProgress {
   };
 }
 
+const noAccommodation: Accommodation = { textMode: false, reason: '' };
+
 function initial(): World {
-  return { candidates: { A: fresh('A'), B: fresh('B'), C: fresh('C') }, events: [] };
+  return {
+    candidates: { A: fresh('A'), B: fresh('B'), C: fresh('C') },
+    accommodations: { A: noAccommodation, B: noAccommodation, C: noAccommodation },
+    events: [],
+  };
 }
 
 let world: World = initial();
@@ -112,6 +130,17 @@ export function record(code: DemoEventCode, candidate: CandidateCode | null, pat
   }
   world = { ...world, events: [{ id: nextEvent++, at: new Date().toISOString(), code, candidate }, ...world.events].slice(0, 50) };
   emit();
+}
+
+/**
+ * Staff switch typing on or off for a candidate. The server refuses this once
+ * the simulation has started (`409 SIMULATION_STARTED`), and so does this.
+ */
+export function setTextMode(candidate: CandidateCode, textMode: boolean, reason: string): boolean {
+  if (world.candidates[candidate].simulation !== 'not-started') return false;
+  world = { ...world, accommodations: { ...world.accommodations, [candidate]: { textMode, reason } } };
+  record('accommodation-changed', candidate);
+  return true;
 }
 
 /** Screens that keep their own session state (the simulation, the interview) drop it on reset. */

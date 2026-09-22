@@ -5,8 +5,10 @@ import { useState } from 'react';
 import { MAX_TURN_LENGTH } from '../../lib/simulation/previewDriver';
 
 /**
- * Where the candidate types a turn. Enter sends, Shift+Enter starts a new line.
- * Typing stays possible while the character replies; sending waits for them.
+ * Typing a turn, which happens only when staff switched it on for this
+ * candidate — no microphone, or a speech difficulty. Everything else is the
+ * same, including the rule that pasting is refused: a prepared answer says
+ * nothing about how someone leads.
  */
 export function Composer({
   disabled,
@@ -38,6 +40,8 @@ export function Composer({
       <textarea
         id="turn"
         rows={3}
+        onPaste={(event) => event.preventDefault()}
+        onDrop={(event) => event.preventDefault()}
         value={text}
         disabled={disabled}
         maxLength={MAX_TURN_LENGTH}
@@ -53,7 +57,7 @@ export function Composer({
       />
       <div className="flex items-center justify-between gap-3">
         <span className="font-mono text-[0.6rem] tabular-nums text-text-muted">
-          {text.length}/{MAX_TURN_LENGTH} · Enter to send, Shift+Enter for a new line
+          {text.length}/{MAX_TURN_LENGTH} · Enter to send · pasting is off · typing is on for you by request
         </span>
         <button
           type="submit"
