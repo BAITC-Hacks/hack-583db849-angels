@@ -1,8 +1,9 @@
 import pytest
-from fastapi import HTTPException
 from pydantic import ValidationError
 
-from services.ml.app.main import build_app, require_internal_token
+from services.ml.app.auth import require_internal_token
+from services.ml.app.errors import ServiceError
+from services.ml.app.main import build_app
 from services.ml.app.schemas.contracts import CandidateView
 
 
@@ -11,11 +12,11 @@ def test_internal_token_is_required(monkeypatch: pytest.MonkeyPatch) -> None:
 
     require_internal_token("test-internal-token", "test-internal-token")
 
-    with pytest.raises(HTTPException) as missing:
+    with pytest.raises(ServiceError) as missing:
         require_internal_token(None, "test-internal-token")
     assert missing.value.status_code == 401
 
-    with pytest.raises(HTTPException) as unknown:
+    with pytest.raises(ServiceError) as unknown:
         require_internal_token("wrong-token", "test-internal-token")
     assert unknown.value.status_code == 401
 
@@ -29,6 +30,15 @@ def test_f0_openapi_exposes_the_routes_used_by_the_api_adapter() -> None:
         "/internal/v1/simulation/assessment",
         "/internal/v1/brief",
     }.issubset(paths)
+
+
+def test_openapi_marks_only_non_health_routes_as_protected() -> None:
+    paths = build_app().openapi()["paths"]
+
+    assert "security" not in paths["/internal/v1/health"]["get"]
+    assert paths["/internal/v1/simulation/turn"]["post"]["security"] == [
+        {"APIKeyHeader": []}
+    ]
 
 
 def test_candidate_view_rejects_profile_fields() -> None:
