@@ -7,7 +7,7 @@ import { sampleScores } from '../../lib/interview/preview';
 import type { Interview } from '../../lib/interview/useInterview';
 import { Button } from '../ui/Button';
 import { DraftComparison } from './DraftComparison';
-import { InterviewNotes } from './InterviewNotes';
+import { InterviewTranscript } from './InterviewTranscript';
 import { LockedDraft } from './LockedDraft';
 import { ScoreInput } from './ScoreInput';
 
@@ -25,8 +25,9 @@ const copy = {
     save: 'Save my scores',
     saved: 'Saved. Your scores are now fixed, so the comparison stays honest.',
     draftTitle: 'AI draft and differences',
-    draftLede: 'Built from your interview notes. It proposes; you and the commission decide.',
+    draftLede: 'Written from the interview transcript. It proposes; you and the commission decide.',
     loading: 'Loading the draft…',
+    waiting: 'Your scores are saved. The draft is written as soon as the interview transcript is ready.',
   },
   ru: {
     preview: 'Превью · заготовленный черновик — настоящий появится в M4',
@@ -41,8 +42,9 @@ const copy = {
     save: 'Сохранить мои баллы',
     saved: 'Сохранено. Баллы зафиксированы, чтобы сравнение оставалось честным.',
     draftTitle: 'Черновик ИИ и расхождения',
-    draftLede: 'Собран по вашим заметкам интервью. Он предлагает — решаете вы и комиссия.',
+    draftLede: 'Написан по расшифровке интервью. Он предлагает — решаете вы и комиссия.',
     loading: 'Загружаем черновик…',
+    waiting: 'Баллы сохранены. Черновик появится, как только будет готова расшифровка интервью.',
   },
 };
 
@@ -54,7 +56,7 @@ const copy = {
 export function InterviewScreen({ state }: { state: Interview }) {
   const { locale } = useStaffLocale();
   const text = copy[locale];
-  const { interview, phase, scores, complete, draft, error, preview } = state;
+  const { interview, phase, scores, complete, draft, error, preview, transcript, transcriptState, waitingForTranscript } = state;
   const done = competencyOrder.filter((competency) => scores[competency] !== undefined).length;
   const held = new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short', timeZone: 'UTC' }).format(
     new Date(interview.heldAt),
@@ -154,6 +156,10 @@ export function InterviewScreen({ state }: { state: Interview }) {
                 <LockedDraft />
               ) : draft ? (
                 <DraftComparison yours={scores} draft={draft} />
+              ) : waitingForTranscript ? (
+                <p className="rounded-panel border border-dashed border-border-strong bg-bg-elevated px-5 py-6 text-sm text-text-secondary">
+                  {text.waiting}
+                </p>
               ) : (
                 <p className="text-sm text-text-muted">{text.loading}</p>
               )}
@@ -161,7 +167,12 @@ export function InterviewScreen({ state }: { state: Interview }) {
           </div>
 
           <div className="lg:sticky lg:top-6">
-            <InterviewNotes notes={interview.notes} />
+            <InterviewTranscript
+              transcript={transcript}
+              state={transcriptState}
+              onRecorded={() => void state.transcribe()}
+              preview={preview}
+            />
           </div>
         </div>
       </main>
