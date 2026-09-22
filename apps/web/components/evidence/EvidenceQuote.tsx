@@ -55,12 +55,12 @@ export function EvidenceQuote({ quote, source, href }: { quote: string; source: 
   return (
     <figure className="flex flex-col gap-1.5 border-l-2 border-status-evidence py-0.5 pl-3">
       <blockquote lang="en" className="text-sm text-text-primary">“{quote}”</blockquote>
-      <figcaption className="flex items-center gap-3">
+      <figcaption className="flex flex-wrap items-center gap-x-3 gap-y-1">
         <span className="font-mono text-[0.62rem] tracking-wide text-status-evidence uppercase">{sourceLabel(source, locale)}</span>
         {target ? (
           <a
             href={target}
-            className="inline-flex items-center gap-1 text-[0.75rem] font-medium text-text-secondary hover:text-text-primary hover:underline"
+            className="inline-flex items-center gap-1 whitespace-nowrap text-[0.75rem] font-medium text-text-secondary hover:text-text-primary hover:underline"
           >
             <ArrowUturnLeftIcon aria-hidden="true" className="h-3 w-3" />
             {contextLink[locale]}
