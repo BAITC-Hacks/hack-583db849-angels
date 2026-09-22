@@ -31,7 +31,7 @@ describe('staff screens in Russian', () => {
     render(
       <Sidebar role="interviewer" onRoleChange={noop} locale="ru" onLocaleChange={noop} collapsed={false} />,
     );
-    expect(screen.getByText('Кандидаты')).toBeTruthy();
+    expect(screen.getByText('Мои интервью')).toBeTruthy();
     expect(screen.getByRole('radiogroup', { name: 'Язык интерфейса' })).toBeTruthy();
     expect(screen.queryByText('Отчёты симуляций')).toBeNull();
   });
@@ -41,6 +41,6 @@ describe('staff screens in Russian', () => {
     expect(screen.getByText('My simulation')).toBeTruthy();
     expect(screen.getByText('Workspace')).toBeTruthy();
     expect(screen.queryByRole('radiogroup')).toBeNull();
-    expect(screen.queryByText('Кандидаты')).toBeNull();
+    expect(screen.queryByText('Мои интервью')).toBeNull();
   });
 });

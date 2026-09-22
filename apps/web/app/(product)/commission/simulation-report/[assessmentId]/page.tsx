@@ -2,6 +2,7 @@ import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { CompetencyScore } from '../../../../../components/evidence/CompetencyScore';
+import { AssessmentGate } from '../../../../../components/home/AssessmentGate';
 import { EnglishMetricsPanel } from '../../../../../components/evidence/EnglishMetricsPanel';
 import { DriveOverview } from '../../../../../components/report/DriveOverview';
 import { InterviewQuestions } from '../../../../../components/report/InterviewQuestions';
@@ -73,7 +74,7 @@ export default async function SimulationReportPage({ params }: { params: Promise
   ];
 
   return (
-    <>
+    <AssessmentGate audience="staff">
       <p className="border-b border-border-subtle bg-bg-elevated px-5 py-1.5 text-center font-mono text-[0.6rem] tracking-[0.12em] text-text-muted uppercase">
         {text.preview}
       </p>
@@ -131,6 +132,6 @@ export default async function SimulationReportPage({ params }: { params: Promise
           </div>
         </div>
       </main>
-    </>
+    </AssessmentGate>
   );
 }

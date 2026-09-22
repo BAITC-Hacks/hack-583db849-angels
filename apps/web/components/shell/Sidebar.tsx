@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { StaffLocale } from '../../lib/i18n/staffLocale';
 import { isActive, navFor, sectionLabel, type NavItem, type NavSection } from '../../lib/navigation';
+import { homeFor } from '../../lib/demo/world';
 import { isStaff, type DemoRole } from '../../lib/roles';
 import { ThemeToggle } from '../ui/ThemeToggle';
 import { LanguageSwitch } from './LanguageSwitch';
@@ -117,7 +118,7 @@ export function Sidebar({
   return (
     <div className={`flex h-full flex-col gap-5 ${collapsed ? 'px-2.5 py-4' : 'px-3.5 py-4'}`}>
       <Link
-        href="/demo/candidates"
+        href={homeFor[role]}
         onClick={onNavigate}
         className={`flex items-center gap-2.5 rounded-control focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-ink ${
           collapsed ? 'justify-center' : 'px-1'

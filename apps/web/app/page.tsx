@@ -1,6 +1,24 @@
-import { redirect } from 'next/navigation';
+'use client';
 
-/** The demo starts with choosing a candidate. */
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import { homeFor } from '../lib/demo/world';
+import { demoRoles, type DemoRole } from '../lib/roles';
+
+/** Each role starts on its own home. */
 export default function Home() {
-  redirect('/demo/candidates');
+  const router = useRouter();
+
+  useEffect(() => {
+    let role: DemoRole = 'interviewer';
+    try {
+      const stored = localStorage.getItem('invision-demo-role');
+      if (demoRoles.includes(stored as DemoRole)) role = stored as DemoRole;
+    } catch {
+      // Blocked storage keeps the default role.
+    }
+    router.replace(homeFor[role]);
+  }, [router]);
+
+  return null;
 }

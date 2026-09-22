@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { BriefClarify, BriefEnglish, BriefFlags, BriefQuestions } from '../../../../../components/brief/BriefSections';
 import { SourcesPanel } from '../../../../../components/brief/SourcesPanel';
+import { MarkBriefViewed } from '../../../../../components/home/MarkBriefViewed';
 import { getBrief } from '../../../../../lib/brief/preview';
 import { getStaffLocale } from '../../../../../lib/i18n/server';
 
@@ -38,6 +39,7 @@ export default async function BriefPage({ params }: { params: Promise<{ candidat
 
   return (
     <>
+      <MarkBriefViewed />
       <p className="border-b border-border-subtle bg-bg-elevated px-5 py-1.5 text-center font-mono text-[0.6rem] tracking-[0.12em] text-text-muted uppercase">
         {text.preview}
       </p>
