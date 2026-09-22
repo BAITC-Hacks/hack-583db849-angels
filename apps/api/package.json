@@ -3,12 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "pnpm generate:ml-types",
     "dev": "nest start --watch",
     "start": "node dist/main.js",
+    "prelint": "pnpm generate:ml-types",
     "lint": "eslint \"{src,test}/**/*.ts\"",
+    "pretypecheck": "pnpm generate:ml-types",
     "typecheck": "tsc --noEmit",
+    "prebuild": "pnpm generate:ml-types",
     "build": "nest build",
+    "pretest": "pnpm generate:ml-types",
     "test": "jest --runInBand",
+    "pretest:watch": "pnpm generate:ml-types",
     "test:watch": "jest --watch",
     "generate:openapi": "ts-node src/openapi.ts",
     "generate:ml-types": "openapi-typescript ../../services/ml/openapi.json -o src/ai-client/schema.d.ts"

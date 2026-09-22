@@ -6,6 +6,7 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/api/package.json apps/api/package.json
 RUN pnpm install --frozen-lockfile --filter @invision/api...
 COPY apps/api apps/api
+COPY services/ml/openapi.json services/ml/openapi.json
 RUN pnpm --filter @invision/api exec prisma generate
 RUN pnpm --filter @invision/api build
 

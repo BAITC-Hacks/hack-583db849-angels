@@ -214,8 +214,8 @@
           "mode": {
             "type": "string",
             "enum": [
-              "text",
-              "voice"
+              "voice",
+              "text"
             ],
             "title": "Mode"
           },
@@ -300,47 +300,21 @@
         ],
         "title": "BriefEnglish"
       },
-      "BriefFlag": {
-        "properties": {
-          "title": {
-            "type": "string",
-            "title": "Title"
-          },
-          "ask": {
-            "type": "string",
-            "title": "Ask"
-          },
-          "sources": {
-            "items": {
-              "$ref": "#/components/schemas/Evidence"
-            },
-            "type": "array",
-            "maxItems": 2,
-            "minItems": 2,
-            "title": "Sources"
-          }
-        },
-        "additionalProperties": false,
-        "type": "object",
-        "required": [
-          "title",
-          "ask",
-          "sources"
-        ],
-        "title": "BriefFlag"
-      },
       "BriefQuestion": {
         "properties": {
-          "competency": {
+          "focus": {
             "type": "string",
             "enum": [
               "D",
               "R",
               "I",
               "V",
-              "E"
+              "E",
+              "invision_knowledge",
+              "english",
+              "motivation"
             ],
-            "title": "Competency"
+            "title": "Focus"
           },
           "question": {
             "type": "string",
@@ -361,7 +335,7 @@
         "additionalProperties": false,
         "type": "object",
         "required": [
-          "competency",
+          "focus",
           "question",
           "why",
           "evidence"
@@ -372,6 +346,16 @@
         "properties": {
           "candidate": {
             "$ref": "#/components/schemas/CandidateView"
+          },
+          "simulationEnglish": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EnglishMetrics"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "additionalProperties": false,
@@ -394,12 +378,12 @@
             "type": "array",
             "title": "Questions"
           },
-          "flags": {
+          "consistency": {
             "items": {
-              "$ref": "#/components/schemas/BriefFlag"
+              "$ref": "#/components/schemas/ConsistencyItem"
             },
             "type": "array",
-            "title": "Flags"
+            "title": "Consistency"
           },
           "clarify": {
             "items": {
@@ -417,7 +401,7 @@
         "required": [
           "summary",
           "questions",
-          "flags",
+          "consistency",
           "clarify",
           "english"
         ],
@@ -535,11 +519,114 @@
         ],
         "title": "CertificateLevel"
       },
+      "Claim": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/Evidence"
+            },
+            "type": "array",
+            "title": "Evidence"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "text",
+          "evidence"
+        ],
+        "title": "Claim"
+      },
+      "ConsistencyItem": {
+        "properties": {
+          "itemId": {
+            "type": "string",
+            "title": "Itemid"
+          },
+          "topic": {
+            "type": "string",
+            "enum": [
+              "english",
+              "invision_knowledge",
+              "motivation",
+              "experience",
+              "achievements",
+              "other"
+            ],
+            "title": "Topic"
+          },
+          "claim": {
+            "$ref": "#/components/schemas/Claim"
+          },
+          "observation": {
+            "$ref": "#/components/schemas/Observation"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "consistent",
+              "discrepancy",
+              "unverified",
+              "confirmed",
+              "resolved"
+            ],
+            "title": "Status"
+          },
+          "whatToDo": {
+            "type": "string",
+            "title": "Whattodo"
+          },
+          "askInInterview": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Askininterview"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "itemId",
+          "topic",
+          "claim",
+          "observation",
+          "status",
+          "whatToDo",
+          "askInInterview"
+        ],
+        "title": "ConsistencyItem"
+      },
       "DirectorDecision": {
         "properties": {
           "beat": {
             "type": "string",
             "title": "Beat"
+          },
+          "matchedAnswerType": {
+            "type": "string",
+            "title": "Matchedanswertype"
+          },
+          "similarity": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 1.0,
+                "minimum": -1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Similarity"
           },
           "nextBeat": {
             "type": "string",
@@ -554,10 +641,13 @@
         "type": "object",
         "required": [
           "beat",
+          "matchedAnswerType",
+          "similarity",
           "nextBeat",
           "reason"
         ],
-        "title": "DirectorDecision"
+        "title": "DirectorDecision",
+        "description": "Logged for audit, never shown to the candidate."
       },
       "DriveScore": {
         "properties": {
@@ -821,6 +911,83 @@
           "reason"
         ],
         "title": "InterviewQuestion"
+      },
+      "Metric": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": [
+              "wordsPerMinute",
+              "fillerRate",
+              "meanTurnLength",
+              "lexicalDiversity",
+              "grammarErrorsPer100Words",
+              "cefrEstimate"
+            ],
+            "title": "Name"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Value"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "simulation",
+              "surprise",
+              "interview"
+            ],
+            "title": "Source"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name",
+          "value",
+          "source"
+        ],
+        "title": "Metric"
+      },
+      "Observation": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/Evidence"
+            },
+            "type": "array",
+            "title": "Evidence"
+          },
+          "metric": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Metric"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "text",
+          "evidence",
+          "metric"
+        ],
+        "title": "Observation"
       },
       "TestAnswer": {
         "properties": {

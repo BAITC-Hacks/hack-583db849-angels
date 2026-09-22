@@ -5,7 +5,7 @@ import { MlHttpAdapter } from '../src/ai-client/ml-http.adapter';
 describe('MlHttpAdapter', () => {
   it('uses generated request types and sends the internal token', async () => {
     const fetchImplementation = jest.fn().mockResolvedValue(
-      new Response(JSON.stringify({ summary: '', questions: [], flags: [], clarify: [], english: { certificate: null, writtenCefr: '', basis: '' } }), {
+      new Response(JSON.stringify({ summary: '', questions: [], consistency: [], clarify: [], english: { certificate: null, writtenCefr: '', basis: '' } }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
       }),
