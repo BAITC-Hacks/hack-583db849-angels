@@ -20,6 +20,7 @@ const events: Record<StaffLocale, Record<DemoEventCode, string>> = {
     'transcript-ready': 'Interview transcript is ready',
     'scores-saved': 'Interviewer saved blind scores',
     'draft-ready': 'AI draft opened for the interviewer',
+    'accommodation-changed': 'Staff changed how a candidate answers',
     'demo-reset': 'Demo reset',
   },
   ru: {
@@ -32,6 +33,7 @@ const events: Record<StaffLocale, Record<DemoEventCode, string>> = {
     'transcript-ready': 'Расшифровка интервью готова',
     'scores-saved': 'Интервьюер сохранил баллы вслепую',
     'draft-ready': 'Черновик ИИ открыт интервьюеру',
+    'accommodation-changed': 'Сотрудник изменил способ ответа кандидата',
     'demo-reset': 'Демо сброшено',
   },
 };

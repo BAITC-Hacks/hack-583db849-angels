@@ -30,3 +30,19 @@ export const previewLines: string[] = [
   "Alright. If we write down who owns what, I'm in. But you tell Timur, not me. I don't want another argument tonight.",
   "Okay. Let's try it your way. And thanks for actually listening.",
 ];
+
+/**
+ * What the recogniser "hears" on the preview, in order.
+ *
+ * On the preview nothing is really transcribed: the candidate records a turn,
+ * and the screen shows the scripted line the report and the judge examples are
+ * written against, so the whole demo tells one story. The real transcript
+ * comes back from `POST /v1/simulations/:id/turns` (#6).
+ */
+export const previewCandidateLines: string[] = [
+  "Okay, let's fix this fast. The demo is in three days, so we can't lose you now. Send me the list of what Timur changed and I'll look at it tonight.",
+  "From now on nobody merges into someone else's module without a review from its owner. I'll set that rule in the repo today.",
+  "We keep your version for the demo because it works. Timur moves his changes to a separate branch and we look at them after Thursday. If his login fix is really needed, the risk is that we demo with a known bug, so I'll ask him to patch only that.",
+  'Today you finish the payment endpoint, Timur fixes the login in his branch, and I write the demo script. We freeze the backend by Thursday noon and do a full run at six.',
+  "Deal. I'll put the owners in the team chat in ten minutes and call Timur right after. If the Thursday run fails, we cut the analytics screen instead of working all night.",
+];
