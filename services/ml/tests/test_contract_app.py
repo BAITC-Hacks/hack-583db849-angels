@@ -31,6 +31,11 @@ def test_f0_openapi_exposes_the_routes_used_by_the_api_adapter() -> None:
         "/internal/v1/simulation/turn",
         "/internal/v1/simulation/assessment",
         "/internal/v1/brief",
+        "/internal/v1/transcribe",
+        "/internal/v1/consistency",
+        "/internal/v1/surprise-question",
+        "/internal/v1/usage",
+        "/internal/v1/interview/draft",
     }.issubset(paths)
 
 
