@@ -1,4 +1,4 @@
-# Public API contract — for Nauryzbek (`apps/api`)
+# Public API contract — for Aibek (`apps/api`)
 
 These are the exact endpoints the web screens call. They are derived from the screens that already run on scripted previews, so the shapes are known to fit:
 
