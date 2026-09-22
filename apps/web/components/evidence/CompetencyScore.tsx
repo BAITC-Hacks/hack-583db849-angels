@@ -11,6 +11,8 @@ export interface CompetencyScoreProps {
   confidence?: Confidence;
   rationale?: string;
   evidence: { quote: string; source: EvidenceSource; href?: string }[];
+  /** Anchor id, so an overview can link to this card. */
+  id?: string;
 }
 
 /**
@@ -25,14 +27,17 @@ const noEvidence = {
   ru: 'Для оценки не хватает проверенных доказательств. Это вопрос для живого интервью, а не низкая оценка.',
 };
 
-export function CompetencyScore({ competency, score, confidence, rationale, evidence }: CompetencyScoreProps) {
+export function CompetencyScore({ competency, score, confidence, rationale, evidence, id }: CompetencyScoreProps) {
   const { locale } = useStaffLocale();
   const { name, looksFor } = competencies[competency];
   const supported = score !== null && evidence.length > 0;
   const shown: Score = supported ? score : null;
 
   return (
-    <article className="@container flex flex-col gap-3 rounded-panel border border-border-subtle bg-bg-surface p-5">
+    <article
+      id={id}
+      className="@container flex scroll-mt-6 flex-col gap-3 rounded-panel border border-border-subtle bg-bg-surface p-5"
+    >
       {/* Laid out by the card's own width, so it also fits a narrow side column. */}
       <header className="flex flex-col gap-3 @lg:flex-row @lg:items-start @lg:justify-between">
         <div className="flex min-w-0 items-start gap-3">
