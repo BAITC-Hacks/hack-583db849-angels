@@ -1,6 +1,8 @@
 """Export the agreed F0 ML contract without duplicating its Pydantic models."""
 
 import json
+import hmac
+import os
 import re
 from pathlib import Path
 from typing import Any
@@ -34,8 +36,9 @@ internal_token = APIKeyHeader(name="X-Internal-Token", auto_error=False)
 
 
 def require_internal_token(token: str | None = Depends(internal_token)) -> None:
-    if token is None:
-        raise HTTPException(status_code=401, detail="Missing X-Internal-Token")
+    expected = os.environ.get("ML_INTERNAL_TOKEN")
+    if token is None or expected is None or not hmac.compare_digest(token, expected):
+        raise HTTPException(status_code=401, detail="Missing or unknown X-Internal-Token")
 
 
 def add_post(app: FastAPI, path: str, request_model: type[Any], response_model: type[Any]) -> None:
