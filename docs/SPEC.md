@@ -63,13 +63,16 @@ The API inVision calls, served by `api`.
 
 | Endpoint group | `platform` | `interviewer` | `commission` | `admin` |
 | --- | --- | --- | --- | --- |
-| Candidates — create, list | yes | yes | yes | yes |
+| Candidates — create, list, progress (filtered by role) | yes | yes | yes | yes |
 | M1 briefs | — | yes | yes | yes |
 | M2 simulations | yes | yes | yes | yes |
-| M3 assessments — create, read scores | — | — | yes | yes |
+| M3 assessments — read scores | — | — | yes | yes |
 | M3 candidate feedback | yes | yes | yes | yes |
-| M4 interviews, interviewer scores, draft | — | yes | read | yes |
+| M4 interviews, recording, interviewer scores, draft | — | yes | read | yes |
 | M5 quality checks | — | — | yes | yes |
+| S surprise question — create, start, answer | yes | — | — | yes |
+| S surprise answer — transcript and video | — | yes | yes | yes |
+| Admin overview, audit events, demo reset | — | — | — | yes |
 
 An interviewer never sees the AI's scores: they score blind, and M4 shows the draft only after their own scores are saved. `platform` can never read a score, a brief or a draft, so the candidate cannot reach one through inVision's system. The candidate-feedback endpoint never returns a score, whoever calls it: inVision relays it to the candidate.
 
@@ -86,7 +89,10 @@ Called only by `api`. Every request carries `X-Internal-Token: $ML_INTERNAL_TOKE
 | `POST /internal/v1/simulation/turn` | F0 stub, M2a real | the character's next line for a candidate turn |
 | `POST /internal/v1/simulation/assessment` | F0 stub, M3 real | scores, English metrics, interview questions, candidate feedback |
 | `POST /internal/v1/brief` | F0 stub, M1 real | the interviewer brief |
-| `POST /internal/v1/interview/transcribe` | M4 | the interview recording → turns by speaker |
+| `POST /internal/v1/transcribe` | M4, M2b, S | audio → turns by speaker; video never, audio track only |
+| `POST /internal/v1/speech` | M2b | the character's voice |
+| `POST /internal/v1/surprise-question` | S | a question from the candidate's application |
+| `GET /internal/v1/usage` | admin | live and replayed calls, spend and cap |
 | `POST /internal/v1/interview/draft` | M4 | draft from the interview transcript |
 | `POST /internal/v1/quality-check` | M5 | question quality and calibration signals |
 
@@ -156,6 +162,7 @@ In `ml`, the Pydantic model has no `profile` field and sets `extra="forbid"`: a 
 | `simulation_turn` | a `turnId` |
 | `interview_note` | an interview note id |
 | `interview_turn` | a turn of the interview transcript, `iturn_NN` (M4, M5) |
+| `surprise_answer` | a segment of the surprise answer transcript, `sseg_NN` (S) |
 
 ### `DriveScore`
 
