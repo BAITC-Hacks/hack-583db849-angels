@@ -1,0 +1,140 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ApiRole {
+  platform
+  interviewer
+  commission
+  admin
+}
+
+enum SimulationMode {
+  text
+  voice
+}
+
+enum SimulationStatus {
+  active
+  completed
+}
+
+enum TurnSpeaker {
+  candidate
+  character
+}
+
+model Candidate {
+  id                 String       @id @default(uuid()) @db.Uuid
+  externalId         String       @unique
+  profile            Json
+  application        Json
+  test               Json
+  englishCertificate Json?
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  simulations        Simulation[]
+  assessments        Assessment[]
+  interviews         Interview[]
+  auditEvents        AuditEvent[]
+}
+
+model Simulation {
+  id         String           @id @default(uuid()) @db.Uuid
+  candidateId String           @db.Uuid
+  scenarioId String
+  mode       SimulationMode
+  status     SimulationStatus @default(active)
+  createdAt  DateTime         @default(now())
+  completedAt DateTime?
+  candidate  Candidate        @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  turns      SimulationTurn[]
+  assessment Assessment?
+}
+
+model SimulationTurn {
+  id           String      @id @default(uuid()) @db.Uuid
+  simulationId String      @db.Uuid
+  sequence     Int
+  speaker      TurnSpeaker
+  text         String
+  startedAt    DateTime?
+  endedAt      DateTime?
+  createdAt    DateTime    @default(now())
+  simulation   Simulation  @relation(fields: [simulationId], references: [id], onDelete: Cascade)
+
+  @@unique([simulationId, sequence])
+}
+
+model Assessment {
+  id           String     @id @default(uuid()) @db.Uuid
+  simulationId String     @unique @db.Uuid
+  candidateId  String     @db.Uuid
+  result       Json
+  createdAt    DateTime   @default(now())
+  simulation   Simulation @relation(fields: [simulationId], references: [id], onDelete: Cascade)
+  candidate    Candidate  @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+}
+
+model Interview {
+  id               String             @id @default(uuid()) @db.Uuid
+  candidateId      String             @db.Uuid
+  heldAt           DateTime
+  transcript       Json?
+  transcriptSource String?
+  notes            Json?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  candidate        Candidate          @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  interviewerScore InterviewerScore?
+  qualityChecks    QualityCheck[]
+}
+
+model InterviewerScore {
+  id          String    @id @default(uuid()) @db.Uuid
+  interviewId String    @unique @db.Uuid
+  scores      Json
+  savedAt     DateTime  @default(now())
+  interview   Interview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+}
+
+model QualityCheck {
+  id             String     @id @default(uuid()) @db.Uuid
+  interviewId    String?    @db.Uuid
+  interviewerRef String?
+  result         Json
+  createdAt      DateTime   @default(now())
+  interview      Interview? @relation(fields: [interviewId], references: [id], onDelete: SetNull)
+}
+
+model AuditEvent {
+  id          String    @id @default(uuid()) @db.Uuid
+  candidateId String?   @db.Uuid
+  actorRole   ApiRole?
+  action      String
+  targetType  String
+  targetId    String?
+  metadata    Json?
+  createdAt   DateTime  @default(now())
+  candidate   Candidate? @relation(fields: [candidateId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([candidateId])
+}
+
+model IdempotencyKey {
+  id          String   @id @default(uuid()) @db.Uuid
+  key         String   @unique
+  requestHash String
+  statusCode  Int
+  response    Json
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+
+  @@index([expiresAt])
+}

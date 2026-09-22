@@ -10,6 +10,7 @@ dist/
 coverage/
 *.tsbuildinfo
 .pnpm-store/
+/apps/api/src/ai-client/schema.d.ts
 
 # Python
 __pycache__/
@@ -38,3 +39,4 @@ __pycache__/
 .idea/
 .vscode/*
 !.vscode/extensions.json
+BACKEND_F0_PLAN.local.md
