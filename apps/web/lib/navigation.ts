@@ -1,5 +1,7 @@
 import {
   BuildingLibraryIcon,
+  HomeIcon,
+  PresentationChartBarIcon,
   ChartBarSquareIcon,
   ChatBubbleBottomCenterTextIcon,
   ChatBubbleLeftRightIcon,
@@ -40,12 +42,36 @@ export interface NavItem {
  */
 export const navItems: NavItem[] = [
   {
-    id: 'candidates',
+    id: 'interviewer-home',
+    section: 'workspace',
+    icon: HomeIcon,
+    label: { en: 'My interviews', ru: 'Мои интервью' },
+    roles: ['interviewer'],
+    href: '/interviewer',
+  },
+  {
+    id: 'commission-home',
     section: 'workspace',
     icon: UsersIcon,
-    label: { en: 'Candidates', ru: 'Кандидаты' },
-    roles: ['interviewer', 'commission', 'admin'],
-    href: '/demo/candidates',
+    label: { en: 'In review', ru: 'На рассмотрении' },
+    roles: ['commission'],
+    href: '/commission',
+  },
+  {
+    id: 'admin-home',
+    section: 'workspace',
+    icon: HomeIcon,
+    label: { en: 'System', ru: 'Система' },
+    roles: ['admin'],
+    href: '/admin',
+  },
+  {
+    id: 'candidate-home',
+    section: 'workspace',
+    icon: HomeIcon,
+    label: { en: 'Home', ru: 'Home' },
+    roles: ['candidate'],
+    href: '/candidate',
   },
   {
     id: 'briefs',
@@ -109,6 +135,14 @@ export const navItems: NavItem[] = [
     match: '/feedback',
     preview: true,
     module: 'M3',
+  },
+  {
+    id: 'overview',
+    section: 'reference',
+    icon: PresentationChartBarIcon,
+    label: { en: 'Demo overview', ru: 'Обзор демо' },
+    roles: ['admin'],
+    href: '/demo/candidates',
   },
   {
     id: 'kit',
