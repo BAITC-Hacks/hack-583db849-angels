@@ -3,16 +3,23 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "generate": "pnpm --filter @invision/api-client run generate",
+    "predev": "pnpm generate",
     "dev": "next dev --hostname 0.0.0.0 --port 3000",
+    "prelint": "pnpm generate",
     "lint": "eslint .",
+    "pretypecheck": "pnpm generate",
     "typecheck": "tsc --noEmit",
+    "prebuild": "pnpm generate",
     "build": "next build",
     "start": "next start --hostname 0.0.0.0 --port 3000",
+    "pretest": "pnpm generate",
     "test": "node --import tsx --test mocks/contract-validation.test.ts && vitest run",
     "test:watch": "vitest"
   },
   "dependencies": {
     "@heroicons/react": "2.2.0",
+    "@invision/api-client": "workspace:*",
     "@invision/stand-client": "workspace:*",
     "@tanstack/react-query": "5.103.2",
     "motion": "13.2.0",
