@@ -21,7 +21,7 @@ What `api` sends to the ML service and what it expects back. It is derived from 
 4. **M2 — the real `turn`:** the scenario engine, director and actor, `config/scenarios/conflict-resolution.json` first.
 5. **M3 — the real `assessment`:** the judge, English metrics, candidate feedback.
 6. **M1 — the real `brief`.**
-7. **M4 — `interview/draft`.**
+7. **M4 — `interview/transcribe` and `interview/draft`.** Transcription reuses the Deepgram path built for M2b.
 8. **M5 — `quality-check`,** draft shapes in the examples.
 
 ## Endpoints
@@ -36,6 +36,7 @@ Every request carries `X-Internal-Token`. Responses are the result object itself
 | `POST` | `/internal/v1/simulation/turn` | `TurnRequest` → `TurnResult` | `ml/simulation-turn.*` |
 | `POST` | `/internal/v1/simulation/assessment` | `AssessmentRequest` → `AssessmentResult` | `ml/simulation-assessment.*` |
 | `POST` | `/internal/v1/brief` | `BriefRequest` → `BriefResult` | `ml/brief.*` |
+| `POST` | `/internal/v1/interview/transcribe` | `TranscribeRequest` → `TranscribeResult` | `ml/interview-transcribe.*` |
 | `POST` | `/internal/v1/interview/draft` | `DraftRequest` → `DraftResult` | `ml/interview-draft.*` |
 | `POST` | `/internal/v1/quality-check` | draft, M5 | `quality-check-*.json` |
 
@@ -57,7 +58,13 @@ Each of these is visible on a screen, and a mistake here shows up in the demo.
 3. **`sourceId` must exist in the request:** a `turnId`, a `fieldId`, an `itemId` or a note id you were sent. The screens link every quote to that source; a missing one is a dead link.
 4. **The character says at most 60 words,** stays in the scenario, never grades, never hints at a right answer, and never asks about personal life. The hidden motive in the scenario file never leaves the service: `ScenarioBrief` has only the public fields.
 5. **Candidate feedback contains no score, no number and no decision wording.** The web's test rejects any digit and the words score, rank, admit, reject, accept, pass and fail. It is the only text the candidate ever reads.
-6. **The draft never sees the interviewer's scores.** `DraftRequest` has no field for them, and `extra="forbid"` rejects them. A draft that saw them could anchor to them in reverse; the comparison is done after, by the web.
+6. **The draft reads the interview transcript and never sees the interviewer's scores.**
+   - Evidence comes only from **candidate** turns (`interview_turn`) or notes. The interviewer's turns are context, not evidence.
+   - `DraftRequest` has no field for the scores, and `extra="forbid"` rejects them. A draft that saw them could anchor to them in reverse; the comparison is done after, by the web.
+6a. **Transcription goes through the gateway,** like every Deepgram call:
+   - speaker diarisation, two speakers, and the one who asks the first question is `interviewer`;
+   - the audio is never sent to an LLM — only the resulting text is;
+   - `api` deletes the audio once the transcript is stored, so you work from the file reference you were given and keep no copy.
 7. **English is separate.**
    - `EnglishMetrics` is computed by code;
    - grammar never moves a D.R.I.V.E. score;
@@ -86,7 +93,7 @@ class Strict(BaseModel):
 Competency = Literal["D", "R", "I", "V", "E"]
 Score = Annotated[int, Field(ge=0, le=4)] | None
 Confidence = Literal["low", "medium", "high"]
-SourceKind = Literal["application_field", "test_item", "simulation_turn", "interview_note", "interview_question"]
+SourceKind = Literal["application_field", "test_item", "simulation_turn", "interview_turn", "interview_note"]
 TurnId = Annotated[str, Field(pattern=r"^turn_\d{2,}$")]
 
 
@@ -310,15 +317,45 @@ class InterviewNote(Strict):
     text: str
 
 
+class InterviewTurn(Strict):
+    turnId: Annotated[str, Field(pattern=r"^iturn_\d{2,}$")]
+    speaker: Literal["interviewer", "candidate"]
+    text: str
+    startSec: float
+    endSec: float
+
+
+class TranscribedTurn(Strict):
+    speaker: Literal["interviewer", "candidate"]
+    text: str
+    startSec: float
+    endSec: float
+
+
+# ---- POST /internal/v1/interview/transcribe
+
+class TranscribeRequest(Strict):
+    interviewId: str
+    audioRef: str                          # where api put the file; api deletes it afterwards
+    language: Literal["en"] = "en"
+    speakers: int = 2
+
+
+class TranscribeResult(Strict):
+    turns: list[TranscribedTurn]           # api assigns iturn_ ids when it stores them
+    durationSec: float
+
+
 class DraftRequest(Strict):
-    """Notes only. The interviewer's scores are deliberately absent, and extra fields are refused."""
+    """The transcript and any notes. The interviewer's scores are deliberately absent, and extra fields are refused."""
 
     candidateId: str
-    notes: list[InterviewNote]
+    transcript: list[InterviewTurn]
+    notes: list[InterviewNote] = []
 
 
 class DraftResult(Strict):
-    scores: list[DriveScore]               # evidence from interview_note only
+    scores: list[DriveScore]               # evidence: candidate interview_turn, or interview_note
 
     @field_validator("scores")
     @classmethod

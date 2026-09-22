@@ -8,7 +8,7 @@ These are the exact endpoints the web screens call. They are derived from the sc
 | Simulation (M2) | `/simulation/:simulationId` | #35 |
 | Commission report (M3) | `/commission/simulation-report/:assessmentId` | #39 |
 | Candidate feedback (M3) | `/feedback/:assessmentId` | #39 |
-| Interview (M4) | `/interviewer/interview/:interviewId` | #40 |
+| Interview (M4) | `/interviewer/interview/:interviewId` | #40, #43 |
 | Brief (M1) | `/interviewer/brief/:candidateId` | #41 |
 
 **How to use this file.** Implement it code-first: NestJS DTOs with `@nestjs/swagger` produce `apps/api/openapi.json`, and the web generates its client from that file (`docs/SPEC.md`, section 9). This file is the target; once your generated OpenAPI covers an endpoint, the OpenAPI wins and this file is updated to match. Conventions (auth, idempotency, error shape, ids) are in `docs/SPEC.md`, section 4, and are not repeated here.
@@ -101,20 +101,29 @@ The last one exists because the screen is addressed by candidate, not by brief.
 
 | Method | Path | Idem. | Success | Errors |
 | --- | --- | --- | --- | --- |
-| `POST` | `/v1/interviews` | ✱ | `201 Interview`; body `{ candidateId, heldAt, notes: string[] }` — you assign `note_1`, `note_2`, … | `404` candidate |
-| `GET` | `/v1/interviews/:interviewId` | | `200 Interview` | `404` |
+| `POST` | `/v1/interviews` | ✱ | `201 Interview`; body `{ candidateId, heldAt, transcript?, transcriptSource?, notes? }` | `404` candidate |
+| `POST` | `/v1/interviews/:interviewId/recording` | ✱ | `202 Interview` with `transcriptStatus: "transcribing"`; multipart `audio` (webm, ogg or wav, up to 60 minutes) and `consent=true` | `400 CONSENT_REQUIRED`, `409 TRANSCRIPT_EXISTS`, `413` |
+| `GET` | `/v1/interviews/:interviewId` | | `200 Interview`, including `transcriptStatus` and `transcript` | `404` |
 | `POST` | `/v1/interviews/:interviewId/interviewer-scores` | ✱ | `201 InterviewerScoresSaved`; body `{ scores }` with **all five** keys | `400` a key missing, `409 SCORES_ALREADY_SAVED` |
-| `POST` | `/v1/interviews/:interviewId/assessment-draft` | ✱ | `201 AssessmentDraft` | **`409 DRAFT_LOCKED`** before the scores |
+| `POST` | `/v1/interviews/:interviewId/assessment-draft` | ✱ | `201 AssessmentDraft` | **`409 DRAFT_LOCKED`** before the scores, `409 TRANSCRIPT_MISSING` |
 | `GET` | `/v1/interviews/:interviewId/assessment-draft` | | `200 AssessmentDraft` | **`409 DRAFT_LOCKED`** before the scores, `404 DRAFT_NOT_FOUND` |
 
+- **The transcript comes one of two ways:**
+  - **inVision's own recording:** `POST /v1/interviews` with `transcript` (turns with `speaker`, `text`, `startSec`, `endSec`) and `transcriptSource: "platform"`;
+  - **recorded on the interviewer's screen:** `POST …/recording` with the audio.
+
+  Either way you assign the turn ids `iturn_01`, `iturn_02`, …
+- **The recording path.** The recording is sent to the ML service for transcription, and **you delete the audio as soon as the transcript is stored**. Only text is ever kept, and only text reaches a model. Without `consent=true` the upload is refused. `transcriptStatus` goes `none → transcribing → ready` (or `failed`); the web polls `GET /v1/interviews/:id`.
+- **The draft needs a transcript.** Without one it answers `409 TRANSCRIPT_MISSING`. The scores may be saved before the transcript exists; the draft follows once it does.
 - **The scores are fixed once saved.** A repeat with the same `Idempotency-Key` returns the saved scores. A different body answers `409 SCORES_ALREADY_SAVED`.
 - **The ML service never sees the interviewer's scores** when it writes the draft (see `ml.md`). The web compares the two itself.
+- **Notes stay optional:** a list of strings, stored with ids `note_1`, `note_2`, … and sent to the draft as extra context.
 
 ### M5 — quality checks (draft)
 
 | Method | Path | Idem. | Success | Errors |
 | --- | --- | --- | --- | --- |
-| `POST` | `/v1/quality-checks/interview` | ✱ | `201 QualityCheck`; body `{ interviewId, questions: { id, text }[] }` | `404` |
+| `POST` | `/v1/quality-checks/interview` | ✱ | `201 QualityCheck`; body `{ interviewId }` — the questions are the interviewer's turns in the transcript | `404`, `409 TRANSCRIPT_MISSING` |
 | `POST` | `/v1/quality-checks/calibration` | ✱ | `201 QualityCheck`; body `{ interviewerRef, from, to }` | |
 | `GET` | `/v1/quality-checks/:qualityCheckId` | | `200 QualityCheck` | `404` |
 
@@ -127,7 +136,7 @@ type Competency = 'D' | 'R' | 'I' | 'V' | 'E';
 type Score = 0 | 1 | 2 | 3 | 4 | null;           // null: not enough verified evidence
 
 interface Evidence {
-  source: 'application_field' | 'test_item' | 'simulation_turn' | 'interview_note' | 'interview_question';
+  source: 'application_field' | 'test_item' | 'simulation_turn' | 'interview_turn' | 'interview_note';
   sourceId: string;
   quote: string;                                  // verbatim; never translated
 }
@@ -219,11 +228,22 @@ interface CandidateFeedback {                     // no score, number or decisio
   nextTime: string[];
 }
 
+interface InterviewTurn {
+  turnId: string;                                 // iturn_01, iturn_02, … assigned by api
+  speaker: 'interviewer' | 'candidate';
+  text: string;                                   // verbatim, never translated
+  startSec: number;
+  endSec: number;
+}
+
 interface Interview {
   interviewId: string;
   candidateId: string;
   heldAt: string;
-  notes: { id: string; text: string }[];          // ids note_1, note_2, … assigned by api
+  transcriptStatus: 'none' | 'transcribing' | 'ready' | 'failed';
+  transcriptSource: 'platform' | 'recording' | null;
+  transcript: InterviewTurn[] | null;
+  notes: { id: string; text: string }[];          // optional extra; ids note_1, note_2, …
   interviewerScores: Record<Competency, Score> | null;
   scoredAt: string | null;
 }
@@ -237,7 +257,7 @@ interface InterviewerScoresSaved {
 interface AssessmentDraft {
   interviewId: string;
   createdAt: string;
-  scores: DriveScore[];                           // evidence comes from interview notes only
+  scores: DriveScore[];                           // evidence: the candidate's interview turns (and notes, if any)
 }
 
 interface QualityCheck {                          // draft, M5
@@ -247,6 +267,7 @@ interface QualityCheck {                          // draft, M5
   interviewId?: string;
   interviewerRef?: string;
   interviews?: number;
+  talkShare?: { interviewer: number; candidate: number };   // share of speaking time, from the transcript
   drift?: { competency: Competency; interviewerMean: number; panelMean: number; delta: number }[];
   signals: {
     kind: 'leading_question' | 'off_limits_question' | 'coverage_gap' | 'scale_drift';
@@ -273,6 +294,9 @@ interface QualityCheck {                          // draft, M5
 | `TURN_IN_FLIGHT` | 409 | a turn while the previous one is still being answered |
 | `SCORES_ALREADY_SAVED` | 409 | new interviewer scores after the first save |
 | `DRAFT_LOCKED` | 409 | the draft requested before the interviewer's scores exist |
+| `TRANSCRIPT_MISSING` | 409 | a draft or an interview check before the transcript exists |
+| `TRANSCRIPT_EXISTS` | 409 | a second recording for an interview that already has a transcript |
+| `CONSENT_REQUIRED` | 400 | a recording uploaded without `consent=true` |
 | `AI_INVALID_OUTPUT` | 502 | the ML service failed schema or evidence checks after its one retry |
 | `AI_UNAVAILABLE` | 503 | the ML service is down |
 | `AI_BUDGET_EXCEEDED` | 503 | the gateway refused: `BUDGET_USD_CAP` reached |
@@ -287,8 +311,9 @@ interface QualityCheck {                          // draft, M5
 | `POST /v1/simulations` | `GET /internal/v1/scenarios/:id`, then `POST /internal/v1/simulation/turn` with no turns | the simulation and the opening turn |
 | `POST /v1/simulations/:id/turns` | `POST /internal/v1/simulation/turn` with the whole transcript | both turns, the director's decision (audit only, never returned) |
 | `POST /v1/simulation-assessments` | `POST /internal/v1/simulation/assessment` | scores, English, questions and feedback — feedback served separately |
-| `POST /v1/interviews/:id/assessment-draft` | `POST /internal/v1/interview/draft` with notes only | the draft |
-| `POST /v1/quality-checks/*` | `POST /internal/v1/quality-check` | the check |
+| `POST /v1/interviews/:id/recording` | `POST /internal/v1/interview/transcribe` | the transcript; **the audio is deleted** once it is stored |
+| `POST /v1/interviews/:id/assessment-draft` | `POST /internal/v1/interview/draft` with the transcript and notes — never the interviewer's scores | the draft |
+| `POST /v1/quality-checks/*` | `POST /internal/v1/quality-check` — for an interview, with its transcript | the check |
 
 ## Tests this contract needs
 
@@ -296,7 +321,8 @@ These go in the same PR as the rule they test, as `AGENTS.md` requires:
 
 - `toLLMView()` drops `profile` and redacts profile values found inside answers;
 - no request to `ml` ever contains a profile field — a spy on `ai-client`;
-- `GET` and `POST` on `/assessment-draft` answer `409 DRAFT_LOCKED` before the interviewer's scores, and `200`/`201` after;
+- `GET` and `POST` on `/assessment-draft` answer `409 DRAFT_LOCKED` before the interviewer's scores, `409 TRANSCRIPT_MISSING` without a transcript, and `200`/`201` after both;
+- a recording without `consent=true` → `400 CONSENT_REQUIRED`; after transcription the audio file no longer exists;
 - a second, different score save answers `409 SCORES_ALREADY_SAVED`;
 - `interviewer` and `platform` get `403` on `GET /v1/simulation-assessments/:id`;
 - `platform` gets `403` on briefs and drafts;

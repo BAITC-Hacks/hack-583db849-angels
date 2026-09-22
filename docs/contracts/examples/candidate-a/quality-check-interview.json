@@ -10,8 +10,8 @@
       "recommendation": "Ask openly: “What mattered most to you in that moment, and why?”",
       "evidence": [
         {
-          "source": "interview_question",
-          "sourceId": "q_2",
+          "source": "interview_turn",
+          "sourceId": "iturn_03",
           "quote": "You would agree that finishing on time matters most, right?"
         }
       ]
@@ -22,8 +22,8 @@
       "recommendation": "Remove the question; it cannot inform any D.R.I.V.E. competency.",
       "evidence": [
         {
-          "source": "interview_question",
-          "sourceId": "q_3",
+          "source": "interview_turn",
+          "sourceId": "iturn_07",
           "quote": "What do your parents do for a living?"
         }
       ]
@@ -38,5 +38,9 @@
       ],
       "evidence": []
     }
-  ]
+  ],
+  "talkShare": {
+    "interviewer": 0.34,
+    "candidate": 0.66
+  }
 }
