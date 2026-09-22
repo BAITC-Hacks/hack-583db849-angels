@@ -1,6 +1,6 @@
 # Working in this repository
 
-Three people, three personal branches per slice, and a `main` that nobody touches directly.
+Four people, each in their own part of the repository, each working down their own list of issues — and a `main` that nobody touches directly.
 
 ## The rules
 
@@ -9,18 +9,33 @@ Three people, three personal branches per slice, and a `main` that nobody touche
 
    | Part | Owner | Branch pattern | Example |
    | --- | --- | --- | --- |
-   | Frontend (`apps/web`) | Meiyrbek | `feat/<slice>-web` | `feat/m2-simulator-web` |
-   | Backend (`apps/api`) | Aibek | `feat/<slice>-api` | `feat/m2-simulator-api` |
-   | ML (`services/ml`) | Nauryzbek | `feat/<slice>-ml` | `feat/m2-simulator-ml` |
+   | Frontend (`apps/web`) | Meiyrbek | `feat/<slice>-web` | `feat/m2a-simulator-voice-web` |
+   | Backend (`apps/api`) | Aibek | `feat/<slice>-api` | `feat/m2a-simulator-voice-api` |
+   | ML (`services/ml`) | Nauryzbek | `feat/<slice>-ml` | `feat/m2a-simulator-voice-ml` |
+   | Scenario stories (`docs/scenarios`) | Beknur | `docs/scenario-stories-<batch>` | `docs/scenario-stories-2-4` |
 
    Fixes use `fix/<slice>-<short-name>`, documentation `docs/<short-name>`.
-3. **Stay in your own branch.** If you need something from another person's part, ask for it in their pull request or in the team chat — do not commit to their branch.
+3. **Stay in your own part.** Every issue belongs to one person and one part; nobody shares an issue, and nobody gets an issue outside their part. A pull request changes only its author's paths:
+
+   | Who | Changes only |
+   | --- | --- |
+   | Aibek | `apps/api/**`, `docker-compose.yml`, the `# API` lines of `.env.example`, `pnpm-lock.yaml` for his own dependencies |
+   | Nauryzbek | `services/ml/**`, `config/**`, `seed/**`, `fixtures/**`, the `# ML` lines of `.env.example` |
+   | Beknur | `docs/scenarios/**` |
+   | Meiyrbek | everything else: `apps/web/**`, `packages/**`, root files, `.github/**`, `docs/**` |
+
+   A pull request that touches anything else is sent back. If you need something from another part, write it in your issue — never commit to someone else's branch or folder.
 4. **Start every slice from fresh `main`:**
    ```bash
    git switch main && git pull
    git switch -c feat/<slice>-<part>
    ```
-5. **Contract first.** A slice begins with one small pull request that only adds the contract — NestJS DTOs, Pydantic schemas, generated types, mock fixtures. Once it is merged, all three parts are built in parallel against it, and the frontend works on mocks until the real endpoint lands.
+5. **The contract is written already, and it is frozen.** `docs/contracts/` holds every shape with an example, so each part is built against it alone:
+   - **API:** a slice's first pull request is its own DTOs and `apps/api/openapi.json`, answering with the examples until the implementation lands;
+   - **ML:** the stubs from #4 answer every internal endpoint with its example, so the API never waits for a later ML slice;
+   - **Web:** each screen runs on its preview until the API side of its slice is merged.
+
+   If a shape looks wrong, say so in your issue and carry on with the rest. Meiyrbek changes the contract in a docs pull request, and only by adding to it. Generated clients are never committed — they are built from the neighbouring part's `openapi.json` — so a pull request that breaks a shape fails its own CI, and nobody has to fix someone else's code.
 6. **Keep pull requests small and reviewable.** One pull request is one coherent outcome. Say in the description what it does, how to check it, and what it deliberately leaves out.
 7. **Meiyrbek approves every pull request before it is merged.** `.github/CODEOWNERS` names only Meiyrbek, so GitHub accepts no other approval. Meiyrbek's own pull requests are merged by Meiyrbek, once the checks pass. Anyone may still review, comment and ask for changes on any pull request — that is welcome; it just does not unlock the merge.
 8. **Keep your branch current.** Rebase on `main` before asking for review:
@@ -33,29 +48,78 @@ Three people, three personal branches per slice, and a `main` that nobody touche
 
 ## Order of work
 
-Slices are done in priority order, and each of us works down our own column:
+Each person works down their own list, top to bottom. Every issue repeats its place under **Order**: what comes before, what comes next, and whether it waits for anyone.
 
-| Slice | Web — Meiyrbek | API — Aibek | ML — Nauryzbek |
-| --- | --- | --- | --- |
-| 01 · F0 Foundation | #2 | #3 | #4 |
-| 02 · M2a Simulator, voice | #5 | #6 | #7 |
-| 03 · M3 Judge | #8 | #9 | #10 |
-| 04 · M1 Brief | #11 | #12 | #13 |
-| 05 · M4 Interview draft | #14 | #15 | #16 |
-| 06 · M5 Quality Guard | #17 | #18 | #19 |
-| 07 · M2b Scenario pool (10 scenarios) | #20 | #21 | #22 |
-| 08 · Demo | #23 | #24 | #25 |
+**Aibek — API**
 
-- **Within a slice the three parts run in parallel.** The API contract pull request comes first; everyone builds against it.
-- **Work ahead by one slice at most.** Waiting for a review on slice 02 is a good moment to start 03 — not 06.
-- **F0 (#2, #3, #4) is merged in the first two days**, before anything else: every later slice stands on it.
-- **A slice is finished when all three parts are in `main`** and the slice runs end to end. Then its milestone closes.
+| Step | Issue | Waits for other people |
+| --- | --- | --- |
+| 1 | #3 F0 — NestJS, Prisma, keys, `toLLMView`, candidates, `openapi.json`, Compose | `ai-client`, seed and Compose: the first pull request of #4 |
+| 2 | #6 M2a — simulations, spoken turns, accommodation | — |
+| 3 | #9 M3 — assessments, started on completion | — |
+| 4 | #12 M1 — briefs, created automatically | — |
+| 5 | #15 M4 — interviews, recording, blind scoring | — |
+| 6 | #51 C — consistency before and after | — |
+| 7 | #24, PR 1 — admin and demo endpoints | — |
+| 8 | #18 M5 — quality checks | the final M5 contract, #17 PR 1 |
+| 9 | #21 M2b — even assignment, the pool | — |
+| 10 | #55 S — the surprise question | — |
+| 11 | #24, PR 2 — `DEMO_MODE` end to end | #25 |
+
+**Nauryzbek — ML**
+
+| Step | Issue | Waits for other people |
+| --- | --- | --- |
+| 1 | #4 F0 — stubs for every endpoint, `openapi.json`, gateway, rubric, seed | — |
+| 2 | #7 M2a — speech in and out, mini-ML, beat engine, actor, first scenario | — |
+| 3 | #10 M3 — judge, evidence check, English metrics, quality bench | — |
+| 4 | #13 M1 — brief with eight focuses and the before-interview consistency | — |
+| 5 | #52 C — consistency after the interview | — |
+| 6 | #16 M4 — two-speaker transcription, interview draft | — |
+| 7 | #19 M5 — quality guard | the final M5 contract, #17 PR 1; if it is not there, do step 8 first |
+| 8 | #22 M2b — scenarios 2–10 through the quality bench | Beknur's stories, #53, batch by batch |
+| 9 | #56 S — the surprise question | — |
+| 10 | #25 D — final cassettes, budget report | — |
+
+**Meiyrbek — web, and review of everything**
+
+| Step | Issue | Waits for other people |
+| --- | --- | --- |
+| 1 | #49 F0 — BFF, role cookie, mappers, generated client | the generated client: `apps/api/openapi.json` from #3 |
+| 2 | #5 M2a — push-to-talk screen | connecting it: #6 PR 1 |
+| 3 | #8 M3 — report and feedback on the API | #9 PR 1 |
+| 4 | #11 M1 — brief with eight focuses | connecting it: #12 PR 1 |
+| 5 | #17, PR 1 — the final M5 contract, by 26.09 | — |
+| 6 | #14 M4 — interview on the API | #15 PR 1 |
+| 7 | #50 C — commission consistency screen | connecting it: #51 |
+| 8 | #23, PR 1 — homes, admin, the server | #24 PR 1 |
+| 9 | #17, PR 2–3 — the quality panel | connecting it: #18 PR 1 |
+| 10 | #20 M2b — scenario pool screen | #21 |
+| 11 | #54 S — surprise question screens | connecting them: #55 PR 1 |
+| 12 | #23, PR 2 — the pitch | — |
+
+**Beknur — product**
+
+| Step | Issue | Waits for other people |
+| --- | --- | --- |
+| 1 | #53 — stories for scenarios 2–10, in three batches by 24, 25 and 26.09 | — |
+
+- **Nobody waits for another person's slice work.** The only waits are the ones in these tables, and each is on a single, early pull request.
+- **Work ahead freely within your own list.** Blocked on a wait? Take your next step and come back.
+- **A slice is finished when every part of it is in `main`** and the slice runs end to end. Then its milestone closes.
+
+## How review works
+
+1. You open a pull request and fill in "How it was checked".
+2. Meiyrbek checks the list under **Done when** in the issue, the CI result, and that the pull request touches only your paths.
+3. Anything wrong comes back as a review comment on the pull request, with the exact error. Fix it in the same branch and push again — the pull request updates itself.
+4. When the parts run together and something breaks, Meiyrbek opens a bug issue with the part's label, assigned to its owner, with the steps and the error.
 
 ## Merge every day
 
 A pull request is merged as soon as it is ready — never saved up for the end.
 
-Integration on the last day is how a project like this fails: three people build for a week on their own assumptions about each other's contracts, and on the final evening nothing fits. Merging daily keeps `main` runnable at every moment, so there is always a demo of whatever is done.
+Integration on the last day is how a project like this fails: people build for a week on their own assumptions about each other's contracts, and on the final evening nothing fits. Merging daily keeps `main` runnable at every moment, so there is always a demo of whatever is done.
 
 That only works if pull requests are small. Aim for a few hundred changed lines at most, so a review takes minutes and happens the same day.
 
@@ -75,11 +139,11 @@ CI runs lint, types, tests and the build. It does not start the stack, so anythi
 
 ## Issues
 
-There is one issue per slice per part, #2 to #25. The title says which: `02-M2a · API · simulations module…` — slice number, slice, part, the work.
+One issue per slice per part: #2 to #25 and #49 to #56. The title says which: `02-M2a · API · simulations…` — slice number, slice, part, the work. Slice numbers follow the order of work.
 
-- **`Refs #N`** in a pull request that does part of an issue, such as the contract. **`Closes #N`** only in the pull request that finishes it: GitHub closes the issue automatically when that pull request is merged. Nobody closes issues by hand.
+- **`Refs #N`** in a pull request that does part of an issue. **`Closes #N`** only in the pull request that finishes it: GitHub closes the issue automatically when that pull request is merged. Nobody closes issues by hand.
 - **The plan comes first.** `docs/PLAN.md` is the one source of truth. When the plan changes, the change goes into `docs/PLAN.md` through a pull request first, and the issues are edited to match after. Two documents that disagree are worse than one that is slightly out of date.
-- **Issues are never deleted.** One that is no longer needed is closed as *not planned*, with one line saying why. When slices move, check the "Depends on" lines in the issues that point at them.
+- **Issues are never deleted.** One that is no longer needed is closed as *not planned*, with one line saying why. When slices move, check the **Order** sections that point at them.
 - **A bug found during integration gets its own issue**, labelled with the part it belongs to.
 
 ## Who owns the shared files
@@ -89,9 +153,14 @@ A few files are touched by everyone. Each has one owner; anyone else changes it 
 | File | Owner |
 | --- | --- |
 | Root `package.json`, `pnpm-workspace.yaml`, `.github/workflows/*` | Meiyrbek |
-| `docker-compose.yml`, `apps/api/prisma/schema.prisma` | Aibek |
-| `services/ml/**`, `config/**` (rubric, models, scenarios, prompts), `seed/**`, `fixtures/**` | Nauryzbek |
-| `docs/PLAN.md`, `README.md`, `CONTRIBUTING.md` | Meiyrbek |
+| `docker-compose.yml` — every block, `web` included | Aibek |
+| `apps/api/prisma/schema.prisma`, `apps/api/openapi.json` | Aibek |
+| `services/ml/**` including `services/ml/openapi.json`, `config/**` (rubric, models, scenarios, prompts), `seed/**`, `fixtures/**` | Nauryzbek |
+| Each part's `Dockerfile` | the part's owner |
+| `docs/scenarios/**` | Beknur |
+| `docs/PLAN.md`, `docs/contracts/**`, `docs/SPEC.md`, `README.md`, `CONTRIBUTING.md` | Meiyrbek |
+
+A new dependency that needs an `allowBuilds` line in `pnpm-workspace.yaml` adds only that line, in the same pull request, and says so.
 
 ## Commits
 

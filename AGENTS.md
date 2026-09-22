@@ -48,7 +48,7 @@ If a task seems to require breaking one of these, stop and ask.
 1. Read the issue and the plan section it points to.
 2. Describe the plan in a few lines: which files you will touch and why.
 3. **Wait for the human to confirm** before a large or cross-cutting change.
-4. **Start a slice with its contract:** NestJS DTOs, Pydantic schemas, generated types and mock fixtures, in one small pull request before any implementation.
+4. **Build against the frozen contract in `docs/contracts/`.** In `apps/api` a slice's first pull request is its own DTOs and `openapi.json`; in `services/ml` the stubs from F0 already answer every endpoint. Work only in your own part (`CONTRIBUTING.md`, rule 3), and never change a shape outside a docs pull request.
 5. Do not change the stack, and do not add a significant dependency without agreement.
 
 ## Where things live

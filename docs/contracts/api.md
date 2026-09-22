@@ -29,7 +29,7 @@ These are the exact endpoints the web screens call. They are derived from the sc
 
 The step-by-step plan with owners and dates is `docs/INTEGRATION.md`.
 
-The contract PR for each group is small: DTOs, the regenerated `openapi.json`, and the example as a fixture. Merge it first. Implementation follows in a second PR.
+The contract PR for each group is small and Aibek's alone: DTOs, the regenerated `openapi.json`, and the example as the answer until the implementation lands. No Pydantic, no web code. Merge it first; the implementation follows in a second PR.
 
 ## How the web calls you
 
@@ -161,7 +161,7 @@ A separate layer across all data about the candidate — application, test, cert
 | `GET` | `/v1/candidates/:candidateId/consistency?stage=after` | | `200 ConsistencyReport` | `404 CONSISTENCY_NOT_FOUND`, `409 DRAFT_LOCKED` before the interviewer's scores |
 
 - **You create both stages yourself.**
-  - `before`: with every brief;
+  - `before`: the brief's own `consistency` block. The ML service returns it inside `brief`, so there is no separate call; `?stage=before` serves the latest brief's items;
   - `after`: when the interview transcript exists **and** the interviewer's scores are saved. It reads the interview, so it stays locked until the interviewer has scored blind, like the draft.
 - **Every item is a signal with evidence, never a verdict:** what was claimed (with its quote), what was observed (with its quote or measured value), a status, what to do, and — before the interview — a question to ask.
 - `progress.consistency` carries both stages' status.
@@ -514,12 +514,12 @@ interface QualityCheck {                          // draft, M5
 
 | Public endpoint | ML endpoint | `api` stores |
 | --- | --- | --- |
-| `POST /v1/candidates`, and after a surprise answer | `POST /internal/v1/brief` | the brief |
+| `POST /v1/candidates`, an assessment becoming ready, a surprise answer transcribed | `POST /internal/v1/brief` | the brief, with its `consistency` block — the before stage of C |
 | `POST /v1/simulations/:id/turns` | `POST /internal/v1/simulation/turn` with the whole transcript | both turns, the director's decision (audit only, never returned) |
 | a simulation completing, or `POST /v1/simulation-assessments` | `POST /internal/v1/simulation/assessment` | scores, English, questions and feedback — feedback served separately |
 | `POST /v1/simulations` | `GET /internal/v1/scenarios`, pick, then `simulation/turn` with no turns, then `speech` | the simulation, the opening turn and its audio |
 | `POST /v1/simulations/:id/turns` | `POST /internal/v1/transcribe` (one speaker), then `simulation/turn`, then `POST /internal/v1/speech` | the transcript as the turn text, the matched branch (audit), the character's audio |
-| every brief, and scores saved + transcript ready | `POST /internal/v1/consistency` with `stage` `before` or `after` | the consistency report |
+| interviewer's scores saved + transcript ready | `POST /internal/v1/consistency` with `stage: "after"` | the after report |
 | `POST /v1/interviews/:id/recording` | `POST /internal/v1/transcribe` (two speakers) | the transcript; **the audio is deleted** once it is stored |
 | `POST /v1/surprise-questions` | `POST /internal/v1/surprise-question` | the question, its competency and why |
 | `POST /v1/surprise-questions/:id/answer` | `POST /internal/v1/transcribe` (one speaker), with the audio only | the segments; the audio is deleted, the video kept for staff |

@@ -2,7 +2,7 @@
 
 What `api` sends to the ML service and what it expects back. It is derived from the screens that already run on scripted previews (see the table in [`api.md`](api.md)), so every field below has a place on a screen.
 
-**How to use this file.** The Pydantic models at the end are ready to copy into `services/ml/app/schemas/`. FastAPI exports them to `services/ml/openapi.json`, and `api` generates its `ai-client` from that file (`docs/SPEC.md`, section 5). Once your exported OpenAPI covers an endpoint, it wins and this file is updated to match.
+**How to use this file.** The Pydantic models at the end are ready to copy into `services/ml/app/schemas/`. FastAPI exports them to `services/ml/openapi.json`, and `api` generates its `ai-client` from that file (`docs/SPEC.md`, section 5). The shapes here are frozen: your exported OpenAPI must match them field for field. A shape that looks wrong is raised in your issue, and Meiyrbek changes this file first, only by adding.
 
 **Examples.** Every request and response has a JSON file for candidate A in [`examples/candidate-a/ml/`](examples/candidate-a/ml/). They validate against the models below. **Your F0 stubs can return them verbatim**: then `api` and the web can integrate against real HTTP before a single prompt exists. Later they are the `DEMO_MODE` answers and the expected results in `seed/`.
 
@@ -10,7 +10,7 @@ What `api` sends to the ML service and what it expects back. It is derived from 
 
 1. **F0 — the stubs.**
    - FastAPI with `GET /internal/v1/health` and the `X-Internal-Token` check;
-   - `turn`, `assessment` and `brief` returning the candidate A examples;
+   - **every endpoint in the table below** returning its candidate A example, so `api` never waits for a later ML slice;
    - **`services/ml/openapi.json` committed.**
    
    Aibek generates `ai-client` from that file; without it the API is written against guesses.
@@ -45,6 +45,10 @@ Every request carries `X-Internal-Token`. Responses are the result object itself
 | `GET` | `/internal/v1/usage` | → `Usage` | `ml/usage.response.json` |
 | `POST` | `/internal/v1/interview/draft` | `DraftRequest` → `DraftResult` | `ml/interview-draft.*` |
 | `POST` | `/internal/v1/quality-check` | draft, M5 | `quality-check-*.json` |
+
+**Consistency, two stages.** `api` calls `consistency` only with `stage: "after"`. The before stage comes inside `brief` as `BriefResult.consistency` — write it once, as one module, and use it in both.
+
+**Audio files.** `audioRef` is a path relative to `UPLOADS_DIR`, a volume `api` and `ml` both mount (`docs/SPEC.md`, section 3). Read the file from there and keep no copy.
 
 **The opening line.** `api` calls `simulation/turn` with an empty `turns` list; you return the character's first line.
 
