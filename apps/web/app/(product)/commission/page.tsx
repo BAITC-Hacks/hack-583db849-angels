@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { AccommodationControl } from '../../../components/home/AccommodationControl';
 import { NextStep } from '../../../components/home/NextStep';
 import { SeedPending } from '../../../components/home/SeedPending';
 import { StatusPill } from '../../../components/home/StatusPill';
@@ -155,6 +156,8 @@ export default function CommissionHome() {
           </tbody>
         </table>
       </div>
+
+      <AccommodationControl />
     </main>
   );
 }

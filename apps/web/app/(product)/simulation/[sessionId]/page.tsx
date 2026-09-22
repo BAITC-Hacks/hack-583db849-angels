@@ -8,11 +8,13 @@ import { ElapsedTime } from '../../../../components/simulation/ElapsedTime';
 import { ScenarioPanel } from '../../../../components/simulation/ScenarioPanel';
 import { StopControl } from '../../../../components/simulation/StopControl';
 import { Transcript } from '../../../../components/simulation/Transcript';
+import { VoiceComposer } from '../../../../components/simulation/VoiceComposer';
 import { useSimulation } from '../../../../lib/simulation/useSimulation';
 
 /**
- * M2: the candidate leads a work situation in English, turn by turn, by typing.
- * Voice arrives on top of this in M2b and must never break it.
+ * M2: the candidate leads a work situation in English, turn by turn, out loud.
+ * Speaking is the point — a prepared answer cannot be pasted into a microphone
+ * — so typing exists only when staff switched it on for this candidate.
  *
  * The candidate sees the conversation and the situation — never a score, a
  * rating or a hint of how they are doing. Candidate screens are English only,
@@ -20,7 +22,7 @@ import { useSimulation } from '../../../../lib/simulation/useSimulation';
  */
 export default function SimulationPage() {
   const { sessionId } = useParams<{ sessionId: string }>();
-  const { scenario, state, preview, send, stop } = useSimulation(sessionId);
+  const { scenario, state, preview, inputMode, send, sendVoice, stop } = useSimulation(sessionId);
   const finished = state.stage === 'finished';
 
   return (
@@ -69,7 +71,11 @@ export default function SimulationPage() {
             </div>
           ) : (
             <div className="sticky bottom-4">
-              <Composer disabled={finished} waiting={state.replying} onSend={send} />
+              {inputMode === 'text' ? (
+                <Composer disabled={finished} waiting={state.replying} onSend={send} />
+              ) : (
+                <VoiceComposer disabled={finished} waiting={state.replying} onSend={sendVoice} />
+              )}
             </div>
           )}
         </section>
