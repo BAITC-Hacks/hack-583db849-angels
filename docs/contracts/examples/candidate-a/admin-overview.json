@@ -1,0 +1,43 @@
+{
+  "demoMode": true,
+  "gatewayMode": "replay",
+  "ml": "up",
+  "usage": {
+    "liveCalls": 0,
+    "replayedCalls": 14,
+    "spentUsd": 0.0,
+    "capUsd": 20.0
+  },
+  "modules": [
+    {
+      "module": "M1",
+      "state": "on"
+    },
+    {
+      "module": "M2",
+      "state": "on"
+    },
+    {
+      "module": "M3",
+      "state": "on"
+    },
+    {
+      "module": "M4",
+      "state": "on"
+    },
+    {
+      "module": "M5",
+      "state": "off"
+    },
+    {
+      "module": "S",
+      "state": "on"
+    }
+  ],
+  "counts": {
+    "candidates": 3,
+    "simulationsCompleted": 1,
+    "assessmentsReady": 1,
+    "interviewsScored": 1
+  }
+}

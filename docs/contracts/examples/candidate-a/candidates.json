@@ -1,0 +1,73 @@
+{
+  "items": [
+    {
+      "candidateId": "00000000-0000-4000-8000-00000000000a",
+      "externalId": "inv-2026-demo-a",
+      "label": "Candidate A",
+      "createdAt": "2026-09-24T08:00:00Z",
+      "progress": {
+        "candidateId": "00000000-0000-4000-8000-00000000000a",
+        "label": "Candidate A",
+        "brief": {
+          "briefId": "6f1c2a0e-0000-4000-8000-00000000a001",
+          "status": "ready"
+        },
+        "simulation": {
+          "simulationId": "6f1c2a0e-0000-4000-8000-00000000a002",
+          "status": "completed",
+          "ending": "completed"
+        },
+        "assessment": {
+          "assessmentId": "6f1c2a0e-0000-4000-8000-00000000a003",
+          "status": "ready"
+        },
+        "interview": {
+          "interviewId": "6f1c2a0e-0000-4000-8000-00000000a004",
+          "transcriptStatus": "ready",
+          "scoresSaved": true,
+          "draftReady": true
+        },
+        "surprise": {
+          "surpriseId": "6f1c2a0e-0000-4000-8000-00000000a007",
+          "status": "answered"
+        }
+      }
+    },
+    {
+      "candidateId": "00000000-0000-4000-8000-00000000000b",
+      "externalId": "inv-2026-demo-b",
+      "label": "Candidate B",
+      "createdAt": "2026-09-24T08:00:00Z",
+      "progress": {
+        "candidateId": "00000000-0000-4000-8000-00000000000b",
+        "label": "Candidate B",
+        "brief": {
+          "briefId": "6f1c2a0e-0000-4000-8000-0000000000b1",
+          "status": "ready"
+        },
+        "simulation": null,
+        "assessment": null,
+        "interview": null,
+        "surprise": null
+      }
+    },
+    {
+      "candidateId": "00000000-0000-4000-8000-00000000000c",
+      "externalId": "inv-2026-demo-c",
+      "label": "Candidate C",
+      "createdAt": "2026-09-24T08:00:00Z",
+      "progress": {
+        "candidateId": "00000000-0000-4000-8000-00000000000c",
+        "label": "Candidate C",
+        "brief": {
+          "briefId": "6f1c2a0e-0000-4000-8000-0000000000c1",
+          "status": "ready"
+        },
+        "simulation": null,
+        "assessment": null,
+        "interview": null,
+        "surprise": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "candidateId": "00000000-0000-4000-8000-00000000000a",
+  "label": "Candidate A",
+  "brief": null,
+  "simulation": {
+    "simulationId": "6f1c2a0e-0000-4000-8000-00000000a002",
+    "status": "completed",
+    "ending": "completed"
+  },
+  "assessment": {
+    "assessmentId": "6f1c2a0e-0000-4000-8000-00000000a003",
+    "status": "ready"
+  },
+  "interview": null,
+  "surprise": {
+    "surpriseId": "6f1c2a0e-0000-4000-8000-00000000a007",
+    "status": "answered"
+  }
+}

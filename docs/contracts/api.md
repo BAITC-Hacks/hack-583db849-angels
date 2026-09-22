@@ -18,22 +18,27 @@ These are the exact endpoints the web screens call. They are derived from the sc
 ## What unblocks the web, in order
 
 1. **F0.** `GET /v1/health`, and `apps/api/openapi.json` committed — even if it holds only health and candidates. The web cannot generate a single call before this file exists.
-2. **Candidates.** `POST /v1/candidates` and `GET /v1/candidates`, with A, B and C seeded.
-3. **M2 simulations.** The screen is ready and waits only for these four endpoints.
+2. **Candidates.** `POST /v1/candidates`, `GET /v1/candidates` (with `?include=progress`), `GET /v1/candidates/:id/progress`, `GET /v1/scenarios`, with A, B and C seeded.
+3. **M2 simulations.** The screen is ready and waits only for these four endpoints, plus the assessment the API starts by itself when a simulation completes.
 4. **M3 assessments and candidate feedback.**
-5. **M4 interviews.**
-6. **M1 briefs.**
-7. **M5 quality checks.** These are drafts; finalise them in the M5 contract PR.
+5. **M4 interviews,** with the recording upload.
+6. **M1 briefs,** created by the API itself after a candidate is registered.
+7. **Admin and demo:** `GET /v1/admin/overview`, `GET /v1/audit-events`, `POST /v1/demo/*`.
+8. **M5 quality checks.** These are drafts; finalise them in the M5 contract PR.
+9. **M2b voice turns and the surprise question (S).**
+
+The step-by-step plan with owners and dates is `docs/INTEGRATION.md`.
 
 The contract PR for each group is small: DTOs, the regenerated `openapi.json`, and the example as a fixture. Merge it first. Implementation follows in a second PR.
 
 ## How the web calls you
 
-The browser never holds an API key. The web calls a Next.js route on its own server (`/api/v1/*`), which adds the `X-API-Key` for the demo role and forwards the request to `API_INTERNAL_URL`. So:
+The browser never holds an API key. The web calls a Next.js route on its own server (`/api/v1/*`), which adds the `X-API-Key` for the demo role and forwards the request to `API_INTERNAL_URL` unchanged: method, body (multipart streamed), `Idempotency-Key`, status and response body. So:
 
 - no CORS is needed;
 - every request reaches you with a key;
-- `GET /v1/health` must answer without a key.
+- `GET /v1/health` must answer without a key;
+- on the server only the web is public; `api` is reachable only inside the Docker network.
 
 ## Roles
 
@@ -41,13 +46,23 @@ The browser never holds an API key. The web calls a Next.js route on its own ser
 
 | Endpoint group | `platform` | `interviewer` | `commission` | `admin` |
 | --- | --- | --- | --- | --- |
-| Candidates — create, list | yes | yes | yes | yes |
+| Candidates — create, list, progress | yes ¹ | yes ¹ | yes | yes |
+| Scenarios — list | yes | yes | yes | yes |
 | M1 briefs | — | yes | yes | yes |
 | M2 simulations | yes | yes | yes | yes |
-| M3 assessments — create, read scores | — | — | yes | yes |
+| M3 assessments — read scores | — | — | yes | yes |
+| M3 assessments — re-run | — | — | — | yes |
 | M3 candidate feedback | yes | yes | yes | yes |
-| M4 interviews, interviewer scores, draft | — | yes | read | yes |
+| M4 interviews, recording, interviewer scores, draft | — | yes | read | yes |
 | M5 quality checks | — | — | yes | yes |
+| S surprise question — create, start, answer, status | yes ² | read | read | yes |
+| S surprise answer — transcript and video | — | yes | yes | yes |
+| Admin overview, audit events | — | — | — | yes |
+| Demo: recorded session | — | — | yes | yes |
+| Demo: reset | — | — | — | yes |
+
+¹ `progress` is filtered by role: `platform` gets no `brief` and no `interview` and never a score; `interviewer` gets no `assessment` — they score blind.
+² `platform` sees the question only after `start`, and never the competency it targets, the transcript or the video.
 
 `API_KEYS` gets a fourth pair, for example `change-me-platform:platform`.
 
@@ -61,37 +76,46 @@ The browser never holds an API key. The web calls a Next.js route on its own ser
 | --- | --- | --- | --- | --- |
 | `GET` | `/v1/health` | | `200 { "status": "ok" }` — no key needed | |
 | `POST` | `/v1/candidates` | ✱ | `201 Candidate` — upsert by `externalId` | `400` |
-| `GET` | `/v1/candidates` | | `200 { items: Candidate[] }` | |
+| `GET` | `/v1/candidates` | | `200 { items: Candidate[] }`; with `?include=progress` each item also has `progress` | |
 | `GET` | `/v1/candidates/:candidateId` | | `200 Candidate` | `404` |
+| `GET` | `/v1/candidates/:candidateId/progress` | | `200 CandidateProgress` — filtered by role | `404` |
+| `GET` | `/v1/scenarios` | | `200 ScenarioBrief[]` | |
+
+`CandidateProgress` is what every role's home reads: one call, every step's state and id. The homes poll it every 5 seconds while a step is `pending`.
 
 ### M1 — briefs
 
 | Method | Path | Idem. | Success | Errors |
 | --- | --- | --- | --- | --- |
-| `POST` | `/v1/briefs` | ✱ | `201 Brief`; body `{ candidateId }` | `404` candidate, `502/503` AI |
+| `POST` | `/v1/briefs` | ✱ | `201 Brief`; body `{ candidateId }` — admin re-run | `404` candidate, `502/503` AI |
 | `GET` | `/v1/briefs/:briefId` | | `200 Brief` | `404` |
 | `GET` | `/v1/candidates/:candidateId/brief` | | `200 Brief` — the latest | `404 BRIEF_NOT_FOUND` |
 
 The last one exists because the screen is addressed by candidate, not by brief.
+
+**You create the brief yourself** right after `POST /v1/candidates`, and again once a surprise answer is transcribed. `progress.brief.status` goes `pending → ready` (or `failed`). In `DEMO_MODE` the briefs for A, B and C come from the seed.
 
 ### M2 — simulations
 
 | Method | Path | Idem. | Success | Errors |
 | --- | --- | --- | --- | --- |
 | `POST` | `/v1/simulations` | ✱ | `201 Simulation`, with the character's opening turn; body `{ candidateId, scenarioId, mode }` | `404` candidate or scenario |
-| `POST` | `/v1/simulations/:simulationId/turns` | ✱ | `200 TurnResult`; body `{ text }` | `400` empty or over 1000 characters, `409 SIMULATION_FINISHED`, `409 TURN_IN_FLIGHT` |
+| `POST` | `/v1/simulations/:simulationId/turns` | ✱ | `200 TurnResult`; body `{ text }`, or multipart `audio` for a voice turn (M2b) | `400` empty or over 1000 characters, `409 SIMULATION_FINISHED`, `409 TURN_IN_FLIGHT` |
+| `GET` | `/v1/simulations/:simulationId/turns/:turnId/audio` | | `200 audio/mpeg` — the character's voice (M2b) | `404` |
 | `POST` | `/v1/simulations/:simulationId/complete` | | `200 Simulation`; body `{ reason: "completed" \| "stopped" }` | `409 SIMULATION_FINISHED` |
 | `GET` | `/v1/simulations/:simulationId` | | `200 Simulation` with every turn | `404` |
 
 - **One turn at a time.** A second turn while the first is still with the ML service answers `409 TURN_IN_FLIGHT`.
 - **`Idempotency-Key` on `/turns` matters.** A network retry must not add the candidate's turn twice.
 - **The simulation completes on its own** when the ML service reports `ended: true`. `/complete` with `stopped` is the candidate's stop button.
+- **When a simulation completes, you start its assessment yourself.** `progress.assessment.status` goes `pending → ready` (or `failed`). Nobody has to press anything.
+- **A voice turn** (M2b) sends the audio; the candidate turn's `text` is the transcript, `recognitionConfidence` is the recogniser's, and `characterAudioUrl` points at the character's voice. Low confidence is a flag on the turn, never a penalty.
 
 ### M3 — assessments and candidate feedback
 
 | Method | Path | Idem. | Success | Errors |
 | --- | --- | --- | --- | --- |
-| `POST` | `/v1/simulation-assessments` | ✱ | `201 Assessment`; body `{ simulationId }` | `409 SIMULATION_NOT_FINISHED`, `502/503` AI |
+| `POST` | `/v1/simulation-assessments` | ✱ | `201 Assessment`; body `{ simulationId }` — admin re-run; normally you start it on completion | `409 SIMULATION_NOT_FINISHED`, `502/503` AI |
 | `GET` | `/v1/simulation-assessments/:assessmentId` | | `200 Assessment` | `404`, `403` for `interviewer` and `platform` |
 | `GET` | `/v1/simulation-assessments/:assessmentId/candidate-feedback` | | `200 CandidateFeedback` | `404` |
 
@@ -119,6 +143,33 @@ The last one exists because the screen is addressed by candidate, not by brief.
 - **The ML service never sees the interviewer's scores** when it writes the draft (see `ml.md`). The web compares the two itself.
 - **Notes stay optional:** a list of strings, stored with ids `note_1`, `note_2`, … and sent to the draft as extra context.
 
+### S — the surprise question (video and voice)
+
+One question about the candidate's own application, one attempt, 90 seconds, on camera. See `docs/INTEGRATION.md`, section 10.
+
+| Method | Path | Idem. | Success | Errors |
+| --- | --- | --- | --- | --- |
+| `POST` | `/v1/surprise-questions` | ✱ | `201 SurpriseQuestion` with `status: "ready"` and `question: null`; body `{ candidateId }` | `404` candidate, `409 SURPRISE_EXISTS` |
+| `POST` | `/v1/surprise-questions/:surpriseId/start` | ✱ | `200 SurpriseQuestion` with the question, `startedAt` and a **server** `answerDeadline` | `409 ALREADY_STARTED` |
+| `POST` | `/v1/surprise-questions/:surpriseId/answer` | ✱ | `202 SurpriseQuestion` with `status: "transcribing"`; multipart `video` (webm or mp4, up to 50 MB), `consentVideo=true`, `consentProcessing=true` | `400 CONSENT_REQUIRED`, `409 DEADLINE_PASSED`, `409 ALREADY_ANSWERED`, `413` |
+| `GET` | `/v1/surprise-questions/:surpriseId` | | `200 SurpriseQuestion` — fields by role | `404` |
+| `GET` | `/v1/surprise-questions/:surpriseId/video` | | `200 video/webm`, streamed | `403` for `platform`, `404` |
+
+- **The question is written by the ML service** from the candidate's application when the surprise is created, and **revealed only by `start`**.
+- **One attempt, held by the server:** a second `start` answers `409 ALREADY_STARTED`, and an answer after `answerDeadline` + 15 s answers `409 DEADLINE_PASSED`.
+- **The video never reaches a model.** You extract the audio (`ffmpeg`), send it to `POST /internal/v1/transcribe` with one speaker, store the transcript as segments `sseg_01`, `sseg_02`, …, and delete the audio. The video file stays for staff playback only.
+- **Every video view is an audit event.** The video is deleted on demo reset and 30 days after the decision.
+- **Once the answer is transcribed,** you create a new brief, so its quotes can cite `surprise_answer`.
+
+### Admin and demo
+
+| Method | Path | Idem. | Success | Errors |
+| --- | --- | --- | --- | --- |
+| `GET` | `/v1/admin/overview` | | `200 AdminOverview` | |
+| `GET` | `/v1/audit-events?limit=50` | | `200 { items: AuditEvent[] }`, newest first | |
+| `POST` | `/v1/demo/recorded-session` | ✱ | `200 CandidateProgress`; body `{ candidateId }` — completes that candidate's simulation from the seed transcript and starts its assessment | `404` when `DEMO_MODE` is off |
+| `POST` | `/v1/demo/reset` | | `204`; drops every simulation, assessment, interview, surprise and video and re-seeds A, B and C | `404` when `DEMO_MODE` is off |
+
 ### M5 — quality checks (draft)
 
 | Method | Path | Idem. | Success | Errors |
@@ -136,7 +187,7 @@ type Competency = 'D' | 'R' | 'I' | 'V' | 'E';
 type Score = 0 | 1 | 2 | 3 | 4 | null;           // null: not enough verified evidence
 
 interface Evidence {
-  source: 'application_field' | 'test_item' | 'simulation_turn' | 'interview_turn' | 'interview_note';
+  source: 'application_field' | 'test_item' | 'simulation_turn' | 'interview_turn' | 'interview_note' | 'surprise_answer';
   sourceId: string;
   quote: string;                                  // verbatim; never translated
 }
@@ -154,6 +205,24 @@ interface Candidate {
   externalId: string;
   label: string;                                  // "Candidate A" for the seed; never the profile name
   createdAt: string;
+  progress?: CandidateProgress;                   // only with ?include=progress
+}
+
+type StepStatus = 'pending' | 'ready' | 'failed';
+
+interface CandidateProgress {                     // filtered by role, see the Roles table
+  candidateId: string;
+  label: string;
+  brief: { briefId: string; status: StepStatus } | null;
+  simulation: { simulationId: string; status: 'active' | 'completed'; ending: 'completed' | 'stopped' | null } | null;
+  assessment: { assessmentId: string; status: StepStatus } | null;
+  interview: {
+    interviewId: string;
+    transcriptStatus: 'none' | 'transcribing' | 'ready' | 'failed';
+    scoresSaved: boolean;
+    draftReady: boolean;
+  } | null;
+  surprise: { surpriseId: string; status: SurpriseStatus } | null;
 }
 
 interface Brief {
@@ -172,6 +241,7 @@ interface Brief {
   sources: {                                      // the answers the quotes point into; no profile data
     application: { fieldId: string; question: string; answer: string }[];
     test: { itemId: string; response: string }[];
+    surpriseAnswer: { surpriseId: string; question: string; segments: SurpriseSegment[] } | null;
   };
 }
 
@@ -207,14 +277,24 @@ interface TurnResult {
   stage: Stage;
   status: 'active' | 'completed';
   candidateTurns: number;
+  recognitionConfidence: number | null;           // voice turns (M2b); null for text
+  characterAudioUrl: string | null;               // voice turns (M2b), relative to /v1; null for text
 }
 
 interface Assessment {
   assessmentId: string;
   simulationId: string;
   candidateId: string;
+  candidateLabel: string;
   createdAt: string;
-  simulation: { scenarioTitle: string; mode: 'text' | 'voice'; completedAt: string; durationSeconds: number; turns: Turn[] };
+  simulation: {
+    scenarioTitle: string;
+    characterName: string;                        // labels the character's turns in the transcript
+    mode: 'text' | 'voice';
+    completedAt: string;
+    durationSeconds: number;
+    turns: Turn[];
+  };
   scores: DriveScore[];                           // all five, in D R I V E order
   english: EnglishMetrics;                        // speech measures are null in text mode
   interviewQuestions: { competency: Competency; question: string; reason: string }[];
@@ -239,6 +319,7 @@ interface InterviewTurn {
 interface Interview {
   interviewId: string;
   candidateId: string;
+  candidateLabel: string;
   heldAt: string;
   transcriptStatus: 'none' | 'transcribing' | 'ready' | 'failed';
   transcriptSource: 'platform' | 'recording' | null;
@@ -258,6 +339,54 @@ interface AssessmentDraft {
   interviewId: string;
   createdAt: string;
   scores: DriveScore[];                           // evidence: the candidate's interview turns (and notes, if any)
+}
+
+type SurpriseStatus = 'ready' | 'started' | 'transcribing' | 'answered' | 'expired' | 'failed';
+
+interface SurpriseSegment {
+  segmentId: string;                              // sseg_01, sseg_02, …
+  text: string;                                   // verbatim, never translated
+  startSec: number;
+  endSec: number;
+}
+
+interface SurpriseQuestion {
+  surpriseId: string;
+  candidateId: string;
+  status: SurpriseStatus;
+  question: string | null;                        // null until start
+  answerSeconds: number;                          // 90
+  startedAt: string | null;
+  answerDeadline: string | null;                  // server time; the client counts down to it
+  // staff only — absent for platform:
+  competency?: Competency;
+  why?: string;
+  segments?: SurpriseSegment[] | null;
+  videoAvailable?: boolean;
+}
+
+interface AdminOverview {
+  demoMode: boolean;
+  gatewayMode: 'live' | 'record' | 'replay';
+  ml: 'up' | 'down';
+  usage: { liveCalls: number; replayedCalls: number; spentUsd: number; capUsd: number };
+  modules: { module: 'M1' | 'M2' | 'M3' | 'M4' | 'M5' | 'S'; state: 'on' | 'off' }[];
+  counts: { candidates: number; simulationsCompleted: number; assessmentsReady: number; interviewsScored: number };
+}
+
+type AuditAction =
+  | 'candidate.created' | 'brief.ready' | 'simulation.started' | 'simulation.completed' | 'simulation.stopped'
+  | 'assessment.ready' | 'interview.created' | 'recording.uploaded' | 'transcript.ready' | 'scores.saved'
+  | 'draft.created' | 'surprise.started' | 'surprise.answered' | 'surprise.video.viewed' | 'demo.reset';
+
+interface AuditEvent {
+  eventId: string;
+  at: string;
+  actorRole: 'platform' | 'interviewer' | 'commission' | 'admin' | 'system';
+  action: AuditAction;                            // the web turns it into a sentence in EN or RU
+  candidateId: string | null;
+  candidateLabel: string | null;
+  subjectId: string | null;
 }
 
 interface QualityCheck {                          // draft, M5
@@ -296,7 +425,12 @@ interface QualityCheck {                          // draft, M5
 | `DRAFT_LOCKED` | 409 | the draft requested before the interviewer's scores exist |
 | `TRANSCRIPT_MISSING` | 409 | a draft or an interview check before the transcript exists |
 | `TRANSCRIPT_EXISTS` | 409 | a second recording for an interview that already has a transcript |
-| `CONSENT_REQUIRED` | 400 | a recording uploaded without `consent=true` |
+| `CONSENT_REQUIRED` | 400 | a recording or a surprise answer uploaded without its consent fields |
+| `SURPRISE_EXISTS` | 409 | a second surprise question for the same candidate |
+| `ALREADY_STARTED` | 409 | the surprise question was already revealed |
+| `ALREADY_ANSWERED` | 409 | a second answer to the surprise question |
+| `DEADLINE_PASSED` | 409 | the surprise answer arrived after the deadline plus 15 seconds |
+| `PAYLOAD_TOO_LARGE` | 413 | audio over 60 minutes or video over 50 MB |
 | `AI_INVALID_OUTPUT` | 502 | the ML service failed schema or evidence checks after its one retry |
 | `AI_UNAVAILABLE` | 503 | the ML service is down |
 | `AI_BUDGET_EXCEEDED` | 503 | the gateway refused: `BUDGET_USD_CAP` reached |
@@ -307,11 +441,15 @@ interface QualityCheck {                          // draft, M5
 
 | Public endpoint | ML endpoint | `api` stores |
 | --- | --- | --- |
-| `POST /v1/briefs` | `POST /internal/v1/brief` | the brief |
+| `POST /v1/candidates`, and after a surprise answer | `POST /internal/v1/brief` | the brief |
 | `POST /v1/simulations` | `GET /internal/v1/scenarios/:id`, then `POST /internal/v1/simulation/turn` with no turns | the simulation and the opening turn |
 | `POST /v1/simulations/:id/turns` | `POST /internal/v1/simulation/turn` with the whole transcript | both turns, the director's decision (audit only, never returned) |
-| `POST /v1/simulation-assessments` | `POST /internal/v1/simulation/assessment` | scores, English, questions and feedback — feedback served separately |
-| `POST /v1/interviews/:id/recording` | `POST /internal/v1/interview/transcribe` | the transcript; **the audio is deleted** once it is stored |
+| a simulation completing, or `POST /v1/simulation-assessments` | `POST /internal/v1/simulation/assessment` | scores, English, questions and feedback — feedback served separately |
+| `POST /v1/simulations/:id/turns` with audio (M2b) | `POST /internal/v1/transcribe` (one speaker), then `simulation/turn`, then `POST /internal/v1/speech` | the transcript as the turn text, the character's audio |
+| `POST /v1/interviews/:id/recording` | `POST /internal/v1/transcribe` (two speakers) | the transcript; **the audio is deleted** once it is stored |
+| `POST /v1/surprise-questions` | `POST /internal/v1/surprise-question` | the question, its competency and why |
+| `POST /v1/surprise-questions/:id/answer` | `POST /internal/v1/transcribe` (one speaker), with the audio only | the segments; the audio is deleted, the video kept for staff |
+| `GET /v1/admin/overview` | `GET /internal/v1/usage` | nothing |
 | `POST /v1/interviews/:id/assessment-draft` | `POST /internal/v1/interview/draft` with the transcript and notes — never the interviewer's scores | the draft |
 | `POST /v1/quality-checks/*` | `POST /internal/v1/quality-check` — for an interview, with its transcript | the check |
 
@@ -328,4 +466,8 @@ These go in the same PR as the rule they test, as `AGENTS.md` requires:
 - `platform` gets `403` on briefs and drafts;
 - no key → `401`, wrong role → `403`, `/v1/health` → `200` without a key;
 - same `Idempotency-Key` + same body → same resource; different body → `409 IDEMPOTENCY_KEY_REUSED`;
-- a turn while one is in flight → `409 TURN_IN_FLIGHT`.
+- a turn while one is in flight → `409 TURN_IN_FLIGHT`;
+- `progress` for `platform` has no `brief`, no `interview` and no score; for `interviewer` it has no `assessment`;
+- a completed simulation gets its assessment without anyone calling `POST /v1/simulation-assessments`;
+- the surprise question: `question` is `null` before `start`; a second `start` → `409 ALREADY_STARTED`; an answer after the deadline → `409 DEADLINE_PASSED`; `platform` gets `403` on the video; every video view writes an audit event;
+- `POST /v1/demo/*` answers `404` when `DEMO_MODE` is off.
