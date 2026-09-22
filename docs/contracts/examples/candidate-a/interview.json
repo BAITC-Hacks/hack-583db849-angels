@@ -1,0 +1,29 @@
+{
+  "interviewId": "6f1c2a0e-0000-4000-8000-00000000a004",
+  "candidateId": "00000000-0000-4000-8000-00000000000a",
+  "heldAt": "2026-09-26T09:30:00Z",
+  "notes": [
+    {
+      "id": "note_1",
+      "text": "Asked about the hackathon conflict. Candidate repeated the plan: owners, deadline, full run on Thursday. Very quick to act."
+    },
+    {
+      "id": "note_2",
+      "text": "Why keep Dana's version? Said it works, and that is what matters for the demo. Did not mention fairness to Dana."
+    },
+    {
+      "id": "note_3",
+      "text": "Values question (doing the right thing at a cost): reported a classmate who copied homework. Said: I felt bad, but rules are rules."
+    },
+    {
+      "id": "note_4",
+      "text": "If Thursday fails? We cut scope and move on. No word about how people feel afterwards."
+    },
+    {
+      "id": "note_5",
+      "text": "Risks of the new review rule: named slower merges and suggested a 24-hour review limit."
+    }
+  ],
+  "interviewerScores": null,
+  "scoredAt": null
+}

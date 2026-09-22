@@ -1,0 +1,8 @@
+{
+  "error": {
+    "code": "DRAFT_LOCKED",
+    "message": "Save the interviewer's scores first.",
+    "details": {},
+    "traceId": "demo-trace-1"
+  }
+}

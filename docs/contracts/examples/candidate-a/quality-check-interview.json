@@ -1,0 +1,42 @@
+{
+  "qualityCheckId": "6f1c2a0e-0000-4000-8000-00000000a005",
+  "kind": "interview",
+  "interviewId": "6f1c2a0e-0000-4000-8000-00000000a004",
+  "createdAt": "2026-09-26T11:00:00Z",
+  "signals": [
+    {
+      "kind": "leading_question",
+      "message": "The question suggests its own answer.",
+      "recommendation": "Ask openly: “What mattered most to you in that moment, and why?”",
+      "evidence": [
+        {
+          "source": "interview_question",
+          "sourceId": "q_2",
+          "quote": "You would agree that finishing on time matters most, right?"
+        }
+      ]
+    },
+    {
+      "kind": "off_limits_question",
+      "message": "Family income and background are not assessed and must not be asked about.",
+      "recommendation": "Remove the question; it cannot inform any D.R.I.V.E. competency.",
+      "evidence": [
+        {
+          "source": "interview_question",
+          "sourceId": "q_3",
+          "quote": "What do your parents do for a living?"
+        }
+      ]
+    },
+    {
+      "kind": "coverage_gap",
+      "message": "No question addressed Values-Driven Leadership or Insightful Vision.",
+      "recommendation": "Use the brief’s questions for V and I.",
+      "competencies": [
+        "V",
+        "I"
+      ],
+      "evidence": []
+    }
+  ]
+}
