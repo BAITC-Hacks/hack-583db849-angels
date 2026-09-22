@@ -38,6 +38,7 @@ The ML service is never exposed publicly. Only `api` calls it.
 | `API_KEYS` | api | demo clients as `key:role` pairs, comma-separated |
 | `ML_SERVICE_URL` | api | where `api` reaches `ml` |
 | `ML_INTERNAL_TOKEN` | api, ml | shared secret on every internal call |
+| `UPLOADS_DIR` | api, ml | a volume both mount at the same path. `api` saves audio there, sends its path relative to this folder as `audioRef`, and deletes it once the transcript is stored |
 | `DEMO_MODE` | api, ml | serve seed results for A, B and C without model calls |
 | `OPENAI_API_KEY`, `DEEPGRAM_API_KEY` | ml only | provider keys |
 | `GATEWAY_MODE` | ml | `live`, `record` or `replay` |
@@ -99,7 +100,7 @@ Called only by `api`. Every request carries `X-Internal-Token: $ML_INTERNAL_TOKE
 
 **`api` owns storage and ids; `ml` owns content.** For a simulation turn, `api` assigns the candidate turn's id and sends the whole transcript; `ml` returns the character's line and the director's decision; `api` assigns the character turn's id and stores both.
 
-**Types flow one way.** FastAPI exports its OpenAPI to `services/ml/openapi.json`, committed. `api` generates `apps/api/src/ai-client/schema.d.ts` from it with `openapi-typescript`. Whoever changes an ML schema regenerates both in the same pull request. F0 adds a CI step that fails when they drift.
+**Types flow one way, and nobody edits the other part.** FastAPI exports its OpenAPI to `services/ml/openapi.json`, committed; an ML test fails when the file differs from the code. `api` generates its `ai-client` types from that file with `openapi-typescript` at build time, into a git-ignored folder — they are never committed. So an ML change that breaks a shape `api` uses fails the `api` job on the ML pull request itself, and nobody has to regenerate someone else's code. Shapes change only through a docs pull request to `docs/contracts/`, and only by adding.
 
 ## 6. Shared schemas
 
@@ -224,4 +225,4 @@ The key is the SHA-256 of the provider, the model, the prompt file's content and
 
 ## 9. Where the public contract comes from
 
-NestJS DTOs with `@nestjs/swagger` produce `apps/api/openapi.json`, committed. `packages/api-client` is generated from it with `openapi-typescript`, and the web app calls the API only through that client. MSW mock fixtures in `apps/web` are validated against the same file. As with the ML types, CI regenerates and fails on drift.
+NestJS DTOs with `@nestjs/swagger` produce `apps/api/openapi.json`, committed; an API test fails when the file differs from the DTOs. `packages/api-client` is generated from it with `openapi-typescript` before the web's typecheck, tests and build, and is never committed. The web app calls the API only through that client. As with the ML types, an API change that breaks a shape the screens use fails the `web` job on the API pull request itself.
