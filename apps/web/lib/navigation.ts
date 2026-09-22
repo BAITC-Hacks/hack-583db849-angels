@@ -53,6 +53,9 @@ export const navItems: NavItem[] = [
     icon: DocumentTextIcon,
     label: { en: 'Briefs', ru: 'Брифы' },
     roles: ['interviewer', 'admin'],
+    href: '/interviewer/brief/00000000-0000-4000-8000-00000000000a',
+    match: '/interviewer/brief',
+    preview: true,
     module: 'M1',
   },
   {
