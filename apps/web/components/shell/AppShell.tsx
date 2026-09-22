@@ -6,7 +6,8 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { homeFor } from '../../lib/demo/world';
 import { useStaffLocale } from '../../lib/i18n/StaffLocaleProvider';
 import { createPreference } from '../../lib/preference';
-import { isStaff, useDemoRole, type DemoRole } from '../../lib/roles';
+import { useDemoRole } from '../../lib/DemoRoleProvider';
+import { isStaff, type DemoRole } from '../../lib/roles';
 import { RoleTile } from './RoleSwitcher';
 import { Sidebar } from './Sidebar';
 
@@ -18,7 +19,7 @@ const useSidebarState = createPreference<'open' | 'folded'>('invision-sidebar', 
  * written in, so screen readers pronounce Russian staff screens correctly.
  */
 export function AppShell({ children }: { children: ReactNode }) {
-  const [role, setRole] = useDemoRole();
+  const { role, setRole } = useDemoRole();
   const router = useRouter();
   const { locale, setLocale } = useStaffLocale();
   const [sidebar, setSidebar] = useSidebarState();

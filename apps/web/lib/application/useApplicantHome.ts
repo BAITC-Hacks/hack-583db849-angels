@@ -2,8 +2,8 @@
 
 import type { ActiveCycle, ApplicationDraft, TestAttemptSummary } from '@invision/stand-client';
 import { useCallback, useEffect, useState } from 'react';
-import { api } from '../api/client';
-import { ApiError } from '../api/error';
+import { api } from '../stand/client';
+import { ApiError } from '../stand/error';
 
 /**
  * Every state the applicant's home screen can be in, as a single value.

@@ -10,7 +10,7 @@ import { StatusLedger } from './StatusLedger';
 import { Alert } from '../ui/Alert';
 import { Button } from '../ui/Button';
 import Link from 'next/link';
-import { useApiErrorText } from '../../lib/api/errorPresentation';
+import { useApiErrorText } from '../../lib/stand/errorPresentation';
 import { useApplicantHome } from '../../lib/application/useApplicantHome';
 import { useAuth } from '../../lib/auth/AuthContext';
 import { formatDate } from '../../lib/format';

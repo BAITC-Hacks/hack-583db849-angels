@@ -9,7 +9,7 @@ import { TextField } from '../../../components/ui/TextField';
 import { ThemeToggle } from '../../../components/ui/ThemeToggle';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useApiErrorText } from '../../../lib/api/errorPresentation';
+import { useApiErrorText } from '../../../lib/stand/errorPresentation';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { validateLoginFields, type FieldErrors } from '../../../lib/validation/identity';
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { whenApiReady } from '../lib/api/ready';
+import { whenApiReady } from '../lib/stand/ready';
 
 /**
  * Starts the MSW browser worker when NEXT_PUBLIC_API_MODE=mock, and renders
