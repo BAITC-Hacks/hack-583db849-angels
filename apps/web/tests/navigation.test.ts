@@ -25,21 +25,26 @@ function routeExists(href: string): boolean {
 describe('navigation by role', () => {
   it('gives the interviewer no simulation reports: they score blind', () => {
     expect(ids('interviewer')).not.toContain('reports');
-    expect(ids('interviewer')).toEqual(expect.arrayContaining(['candidates', 'briefs', 'interviews']));
+    expect(ids('interviewer')).toEqual(expect.arrayContaining(['interviewer-home', 'briefs', 'interviews']));
   });
 
   it('gives the commission the reports and the quality guard, not the interview form', () => {
-    expect(ids('commission')).toEqual(expect.arrayContaining(['reports', 'quality']));
+    expect(ids('commission')).toEqual(expect.arrayContaining(['commission-home', 'reports', 'quality']));
     expect(ids('commission')).not.toContain('interviews');
   });
 
   it('shows a candidate only their own screens', () => {
-    expect(ids('candidate')).toEqual(['simulation', 'feedback', 'stand']);
+    expect(ids('candidate')).toEqual(['candidate-home', 'simulation', 'feedback', 'stand']);
   });
 
   it('shows the admin everything', () => {
     expect(ids('admin').sort()).toEqual(navItems.filter((item) => item.roles.includes('admin')).map((i) => i.id).sort());
-    expect(ids('admin')).toEqual(expect.arrayContaining(['briefs', 'interviews', 'reports', 'quality', 'kit']));
+    expect(ids('admin')).toEqual(expect.arrayContaining(['admin-home', 'briefs', 'interviews', 'reports', 'quality', 'overview', 'kit']));
+  });
+
+  it('gives every role its own home', () => {
+    const homes = (['interviewer', 'commission', 'admin', 'candidate'] as const).map((role) => navFor(role)[0].href);
+    expect(new Set(homes).size).toBe(4);
   });
 
   it('keeps candidate-only items in English in both languages', () => {
