@@ -38,3 +38,4 @@ __pycache__/
 .idea/
 .vscode/*
 !.vscode/extensions.json
+BACKEND_F0_PLAN.local.md
