@@ -1,0 +1,59 @@
+{
+  "externalId": "inv-2026-demo-c",
+  "profile": {
+    "fullName": "Candidate C (synthetic)",
+    "email": "candidate.c@example.test",
+    "phone": "+7 000 000 00 03",
+    "iin": "000000000003",
+    "gender": "not recorded",
+    "region": "synthetic region",
+    "school": "Synthetic School No. 3",
+    "familyIncome": "not recorded",
+    "photoUrl": null
+  },
+  "application": {
+    "answers": [
+      {
+        "fieldId": "motivation",
+        "question": "Why inVision U?",
+        "answer": "I applied because several people recommended the programme. I prefer to make decisions independently and usually do not ask for advice."
+      },
+      {
+        "fieldId": "leadership_example",
+        "question": "Describe a time you led others.",
+        "answer": "I was listed as the leader of a class event. The group completed it, but I do not remember who planned each part or what I personally changed."
+      },
+      {
+        "fieldId": "setback",
+        "question": "Tell us about something that did not go as planned.",
+        "answer": "Nothing important has gone wrong in my projects. Usually everything works as expected."
+      },
+      {
+        "fieldId": "community",
+        "question": "What problem in your community would you like to solve?",
+        "answer": "I might create a volunteering project, although I have not chosen the problem, users or first step yet."
+      },
+      {
+        "fieldId": "english_self",
+        "question": "How would you rate your English?",
+        "answer": "C1. I use English every day."
+      }
+    ]
+  },
+  "test": {
+    "answers": [
+      {
+        "itemId": "block_03",
+        "response": "I never decide before every person agrees with me."
+      },
+      {
+        "itemId": "block_07",
+        "response": "When a plan fails, I immediately replace it with a detailed backup plan."
+      }
+    ]
+  },
+  "englishCertificate": {
+    "type": "IELTS",
+    "score": "5.5"
+  }
+}
