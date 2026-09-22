@@ -1,0 +1,67 @@
+{
+  "items": [
+    {
+      "eventId": "6f1c2a0e-0000-4000-8000-0000000e0007",
+      "at": "2026-09-26T10:40:02Z",
+      "actorRole": "system",
+      "action": "draft.created",
+      "candidateId": "00000000-0000-4000-8000-00000000000a",
+      "candidateLabel": "Candidate A",
+      "subjectId": "6f1c2a0e-0000-4000-8000-00000000a004"
+    },
+    {
+      "eventId": "6f1c2a0e-0000-4000-8000-0000000e0006",
+      "at": "2026-09-26T10:40:00Z",
+      "actorRole": "interviewer",
+      "action": "scores.saved",
+      "candidateId": "00000000-0000-4000-8000-00000000000a",
+      "candidateLabel": "Candidate A",
+      "subjectId": "6f1c2a0e-0000-4000-8000-00000000a004"
+    },
+    {
+      "eventId": "6f1c2a0e-0000-4000-8000-0000000e0005",
+      "at": "2026-09-26T10:36:10Z",
+      "actorRole": "system",
+      "action": "transcript.ready",
+      "candidateId": "00000000-0000-4000-8000-00000000000a",
+      "candidateLabel": "Candidate A",
+      "subjectId": "6f1c2a0e-0000-4000-8000-00000000a004"
+    },
+    {
+      "eventId": "6f1c2a0e-0000-4000-8000-0000000e0004",
+      "at": "2026-09-26T10:35:30Z",
+      "actorRole": "interviewer",
+      "action": "recording.uploaded",
+      "candidateId": "00000000-0000-4000-8000-00000000000a",
+      "candidateLabel": "Candidate A",
+      "subjectId": "6f1c2a0e-0000-4000-8000-00000000a004"
+    },
+    {
+      "eventId": "6f1c2a0e-0000-4000-8000-0000000e0003",
+      "at": "2026-09-25T10:12:05Z",
+      "actorRole": "system",
+      "action": "assessment.ready",
+      "candidateId": "00000000-0000-4000-8000-00000000000a",
+      "candidateLabel": "Candidate A",
+      "subjectId": "6f1c2a0e-0000-4000-8000-00000000a003"
+    },
+    {
+      "eventId": "6f1c2a0e-0000-4000-8000-0000000e0002",
+      "at": "2026-09-25T10:11:50Z",
+      "actorRole": "platform",
+      "action": "simulation.completed",
+      "candidateId": "00000000-0000-4000-8000-00000000000a",
+      "candidateLabel": "Candidate A",
+      "subjectId": "6f1c2a0e-0000-4000-8000-00000000a002"
+    },
+    {
+      "eventId": "6f1c2a0e-0000-4000-8000-0000000e0001",
+      "at": "2026-09-25T10:05:00Z",
+      "actorRole": "platform",
+      "action": "simulation.started",
+      "candidateId": "00000000-0000-4000-8000-00000000000a",
+      "candidateLabel": "Candidate A",
+      "subjectId": "6f1c2a0e-0000-4000-8000-00000000a002"
+    }
+  ]
+}
