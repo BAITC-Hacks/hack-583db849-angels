@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronDoubleLeftIcon, ChevronDoubleRightIcon, LockClosedIcon } from '@heroicons/react/24/outline';
+import { BeakerIcon, ChevronDoubleLeftIcon, ChevronDoubleRightIcon, LockClosedIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { StaffLocale } from '../../lib/i18n/staffLocale';
@@ -11,8 +11,8 @@ import { LanguageSwitch } from './LanguageSwitch';
 import { RoleSwitcher } from './RoleSwitcher';
 
 const copy = {
-  en: { locked: 'Arrives with', collapse: 'Collapse sidebar', expand: 'Expand sidebar', synthetic: 'Synthetic data only' },
-  ru: { locked: 'Появится в', collapse: 'Свернуть панель', expand: 'Развернуть панель', synthetic: 'Только синтетические данные' },
+  en: { preview: 'Preview — scripted data until the API lands', locked: 'Arrives with', collapse: 'Collapse sidebar', expand: 'Expand sidebar', synthetic: 'Synthetic data only' },
+  ru: { preview: 'Превью — заготовленные данные, пока нет API', locked: 'Появится в', collapse: 'Свернуть панель', expand: 'Развернуть панель', synthetic: 'Только синтетические данные' },
 };
 
 const sections: NavSection[] = ['workspace', 'reference', 'demo'];
@@ -77,7 +77,10 @@ function Item({
     >
       {active ? <span aria-hidden="true" className="absolute top-2 bottom-2 left-0 w-0.5 rounded-full bg-brand-green" /> : null}
       <Icon aria-hidden="true" className={`h-[18px] w-[18px] shrink-0 ${active ? 'text-brand-ink' : ''}`} />
-      {collapsed ? null : <span className="truncate">{label}</span>}
+      {collapsed ? null : <span className="flex-1 truncate">{label}</span>}
+      {item.preview && !collapsed ? (
+        <BeakerIcon title={copy[locale].preview} className="h-3.5 w-3.5 shrink-0 text-text-muted" />
+      ) : null}
     </Link>
   );
 }
