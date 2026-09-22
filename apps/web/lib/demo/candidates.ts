@@ -90,6 +90,7 @@ export interface DemoStep {
 export const demoSteps: DemoStep[] = [
   {
     module: 'M1',
+    preview: '/interviewer/brief/00000000-0000-4000-8000-00000000000a',
     copy: {
       en: { title: 'Brief', note: 'Questions for the interviewer, each with its source' },
       ru: { title: 'Бриф', note: 'Вопросы для интервьюера, у каждого — источник' },
