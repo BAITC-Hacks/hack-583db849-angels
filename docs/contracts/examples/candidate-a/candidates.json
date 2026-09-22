@@ -30,6 +30,10 @@
         "surprise": {
           "surpriseId": "6f1c2a0e-0000-4000-8000-00000000a007",
           "status": "answered"
+        },
+        "consistency": {
+          "before": "ready",
+          "after": "ready"
         }
       }
     },
@@ -48,7 +52,11 @@
         "simulation": null,
         "assessment": null,
         "interview": null,
-        "surprise": null
+        "surprise": null,
+        "consistency": {
+          "before": "ready",
+          "after": null
+        }
       }
     },
     {
@@ -66,7 +74,11 @@
         "simulation": null,
         "assessment": null,
         "interview": null,
-        "surprise": null
+        "surprise": null,
+        "consistency": {
+          "before": "ready",
+          "after": null
+        }
       }
     }
   ]

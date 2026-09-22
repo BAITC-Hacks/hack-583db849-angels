@@ -15,5 +15,9 @@
   "surprise": {
     "surpriseId": "6f1c2a0e-0000-4000-8000-00000000a007",
     "status": "answered"
+  },
+  "consistency": {
+    "before": null,
+    "after": null
   }
 }

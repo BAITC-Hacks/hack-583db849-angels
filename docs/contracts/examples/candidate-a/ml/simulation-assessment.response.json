@@ -72,8 +72,8 @@
   ],
   "english": {
     "cefrEstimate": "B2",
-    "wordsPerMinute": null,
-    "fillerRate": null,
+    "wordsPerMinute": 112,
+    "fillerRate": 0.03,
     "meanTurnLength": 33.8,
     "lexicalDiversity": 0.71,
     "grammarErrorsPer100Words": 0.8

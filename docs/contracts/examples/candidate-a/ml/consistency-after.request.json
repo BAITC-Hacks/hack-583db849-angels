@@ -1,0 +1,238 @@
+{
+  "stage": "after",
+  "candidate": {
+    "candidateId": "00000000-0000-4000-8000-00000000000a",
+    "application": {
+      "answers": [
+        {
+          "fieldId": "motivation",
+          "question": "Why inVision U?",
+          "answer": "I want to build products that people in my city actually use. At school I led our robotics team to the regional final, and I always ask everyone's opinion before I decide anything. inVision U is where I can learn to do this at a bigger scale."
+        },
+        {
+          "fieldId": "leadership_example",
+          "question": "Describe a time you led others.",
+          "answer": "I organised a weekend clean-up with twelve volunteers and split them into three teams. Each team had a leader and a list of streets. We finished by two and collected forty bags."
+        },
+        {
+          "fieldId": "setback",
+          "question": "Tell us about something that did not go as planned.",
+          "answer": "Our robot broke two days before the final. We rebuilt the arm overnight and still made it. I learned to always have spare parts."
+        },
+        {
+          "fieldId": "community",
+          "question": "What problem in your community would you like to solve?",
+          "answer": "Public transport in Almaty is hard to plan. I want to make an app that shows real bus times."
+        },
+        {
+          "fieldId": "english_self",
+          "question": "How would you rate your English?",
+          "answer": "C2. I speak fluently and read everything in English."
+        }
+      ]
+    },
+    "test": {
+      "answers": [
+        {
+          "itemId": "block_03",
+          "response": "I prefer to decide quickly and explain my reasons later."
+        },
+        {
+          "itemId": "block_07",
+          "response": "When a teammate disagrees, I focus on finishing the task first."
+        }
+      ]
+    },
+    "englishCertificate": {
+      "type": "IELTS",
+      "score": "6.5"
+    }
+  },
+  "simulationEnglish": {
+    "cefrEstimate": "B2",
+    "wordsPerMinute": 112,
+    "fillerRate": 0.03,
+    "meanTurnLength": 33.8,
+    "lexicalDiversity": 0.71,
+    "grammarErrorsPer100Words": 0.8
+  },
+  "simulationTurns": [
+    {
+      "turnId": "turn_01",
+      "speaker": "character",
+      "text": "Honestly, I'm done. Timur rewrote my whole module last night without a word to me. If my work can just be thrown away, why am I even here? Maybe the three of you can finish the demo without me.",
+      "startedAt": "2026-09-25T10:05:00Z",
+      "endedAt": "2026-09-25T10:05:30Z"
+    },
+    {
+      "turnId": "turn_02",
+      "speaker": "candidate",
+      "text": "Okay, let's fix this fast. The demo is in three days, so we can't lose you now. Send me the list of what Timur changed and I'll look at it tonight.",
+      "startedAt": "2026-09-25T10:05:38Z",
+      "endedAt": "2026-09-25T10:06:08Z"
+    },
+    {
+      "turnId": "turn_03",
+      "speaker": "character",
+      "text": "Okay… I hear you. But it isn't only about the code. Nobody asked me anything. How do I know it won't happen again next week?",
+      "startedAt": "2026-09-25T10:06:16Z",
+      "endedAt": "2026-09-25T10:06:46Z"
+    },
+    {
+      "turnId": "turn_04",
+      "speaker": "candidate",
+      "text": "From now on nobody merges into someone else's module without a review from its owner. I'll set that rule in the repo today.",
+      "startedAt": "2026-09-25T10:06:54Z",
+      "endedAt": "2026-09-25T10:07:24Z"
+    },
+    {
+      "turnId": "turn_05",
+      "speaker": "character",
+      "text": "Fine, I could talk to him. But the demo is in three days and his version still breaks the login. Who decides which version we keep?",
+      "startedAt": "2026-09-25T10:07:32Z",
+      "endedAt": "2026-09-25T10:08:02Z"
+    },
+    {
+      "turnId": "turn_06",
+      "speaker": "candidate",
+      "text": "We keep your version for the demo because it works. Timur moves his changes to a separate branch and we look at them after Thursday. If his login fix is really needed, the risk is that we demo with a known bug, so I'll ask him to patch only that.",
+      "startedAt": "2026-09-25T10:08:10Z",
+      "endedAt": "2026-09-25T10:08:40Z"
+    },
+    {
+      "turnId": "turn_07",
+      "speaker": "character",
+      "text": "That sounds fair, I guess. So what do I actually do today? I don't want to sit around waiting for Timur to agree with me.",
+      "startedAt": "2026-09-25T10:08:48Z",
+      "endedAt": "2026-09-25T10:09:18Z"
+    },
+    {
+      "turnId": "turn_08",
+      "speaker": "candidate",
+      "text": "Today you finish the payment endpoint, Timur fixes the login in his branch, and I write the demo script. We freeze the backend by Thursday noon and do a full run at six.",
+      "startedAt": "2026-09-25T10:09:26Z",
+      "endedAt": "2026-09-25T10:09:56Z"
+    },
+    {
+      "turnId": "turn_09",
+      "speaker": "character",
+      "text": "Alright. If we write down who owns what, I'm in. But you tell Timur, not me. I don't want another argument tonight.",
+      "startedAt": "2026-09-25T10:10:04Z",
+      "endedAt": "2026-09-25T10:10:34Z"
+    },
+    {
+      "turnId": "turn_10",
+      "speaker": "candidate",
+      "text": "Deal. I'll put the owners in the team chat in ten minutes and call Timur right after. If the Thursday run fails, we cut the analytics screen instead of working all night.",
+      "startedAt": "2026-09-25T10:10:42Z",
+      "endedAt": "2026-09-25T10:11:12Z"
+    },
+    {
+      "turnId": "turn_11",
+      "speaker": "character",
+      "text": "Okay. Let's try it your way. And thanks for actually listening.",
+      "startedAt": "2026-09-25T10:11:20Z",
+      "endedAt": "2026-09-25T10:11:50Z"
+    }
+  ],
+  "interviewTranscript": [
+    {
+      "turnId": "iturn_01",
+      "speaker": "interviewer",
+      "text": "Thanks for coming in. Tell me about the conflict in the simulation. What did you do first?",
+      "startSec": 5,
+      "endSec": 12
+    },
+    {
+      "turnId": "iturn_02",
+      "speaker": "candidate",
+      "text": "I made a plan straight away: owners, a deadline and a full run on Thursday. When a demo is close, speed matters.",
+      "startSec": 14,
+      "endSec": 29
+    },
+    {
+      "turnId": "iturn_03",
+      "speaker": "interviewer",
+      "text": "You would agree that finishing on time matters most, right?",
+      "startSec": 41,
+      "endSec": 45
+    },
+    {
+      "turnId": "iturn_04",
+      "speaker": "candidate",
+      "text": "Yes, finishing on time is what matters for a demo.",
+      "startSec": 46,
+      "endSec": 51
+    },
+    {
+      "turnId": "iturn_05",
+      "speaker": "interviewer",
+      "text": "Why did you keep Dana's version?",
+      "startSec": 58,
+      "endSec": 61
+    },
+    {
+      "turnId": "iturn_06",
+      "speaker": "candidate",
+      "text": "It works, and that is what matters for the demo. Timur can bring his changes in later.",
+      "startSec": 63,
+      "endSec": 72
+    },
+    {
+      "turnId": "iturn_07",
+      "speaker": "interviewer",
+      "text": "What do your parents do for a living?",
+      "startSec": 90,
+      "endSec": 93
+    },
+    {
+      "turnId": "iturn_08",
+      "speaker": "candidate",
+      "text": "Sorry, is that part of the interview?",
+      "startSec": 95,
+      "endSec": 98
+    },
+    {
+      "turnId": "iturn_09",
+      "speaker": "interviewer",
+      "text": "Fair point, let me move on. Tell me about a time doing the right thing cost you something.",
+      "startSec": 99,
+      "endSec": 106
+    },
+    {
+      "turnId": "iturn_10",
+      "speaker": "candidate",
+      "text": "I once reported a classmate who copied homework. I felt bad, but rules are rules, so I told the teacher.",
+      "startSec": 112,
+      "endSec": 124
+    },
+    {
+      "turnId": "iturn_11",
+      "speaker": "interviewer",
+      "text": "If the Thursday run fails, what happens next?",
+      "startSec": 140,
+      "endSec": 144
+    },
+    {
+      "turnId": "iturn_12",
+      "speaker": "candidate",
+      "text": "We cut scope and move on. The analytics screen can wait.",
+      "startSec": 146,
+      "endSec": 152
+    },
+    {
+      "turnId": "iturn_13",
+      "speaker": "interviewer",
+      "text": "What could go wrong with the new review rule?",
+      "startSec": 170,
+      "endSec": 174
+    },
+    {
+      "turnId": "iturn_14",
+      "speaker": "candidate",
+      "text": "Merges get slower. I would add a 24-hour limit for reviews so nobody is blocked.",
+      "startSec": 176,
+      "endSec": 186
+    }
+  ]
+}

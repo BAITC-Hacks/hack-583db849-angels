@@ -7,7 +7,7 @@
   "simulation": {
     "scenarioTitle": "A teammate is about to walk away",
     "characterName": "Dana",
-    "mode": "text",
+    "mode": "voice",
     "completedAt": "2026-09-25T10:11:50Z",
     "durationSeconds": 420,
     "turns": [
@@ -88,7 +88,8 @@
         "startedAt": "2026-09-25T10:11:20Z",
         "endedAt": "2026-09-25T10:11:50Z"
       }
-    ]
+    ],
+    "accommodation": false
   },
   "scores": [
     {
@@ -163,8 +164,8 @@
   ],
   "english": {
     "cefrEstimate": "B2",
-    "wordsPerMinute": null,
-    "fillerRate": null,
+    "wordsPerMinute": 112,
+    "fillerRate": 0.03,
     "meanTurnLength": 33.8,
     "lexicalDiversity": 0.71,
     "grammarErrorsPer100Words": 0.8

@@ -14,7 +14,8 @@ The step-by-step plan for wiring the web to these endpoints — who, in which or
 **Checked before this was merged:**
 - every public example satisfies the DTOs in `api.md` under strict TypeScript;
 - every ML example validates against the Pydantic models in `ml.md`;
-- the models refuse a profile field, interviewer scores in a draft request, a score without evidence, a score of 5 and a character line over 60 words;
+- the models refuse a profile field, interviewer scores in a draft request, a score without evidence, a score of 5, a character line over 60 words, a scenario that cannot show all five competencies and a brief that skips one of its eight focuses;
+- [`examples/candidate-a/ml/scenario-config.conflict-resolution.json`](examples/candidate-a/ml/scenario-config.conflict-resolution.json) is the template for all ten scenarios: beats, answer types with example phrases for the mini-ML, fallback branches;
 - every quote in an ML response appears word for word in its request.
 
 **Which one wins.** These files are the target, not a second source of truth. Contracts stay code-first (`docs/SPEC.md`, section 9). Once your generated OpenAPI covers an endpoint, it wins, and the file here is updated in the same PR. Conventions shared by both — auth, idempotency, errors, the shared schemas, evidence checking — stay in `docs/SPEC.md`.
