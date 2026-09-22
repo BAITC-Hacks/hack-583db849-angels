@@ -3,21 +3,20 @@
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { Composer } from '../../../components/simulation/Composer';
-import { ElapsedTime } from '../../../components/simulation/ElapsedTime';
-import { ScenarioPanel } from '../../../components/simulation/ScenarioPanel';
-import { StopControl } from '../../../components/simulation/StopControl';
-import { Transcript } from '../../../components/simulation/Transcript';
-import { Logo } from '../../../components/ui/Logo';
-import { ThemeToggle } from '../../../components/ui/ThemeToggle';
-import { useSimulation } from '../../../lib/simulation/useSimulation';
+import { Composer } from '../../../../components/simulation/Composer';
+import { ElapsedTime } from '../../../../components/simulation/ElapsedTime';
+import { ScenarioPanel } from '../../../../components/simulation/ScenarioPanel';
+import { StopControl } from '../../../../components/simulation/StopControl';
+import { Transcript } from '../../../../components/simulation/Transcript';
+import { useSimulation } from '../../../../lib/simulation/useSimulation';
 
 /**
  * M2: the candidate leads a work situation in English, turn by turn, by typing.
  * Voice arrives on top of this in M2b and must never break it.
  *
  * The candidate sees the conversation and the situation — never a score, a
- * rating or a hint of how they are doing.
+ * rating or a hint of how they are doing. Candidate screens are English only,
+ * whatever language the staff have chosen.
  */
 export default function SimulationPage() {
   const { sessionId } = useParams<{ sessionId: string }>();
@@ -25,17 +24,13 @@ export default function SimulationPage() {
   const finished = state.stage === 'finished';
 
   return (
-    <div className="flex min-h-screen flex-col bg-bg-base">
+    <div lang="en" className="flex min-h-screen flex-col bg-bg-base">
       <header className="sticky top-0 z-30 border-b border-border-subtle bg-bg-base/85 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3">
-          <div className="flex min-w-0 items-center gap-4">
-            <Logo markSize={24} subtitle={false} />
-            <span className="hidden truncate text-sm font-semibold text-text-primary md:inline">{scenario.title}</span>
-          </div>
-          <div className="flex items-center gap-3">
+          <span className="hidden min-w-0 truncate text-sm font-semibold text-text-primary md:inline">{scenario.title}</span>
+          <div className="ml-auto flex items-center gap-3">
             <ElapsedTime running={!finished} />
             {finished ? null : <StopControl onStop={stop} />}
-            <ThemeToggle />
           </div>
         </div>
         {preview ? (

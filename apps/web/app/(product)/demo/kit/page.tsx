@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
-import { DemoHeader } from '../../../components/demo/DemoHeader';
-import { CompetencyScore, type CompetencyScoreProps } from '../../../components/evidence/CompetencyScore';
-import { EnglishMetricsPanel } from '../../../components/evidence/EnglishMetricsPanel';
-import { ScoreMeter } from '../../../components/evidence/ScoreMeter';
+import { CompetencyScore, type CompetencyScoreProps } from '../../../../components/evidence/CompetencyScore';
+import { EnglishMetricsPanel } from '../../../../components/evidence/EnglishMetricsPanel';
+import { ScoreMeter } from '../../../../components/evidence/ScoreMeter';
+import { getStaffLocale } from '../../../../lib/i18n/server';
 
 export const metadata: Metadata = { title: 'Evidence components — AI Leader ID' };
 
@@ -51,23 +51,39 @@ const sample: CompetencyScoreProps[] = [
   },
 ];
 
-export default function EvidenceKitPage() {
+const copy = {
+  en: {
+    eyebrow: 'Reference',
+    title: 'Evidence components',
+    lede: 'What the report, the brief and the interview draft are built from. Every score carries its quotes; a competency without verified evidence says so instead of showing a low number. Synthetic data.',
+    scale: 'Scale',
+    separately: 'Separately',
+    withoutEvidence: 'A score sent without evidence',
+  },
+  ru: {
+    eyebrow: 'Справочник',
+    title: 'Компоненты доказательств',
+    lede: 'Из чего собраны отчёт, бриф и черновик интервью. У каждого балла есть цитаты; компетенция без проверенных доказательств так и подписана, а не получает низкий балл. Цитаты кандидата не переводятся. Данные синтетические.',
+    scale: 'Шкала',
+    separately: 'Отдельно',
+    withoutEvidence: 'Балл, присланный без доказательств',
+  },
+};
+
+export default async function EvidenceKitPage() {
+  const text = copy[await getStaffLocale()];
+
   return (
     <>
-      <DemoHeader />
-
       <main className="mx-auto flex max-w-6xl flex-col gap-10 px-5 py-10">
         <section className="flex flex-col gap-2">
-          <p className="font-mono text-[0.62rem] tracking-[0.14em] text-text-muted uppercase">Reference</p>
-          <h1 className="text-balance-tight text-2xl font-extrabold sm:text-3xl">Evidence components</h1>
-          <p className="max-w-2xl text-sm text-text-secondary">
-            What the report, the brief and the interview draft are built from. Every score carries its quotes; a
-            competency without verified evidence says so instead of showing a low number. Synthetic data.
-          </p>
+          <p className="font-mono text-[0.62rem] tracking-[0.14em] text-text-muted uppercase">{text.eyebrow}</p>
+          <h1 className="text-balance-tight text-2xl font-extrabold sm:text-3xl">{text.title}</h1>
+          <p className="max-w-2xl text-sm text-text-secondary">{text.lede}</p>
         </section>
 
         <section className="flex flex-col gap-3">
-          <h2 className="font-mono text-[0.62rem] tracking-[0.14em] text-text-muted uppercase">Scale</h2>
+          <h2 className="font-mono text-[0.62rem] tracking-[0.14em] text-text-muted uppercase">{text.scale}</h2>
           <div className="flex flex-wrap gap-x-8 gap-y-3 rounded-panel border border-border-subtle bg-bg-surface p-5">
             {([0, 1, 2, 3, 4, null] as const).map((score) => (
               <ScoreMeter key={String(score)} score={score} />
@@ -84,7 +100,7 @@ export default function EvidenceKitPage() {
           </div>
 
           <div className="flex flex-col gap-3">
-            <h2 className="font-mono text-[0.62rem] tracking-[0.14em] text-text-muted uppercase">Separately</h2>
+            <h2 className="font-mono text-[0.62rem] tracking-[0.14em] text-text-muted uppercase">{text.separately}</h2>
             <EnglishMetricsPanel
               metrics={{
                 cefrEstimate: 'B2',
@@ -97,7 +113,7 @@ export default function EvidenceKitPage() {
             />
 
             <h2 className="mt-4 font-mono text-[0.62rem] tracking-[0.14em] text-text-muted uppercase">
-              A score sent without evidence
+              {text.withoutEvidence}
             </h2>
             <CompetencyScore competency="R" score={4} confidence="high" evidence={[]} />
           </div>
