@@ -1,5 +1,5 @@
 import { competencyOrder } from '../drive';
-import type { AssessmentDraft, InterviewerScores } from './types';
+import type { AssessmentDraft, InterviewTurn, InterviewerScores } from './types';
 
 /** The server's answer to a draft request before the interviewer has scored. */
 export class DraftLockedError extends Error {
@@ -7,6 +7,15 @@ export class DraftLockedError extends Error {
   readonly code = 'DRAFT_LOCKED';
   constructor() {
     super("Save the interviewer's scores first.");
+  }
+}
+
+/** The draft is written from the transcript; without one there is nothing to write from. */
+export class TranscriptMissingError extends Error {
+  readonly status = 409;
+  readonly code = 'TRANSCRIPT_MISSING';
+  constructor() {
+    super('Add the interview recording or transcript first.');
   }
 }
 
@@ -19,17 +28,28 @@ export class IncompleteScoresError extends Error {
 }
 
 /**
- * Stands in for the interviews API (#15) and keeps its rule: the draft does
- * not exist for the client until the interviewer's own scores are saved, and
- * those scores cannot change afterwards.
+ * Stands in for the interviews API (#15) and keeps its rules: the draft does
+ * not exist for the client until the interviewer's own scores are saved, those
+ * scores cannot change afterwards, and a draft needs a transcript.
+ *
+ * `transcribe` stands in for uploading the recording: in the preview the audio
+ * never leaves the browser and the scripted transcript comes back instead.
  */
 export class PreviewInterviewServer {
   private saved: InterviewerScores | null = null;
+  private transcript: InterviewTurn[] | null = null;
 
   constructor(
     private readonly draft: AssessmentDraft,
+    private readonly scripted: InterviewTurn[],
     private readonly delayMs = 700,
   ) {}
+
+  async transcribe(): Promise<InterviewTurn[]> {
+    await wait(this.delayMs * 2);
+    this.transcript = this.scripted;
+    return this.transcript;
+  }
 
   async saveScores(scores: InterviewerScores): Promise<InterviewerScores> {
     if (this.saved) return this.saved;
@@ -41,6 +61,7 @@ export class PreviewInterviewServer {
 
   async getDraft(): Promise<AssessmentDraft> {
     if (!this.saved) throw new DraftLockedError();
+    if (!this.transcript) throw new TranscriptMissingError();
     await wait(this.delayMs / 2);
     return this.draft;
   }

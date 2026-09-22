@@ -4,18 +4,30 @@ import { ArrowUturnLeftIcon } from '@heroicons/react/24/outline';
 import { useStaffLocale } from '../../lib/i18n/StaffLocaleProvider';
 import type { StaffLocale } from '../../lib/i18n/staffLocale';
 
-export type EvidenceSourceKind = 'simulation_turn' | 'application_field' | 'test_item' | 'interview_note';
+export type EvidenceSourceKind = 'simulation_turn' | 'application_field' | 'test_item' | 'interview_turn' | 'interview_note';
 
 export interface EvidenceSource {
   kind: EvidenceSourceKind;
-  /** A turn id (`turn_04`), a form field id, a test item id or an interview note id. */
+  /** A turn id (`turn_04`), a form field id, a test item id, an interview turn (`iturn_05`) or note id. */
   id: string;
 }
 
 /** How a source is named on screen: short enough for a chip, exact enough to find. */
 const sourceWords: Record<StaffLocale, Record<EvidenceSourceKind, string>> = {
-  en: { simulation_turn: 'Turn', application_field: 'Application', test_item: 'Test', interview_note: 'Interview note' },
-  ru: { simulation_turn: 'Ход', application_field: 'Анкета', test_item: 'Тест', interview_note: 'Заметка интервью' },
+  en: {
+    simulation_turn: 'Turn',
+    application_field: 'Application',
+    test_item: 'Test',
+    interview_turn: 'Interview',
+    interview_note: 'Interview note',
+  },
+  ru: {
+    simulation_turn: 'Ход',
+    application_field: 'Анкета',
+    test_item: 'Тест',
+    interview_turn: 'Интервью',
+    interview_note: 'Заметка интервью',
+  },
 };
 
 const contextLink: Record<StaffLocale, string> = { en: 'Show in context', ru: 'Показать в контексте' };
@@ -24,6 +36,7 @@ export function sourceLabel(source: EvidenceSource, locale: StaffLocale = 'en'):
   const word = sourceWords[locale][source.kind];
   if (source.kind === 'simulation_turn') return `${word} ${source.id.replace(/^turn_/, '')}`;
   if (source.kind === 'interview_note') return `${word} ${source.id.replace(/^note_/, '')}`;
+  if (source.kind === 'interview_turn') return `${word} · ${source.id.replace(/^iturn_/, '#')}`;
   return `${word} · ${source.id}`;
 }
 

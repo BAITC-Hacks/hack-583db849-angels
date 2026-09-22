@@ -5,17 +5,22 @@ import type { Competency } from '../drive';
 /** The interviewer's own view, entered before any AI opinion is visible. */
 export type InterviewerScores = Record<Competency, Score | undefined>;
 
-export interface InterviewNote {
-  /** Referenced by evidence as `interview_note`. */
-  id: string;
+/**
+ * One stretch of speech in the interview transcript. Referenced by evidence as
+ * `interview_turn`; the id is `iturn_` plus a two-digit position.
+ */
+export interface InterviewTurn {
+  turnId: string;
+  speaker: 'interviewer' | 'candidate';
   text: string;
+  startSec: number;
+  endSec: number;
 }
 
 export interface InterviewView {
   interviewId: string;
   candidate: { id: string; code: 'A' | 'B' | 'C' };
   heldAt: string;
-  notes: InterviewNote[];
 }
 
 /** What the server returns once the interviewer's scores are saved — and never before. */
