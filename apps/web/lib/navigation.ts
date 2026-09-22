@@ -25,6 +25,8 @@ export interface NavItem {
   href?: string;
   /** Paths that count as this item when they differ from `href`. */
   match?: string;
+  /** The screen runs on scripted preview data until its API lands. */
+  preview?: boolean;
   module?: 'M1' | 'M2' | 'M3' | 'M4' | 'M5';
 }
 
@@ -67,6 +69,9 @@ export const navItems: NavItem[] = [
     icon: ChartBarSquareIcon,
     label: { en: 'Simulation reports', ru: 'Отчёты симуляций' },
     roles: ['commission', 'admin'],
+    href: '/commission/simulation-report/preview',
+    match: '/commission/simulation-report',
+    preview: true,
     module: 'M3',
   },
   {
@@ -85,6 +90,7 @@ export const navItems: NavItem[] = [
     roles: ['candidate'],
     href: '/simulation/preview',
     match: '/simulation',
+    preview: true,
     module: 'M2',
   },
   {
@@ -93,6 +99,9 @@ export const navItems: NavItem[] = [
     icon: ChatBubbleBottomCenterTextIcon,
     label: { en: 'My feedback', ru: 'My feedback' },
     roles: ['candidate'],
+    href: '/feedback/preview',
+    match: '/feedback',
+    preview: true,
     module: 'M3',
   },
   {

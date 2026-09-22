@@ -82,6 +82,8 @@ export interface DemoStep {
   copy: Copy<{ title: string; note: string }>;
   /** Where the step opens for a candidate; absent until its slice lands. */
   href?: (candidateId: string) => string;
+  /** A screen on scripted preview data, reachable before the slice lands. */
+  preview?: string;
 }
 
 /** The minimal pitch path, in order. A step gets an `href` when its slice is merged. */
@@ -95,6 +97,7 @@ export const demoSteps: DemoStep[] = [
   },
   {
     module: 'M2',
+    preview: '/simulation/preview',
     copy: {
       en: { title: 'Simulation', note: 'The candidate leads a work situation in English' },
       ru: { title: 'Симуляция', note: 'Кандидат ведёт рабочую ситуацию на английском' },
@@ -102,6 +105,7 @@ export const demoSteps: DemoStep[] = [
   },
   {
     module: 'M3',
+    preview: '/commission/simulation-report/preview',
     copy: {
       en: { title: 'Report', note: 'D.R.I.V.E. scores with verbatim quotes' },
       ru: { title: 'Отчёт', note: 'Баллы D.R.I.V.E. с дословными цитатами' },
