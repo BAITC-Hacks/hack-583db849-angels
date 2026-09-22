@@ -21,6 +21,65 @@
           "health"
         ]
       }
+    },
+    "/v1/candidates": {
+      "post": {
+        "operationId": "CandidatesController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCandidateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "candidates"
+        ]
+      },
+      "get": {
+        "operationId": "CandidatesController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "candidates"
+        ]
+      }
+    },
+    "/v1/candidates/{candidateId}": {
+      "get": {
+        "operationId": "CandidatesController_get",
+        "parameters": [
+          {
+            "name": "candidateId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "candidates"
+        ]
+      }
     }
   },
   "info": {
@@ -46,6 +105,96 @@
         },
         "required": [
           "status"
+        ]
+      },
+      "AnswerDto": {
+        "type": "object",
+        "properties": {
+          "fieldId": {
+            "type": "string"
+          },
+          "question": {
+            "type": "string"
+          },
+          "answer": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "fieldId",
+          "question",
+          "answer"
+        ]
+      },
+      "ApplicationDto": {
+        "type": "object",
+        "properties": {
+          "answers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnswerDto"
+            }
+          }
+        },
+        "required": [
+          "answers"
+        ]
+      },
+      "TestAnswerDto": {
+        "type": "object",
+        "properties": {
+          "itemId": {
+            "type": "string"
+          },
+          "response": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "itemId",
+          "response"
+        ]
+      },
+      "TestAnswersDto": {
+        "type": "object",
+        "properties": {
+          "answers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TestAnswerDto"
+            }
+          }
+        },
+        "required": [
+          "answers"
+        ]
+      },
+      "CreateCandidateDto": {
+        "type": "object",
+        "properties": {
+          "externalId": {
+            "type": "string"
+          },
+          "profile": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "application": {
+            "$ref": "#/components/schemas/ApplicationDto"
+          },
+          "test": {
+            "$ref": "#/components/schemas/TestAnswersDto"
+          },
+          "englishCertificate": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "externalId",
+          "profile",
+          "application",
+          "test"
         ]
       }
     }
