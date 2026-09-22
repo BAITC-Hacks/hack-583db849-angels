@@ -54,7 +54,7 @@ If a task seems to require breaking one of these, stop and ask.
 ## Where things live
 
 ```
-apps/web/            Next.js — demo screens, English only
+apps/web/            Next.js — candidate screens English only; staff screens English or Russian
 apps/api/            NestJS — public API, storage, access rules, toLLMView, audit
 services/ml/         FastAPI — gateway, M1–M5 logic, evidence check, English metrics
 config/              rubric.drive.json, models.json, scenarios/*.json, prompts/*.md
@@ -108,7 +108,9 @@ The whole API budget is about $20.
 
 ## Language
 
-- Code, identifiers, comments, commit messages and the interface are in English.
+- Code, identifiers, comments and commit messages are in English.
+- **The interface depends on who reads it.** Candidate screens (the simulation, the feedback) and the stand are English only. Interviewer, commission and admin screens are English or Russian, switched in the sidebar; every text on them exists in both, defined next to the component that shows it.
+- **A candidate's quote is never translated.** Evidence is checked word for word against its source, so it is shown exactly as the candidate wrote or said it, whatever the interface language.
 - The simulation is in English.
 - `docs/PLAN.md` is in Russian — read it; do not translate it unless asked.
 
