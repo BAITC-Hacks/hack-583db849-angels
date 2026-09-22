@@ -53,7 +53,7 @@ const copy = {
 
 /**
  * The interviewer's scores beside the draft's, competency by competency, with
- * the quotes from their own notes. It points at differences and resolves
+ * the candidate's own words from the transcript. It points at differences and resolves
  * none: no average, no merged score, no suggestion to change.
  */
 export function DraftComparison({ yours, draft }: { yours: InterviewerScores; draft: AssessmentDraft }) {
