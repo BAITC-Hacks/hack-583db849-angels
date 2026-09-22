@@ -16,6 +16,7 @@ const copy = {
     candidate: 'Candidate',
     watchFor: 'What to point at',
     notBuilt: 'Not built yet',
+    preview: 'Preview',
     start: 'Start',
     opensWith: 'Opens when M2 lands',
   },
@@ -28,6 +29,7 @@ const copy = {
     candidate: 'Кандидат',
     watchFor: 'На что обратить внимание',
     notBuilt: 'Ещё не готово',
+    preview: 'Превью',
     start: 'Начать',
     opensWith: 'Откроется с M2',
   },
@@ -59,18 +61,40 @@ export default async function DemoCandidatesPage() {
           {text.path}
         </h2>
         <ol className="grid gap-px overflow-hidden rounded-panel border border-border-subtle bg-border-subtle sm:grid-cols-2 lg:grid-cols-5">
-          {demoSteps.map((step, index) => (
-            <li key={step.module} className="flex flex-col gap-1.5 bg-bg-surface p-4">
-              <div className="flex items-center justify-between gap-2">
-                <span className="font-mono text-[0.68rem] tracking-[0.12em] text-brand-ink">
-                  0{index + 1} · {step.module}
-                </span>
-                {step.href ? null : <LockClosedIcon aria-label={text.notBuilt} className="h-3.5 w-3.5 text-text-muted" />}
-              </div>
-              <p className="text-sm font-semibold text-text-primary">{step.copy[locale].title}</p>
-              <p className="text-[0.8rem] text-text-secondary">{step.copy[locale].note}</p>
-            </li>
-          ))}
+          {demoSteps.map((step, index) => {
+            const body = (
+              <>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-mono text-[0.68rem] tracking-[0.12em] text-brand-ink">
+                    0{index + 1} · {step.module}
+                  </span>
+                  {step.href ? null : step.preview ? (
+                    <span className="rounded-full border border-border-subtle px-1.5 py-px font-mono text-[0.52rem] tracking-wide text-text-muted uppercase">
+                      {text.preview}
+                    </span>
+                  ) : (
+                    <LockClosedIcon aria-label={text.notBuilt} className="h-3.5 w-3.5 text-text-muted" />
+                  )}
+                </div>
+                <p className="text-sm font-semibold text-text-primary">{step.copy[locale].title}</p>
+                <p className="text-[0.8rem] text-text-secondary">{step.copy[locale].note}</p>
+              </>
+            );
+            return (
+              <li key={step.module} className="flex bg-bg-surface">
+                {step.preview && !step.href ? (
+                  <Link
+                    href={step.preview}
+                    className="flex flex-1 flex-col gap-1.5 p-4 transition-colors hover:bg-bg-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-ink"
+                  >
+                    {body}
+                  </Link>
+                ) : (
+                  <div className="flex flex-1 flex-col gap-1.5 p-4">{body}</div>
+                )}
+              </li>
+            );
+          })}
         </ol>
       </section>
 
