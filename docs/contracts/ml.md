@@ -1,4 +1,4 @@
-# Internal ML contract — for Beknur (`services/ml`)
+# Internal ML contract — for Nauryzbek (`services/ml`)
 
 What `api` sends to the ML service and what it expects back. It is derived from the screens that already run on scripted previews (see the table in [`api.md`](api.md)), so every field below has a place on a screen.
 
@@ -13,7 +13,7 @@ What `api` sends to the ML service and what it expects back. It is derived from 
    - `turn`, `assessment` and `brief` returning the candidate A examples;
    - **`services/ml/openapi.json` committed.**
    
-   Nauryzbek generates `ai-client` from that file; without it he writes against guesses.
+   Aibek generates `ai-client` from that file; without it the API is written against guesses.
 2. **F0 — the seed.**
    - `seed/candidates/{a,b,c}/` in the layout of `docs/SPEC.md`, section 8. Candidate A's `snapshot.json` is in `examples/candidate-a/`; B and C follow `docs/PLAN.md`, section 6.
    - `config/rubric.drive.json`.

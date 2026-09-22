@@ -15,8 +15,9 @@
 | Кто | Роль |
 |---|---|
 | Мейірбек | тех-лид и фронтенд |
-| Наурызбек | бэкенд (NestJS) |
-| Бекнур | ML (Python) |
+| Айбек | бэкенд (NestJS) |
+| Наурызбек | ML (Python) |
+| Бекнур | продукт-менеджер: презентация и питч |
 
 **Сроки и ресурсы:** до питча ~10 дней. Бюджет ~$20 на OpenAI, ключи у Мейірбека. Голос — Deepgram на кредит $200.
 
@@ -178,10 +179,10 @@ inVision присылает снимок кандидата в теле запр
 apps/web/                 Next.js; кандидату — English, сотрудникам — EN/RU (Мейірбек)
 apps/api/src/
   modules/{briefs,simulations,simulation-assessments,interviews,quality-guard,candidates,audit}/
-  ai-client/  privacy/to-llm-view.service.ts  auth/  config/            (Наурызбек)
+  ai-client/  privacy/to-llm-view.service.ts  auth/  config/            (Айбек)
 services/ml/app/
   gateway/  providers/  schemas/  cache/  evidence/  metrics/english.py
-  modules/{m1_brief,m2_simulator,m3_judge,m4_interview_draft,m5_quality_guard}.py   (Бекнур)
+  modules/{m1_brief,m2_simulator,m3_judge,m4_interview_draft,m5_quality_guard}.py   (Наурызбек)
 config/
   rubric.drive.json  models.json  scenarios/*.json
   prompts/{m1-brief,m2-director,m2-actor,m3-judge,m4-interview-draft,m5-quality-guard}.md
@@ -216,7 +217,7 @@ docs/SPEC.md · README.md · CONTRIBUTING.md
 
 Каждый слайс начинается с маленького PR контракта: DTO, Pydantic-схемы, сгенерированные типы, MSW-фикстуры. После его мерджа трое работают параллельно, каждый на своей ветке: `feat/<слайс>-web`, `-api`, `-ml`.
 
-| Слайс | Мейірбек (web) | Наурызбек (api) | Бекнур (ml) | Готов, когда |
+| Слайс | Мейірбек (web) | Айбек (api) | Наурызбек (ml) | Готов, когда |
 |---|---|---|---|---|
 | **F0 Фундамент** | репозиторий, CI с проверкой секретов, перенос стенда без смены языка, `/demo/candidates` | модули NestJS, Prisma-схема, `X-API-Key`, роли, аудит, `toLLMView` + PII-тест, `ai-client`, Compose | FastAPI с тремя внутренними эндпоинтами-заглушками, gateway (live/record/replay, кэш, лимиты), `rubric.drive.json`, seed A/B/C | `docker compose up` поднимает всё; PII-тесты с обеих сторон зелёные |
 | **M2a Симулятор, текст** | экран симуляции в текстовом режиме | модуль `simulations`, `Idempotency-Key`, хранение ходов | движок битов, режиссёр/актёр, один сценарий | сценарий проходится текстом до конца, живьём и через replay |
@@ -232,7 +233,7 @@ docs/SPEC.md · README.md · CONTRIBUTING.md
 
 Сегодня 22.09, питч около 01.10. Подробно, с номерами шагов, — `docs/INTEGRATION.md`, раздел 11.
 
-| День | Мейірбек (веб) | Наурызбек (API) | Бекнур (ML) |
+| День | Мейірбек (веб) | Айбек (API) | Наурызбек (ML) |
 |---|---|---|---|
 | 22–23.09 | мерж веб-стопки, BFF и роль в cookie, мапперы и золотые тесты | F0 + `openapi.json` в `main`, candidates и progress | F0: стабы с примерами, `openapi.json`, seed |
 | 24.09 | генерация клиента, подключение M2a | M2a | M2a `turn` |
@@ -257,7 +258,7 @@ docs/SPEC.md · README.md · CONTRIBUTING.md
 
 **Бюджет:**
 - по умолчанию у всех `GATEWAY_MODE=replay`;
-- живые вызовы — только по отдельным ключам проекта OpenAI с лимитом на каждый ключ: у Мейірбека и у Бекнура (ему нужны живые вызовы, чтобы писать промпты); Наурызбек работает на replay;
+- живые вызовы — только по отдельным ключам проекта OpenAI с лимитом на каждый ключ: у Мейірбека и у Наурызбека (ему нужны живые вызовы, чтобы писать промпты); Айбек работает на replay;
 - лимит стоимости на один запрос в `models.json` и общий жёсткий `BUDGET_USD_CAP` в шлюзе.
 
 **Публичный репозиторий:**
@@ -317,4 +318,4 @@ docs/SPEC.md · README.md · CONTRIBUTING.md
 - [ ] Актуальные имена и цены моделей OpenAI и Deepgram — проверить в день 1.
 - [ ] Официальное содержание индикаторов и запрещённых выводов D.R.I.V.E. — подтвердить у inVision.
 - [ ] Новый логотип — обсудим позже.
-- [ ] На каком языке модель пишет текст для сотрудников — обоснования баллов, вопросы брифа, рекомендации M5: английский или язык интерфейса сотрудника. Решает Бекнур в промптах; цитаты в любом случае остаются дословными.
+- [ ] На каком языке модель пишет текст для сотрудников — обоснования баллов, вопросы брифа, рекомендации M5: английский или язык интерфейса сотрудника. Решает Наурызбек в промптах; цитаты в любом случае остаются дословными.

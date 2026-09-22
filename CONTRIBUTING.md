@@ -10,8 +10,8 @@ Three people, three personal branches per slice, and a `main` that nobody touche
    | Part | Owner | Branch pattern | Example |
    | --- | --- | --- | --- |
    | Frontend (`apps/web`) | Meiyrbek | `feat/<slice>-web` | `feat/m2-simulator-web` |
-   | Backend (`apps/api`) | Nauryzbek | `feat/<slice>-api` | `feat/m2-simulator-api` |
-   | ML (`services/ml`) | Beknur | `feat/<slice>-ml` | `feat/m2-simulator-ml` |
+   | Backend (`apps/api`) | Aibek | `feat/<slice>-api` | `feat/m2-simulator-api` |
+   | ML (`services/ml`) | Nauryzbek | `feat/<slice>-ml` | `feat/m2-simulator-ml` |
 
    Fixes use `fix/<slice>-<short-name>`, documentation `docs/<short-name>`.
 3. **Stay in your own branch.** If you need something from another person's part, ask for it in their pull request or in the team chat — do not commit to their branch.
@@ -22,7 +22,7 @@ Three people, three personal branches per slice, and a `main` that nobody touche
    ```
 5. **Contract first.** A slice begins with one small pull request that only adds the contract — NestJS DTOs, Pydantic schemas, generated types, mock fixtures. Once it is merged, all three parts are built in parallel against it, and the frontend works on mocks until the real endpoint lands.
 6. **Keep pull requests small and reviewable.** One pull request is one coherent outcome. Say in the description what it does, how to check it, and what it deliberately leaves out.
-7. **Meiyrbek approves every pull request before it is merged.** `.github/CODEOWNERS` names only him, so GitHub accepts no other approval. He merges his own pull requests himself, once the checks pass. Anyone may still review, comment and ask for changes on any pull request — that is welcome; it just does not unlock the merge.
+7. **Meiyrbek approves every pull request before it is merged.** `.github/CODEOWNERS` names only Meiyrbek, so GitHub accepts no other approval. Meiyrbek's own pull requests are merged by Meiyrbek, once the checks pass. Anyone may still review, comment and ask for changes on any pull request — that is welcome; it just does not unlock the merge.
 8. **Keep your branch current.** Rebase on `main` before asking for review:
    ```bash
    git fetch origin
@@ -35,7 +35,7 @@ Three people, three personal branches per slice, and a `main` that nobody touche
 
 Slices are done in priority order, and each of us works down our own column:
 
-| Slice | Web — Meiyrbek | API — Nauryzbek | ML — Beknur |
+| Slice | Web — Meiyrbek | API — Aibek | ML — Nauryzbek |
 | --- | --- | --- | --- |
 | 01 · F0 Foundation | #2 | #3 | #4 |
 | 02 · M2a Simulator, text | #5 | #6 | #7 |
@@ -89,8 +89,8 @@ A few files are touched by everyone. Each has one owner; anyone else changes it 
 | File | Owner |
 | --- | --- |
 | Root `package.json`, `pnpm-workspace.yaml`, `.github/workflows/*` | Meiyrbek |
-| `docker-compose.yml`, `apps/api/prisma/schema.prisma` | Nauryzbek |
-| `services/ml/**`, `config/**` (rubric, models, scenarios, prompts), `seed/**`, `fixtures/**` | Beknur |
+| `docker-compose.yml`, `apps/api/prisma/schema.prisma` | Aibek |
+| `services/ml/**`, `config/**` (rubric, models, scenarios, prompts), `seed/**`, `fixtures/**` | Nauryzbek |
 | `docs/PLAN.md`, `README.md`, `CONTRIBUTING.md` | Meiyrbek |
 
 ## Commits
@@ -108,7 +108,7 @@ Conventional Commits, in English, saying what changed and why: `feat: stream the
 ## Budget
 
 - Everyone works with `GATEWAY_MODE=replay` by default: answers come from `fixtures/cassettes/` and cost nothing.
-- Live calls run only on separate OpenAI project keys, each with its own spending limit — Meiyrbek's and Beknur's. Nauryzbek works on replay.
+- Live calls run only on separate OpenAI project keys, each with its own spending limit — Meiyrbek's and Nauryzbek's. Aibek works on replay.
 - Every task in `config/models.json` has a per-request cost limit, and the gateway refuses everything past `BUDGET_USD_CAP`.
 
 ## Secrets and data

@@ -4,8 +4,8 @@ The shapes the web screens already render, written down so the API and the ML se
 
 | For | File | What is in it |
 | --- | --- | --- |
-| **Nauryzbek** — `apps/api` | [`api.md`](api.md) | the public `/v1` endpoints, DTOs, roles, error codes, which ML call each endpoint makes, the tests the rules need |
-| **Beknur** — `services/ml` | [`ml.md`](ml.md) | the internal `/internal/v1` endpoints, paste-ready Pydantic models, the rules the screens rely on |
+| **Aibek** — `apps/api` | [`api.md`](api.md) | the public `/v1` endpoints, DTOs, roles, error codes, which ML call each endpoint makes, the tests the rules need |
+| **Nauryzbek** — `services/ml` | [`ml.md`](ml.md) | the internal `/internal/v1` endpoints, paste-ready Pydantic models, the rules the screens rely on |
 
 [`examples/candidate-a/`](examples/candidate-a/) holds a JSON example of every request and response for candidate A: the public API at the top level, the internal ML API under `ml/`, plus candidate A's `snapshot.json` for the seed. They are generated from the web previews, so they are exactly what the screens show today.
 
