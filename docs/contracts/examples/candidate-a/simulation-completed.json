@@ -15,7 +15,8 @@
     "expectedMinutes": 8,
     "maxCandidateTurns": 5
   },
-  "mode": "text",
+  "mode": "voice",
+  "accommodation": false,
   "status": "completed",
   "stage": "finished",
   "ending": "completed",

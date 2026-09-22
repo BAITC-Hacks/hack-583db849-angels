@@ -4,7 +4,9 @@
   "ended": false,
   "director": {
     "beat": "opening",
+    "matchedAnswerType": "rush_to_fix",
+    "similarity": 0.71,
     "nextBeat": "trust",
-    "reason": "The candidate acknowledged the problem but offered only speed; Dana raises being asked."
+    "reason": "The answer offers speed without acknowledging Dana; the trust beat follows."
   }
 }

@@ -16,6 +16,6 @@
   "stage": "in-progress",
   "status": "active",
   "candidateTurns": 1,
-  "recognitionConfidence": null,
-  "characterAudioUrl": null
+  "recognitionConfidence": 0.93,
+  "characterAudioUrl": "/v1/simulations/6f1c2a0e-0000-4000-8000-00000000a002/turns/turn_03/audio"
 }

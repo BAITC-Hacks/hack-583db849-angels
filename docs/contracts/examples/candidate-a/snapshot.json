@@ -32,6 +32,11 @@
         "fieldId": "community",
         "question": "What problem in your community would you like to solve?",
         "answer": "Public transport in Almaty is hard to plan. I want to make an app that shows real bus times."
+      },
+      {
+        "fieldId": "english_self",
+        "question": "How would you rate your English?",
+        "answer": "C2. I speak fluently and read everything in English."
       }
     ]
   },

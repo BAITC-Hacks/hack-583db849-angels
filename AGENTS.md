@@ -95,7 +95,7 @@ The whole API budget is about $20.
 ## Scope
 
 - **M2 and M3 are built as one complete, provable product.** M1, M4 and M5 stay thin but real. Do not gold-plate the thin modules.
-- **M2 works as text first.** Voice is a later stage (M2b) and must never break text mode.
+- **M2 works by voice.** Text input exists only for a candidate whose accommodation staff switched on, and paste is blocked there too. The mini-ML picks the story branch; it never scores.
 
 ## Do not
 

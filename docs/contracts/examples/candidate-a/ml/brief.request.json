@@ -22,6 +22,11 @@
           "fieldId": "community",
           "question": "What problem in your community would you like to solve?",
           "answer": "Public transport in Almaty is hard to plan. I want to make an app that shows real bus times."
+        },
+        {
+          "fieldId": "english_self",
+          "question": "How would you rate your English?",
+          "answer": "C2. I speak fluently and read everything in English."
         }
       ]
     },
@@ -41,5 +46,13 @@
       "type": "IELTS",
       "score": "6.5"
     }
+  },
+  "simulationEnglish": {
+    "cefrEstimate": "B2",
+    "wordsPerMinute": 112,
+    "fillerRate": 0.03,
+    "meanTurnLength": 33.8,
+    "lexicalDiversity": 0.71,
+    "grammarErrorsPer100Words": 0.8
   }
 }
