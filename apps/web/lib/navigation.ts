@@ -1,0 +1,130 @@
+import {
+  BuildingLibraryIcon,
+  ChartBarSquareIcon,
+  ChatBubbleBottomCenterTextIcon,
+  ChatBubbleLeftRightIcon,
+  ClipboardDocumentCheckIcon,
+  DocumentTextIcon,
+  ShieldCheckIcon,
+  SwatchIcon,
+  UsersIcon,
+} from '@heroicons/react/24/outline';
+import type { ComponentType, SVGProps } from 'react';
+import type { Copy } from './i18n/staffLocale';
+import type { DemoRole } from './roles';
+
+export type NavSection = 'workspace' | 'reference' | 'demo';
+
+export interface NavItem {
+  id: string;
+  section: NavSection;
+  icon: ComponentType<SVGProps<SVGSVGElement>>;
+  label: Copy<string>;
+  roles: DemoRole[];
+  /** Absent while the item's slice has not landed; the item then shows as locked. */
+  href?: string;
+  /** Paths that count as this item when they differ from `href`. */
+  match?: string;
+  module?: 'M1' | 'M2' | 'M3' | 'M4' | 'M5';
+}
+
+/**
+ * Every place the sidebar can take someone, and who may go there.
+ *
+ * The role lists carry the product's rules, not just tidiness: an interviewer
+ * has no simulation reports, because they score blind; a candidate sees only
+ * their own simulation and feedback. The server enforces the same with API key
+ * roles — hiding a link is not authorization.
+ */
+export const navItems: NavItem[] = [
+  {
+    id: 'candidates',
+    section: 'workspace',
+    icon: UsersIcon,
+    label: { en: 'Candidates', ru: 'Кандидаты' },
+    roles: ['interviewer', 'commission', 'admin'],
+    href: '/demo/candidates',
+  },
+  {
+    id: 'briefs',
+    section: 'workspace',
+    icon: DocumentTextIcon,
+    label: { en: 'Briefs', ru: 'Брифы' },
+    roles: ['interviewer', 'admin'],
+    module: 'M1',
+  },
+  {
+    id: 'interviews',
+    section: 'workspace',
+    icon: ClipboardDocumentCheckIcon,
+    label: { en: 'Interviews', ru: 'Интервью' },
+    roles: ['interviewer', 'admin'],
+    module: 'M4',
+  },
+  {
+    id: 'reports',
+    section: 'workspace',
+    icon: ChartBarSquareIcon,
+    label: { en: 'Simulation reports', ru: 'Отчёты симуляций' },
+    roles: ['commission', 'admin'],
+    module: 'M3',
+  },
+  {
+    id: 'quality',
+    section: 'workspace',
+    icon: ShieldCheckIcon,
+    label: { en: 'Quality guard', ru: 'Контроль качества' },
+    roles: ['commission', 'admin'],
+    module: 'M5',
+  },
+  {
+    id: 'simulation',
+    section: 'workspace',
+    icon: ChatBubbleLeftRightIcon,
+    label: { en: 'My simulation', ru: 'My simulation' },
+    roles: ['candidate'],
+    href: '/simulation/preview',
+    match: '/simulation',
+    module: 'M2',
+  },
+  {
+    id: 'feedback',
+    section: 'workspace',
+    icon: ChatBubbleBottomCenterTextIcon,
+    label: { en: 'My feedback', ru: 'My feedback' },
+    roles: ['candidate'],
+    module: 'M3',
+  },
+  {
+    id: 'kit',
+    section: 'reference',
+    icon: SwatchIcon,
+    label: { en: 'Evidence components', ru: 'Компоненты доказательств' },
+    roles: ['admin'],
+    href: '/demo/kit',
+  },
+  {
+    id: 'stand',
+    section: 'demo',
+    icon: BuildingLibraryIcon,
+    label: { en: 'Platform stand', ru: 'Стенд платформы' },
+    roles: ['interviewer', 'commission', 'admin', 'candidate'],
+    href: '/stand',
+  },
+];
+
+export const sectionLabel: Record<NavSection, Copy<string>> = {
+  workspace: { en: 'Workspace', ru: 'Работа' },
+  reference: { en: 'Reference', ru: 'Справочник' },
+  demo: { en: 'Demo', ru: 'Демо' },
+};
+
+export function navFor(role: DemoRole): NavItem[] {
+  return navItems.filter((item) => item.roles.includes(role));
+}
+
+/** The item a path belongs to, so the sidebar can mark where the reader is. */
+export function isActive(item: NavItem, pathname: string): boolean {
+  const base = item.match ?? item.href;
+  return Boolean(base && (pathname === base || pathname.startsWith(`${base}/`)));
+}
