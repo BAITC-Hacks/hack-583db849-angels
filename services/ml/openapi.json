@@ -266,6 +266,45 @@
         ]
       }
     },
+    "/internal/v1/speech": {
+      "post": {
+        "summary": "Speech",
+        "operationId": "speech_internal_v1_speech_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SpeechRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "audio/mpeg": {}
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
     "/internal/v1/consistency": {
       "post": {
         "summary": "Consistency",
@@ -1503,6 +1542,25 @@
         ],
         "title": "ScenarioBrief",
         "description": "The public part of a scenario. The hidden motive and the beats stay inside the service."
+      },
+      "SpeechRequest": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "voice": {
+            "type": "string",
+            "title": "Voice"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "text",
+          "voice"
+        ],
+        "title": "SpeechRequest"
       },
       "SurpriseRequest": {
         "properties": {

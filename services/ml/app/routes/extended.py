@@ -14,19 +14,12 @@ from ..schemas.contracts import (
     DraftResult,
     SurpriseRequest,
     SurpriseResult,
-    TranscribeRequest,
-    TranscribeResult,
     Usage,
 )
 
 
 def extended_router(authenticate: Callable[..., None]) -> APIRouter:
     router = APIRouter(prefix="/internal/v1", dependencies=[Depends(authenticate)])
-
-    @router.post("/transcribe", response_model=TranscribeResult)
-    async def transcribe(request: TranscribeRequest) -> TranscribeResult:
-        del request
-        return load_example("transcribe.response.json", TranscribeResult)
 
     @router.post("/consistency", response_model=ConsistencyResult)
     async def consistency(request: ConsistencyRequest) -> ConsistencyResult:

@@ -15,10 +15,13 @@ TOKEN = {"X-Internal-Token": "test-internal-token"}
 
 
 @pytest.fixture
-def client() -> TestClient:
+def client(tmp_path: Path) -> TestClient:
+    audio = tmp_path / "tmp" / "recordings" / "6f1c2a0e-a004.webm"
+    audio.parent.mkdir(parents=True)
+    audio.write_bytes(b"synthetic audio placeholder")
     settings = Settings(
         ml_internal_token="test-internal-token",
-        uploads_dir=Path("/tmp/uploads"),
+        uploads_dir=tmp_path,
         gateway_mode="replay",
         budget_usd_cap=Decimal("20"),
         demo_mode=False,
