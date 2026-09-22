@@ -21,8 +21,10 @@ What `api` sends to the ML service and what it expects back. It is derived from 
 4. **M2 — the real `turn`:** the scenario engine, director and actor, `config/scenarios/conflict-resolution.json` first.
 5. **M3 — the real `assessment`:** the judge, English metrics, candidate feedback.
 6. **M1 — the real `brief`.**
-7. **M4 — `interview/transcribe` and `interview/draft`.** Transcription reuses the Deepgram path built for M2b.
-8. **M5 — `quality-check`,** draft shapes in the examples.
+7. **M4 — `transcribe` and `interview/draft`.** One transcription endpoint serves the interview (two speakers), the surprise answer and voice turns (one speaker).
+8. **Admin — `GET /internal/v1/usage`:** live and replayed calls and spend, from the gateway's cost log.
+9. **M5 — `quality-check`,** draft shapes in the examples.
+10. **M2b — `speech`** (the character's voice), and **S — `surprise-question`.**
 
 ## Endpoints
 
@@ -36,7 +38,10 @@ Every request carries `X-Internal-Token`. Responses are the result object itself
 | `POST` | `/internal/v1/simulation/turn` | `TurnRequest` → `TurnResult` | `ml/simulation-turn.*` |
 | `POST` | `/internal/v1/simulation/assessment` | `AssessmentRequest` → `AssessmentResult` | `ml/simulation-assessment.*` |
 | `POST` | `/internal/v1/brief` | `BriefRequest` → `BriefResult` | `ml/brief.*` |
-| `POST` | `/internal/v1/interview/transcribe` | `TranscribeRequest` → `TranscribeResult` | `ml/interview-transcribe.*` |
+| `POST` | `/internal/v1/transcribe` | `TranscribeRequest` → `TranscribeResult` | `ml/transcribe.*` |
+| `POST` | `/internal/v1/speech` | `SpeechRequest` → `audio/mpeg` (M2b) | |
+| `POST` | `/internal/v1/surprise-question` | `SurpriseRequest` → `SurpriseResult` (S) | `ml/surprise-question.*` |
+| `GET` | `/internal/v1/usage` | → `Usage` | `ml/usage.response.json` |
 | `POST` | `/internal/v1/interview/draft` | `DraftRequest` → `DraftResult` | `ml/interview-draft.*` |
 | `POST` | `/internal/v1/quality-check` | draft, M5 | `quality-check-*.json` |
 
@@ -62,9 +67,10 @@ Each of these is visible on a screen, and a mistake here shows up in the demo.
    - Evidence comes only from **candidate** turns (`interview_turn`) or notes. The interviewer's turns are context, not evidence.
    - `DraftRequest` has no field for the scores, and `extra="forbid"` rejects them. A draft that saw them could anchor to them in reverse; the comparison is done after, by the web.
 6a. **Transcription goes through the gateway,** like every Deepgram call:
-   - speaker diarisation, two speakers, and the one who asks the first question is `interviewer`;
-   - the audio is never sent to an LLM — only the resulting text is;
+   - for an interview (`speakers: 2`) the speaker who asks the first question is `interviewer`; for a surprise answer or a voice turn (`speakers: 1`) every turn is `candidate`;
+   - the audio is never sent to an LLM — only the resulting text is. For the surprise answer you receive the audio track only, never the video;
    - `api` deletes the audio once the transcript is stored, so you work from the file reference you were given and keep no copy.
+6b. **The surprise question** is about the candidate's own application, answerable in 90 seconds without preparation, in plain English, and never touches personal life, family, health, money or anything on the `profile` list. You return the competency it targets and why — staff see them, the candidate never does.
 7. **English is separate.**
    - `EnglishMetrics` is computed by code;
    - grammar never moves a D.R.I.V.E. score;
@@ -93,7 +99,7 @@ class Strict(BaseModel):
 Competency = Literal["D", "R", "I", "V", "E"]
 Score = Annotated[int, Field(ge=0, le=4)] | None
 Confidence = Literal["low", "medium", "high"]
-SourceKind = Literal["application_field", "test_item", "simulation_turn", "interview_turn", "interview_note"]
+SourceKind = Literal["application_field", "test_item", "simulation_turn", "interview_turn", "interview_note", "surprise_answer"]
 TurnId = Annotated[str, Field(pattern=r"^turn_\d{2,}$")]
 
 
@@ -332,13 +338,13 @@ class TranscribedTurn(Strict):
     endSec: float
 
 
-# ---- POST /internal/v1/interview/transcribe
+# ---- POST /internal/v1/transcribe
 
 class TranscribeRequest(Strict):
-    interviewId: str
+    purpose: Literal["interview", "surprise", "turn"]
     audioRef: str                          # where api put the file; api deletes it afterwards
     language: Literal["en"] = "en"
-    speakers: int = 2
+    speakers: Literal[1, 2] = 2
 
 
 class TranscribeResult(Strict):
@@ -361,4 +367,40 @@ class DraftResult(Strict):
     @classmethod
     def every_competency_once(cls, scores: list[DriveScore]) -> list[DriveScore]:
         return all_five(scores)
+
+
+# ---- POST /internal/v1/speech (M2b)
+
+class SpeechRequest(Strict):
+    text: str
+    voice: str                             # from the scenario's character
+
+
+# ---- POST /internal/v1/surprise-question (S)
+
+class SurpriseRequest(Strict):
+    candidate: CandidateView
+
+
+class SurpriseResult(Strict):
+    question: str
+    competency: Competency
+    why: str                               # for staff only
+
+    @field_validator("question")
+    @classmethod
+    def short_enough_to_answer(cls, question: str) -> str:
+        if len(question.split()) > 40:
+            raise ValueError("a surprise question is at most 40 words")
+        return question
+
+
+# ---- GET /internal/v1/usage
+
+class Usage(Strict):
+    gatewayMode: Literal["live", "record", "replay"]
+    liveCalls: int
+    replayedCalls: int
+    spentUsd: float
+    capUsd: float
 ```

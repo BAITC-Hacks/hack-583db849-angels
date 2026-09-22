@@ -1,0 +1,24 @@
+{
+  "candidateId": "00000000-0000-4000-8000-00000000000a",
+  "label": "Candidate A",
+  "brief": {
+    "briefId": "6f1c2a0e-0000-4000-8000-00000000a001",
+    "status": "ready"
+  },
+  "simulation": {
+    "simulationId": "6f1c2a0e-0000-4000-8000-00000000a002",
+    "status": "completed",
+    "ending": "completed"
+  },
+  "assessment": null,
+  "interview": {
+    "interviewId": "6f1c2a0e-0000-4000-8000-00000000a004",
+    "transcriptStatus": "ready",
+    "scoresSaved": true,
+    "draftReady": true
+  },
+  "surprise": {
+    "surpriseId": "6f1c2a0e-0000-4000-8000-00000000a007",
+    "status": "answered"
+  }
+}

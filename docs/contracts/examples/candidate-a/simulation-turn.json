@@ -15,5 +15,7 @@
   },
   "stage": "in-progress",
   "status": "active",
-  "candidateTurns": 1
+  "candidateTurns": 1,
+  "recognitionConfidence": null,
+  "characterAudioUrl": null
 }
