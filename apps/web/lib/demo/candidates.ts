@@ -113,6 +113,7 @@ export const demoSteps: DemoStep[] = [
   },
   {
     module: 'M4',
+    preview: '/interviewer/interview/preview',
     copy: {
       en: { title: 'Interview draft', note: 'Opens only after the interviewer scores' },
       ru: { title: 'Черновик интервью', note: 'Открывается только после оценки интервьюера' },
