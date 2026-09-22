@@ -2,8 +2,8 @@
 
 import type { ApplicationDraft, DraftAnswerPatch, DraftAnswers } from '@invision/stand-client';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { api } from '../api/client';
-import { ApiError } from '../api/error';
+import { api } from '../stand/client';
+import { ApiError } from '../stand/error';
 
 export type SaveState =
   | { kind: 'idle' }
