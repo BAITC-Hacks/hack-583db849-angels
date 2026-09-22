@@ -1,0 +1,187 @@
+{
+  "assessmentId": "6f1c2a0e-0000-4000-8000-00000000a003",
+  "simulationId": "6f1c2a0e-0000-4000-8000-00000000a002",
+  "candidateId": "00000000-0000-4000-8000-00000000000a",
+  "createdAt": "2026-09-25T10:11:58Z",
+  "simulation": {
+    "scenarioTitle": "A teammate is about to walk away",
+    "mode": "text",
+    "completedAt": "2026-09-25T10:11:50Z",
+    "durationSeconds": 420,
+    "turns": [
+      {
+        "turnId": "turn_01",
+        "speaker": "character",
+        "text": "Honestly, I'm done. Timur rewrote my whole module last night without a word to me. If my work can just be thrown away, why am I even here? Maybe the three of you can finish the demo without me.",
+        "startedAt": "2026-09-25T10:05:00Z",
+        "endedAt": "2026-09-25T10:05:30Z"
+      },
+      {
+        "turnId": "turn_02",
+        "speaker": "candidate",
+        "text": "Okay, let's fix this fast. The demo is in three days, so we can't lose you now. Send me the list of what Timur changed and I'll look at it tonight.",
+        "startedAt": "2026-09-25T10:05:38Z",
+        "endedAt": "2026-09-25T10:06:08Z"
+      },
+      {
+        "turnId": "turn_03",
+        "speaker": "character",
+        "text": "Okay… I hear you. But it isn't only about the code. Nobody asked me anything. How do I know it won't happen again next week?",
+        "startedAt": "2026-09-25T10:06:16Z",
+        "endedAt": "2026-09-25T10:06:46Z"
+      },
+      {
+        "turnId": "turn_04",
+        "speaker": "candidate",
+        "text": "From now on nobody merges into someone else's module without a review from its owner. I'll set that rule in the repo today.",
+        "startedAt": "2026-09-25T10:06:54Z",
+        "endedAt": "2026-09-25T10:07:24Z"
+      },
+      {
+        "turnId": "turn_05",
+        "speaker": "character",
+        "text": "Fine, I could talk to him. But the demo is in three days and his version still breaks the login. Who decides which version we keep?",
+        "startedAt": "2026-09-25T10:07:32Z",
+        "endedAt": "2026-09-25T10:08:02Z"
+      },
+      {
+        "turnId": "turn_06",
+        "speaker": "candidate",
+        "text": "We keep your version for the demo because it works. Timur moves his changes to a separate branch and we look at them after Thursday. If his login fix is really needed, the risk is that we demo with a known bug, so I'll ask him to patch only that.",
+        "startedAt": "2026-09-25T10:08:10Z",
+        "endedAt": "2026-09-25T10:08:40Z"
+      },
+      {
+        "turnId": "turn_07",
+        "speaker": "character",
+        "text": "That sounds fair, I guess. So what do I actually do today? I don't want to sit around waiting for Timur to agree with me.",
+        "startedAt": "2026-09-25T10:08:48Z",
+        "endedAt": "2026-09-25T10:09:18Z"
+      },
+      {
+        "turnId": "turn_08",
+        "speaker": "candidate",
+        "text": "Today you finish the payment endpoint, Timur fixes the login in his branch, and I write the demo script. We freeze the backend by Thursday noon and do a full run at six.",
+        "startedAt": "2026-09-25T10:09:26Z",
+        "endedAt": "2026-09-25T10:09:56Z"
+      },
+      {
+        "turnId": "turn_09",
+        "speaker": "character",
+        "text": "Alright. If we write down who owns what, I'm in. But you tell Timur, not me. I don't want another argument tonight.",
+        "startedAt": "2026-09-25T10:10:04Z",
+        "endedAt": "2026-09-25T10:10:34Z"
+      },
+      {
+        "turnId": "turn_10",
+        "speaker": "candidate",
+        "text": "Deal. I'll put the owners in the team chat in ten minutes and call Timur right after. If the Thursday run fails, we cut the analytics screen instead of working all night.",
+        "startedAt": "2026-09-25T10:10:42Z",
+        "endedAt": "2026-09-25T10:11:12Z"
+      },
+      {
+        "turnId": "turn_11",
+        "speaker": "character",
+        "text": "Okay. Let's try it your way. And thanks for actually listening.",
+        "startedAt": "2026-09-25T10:11:20Z",
+        "endedAt": "2026-09-25T10:11:50Z"
+      }
+    ]
+  },
+  "scores": [
+    {
+      "competency": "D",
+      "score": 2,
+      "confidence": "medium",
+      "rationale": "Has a fallback if the run fails, but says nothing about how the team recovers from the conflict itself.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_10",
+          "quote": "If the Thursday run fails, we cut the analytics screen instead of working all night."
+        }
+      ]
+    },
+    {
+      "competency": "R",
+      "score": 2,
+      "confidence": "low",
+      "rationale": "Names one risk and a way to contain it; does not weigh what the decision costs the people involved.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_06",
+          "quote": "the risk is that we demo with a known bug, so I'll ask him to patch only that."
+        }
+      ]
+    },
+    {
+      "competency": "I",
+      "score": 2,
+      "confidence": "medium",
+      "rationale": "Sees the process gap behind the conflict, and treats it purely as a process problem.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_04",
+          "quote": "nobody merges into someone else's module without a review from its owner"
+        }
+      ]
+    },
+    {
+      "competency": "V",
+      "score": null,
+      "confidence": null,
+      "rationale": null,
+      "evidence": []
+    },
+    {
+      "competency": "E",
+      "score": 4,
+      "confidence": "high",
+      "rationale": "Turns the conflict into owners, deadlines and a checkpoint without being asked, and starts acting at once.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_08",
+          "quote": "Today you finish the payment endpoint, Timur fixes the login in his branch, and I write the demo script."
+        },
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_08",
+          "quote": "We freeze the backend by Thursday noon and do a full run at six."
+        },
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_10",
+          "quote": "I'll put the owners in the team chat in ten minutes and call Timur right after."
+        }
+      ]
+    }
+  ],
+  "english": {
+    "cefrEstimate": "B2",
+    "wordsPerMinute": null,
+    "fillerRate": null,
+    "meanTurnLength": 33.8,
+    "lexicalDiversity": 0.71,
+    "grammarErrorsPer100Words": 0.8
+  },
+  "interviewQuestions": [
+    {
+      "competency": "V",
+      "question": "Tell me about a decision where doing the right thing cost you or your team something. What did you do?",
+      "reason": "No verified evidence for Values-Driven Leadership in the simulation."
+    },
+    {
+      "competency": "D",
+      "question": "The Thursday run fails and the analytics screen is already cut. What happens next, and how do you keep the team together?",
+      "reason": "A fallback was named, but not how the team recovers."
+    },
+    {
+      "competency": "R",
+      "question": "What could go wrong with the new review rule, and for whom?",
+      "reason": "One risk was named; its effect on people was not."
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "candidateTurn": {
+    "turnId": "turn_02",
+    "speaker": "candidate",
+    "text": "Okay, let's fix this fast. The demo is in three days, so we can't lose you now. Send me the list of what Timur changed and I'll look at it tonight.",
+    "startedAt": "2026-09-25T10:05:38Z",
+    "endedAt": "2026-09-25T10:06:08Z"
+  },
+  "characterTurn": {
+    "turnId": "turn_03",
+    "speaker": "character",
+    "text": "Okay… I hear you. But it isn't only about the code. Nobody asked me anything. How do I know it won't happen again next week?",
+    "startedAt": "2026-09-25T10:06:16Z",
+    "endedAt": "2026-09-25T10:06:46Z"
+  },
+  "stage": "in-progress",
+  "status": "active",
+  "candidateTurns": 1
+}

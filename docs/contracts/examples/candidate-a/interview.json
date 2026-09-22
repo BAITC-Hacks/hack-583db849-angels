@@ -1,0 +1,110 @@
+{
+  "interviewId": "6f1c2a0e-0000-4000-8000-00000000a004",
+  "candidateId": "00000000-0000-4000-8000-00000000000a",
+  "heldAt": "2026-09-26T09:30:00Z",
+  "transcriptStatus": "ready",
+  "transcriptSource": "recording",
+  "transcript": [
+    {
+      "turnId": "iturn_01",
+      "speaker": "interviewer",
+      "text": "Thanks for coming in. Tell me about the conflict in the simulation. What did you do first?",
+      "startSec": 5,
+      "endSec": 12
+    },
+    {
+      "turnId": "iturn_02",
+      "speaker": "candidate",
+      "text": "I made a plan straight away: owners, a deadline and a full run on Thursday. When a demo is close, speed matters.",
+      "startSec": 14,
+      "endSec": 29
+    },
+    {
+      "turnId": "iturn_03",
+      "speaker": "interviewer",
+      "text": "You would agree that finishing on time matters most, right?",
+      "startSec": 41,
+      "endSec": 45
+    },
+    {
+      "turnId": "iturn_04",
+      "speaker": "candidate",
+      "text": "Yes, finishing on time is what matters for a demo.",
+      "startSec": 46,
+      "endSec": 51
+    },
+    {
+      "turnId": "iturn_05",
+      "speaker": "interviewer",
+      "text": "Why did you keep Dana's version?",
+      "startSec": 58,
+      "endSec": 61
+    },
+    {
+      "turnId": "iturn_06",
+      "speaker": "candidate",
+      "text": "It works, and that is what matters for the demo. Timur can bring his changes in later.",
+      "startSec": 63,
+      "endSec": 72
+    },
+    {
+      "turnId": "iturn_07",
+      "speaker": "interviewer",
+      "text": "What do your parents do for a living?",
+      "startSec": 90,
+      "endSec": 93
+    },
+    {
+      "turnId": "iturn_08",
+      "speaker": "candidate",
+      "text": "Sorry, is that part of the interview?",
+      "startSec": 95,
+      "endSec": 98
+    },
+    {
+      "turnId": "iturn_09",
+      "speaker": "interviewer",
+      "text": "Fair point, let me move on. Tell me about a time doing the right thing cost you something.",
+      "startSec": 99,
+      "endSec": 106
+    },
+    {
+      "turnId": "iturn_10",
+      "speaker": "candidate",
+      "text": "I once reported a classmate who copied homework. I felt bad, but rules are rules, so I told the teacher.",
+      "startSec": 112,
+      "endSec": 124
+    },
+    {
+      "turnId": "iturn_11",
+      "speaker": "interviewer",
+      "text": "If the Thursday run fails, what happens next?",
+      "startSec": 140,
+      "endSec": 144
+    },
+    {
+      "turnId": "iturn_12",
+      "speaker": "candidate",
+      "text": "We cut scope and move on. The analytics screen can wait.",
+      "startSec": 146,
+      "endSec": 152
+    },
+    {
+      "turnId": "iturn_13",
+      "speaker": "interviewer",
+      "text": "What could go wrong with the new review rule?",
+      "startSec": 170,
+      "endSec": 174
+    },
+    {
+      "turnId": "iturn_14",
+      "speaker": "candidate",
+      "text": "Merges get slower. I would add a 24-hour limit for reviews so nobody is blocked.",
+      "startSec": 176,
+      "endSec": 186
+    }
+  ],
+  "notes": [],
+  "interviewerScores": null,
+  "scoredAt": null
+}

@@ -1,0 +1,23 @@
+{
+  "scenarioId": "conflict-resolution",
+  "turns": [
+    {
+      "turnId": "turn_01",
+      "speaker": "character",
+      "text": "Honestly, I'm done. Timur rewrote my whole module last night without a word to me. If my work can just be thrown away, why am I even here? Maybe the three of you can finish the demo without me.",
+      "startedAt": "2026-09-25T10:05:00Z",
+      "endedAt": "2026-09-25T10:05:30Z"
+    },
+    {
+      "turnId": "turn_02",
+      "speaker": "candidate",
+      "text": "Okay, let's fix this fast. The demo is in three days, so we can't lose you now. Send me the list of what Timur changed and I'll look at it tonight.",
+      "startedAt": "2026-09-25T10:05:38Z",
+      "endedAt": "2026-09-25T10:06:08Z"
+    }
+  ],
+  "state": {
+    "beat": "opening",
+    "candidateTurns": 1
+  }
+}

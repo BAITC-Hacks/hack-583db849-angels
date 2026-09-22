@@ -1,0 +1,10 @@
+{
+  "text": "Okay… I hear you. But it isn't only about the code. Nobody asked me anything. How do I know it won't happen again next week?",
+  "stage": "in-progress",
+  "ended": false,
+  "director": {
+    "beat": "opening",
+    "nextBeat": "trust",
+    "reason": "The candidate acknowledged the problem but offered only speed; Dana raises being asked."
+  }
+}
