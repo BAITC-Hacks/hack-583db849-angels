@@ -23,10 +23,81 @@
         }
       }
     },
+    "/internal/v1/scenarios": {
+      "get": {
+        "summary": "Scenarios",
+        "operationId": "scenarios_internal_v1_scenarios_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ScenarioBrief"
+                  },
+                  "type": "array",
+                  "title": "Response Scenarios Internal V1 Scenarios Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/internal/v1/scenarios/{scenarioId}": {
+      "get": {
+        "summary": "Scenario",
+        "operationId": "scenario_internal_v1_scenarios__scenarioId__get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "scenarioId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Scenarioid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScenarioBrief"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/internal/v1/simulation/turn": {
       "post": {
-        "summary": "Internal V1 Simulation Turn",
-        "operationId": "internal_v1_simulation_turn_internal_v1_simulation_turn_post",
+        "summary": "Simulation Turn",
+        "operationId": "simulation_turn_internal_v1_simulation_turn_post",
         "requestBody": {
           "content": {
             "application/json": {
@@ -68,8 +139,8 @@
     },
     "/internal/v1/simulation/assessment": {
       "post": {
-        "summary": "Internal V1 Simulation Assessment",
-        "operationId": "internal_v1_simulation_assessment_internal_v1_simulation_assessment_post",
+        "summary": "Simulation Assessment",
+        "operationId": "simulation_assessment_internal_v1_simulation_assessment_post",
         "requestBody": {
           "content": {
             "application/json": {
@@ -111,8 +182,8 @@
     },
     "/internal/v1/brief": {
       "post": {
-        "summary": "Internal V1 Brief",
-        "operationId": "internal_v1_brief_internal_v1_brief_post",
+        "summary": "Brief",
+        "operationId": "brief_internal_v1_brief_post",
         "requestBody": {
           "content": {
             "application/json": {
@@ -513,6 +584,30 @@
           "cefr"
         ],
         "title": "CertificateLevel"
+      },
+      "Character": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "wants": {
+            "type": "string",
+            "title": "Wants"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name",
+          "role",
+          "wants"
+        ],
+        "title": "Character"
       },
       "Claim": {
         "properties": {
@@ -984,6 +1079,64 @@
           "metric"
         ],
         "title": "Observation"
+      },
+      "ScenarioBrief": {
+        "properties": {
+          "scenarioId": {
+            "type": "string",
+            "title": "Scenarioid"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "situation": {
+            "type": "string",
+            "title": "Situation"
+          },
+          "yourRole": {
+            "type": "string",
+            "title": "Yourrole"
+          },
+          "goal": {
+            "type": "string",
+            "title": "Goal"
+          },
+          "character": {
+            "$ref": "#/components/schemas/Character"
+          },
+          "expectedMinutes": {
+            "type": "integer",
+            "title": "Expectedminutes"
+          },
+          "maxCandidateTurns": {
+            "type": "integer",
+            "title": "Maxcandidateturns"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "ready"
+            ],
+            "title": "Status"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "scenarioId",
+          "title",
+          "situation",
+          "yourRole",
+          "goal",
+          "character",
+          "expectedMinutes",
+          "maxCandidateTurns",
+          "status"
+        ],
+        "title": "ScenarioBrief",
+        "description": "The public part of a scenario. The hidden motive and the beats stay inside the service."
       },
       "TestAnswer": {
         "properties": {

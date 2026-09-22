@@ -72,8 +72,7 @@ def test_valid_token_reaches_the_current_contract_stub() -> None:
         headers={"X-Internal-Token": "test-internal-token"},
     )
 
-    assert response.status_code == 501
-    assert_error_shape(response, "NOT_IMPLEMENTED")
+    assert response.status_code == 200
 
 
 def test_validation_errors_do_not_echo_the_request() -> None:
