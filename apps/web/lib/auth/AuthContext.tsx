@@ -2,9 +2,9 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { LoginRequest, RegisterApplicantRequest, UserPublic } from '@invision/stand-client';
-import { api } from '../api/client';
-import { ApiError } from '../api/error';
-import { whenApiReady } from '../api/ready';
+import { api } from '../stand/client';
+import { ApiError } from '../stand/error';
+import { whenApiReady } from '../stand/ready';
 
 export type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated';
 

@@ -1,4 +1,3 @@
-import { createPreference } from './preference';
 import type { Copy } from './i18n/staffLocale';
 
 /**
@@ -50,4 +49,20 @@ export const roleMeta: Record<DemoRole, { short: string; tile: string; copy: Cop
   },
 };
 
-export const useDemoRole = createPreference<DemoRole>('invision-demo-role', 'interviewer', demoRoles);
+export const DEMO_ROLE_COOKIE = 'invision-demo-role';
+
+/**
+ * The role lives in a cookie, not in localStorage: the server reads it on every
+ * request to pick the API key, and it renders the right home on the first paint.
+ */
+export function readDemoRole(value: string | undefined): DemoRole {
+  return demoRoles.includes(value as DemoRole) ? (value as DemoRole) : 'interviewer';
+}
+
+/** Which API key a demo role speaks with. A candidate goes through inVision's own platform key. */
+export const apiRoleFor: Record<DemoRole, 'platform' | 'interviewer' | 'commission' | 'admin'> = {
+  candidate: 'platform',
+  interviewer: 'interviewer',
+  commission: 'commission',
+  admin: 'admin',
+};

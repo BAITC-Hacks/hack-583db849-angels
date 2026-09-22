@@ -2,8 +2,8 @@
 
 import type { CurrentTestBlock, CurrentTestBlockResponse, TestAttemptSummary } from '@invision/stand-client';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { api } from '../api/client';
-import { ApiError } from '../api/error';
+import { api } from '../stand/client';
+import { ApiError } from '../stand/error';
 
 /**
  * Every state the forced-choice screen can be in, as one value.

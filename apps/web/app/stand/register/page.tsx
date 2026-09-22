@@ -7,7 +7,7 @@ import { Button } from '../../../components/ui/Button';
 import { Logo } from '../../../components/ui/Logo';
 import { TextField } from '../../../components/ui/TextField';
 import { ThemeToggle } from '../../../components/ui/ThemeToggle';
-import { useApiErrorText } from '../../../lib/api/errorPresentation';
+import { useApiErrorText } from '../../../lib/stand/errorPresentation';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { minEligibleBirthYear, validateRegisterFields, type FieldErrors } from '../../../lib/validation/identity';
 import Link from 'next/link';

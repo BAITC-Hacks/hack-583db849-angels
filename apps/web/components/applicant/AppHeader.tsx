@@ -4,7 +4,7 @@ import { ArrowRightStartOnRectangleIcon, UserCircleIcon } from '@heroicons/react
 import { useState } from 'react';
 import { Logo } from '../ui/Logo';
 import { ThemeToggle } from '../ui/ThemeToggle';
-import { useApiErrorText } from '../../lib/api/errorPresentation';
+import { useApiErrorText } from '../../lib/stand/errorPresentation';
 import { useAuth } from '../../lib/auth/AuthContext';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
