@@ -22,7 +22,9 @@ const contextLink: Record<StaffLocale, string> = { en: 'Show in context', ru: '�
 
 export function sourceLabel(source: EvidenceSource, locale: StaffLocale = 'en'): string {
   const word = sourceWords[locale][source.kind];
-  return source.kind === 'simulation_turn' ? `${word} ${source.id.replace(/^turn_/, '')}` : `${word} · ${source.id}`;
+  if (source.kind === 'simulation_turn') return `${word} ${source.id.replace(/^turn_/, '')}`;
+  if (source.kind === 'interview_note') return `${word} ${source.id.replace(/^note_/, '')}`;
+  return `${word} · ${source.id}`;
 }
 
 /**
