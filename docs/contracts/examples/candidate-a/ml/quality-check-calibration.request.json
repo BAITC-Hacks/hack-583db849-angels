@@ -1,0 +1,413 @@
+{
+  "kind": "calibration",
+  "history": [
+    {
+      "interviewRef": "interview-01",
+      "interviewerRef": "interviewer-2",
+      "heldAt": "2026-09-09T09:30:00Z",
+      "scores": [
+        {
+          "competency": "D",
+          "score": 2
+        },
+        {
+          "competency": "R",
+          "score": 2
+        },
+        {
+          "competency": "I",
+          "score": 3
+        },
+        {
+          "competency": "V",
+          "score": 4
+        },
+        {
+          "competency": "E",
+          "score": 3
+        }
+      ]
+    },
+    {
+      "interviewRef": "interview-02",
+      "interviewerRef": "interviewer-2",
+      "heldAt": "2026-09-10T09:30:00Z",
+      "scores": [
+        {
+          "competency": "D",
+          "score": 2
+        },
+        {
+          "competency": "R",
+          "score": 2
+        },
+        {
+          "competency": "I",
+          "score": 2
+        },
+        {
+          "competency": "V",
+          "score": 3
+        },
+        {
+          "competency": "E",
+          "score": 3
+        }
+      ]
+    },
+    {
+      "interviewRef": "interview-03",
+      "interviewerRef": "interviewer-2",
+      "heldAt": "2026-09-11T09:30:00Z",
+      "scores": [
+        {
+          "competency": "D",
+          "score": 3
+        },
+        {
+          "competency": "R",
+          "score": 2
+        },
+        {
+          "competency": "I",
+          "score": 2
+        },
+        {
+          "competency": "V",
+          "score": 4
+        },
+        {
+          "competency": "E",
+          "score": 3
+        }
+      ]
+    },
+    {
+      "interviewRef": "interview-04",
+      "interviewerRef": "interviewer-2",
+      "heldAt": "2026-09-12T09:30:00Z",
+      "scores": [
+        {
+          "competency": "D",
+          "score": 2
+        },
+        {
+          "competency": "R",
+          "score": 3
+        },
+        {
+          "competency": "I",
+          "score": 3
+        },
+        {
+          "competency": "V",
+          "score": 3
+        },
+        {
+          "competency": "E",
+          "score": 2
+        }
+      ]
+    },
+    {
+      "interviewRef": "interview-05",
+      "interviewerRef": "interviewer-2",
+      "heldAt": "2026-09-13T09:30:00Z",
+      "scores": [
+        {
+          "competency": "D",
+          "score": 2
+        },
+        {
+          "competency": "R",
+          "score": 2
+        },
+        {
+          "competency": "I",
+          "score": 2
+        },
+        {
+          "competency": "V",
+          "score": 3
+        },
+        {
+          "competency": "E",
+          "score": 3
+        }
+      ]
+    },
+    {
+      "interviewRef": "interview-06",
+      "interviewerRef": "interviewer-1",
+      "heldAt": "2026-09-14T09:30:00Z",
+      "scores": [
+        {
+          "competency": "D",
+          "score": 2
+        },
+        {
+          "competency": "R",
+          "score": 2
+        },
+        {
+          "competency": "I",
+          "score": 2
+        },
+        {
+          "competency": "V",
+          "score": 2
+        },
+        {
+          "competency": "E",
+          "score": 3
+        }
+      ]
+    },
+    {
+      "interviewRef": "interview-07",
+      "interviewerRef": "interviewer-3",
+      "heldAt": "2026-09-15T09:30:00Z",
+      "scores": [
+        {
+          "competency": "D",
+          "score": 2
+        },
+        {
+          "competency": "R",
+          "score": 2
+        },
+        {
+          "competency": "I",
+          "score": 3
+        },
+        {
+          "competency": "V",
+          "score": 3
+        },
+        {
+          "competency": "E",
+          "score": 3
+        }
+      ]
+    },
+    {
+      "interviewRef": "interview-08",
+      "interviewerRef": "interviewer-1",
+      "heldAt": "2026-09-16T09:30:00Z",
+      "scores": [
+        {
+          "competency": "D",
+          "score": 3
+        },
+        {
+          "competency": "R",
+          "score": 2
+        },
+        {
+          "competency": "I",
+          "score": 2
+        },
+        {
+          "competency": "V",
+          "score": 2
+        },
+        {
+          "competency": "E",
+          "score": 2
+        }
+      ]
+    },
+    {
+      "interviewRef": "interview-09",
+      "interviewerRef": "interviewer-3",
+      "heldAt": "2026-09-17T09:30:00Z",
+      "scores": [
+        {
+          "competency": "D",
+          "score": 2
+        },
+        {
+          "competency": "R",
+          "score": 3
+        },
+        {
+          "competency": "I",
+          "score": 2
+        },
+        {
+          "competency": "V",
+          "score": 2
+        },
+        {
+          "competency": "E",
+          "score": 3
+        }
+      ]
+    },
+    {
+      "interviewRef": "interview-10",
+      "interviewerRef": "interviewer-1",
+      "heldAt": "2026-09-18T09:30:00Z",
+      "scores": [
+        {
+          "competency": "D",
+          "score": 2
+        },
+        {
+          "competency": "R",
+          "score": 2
+        },
+        {
+          "competency": "I",
+          "score": 3
+        },
+        {
+          "competency": "V",
+          "score": 3
+        },
+        {
+          "competency": "E",
+          "score": 3
+        }
+      ]
+    },
+    {
+      "interviewRef": "interview-11",
+      "interviewerRef": "interviewer-3",
+      "heldAt": "2026-09-19T09:30:00Z",
+      "scores": [
+        {
+          "competency": "D",
+          "score": 3
+        },
+        {
+          "competency": "R",
+          "score": 2
+        },
+        {
+          "competency": "I",
+          "score": 2
+        },
+        {
+          "competency": "V",
+          "score": 2
+        },
+        {
+          "competency": "E",
+          "score": 2
+        }
+      ]
+    },
+    {
+      "interviewRef": "interview-12",
+      "interviewerRef": "interviewer-1",
+      "heldAt": "2026-09-20T09:30:00Z",
+      "scores": [
+        {
+          "competency": "D",
+          "score": 2
+        },
+        {
+          "competency": "R",
+          "score": 2
+        },
+        {
+          "competency": "I",
+          "score": 2
+        },
+        {
+          "competency": "V",
+          "score": 2
+        },
+        {
+          "competency": "E",
+          "score": 3
+        }
+      ]
+    },
+    {
+      "interviewRef": "interview-13",
+      "interviewerRef": "interviewer-3",
+      "heldAt": "2026-09-21T09:30:00Z",
+      "scores": [
+        {
+          "competency": "D",
+          "score": 2
+        },
+        {
+          "competency": "R",
+          "score": 3
+        },
+        {
+          "competency": "I",
+          "score": 3
+        },
+        {
+          "competency": "V",
+          "score": 3
+        },
+        {
+          "competency": "E",
+          "score": 3
+        }
+      ]
+    },
+    {
+      "interviewRef": "interview-14",
+      "interviewerRef": "interviewer-1",
+      "heldAt": "2026-09-22T09:30:00Z",
+      "scores": [
+        {
+          "competency": "D",
+          "score": 3
+        },
+        {
+          "competency": "R",
+          "score": 2
+        },
+        {
+          "competency": "I",
+          "score": 2
+        },
+        {
+          "competency": "V",
+          "score": 2
+        },
+        {
+          "competency": "E",
+          "score": 2
+        }
+      ]
+    },
+    {
+      "interviewRef": "interview-15",
+      "interviewerRef": "interviewer-3",
+      "heldAt": "2026-09-23T09:30:00Z",
+      "scores": [
+        {
+          "competency": "D",
+          "score": 2
+        },
+        {
+          "competency": "R",
+          "score": 2
+        },
+        {
+          "competency": "I",
+          "score": 2
+        },
+        {
+          "competency": "V",
+          "score": 2
+        },
+        {
+          "competency": "E",
+          "score": 3
+        }
+      ]
+    }
+  ],
+  "interviewerRef": "interviewer-2",
+  "periodFrom": "2026-09-01",
+  "periodTo": "2026-09-30"
+}
