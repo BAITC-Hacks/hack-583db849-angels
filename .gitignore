@@ -10,6 +10,7 @@ dist/
 coverage/
 *.tsbuildinfo
 .pnpm-store/
+/apps/api/src/ai-client/schema.d.ts
 
 # Python
 __pycache__/

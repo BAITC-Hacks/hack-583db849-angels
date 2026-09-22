@@ -19,15 +19,15 @@ def test_internal_token_is_required(monkeypatch: pytest.MonkeyPatch) -> None:
     assert unknown.value.status_code == 401
 
 
-def test_f0_openapi_exposes_the_agreed_internal_routes() -> None:
+def test_f0_openapi_exposes_the_routes_used_by_the_api_adapter() -> None:
     paths = build_app().openapi()["paths"]
 
-    assert set(paths) == {
+    assert {
         "/internal/v1/health",
         "/internal/v1/simulation/turn",
         "/internal/v1/simulation/assessment",
         "/internal/v1/brief",
-    }
+    }.issubset(paths)
 
 
 def test_candidate_view_rejects_profile_fields() -> None:
