@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { BriefClarify, BriefEnglish, BriefFlags, BriefQuestions } from '../../../../../components/brief/BriefSections';
+import { BriefClarify, BriefConsistency, BriefEnglish, BriefQuestions } from '../../../../../components/brief/BriefSections';
 import { SourcesPanel } from '../../../../../components/brief/SourcesPanel';
 import { MarkBriefViewed } from '../../../../../components/home/MarkBriefViewed';
 import { getBrief } from '../../../../../lib/brief/preview';
@@ -12,7 +12,7 @@ const copy = {
     preview: 'Preview · a scripted brief — the real one arrives with M1',
     eyebrow: 'Interviewer brief',
     candidate: 'Candidate',
-    lede: 'Read it before the interview. Every item shows where it comes from, and nothing here is a score.',
+    lede: 'Read it before the interview: what to ask, and what the candidate said about themselves against what was measured. Every item shows where it comes from, and nothing here is a score.',
     privacy: 'The model saw the answers, not the person: no name, IIN, contacts, school, region or photo.',
     summary: 'In short',
   },
@@ -20,7 +20,7 @@ const copy = {
     preview: 'Превью · заготовленный бриф — настоящий появится в M1',
     eyebrow: 'Бриф для интервьюера',
     candidate: 'Кандидат',
-    lede: 'Прочитайте перед интервью. У каждого пункта виден источник, и оценок здесь нет.',
+    lede: 'Прочитайте перед интервью: что спросить и что заявил кандидат против того, что измерено. У каждого пункта виден источник, и оценок здесь нет.',
     privacy: 'Модель видела ответы, а не человека: без имени, ИИН, контактов, школы, региона и фото.',
     summary: 'Коротко',
   },
@@ -28,9 +28,11 @@ const copy = {
 
 /**
  * M1: everything the interviewer needs in one screen before the meeting —
- * questions for each D.R.I.V.E. letter, inconsistencies, topics to clarify and
- * the English gap — each traceable to the answer it came from. Scripted until
- * the briefs API lands (#12).
+ * questions for each D.R.I.V.E. letter and for the three things no rubric
+ * covers (what they know about inVision U, their real English, whether the
+ * application was deliberate), what they claimed against what was measured,
+ * topics to clarify and the English gap. Every item is traceable to the answer
+ * it came from. Scripted until the briefs API lands (#12).
  */
 export default async function BriefPage({ params }: { params: Promise<{ candidateId: string }> }) {
   const { candidateId } = await params;
@@ -61,7 +63,7 @@ export default async function BriefPage({ params }: { params: Promise<{ candidat
               <p className="mt-1 text-sm text-text-primary">{brief.summary}</p>
             </section>
             <BriefQuestions questions={brief.questions} />
-            <BriefFlags flags={brief.flags} />
+            <BriefConsistency items={brief.consistency} />
             <div className="grid items-start gap-4 md:grid-cols-2">
               <BriefClarify items={brief.clarify} />
               <BriefEnglish english={brief.english} />
