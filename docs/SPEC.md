@@ -202,7 +202,7 @@ seed/candidates/a/  snapshot.json  expected-brief.json  transcript.json
                     expected-assessment.json  interview-notes.json  interviewer-scores.json
 seed/candidates/b/  …the same files…
 seed/candidates/c/  …the same files…
-seed/quality-history.json   interview questions and score history for M5
+seed/quality-history.json   scored interviews for M5 calibration (ScoredInterview[] in contracts/ml.md)
 ```
 
 Candidates A, B and C have fixed ids, so every part refers to the same person:

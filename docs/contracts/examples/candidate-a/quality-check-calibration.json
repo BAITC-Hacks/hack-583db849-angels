@@ -1,21 +1,25 @@
 {
   "qualityCheckId": "6f1c2a0e-0000-4000-8000-00000000a006",
   "kind": "calibration",
-  "interviewerRef": "interviewer-2",
   "createdAt": "2026-09-26T11:05:00Z",
-  "interviews": 14,
+  "interviewId": null,
+  "interviewerRef": "interviewer-2",
+  "from": "2026-09-01",
+  "to": "2026-09-30",
+  "interviews": 15,
+  "talkShare": null,
   "drift": [
     {
       "competency": "D",
-      "interviewerMean": 2.1,
-      "panelMean": 2.2,
+      "interviewerMean": 2.2,
+      "panelMean": 2.3,
       "delta": -0.1
     },
     {
       "competency": "R",
-      "interviewerMean": 2.0,
-      "panelMean": 2.1,
-      "delta": -0.1
+      "interviewerMean": 2.2,
+      "panelMean": 2.2,
+      "delta": 0.0
     },
     {
       "competency": "I",
@@ -26,24 +30,25 @@
     {
       "competency": "V",
       "interviewerMean": 3.4,
-      "panelMean": 2.4,
-      "delta": 1.0
+      "panelMean": 2.3,
+      "delta": 1.1
     },
     {
       "competency": "E",
-      "interviewerMean": 2.9,
-      "panelMean": 2.8,
+      "interviewerMean": 2.8,
+      "panelMean": 2.7,
       "delta": 0.1
     }
   ],
   "signals": [
     {
       "kind": "scale_drift",
+      "message": "Values scores run 1.1 above the panel across this interviewer's 5 interviews in the period (3.4 against 2.3).",
+      "recommendation": "Score two recent Values answers again against the rubric's indicators, with another interviewer.",
       "competencies": [
         "V"
       ],
-      "message": "Values scores run a full point above the panel across 14 interviews.",
-      "recommendation": "Review two recent V scores against the rubric’s indicators with another interviewer."
+      "evidence": []
     }
   ]
 }
