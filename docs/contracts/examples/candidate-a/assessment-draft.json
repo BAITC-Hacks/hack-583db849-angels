@@ -9,8 +9,8 @@
       "rationale": "Recovery is framed as cutting scope; the team itself does not come into it.",
       "evidence": [
         {
-          "source": "interview_note",
-          "sourceId": "note_4",
+          "source": "interview_turn",
+          "sourceId": "iturn_12",
           "quote": "We cut scope and move on."
         }
       ]
@@ -22,9 +22,9 @@
       "rationale": "Names a cost of their own rule and proposes a concrete limit for it.",
       "evidence": [
         {
-          "source": "interview_note",
-          "sourceId": "note_5",
-          "quote": "named slower merges and suggested a 24-hour review limit"
+          "source": "interview_turn",
+          "sourceId": "iturn_14",
+          "quote": "I would add a 24-hour limit for reviews so nobody is blocked."
         }
       ]
     },
@@ -42,14 +42,14 @@
       "rationale": "One story, where following the rule outweighs the person; fairness to the teammate is not raised.",
       "evidence": [
         {
-          "source": "interview_note",
-          "sourceId": "note_3",
-          "quote": "I felt bad, but rules are rules."
+          "source": "interview_turn",
+          "sourceId": "iturn_10",
+          "quote": "I felt bad, but rules are rules, so I told the teacher."
         },
         {
-          "source": "interview_note",
-          "sourceId": "note_2",
-          "quote": "Did not mention fairness to Dana."
+          "source": "interview_turn",
+          "sourceId": "iturn_06",
+          "quote": "It works, and that is what matters for the demo."
         }
       ]
     },
@@ -60,9 +60,9 @@
       "rationale": "Restates a complete plan with owners and a checkpoint, unprompted.",
       "evidence": [
         {
-          "source": "interview_note",
-          "sourceId": "note_1",
-          "quote": "Candidate repeated the plan: owners, deadline, full run on Thursday."
+          "source": "interview_turn",
+          "sourceId": "iturn_02",
+          "quote": "I made a plan straight away: owners, a deadline and a full run on Thursday."
         }
       ]
     }

@@ -86,7 +86,8 @@ Called only by `api`. Every request carries `X-Internal-Token: $ML_INTERNAL_TOKE
 | `POST /internal/v1/simulation/turn` | F0 stub, M2a real | the character's next line for a candidate turn |
 | `POST /internal/v1/simulation/assessment` | F0 stub, M3 real | scores, English metrics, interview questions, candidate feedback |
 | `POST /internal/v1/brief` | F0 stub, M1 real | the interviewer brief |
-| `POST /internal/v1/interview/draft` | M4 | draft from interview notes |
+| `POST /internal/v1/interview/transcribe` | M4 | the interview recording → turns by speaker |
+| `POST /internal/v1/interview/draft` | M4 | draft from the interview transcript |
 | `POST /internal/v1/quality-check` | M5 | question quality and calibration signals |
 
 **`api` owns storage and ids; `ml` owns content.** For a simulation turn, `api` assigns the candidate turn's id and sends the whole transcript; `ml` returns the character's line and the director's decision; `api` assigns the character turn's id and stores both.
@@ -154,7 +155,7 @@ In `ml`, the Pydantic model has no `profile` field and sets `extra="forbid"`: a 
 | `test_item` | a `test.answers[].itemId` |
 | `simulation_turn` | a `turnId` |
 | `interview_note` | an interview note id |
-| `interview_question` | a question the interviewer asked (M5) |
+| `interview_turn` | a turn of the interview transcript, `iturn_NN` (M4, M5) |
 
 ### `DriveScore`
 
