@@ -1,17 +1,4 @@
 {
-  "qualityCheckId": "6f1c2a0e-0000-4000-8000-00000000a005",
-  "kind": "interview",
-  "createdAt": "2026-09-26T11:00:00Z",
-  "interviewId": "6f1c2a0e-0000-4000-8000-00000000a004",
-  "interviewerRef": "interviewer-2",
-  "from": null,
-  "to": null,
-  "interviews": null,
-  "talkShare": {
-    "interviewer": 0.34,
-    "candidate": 0.66
-  },
-  "drift": [],
   "signals": [
     {
       "kind": "leading_question",
@@ -49,5 +36,11 @@
       ],
       "evidence": []
     }
-  ]
+  ],
+  "talkShare": {
+    "interviewer": 0.34,
+    "candidate": 0.66
+  },
+  "drift": [],
+  "interviews": null
 }
