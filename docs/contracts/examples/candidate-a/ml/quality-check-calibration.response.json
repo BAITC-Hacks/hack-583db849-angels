@@ -1,0 +1,47 @@
+{
+  "signals": [
+    {
+      "kind": "scale_drift",
+      "message": "Values scores run 1.1 above the panel across this interviewer's 5 interviews in the period (3.4 against 2.3).",
+      "recommendation": "Score two recent Values answers again against the rubric's indicators, with another interviewer.",
+      "competencies": [
+        "V"
+      ],
+      "evidence": []
+    }
+  ],
+  "talkShare": null,
+  "drift": [
+    {
+      "competency": "D",
+      "interviewerMean": 2.2,
+      "panelMean": 2.3,
+      "delta": -0.1
+    },
+    {
+      "competency": "R",
+      "interviewerMean": 2.2,
+      "panelMean": 2.2,
+      "delta": 0.0
+    },
+    {
+      "competency": "I",
+      "interviewerMean": 2.4,
+      "panelMean": 2.3,
+      "delta": 0.1
+    },
+    {
+      "competency": "V",
+      "interviewerMean": 3.4,
+      "panelMean": 2.3,
+      "delta": 1.1
+    },
+    {
+      "competency": "E",
+      "interviewerMean": 2.8,
+      "panelMean": 2.7,
+      "delta": 0.1
+    }
+  ],
+  "interviews": 15
+}

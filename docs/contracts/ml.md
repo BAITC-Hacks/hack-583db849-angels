@@ -23,7 +23,7 @@ What `api` sends to the ML service and what it expects back. It is derived from 
 6. **M1 — the real `brief`.**
 7. **M4 — `transcribe` and `interview/draft`.** One transcription endpoint serves the interview (two speakers), the surprise answer and voice turns (one speaker).
 8. **Admin — `GET /internal/v1/usage`:** live and replayed calls and spend, from the gateway's cost log.
-9. **M5 — `quality-check`,** draft shapes in the examples.
+9. **M5 — `quality-check`:** leading and off-limits questions from an interview transcript, and an interviewer's drift against the panel from a pseudonymous score history.
 10. **M2b — scenarios 2–10**, each through the quality bench before it becomes `ready`; **C — `consistency`**; **S — `surprise-question`.**
 
 ## Endpoints
@@ -44,7 +44,7 @@ Every request carries `X-Internal-Token`. Responses are the result object itself
 | `POST` | `/internal/v1/surprise-question` | `SurpriseRequest` → `SurpriseResult` (S) | `ml/surprise-question.*` |
 | `GET` | `/internal/v1/usage` | → `Usage` | `ml/usage.response.json` |
 | `POST` | `/internal/v1/interview/draft` | `DraftRequest` → `DraftResult` | `ml/interview-draft.*` |
-| `POST` | `/internal/v1/quality-check` | draft, M5 | `quality-check-*.json` |
+| `POST` | `/internal/v1/quality-check` | `QualityCheckRequest` → `QualityCheckResult` (M5) | `ml/quality-check-*.json` |
 
 **Consistency, two stages.** `api` calls `consistency` only with `stage: "after"`. The before stage comes inside `brief` as `BriefResult.consistency` — write it once, as one module, and use it in both.
 
@@ -95,6 +95,11 @@ Each of these is visible on a screen, and a mistake here shows up in the demo.
    - `CandidateView` has no `profile` and forbids extra fields;
    - `api` has already redacted profile values found inside answers;
    - log `candidateId`, never text you did not need.
+9a. **The quality check is about the process, never the candidate.**
+   - For an interview you receive the transcript. Examine the **interviewer's** turns: a question that suggests its own answer, a question that may not be asked at all (family, money, health, background), and which competencies never came up. Every such signal quotes the question verbatim, like any other evidence.
+   - A candidate's turn is context. Nothing you return may describe, score or explain a candidate — the screens show these signals to a panel about their own work.
+   - For a calibration you receive saved scores with pseudonymous references and no candidate data at all. `drift` and `talkShare` are arithmetic: compute them in code, and let the model write only the message and the recommendation.
+   - A recommendation says what a person could do next — re-ask openly, drop the question, calibrate two scores against the rubric. It never says what to decide about anyone.
 10. **Model-written staff text is English for now:** rationales, questions, summaries. Staff screens can switch to Russian, so whether it should follow the staff language is an open question for you (`docs/PLAN.md`, section 15). Quotes stay verbatim either way.
 
 ## Models
@@ -507,6 +512,77 @@ class SurpriseResult(Strict):
             raise ValueError("a surprise question is at most 40 words")
         return question
 
+
+
+# ---- POST /internal/v1/quality-check (M5)
+
+SignalKind = Literal["leading_question", "off_limits_question", "coverage_gap", "scale_drift"]
+
+
+class ScoreValue(Strict):
+    competency: Competency
+    score: Score
+
+
+class ScoredInterview(Strict):
+    """One saved set of scores, pseudonymous: no candidate, no names."""
+
+    interviewRef: str
+    interviewerRef: str
+    heldAt: str
+    scores: list[ScoreValue]
+
+
+class QualityCheckRequest(Strict):
+    kind: Literal["interview", "calibration"]
+    transcript: list[InterviewTurn] = []      # interview only
+    history: list[ScoredInterview] = []       # calibration only, the whole panel over the period
+    interviewerRef: str | None = None
+    periodFrom: str | None = None
+    periodTo: str | None = None
+
+    @model_validator(mode="after")
+    def one_kind_of_input(self) -> "QualityCheckRequest":
+        if self.kind == "interview" and (not self.transcript or self.history):
+            raise ValueError("an interview check reads a transcript and nothing else")
+        if self.kind == "calibration" and (not self.history or self.transcript or not self.interviewerRef):
+            raise ValueError("a calibration check reads a history and needs an interviewerRef")
+        return self
+
+
+class QualitySignal(Strict):
+    kind: SignalKind
+    message: str
+    recommendation: str
+    competencies: list[Competency] = []
+    evidence: list[Evidence] = []             # interviewer turns, verbatim
+
+    @model_validator(mode="after")
+    def a_question_signal_quotes_the_question(self) -> "QualitySignal":
+        if self.kind in ("leading_question", "off_limits_question") and not self.evidence:
+            raise ValueError("a signal about a question quotes that question")
+        if self.kind == "scale_drift" and not self.competencies:
+            raise ValueError("drift names the competency it drifted on")
+        return self
+
+
+class TalkShare(Strict):
+    interviewer: float
+    candidate: float
+
+
+class Drift(Strict):
+    competency: Competency
+    interviewerMean: float
+    panelMean: float
+    delta: float
+
+
+class QualityCheckResult(Strict):
+    signals: list[QualitySignal]
+    talkShare: TalkShare | None = None        # interview, computed in code from the turn times
+    drift: list[Drift] = []                   # calibration, computed in code
+    interviews: int | None = None             # calibration: how many interviews were read
 
 # ---- GET /internal/v1/usage
 

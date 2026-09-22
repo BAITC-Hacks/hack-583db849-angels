@@ -24,7 +24,7 @@ These are the exact endpoints the web screens call. They are derived from the sc
 5. **M4 interviews,** with the recording upload.
 6. **M1 briefs,** created by the API itself after a candidate is registered.
 7. **Admin and demo:** `GET /v1/admin/overview`, `GET /v1/audit-events`, `POST /v1/demo/*`.
-8. **M5 quality checks.** These are drafts; finalise them in the M5 contract PR.
+8. **M5 quality checks.** `POST /v1/quality-checks/interview`, `POST /v1/quality-checks/calibration`, `GET /v1/quality-checks` and `GET /v1/quality-checks/:id`.
 9. **The scenario pool (M2b), consistency (C) and the surprise question (S).**
 
 The step-by-step plan with owners and dates is `docs/INTEGRATION.md`.
@@ -193,13 +193,21 @@ One question about the candidate's own application, one attempt, 90 seconds, on 
 | `POST` | `/v1/demo/recorded-session` | ✱ | `200 CandidateProgress`; body `{ candidateId }` — completes that candidate's simulation from the seed transcript and starts its assessment | `404` when `DEMO_MODE` is off |
 | `POST` | `/v1/demo/reset` | | `204`; drops every simulation, assessment, interview, surprise and video and re-seeds A, B and C | `404` when `DEMO_MODE` is off |
 
-### M5 — quality checks (draft)
+### M5 — quality checks
+
+The process, not the candidate. Every output is a signal about how an interview was run or how an interviewer's scale sits against the panel's, with a recommendation — never a verdict, and never a word about any candidate.
 
 | Method | Path | Idem. | Success | Errors |
 | --- | --- | --- | --- | --- |
 | `POST` | `/v1/quality-checks/interview` | ✱ | `201 QualityCheck`; body `{ interviewId }` — the questions are the interviewer's turns in the transcript | `404`, `409 TRANSCRIPT_MISSING` |
-| `POST` | `/v1/quality-checks/calibration` | ✱ | `201 QualityCheck`; body `{ interviewerRef, from, to }` | |
+| `POST` | `/v1/quality-checks/calibration` | ✱ | `201 QualityCheck`; body `{ interviewerRef, from, to }` — dates are `YYYY-MM-DD`, `to` excluded | `404`, `409 NOT_ENOUGH_HISTORY` under three interviews |
+| `GET` | `/v1/quality-checks` | | `200 { items: QualityCheck[] }`, newest first; `?kind=interview\|calibration`, `?interviewerRef=`, `?limit=` (default 20) | |
 | `GET` | `/v1/quality-checks/:qualityCheckId` | | `200 QualityCheck` | `404` |
+
+- **An interview check reads only the transcript.** The interviewer's turns are what is examined; the candidate's turns are context and are never quoted back as a finding about the candidate.
+- **A calibration check reads saved scores.** You send the ML service the history for `interviewerRef` and for the rest of the panel over the same period, pseudonymously — no candidate, no name. It returns the means, the difference and what to do about it.
+- **`interviewerRef` is a pseudonym** (`interviewer-2`), the same one the interview carries. The panel is everyone else in the period.
+- **Both checks are re-runnable:** a new check is a new row; nothing is overwritten, so a panel can see whether a recommendation was followed.
 
 ## DTOs
 
@@ -456,22 +464,26 @@ interface AuditEvent {
   subjectId: string | null;
 }
 
-interface QualityCheck {                          // draft, M5
+interface QualityCheck {
   qualityCheckId: string;
   kind: 'interview' | 'calibration';
   createdAt: string;
-  interviewId?: string;
-  interviewerRef?: string;
-  interviews?: number;
-  talkShare?: { interviewer: number; candidate: number };   // share of speaking time, from the transcript
-  drift?: { competency: Competency; interviewerMean: number; panelMean: number; delta: number }[];
-  signals: {
-    kind: 'leading_question' | 'off_limits_question' | 'coverage_gap' | 'scale_drift';
-    message: string;
-    recommendation: string;
-    competencies?: Competency[];
-    evidence?: Evidence[];
-  }[];                                            // signals and recommendations, never a verdict about a candidate
+  interviewId: string | null;                     // interview checks
+  interviewerRef: string | null;                  // both kinds, when the interview names one
+  from: string | null;                            // calibration period, `YYYY-MM-DD`
+  to: string | null;
+  interviews: number | null;                      // calibration: how many interviews it read
+  talkShare: { interviewer: number; candidate: number } | null;   // interview: share of speaking time
+  drift: { competency: Competency; interviewerMean: number; panelMean: number; delta: number }[];   // calibration
+  signals: QualitySignal[];                       // signals and recommendations, never a verdict about a candidate
+}
+
+interface QualitySignal {
+  kind: 'leading_question' | 'off_limits_question' | 'coverage_gap' | 'scale_drift';
+  message: string;
+  recommendation: string;                         // what a person could do next, never what to decide
+  competencies: Competency[];                     // empty when the signal is not about a competency
+  evidence: Evidence[];                           // verbatim interviewer turns; empty for coverage and drift
 }
 ```
 
@@ -496,6 +508,7 @@ interface QualityCheck {                          // draft, M5
 | `SIMULATION_EXISTS` | 409 | a second simulation for the same candidate; `details.simulationId` |
 | `SIMULATION_STARTED` | 409 | an accommodation changed after the simulation started |
 | `NO_SCENARIO_READY` | 503 | no scenario in the pool has passed the quality bench |
+| `NOT_ENOUGH_HISTORY` | 409 | a calibration check over fewer than three interviews |
 | `TEXT_MODE_NOT_ALLOWED` | 403 | a text turn without an accommodation |
 | `SPEECH_NOT_RECOGNISED` | 422 | nothing was recognised in the audio; record again |
 | `CONSISTENCY_NOT_FOUND` | 404 | that stage has not been produced yet |
@@ -525,7 +538,8 @@ interface QualityCheck {                          // draft, M5
 | `POST /v1/surprise-questions/:id/answer` | `POST /internal/v1/transcribe` (one speaker), with the audio only | the segments; the audio is deleted, the video kept for staff |
 | `GET /v1/admin/overview` | `GET /internal/v1/usage` | nothing |
 | `POST /v1/interviews/:id/assessment-draft` | `POST /internal/v1/interview/draft` with the transcript and notes — never the interviewer's scores | the draft |
-| `POST /v1/quality-checks/*` | `POST /internal/v1/quality-check` — for an interview, with its transcript | the check |
+| `POST /v1/quality-checks/interview` | `POST /internal/v1/quality-check` with `kind: "interview"` and the transcript | the check |
+| `POST /v1/quality-checks/calibration` | `POST /internal/v1/quality-check` with `kind: "calibration"` and the pseudonymous score history | the check |
 
 ## Tests this contract needs
 
@@ -547,4 +561,7 @@ These go in the same PR as the rule they test, as `AGENTS.md` requires:
 - `POST /v1/demo/*` answers `404` when `DEMO_MODE` is off;
 - scenario assignment: only `ready` scenarios, least-assigned first; a second create → `409 SIMULATION_EXISTS`;
 - a JSON turn without an accommodation → `403 TEXT_MODE_NOT_ALLOWED`;
-- `consistency?stage=after` → `409 DRAFT_LOCKED` before the interviewer's scores.
+- `consistency?stage=after` → `409 DRAFT_LOCKED` before the interviewer's scores;
+- an interview quality check without a transcript → `409 TRANSCRIPT_MISSING`, and a calibration over fewer than three interviews → `409 NOT_ENOUGH_HISTORY`;
+- no quality check, of either kind, contains a `candidateId` or a candidate label — a check is about the process;
+- the history sent for a calibration carries no candidate field at all — a spy on `ai-client`.
