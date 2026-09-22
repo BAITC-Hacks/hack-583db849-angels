@@ -20,9 +20,9 @@ The product and the plan are in [`PLAN.md`](PLAN.md). This file is the technical
 | Service | Port | Owner | Reachable from |
 | --- | --- | --- | --- |
 | `web` — Next.js | 3000 | Meiyrbek | the browser |
-| `api` — NestJS | 3001 | Nauryzbek | the browser, inVision |
-| `ml` — FastAPI | 8000 | Beknur | **`api` only**, over the Compose network |
-| `postgres` | 5432 | Nauryzbek | `api` only |
+| `api` — NestJS | 3001 | Aibek | the browser, inVision |
+| `ml` — FastAPI | 8000 | Nauryzbek | **`api` only**, over the Compose network |
+| `postgres` | 5432 | Aibek | `api` only |
 
 The ML service is never exposed publicly. Only `api` calls it.
 

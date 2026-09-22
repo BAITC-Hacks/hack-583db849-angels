@@ -52,8 +52,9 @@ The plan is agreed and the repository is being set up. There is no runnable code
 | | Role |
 | --- | --- |
 | Meiyrbek | Tech lead, frontend |
-| Nauryzbek | Backend |
-| Beknur | ML |
+| Aibek | Backend |
+| Nauryzbek | ML |
+| Beknur | Product manager |
 
 ## Working here
 
