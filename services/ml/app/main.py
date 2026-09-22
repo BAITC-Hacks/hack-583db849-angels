@@ -8,6 +8,7 @@ from .auth import internal_auth_dependency
 from .config import Settings, load_settings
 from .errors import install_error_handlers
 from .routes.core import core_router
+from .routes.extended import extended_router
 from .schemas.contracts import HealthResponse
 
 
@@ -25,6 +26,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return HealthResponse(status="ok")
 
     app.include_router(core_router(authenticate))
+    app.include_router(extended_router(authenticate))
     return app
 
 
