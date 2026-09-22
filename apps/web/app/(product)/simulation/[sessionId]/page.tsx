@@ -60,11 +60,11 @@ export default function SimulationPage() {
                 notes, no scores — will be ready after the review.
               </p>
               <Link
-                href="/demo/candidates"
+                href="/candidate"
                 className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-ink hover:underline"
               >
                 <ArrowLeftIcon aria-hidden="true" className="h-3.5 w-3.5" />
-                Back to the demo
+                Back to your home
               </Link>
             </div>
           ) : (

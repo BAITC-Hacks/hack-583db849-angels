@@ -1,10 +1,12 @@
 'use client';
 
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState, type ReactNode } from 'react';
+import { homeFor } from '../../lib/demo/world';
 import { useStaffLocale } from '../../lib/i18n/StaffLocaleProvider';
 import { createPreference } from '../../lib/preference';
-import { isStaff, useDemoRole } from '../../lib/roles';
+import { isStaff, useDemoRole, type DemoRole } from '../../lib/roles';
 import { RoleTile } from './RoleSwitcher';
 import { Sidebar } from './Sidebar';
 
@@ -17,6 +19,7 @@ const useSidebarState = createPreference<'open' | 'folded'>('invision-sidebar', 
  */
 export function AppShell({ children }: { children: ReactNode }) {
   const [role, setRole] = useDemoRole();
+  const router = useRouter();
   const { locale, setLocale } = useStaffLocale();
   const [sidebar, setSidebar] = useSidebarState();
   const [drawer, setDrawer] = useState(false);
@@ -29,7 +32,14 @@ export function AppShell({ children }: { children: ReactNode }) {
     return () => document.removeEventListener('keydown', close);
   }, [drawer]);
 
-  const sidebarProps = { role, onRoleChange: setRole, locale, onLocaleChange: setLocale };
+  // A new role starts on its own home: each role sees a different product.
+  const changeRole = (next: DemoRole) => {
+    setRole(next);
+    setDrawer(false);
+    router.push(homeFor[next]);
+  };
+
+  const sidebarProps = { role, onRoleChange: changeRole, locale, onLocaleChange: setLocale };
 
   return (
     <div className="min-h-screen bg-bg-base lg:flex">
