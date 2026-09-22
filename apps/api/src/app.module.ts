@@ -5,9 +5,10 @@ import { HealthController } from './health/health.controller';
 import { AuthModule } from './auth/auth.module';
 import { CandidatesModule } from './modules/candidates/candidates.module';
 import { IdempotencyModule } from './idempotency/idempotency.module';
+import { PrivacyModule } from './privacy/privacy.module';
 
 @Module({
-  imports: [AuthModule, DatabaseModule, IdempotencyModule, CandidatesModule],
+  imports: [AuthModule, DatabaseModule, IdempotencyModule, PrivacyModule, CandidatesModule],
   controllers: [HealthController],
 })
 export class AppModule {}
