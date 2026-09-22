@@ -99,7 +99,8 @@ Conventional Commits, in English, saying what changed and why: `feat: stream the
 
 ## Code and language
 
-- Code, identifiers, comments and the interface are in English. The simulation is in English.
+- Code, identifiers and comments are in English. The simulation is in English.
+- Candidate screens and the stand are English only. Interviewer, commission and admin screens are English or Russian; a text added to them is added in both. Candidate quotes are never translated.
 - Every model call goes through the ML gateway. Nothing calls OpenAI or Deepgram directly.
 - Model output is validated against a schema. On invalid output: one retry, then a clear error.
 - Personal data never leaves the API towards the ML service: everything goes through `toLLMView()`.

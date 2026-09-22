@@ -1,6 +1,6 @@
 # apps/web
 
-The Next.js frontend. English only.
+The Next.js frontend. Candidate screens and the stand are English only; interviewer, commission and admin screens switch between English and Russian in the sidebar.
 
 | Route | What it is |
 | --- | --- |
