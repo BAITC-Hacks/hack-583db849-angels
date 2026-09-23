@@ -23,7 +23,6 @@ services:
       ML_INTERNAL_TOKEN: local-internal-token
       GATEWAY_MODE: replay
       BUDGET_USD_CAP: "20"
-      UPLOADS_DIR: /repo/context/fixtures/audio
     healthcheck:
       interval: 5s
       timeout: 3s
