@@ -1,0 +1,108 @@
+{
+  "summary": "Synthetic preparation brief for candidate C.",
+  "questions": [
+    {
+      "focus": "D",
+      "question": "Candidate C: give a specific recent example for D.",
+      "why": "The written answer needs a concrete, verifiable example.",
+      "evidence": [
+        {
+          "source": "application_field",
+          "sourceId": "setback",
+          "quote": "Nothing important has gone wrong in my projects. Usually everything works as expected."
+        }
+      ]
+    },
+    {
+      "focus": "R",
+      "question": "Candidate C: give a specific recent example for R.",
+      "why": "The written answer needs a concrete, verifiable example.",
+      "evidence": [
+        {
+          "source": "application_field",
+          "sourceId": "leadership_example",
+          "quote": "I was listed as the leader of a class event. The group completed it, but I do not remember who planned each part or what I personally changed."
+        }
+      ]
+    },
+    {
+      "focus": "I",
+      "question": "Candidate C: give a specific recent example for I.",
+      "why": "The written answer needs a concrete, verifiable example.",
+      "evidence": [
+        {
+          "source": "application_field",
+          "sourceId": "community",
+          "quote": "I might create a volunteering project, although I have not chosen the problem, users or first step yet."
+        }
+      ]
+    },
+    {
+      "focus": "V",
+      "question": "Candidate C: give a specific recent example for V.",
+      "why": "The written answer needs a concrete, verifiable example.",
+      "evidence": [
+        {
+          "source": "application_field",
+          "sourceId": "leadership_example",
+          "quote": "I was listed as the leader of a class event. The group completed it, but I do not remember who planned each part or what I personally changed."
+        }
+      ]
+    },
+    {
+      "focus": "E",
+      "question": "Candidate C: give a specific recent example for E.",
+      "why": "The written answer needs a concrete, verifiable example.",
+      "evidence": [
+        {
+          "source": "application_field",
+          "sourceId": "leadership_example",
+          "quote": "I was listed as the leader of a class event. The group completed it, but I do not remember who planned each part or what I personally changed."
+        }
+      ]
+    },
+    {
+      "focus": "invision_knowledge",
+      "question": "Candidate C: give a specific recent example for invision_knowledge.",
+      "why": "The written answer needs a concrete, verifiable example.",
+      "evidence": [
+        {
+          "source": "application_field",
+          "sourceId": "motivation",
+          "quote": "I applied because several people recommended the programme. I prefer to make decisions independently and usually do not ask for advice."
+        }
+      ]
+    },
+    {
+      "focus": "english",
+      "question": "Candidate C: give a specific recent example for english.",
+      "why": "The written answer needs a concrete, verifiable example.",
+      "evidence": [
+        {
+          "source": "application_field",
+          "sourceId": "english_self",
+          "quote": "C1. I use English every day."
+        }
+      ]
+    },
+    {
+      "focus": "motivation",
+      "question": "Candidate C: give a specific recent example for motivation.",
+      "why": "The written answer needs a concrete, verifiable example.",
+      "evidence": [
+        {
+          "source": "application_field",
+          "sourceId": "motivation",
+          "quote": "I applied because several people recommended the programme. I prefer to make decisions independently and usually do not ask for advice."
+        }
+      ]
+    }
+  ],
+  "consistency": [],
+  "clarify": [],
+  "english": {
+    "certificate": null,
+    "writtenCefr": "B1",
+    "basis": "Estimated from synthetic written answers only; leadership scoring is separate."
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "scores": [
+    {
+      "competency": "D",
+      "score": null,
+      "confidence": null,
+      "rationale": null,
+      "evidence": []
+    },
+    {
+      "competency": "R",
+      "score": null,
+      "confidence": null,
+      "rationale": null,
+      "evidence": []
+    },
+    {
+      "competency": "I",
+      "score": null,
+      "confidence": null,
+      "rationale": null,
+      "evidence": []
+    },
+    {
+      "competency": "V",
+      "score": null,
+      "confidence": null,
+      "rationale": null,
+      "evidence": []
+    },
+    {
+      "competency": "E",
+      "score": null,
+      "confidence": null,
+      "rationale": null,
+      "evidence": []
+    }
+  ],
+  "english": {
+    "wordsPerMinute": null,
+    "fillerRate": null,
+    "meanTurnLength": null,
+    "lexicalDiversity": null,
+    "grammarErrorsPer100Words": null,
+    "cefrEstimate": null
+  },
+  "interviewQuestions": [
+    {
+      "competency": "D",
+      "question": "Tell me about a specific situation where you demonstrated D.",
+      "reason": "There is not enough verified behavioral evidence yet."
+    },
+    {
+      "competency": "R",
+      "question": "Tell me about a specific situation where you demonstrated R.",
+      "reason": "There is not enough verified behavioral evidence yet."
+    },
+    {
+      "competency": "I",
+      "question": "Tell me about a specific situation where you demonstrated I.",
+      "reason": "There is not enough verified behavioral evidence yet."
+    },
+    {
+      "competency": "V",
+      "question": "Tell me about a specific situation where you demonstrated V.",
+      "reason": "There is not enough verified behavioral evidence yet."
+    },
+    {
+      "competency": "E",
+      "question": "Tell me about a specific situation where you demonstrated E.",
+      "reason": "There is not enough verified behavioral evidence yet."
+    }
+  ],
+  "candidateFeedback": {
+    "strengths": [
+      "You stayed engaged with the conversation."
+    ],
+    "growth": [
+      "Use a real example and explain your own action and its effect."
+    ],
+    "nextTime": [
+      "Prepare one recent situation with a challenge, action, and outcome."
+    ]
+  }
+}
