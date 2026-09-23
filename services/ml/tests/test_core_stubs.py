@@ -68,11 +68,6 @@ def test_unknown_scenario_returns_a_safe_error(client: TestClient) -> None:
     ("path", "request_name", "response_name"),
     [
         (
-            "/internal/v1/simulation/turn",
-            "simulation-turn.request.json",
-            "simulation-turn.response.json",
-        ),
-        (
             "/internal/v1/simulation/assessment",
             "simulation-assessment.request.json",
             "simulation-assessment.response.json",

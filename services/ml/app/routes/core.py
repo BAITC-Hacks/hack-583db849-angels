@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends
 
 from ..errors import ServiceError
 from ..examples import load_example
+from ..modules.simulation import SimulationService
 from ..scenarios import ScenarioRepository
 from ..schemas.contracts import (
     AssessmentRequest,
@@ -21,7 +22,9 @@ from ..schemas.contracts import (
 
 
 def core_router(
-    authenticate: Callable[..., None], scenarios_repository: ScenarioRepository
+    authenticate: Callable[..., None],
+    scenarios_repository: ScenarioRepository,
+    simulation_service: SimulationService,
 ) -> APIRouter:
     router = APIRouter(prefix="/internal/v1", dependencies=[Depends(authenticate)])
 
@@ -42,8 +45,7 @@ def core_router(
 
     @router.post("/simulation/turn", response_model=TurnResult)
     async def simulation_turn(request: TurnRequest) -> TurnResult:
-        del request
-        return load_example("simulation-turn.response.json", TurnResult)
+        return await simulation_service.turn(request)
 
     @router.post("/simulation/assessment", response_model=AssessmentResult)
     async def simulation_assessment(request: AssessmentRequest) -> AssessmentResult:

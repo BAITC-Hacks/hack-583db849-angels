@@ -14,12 +14,20 @@ from services.ml.app.gateway.errors import (
     GatewayReplayError,
 )
 from services.ml.app.main import create_app
+from services.ml.app.schemas.contracts import TurnResult
 
 
 ROOT = Path(__file__).resolve().parents[3]
 TURN_REQUEST = (
     ROOT / "docs" / "contracts" / "examples" / "candidate-a" / "ml" / "simulation-turn.request.json"
 )
+TURN_RESPONSE = TURN_REQUEST.with_name("simulation-turn.response.json")
+
+
+class ContractExampleSimulation:
+    async def turn(self, request) -> TurnResult:
+        del request
+        return TurnResult.model_validate_json(TURN_RESPONSE.read_text(encoding="utf-8"))
 
 
 def client() -> TestClient:
@@ -30,7 +38,10 @@ def client() -> TestClient:
         budget_usd_cap=Decimal("20"),
         demo_mode=False,
     )
-    return TestClient(create_app(settings), raise_server_exceptions=False)
+    return TestClient(
+        create_app(settings, simulation_service=ContractExampleSimulation()),
+        raise_server_exceptions=False,
+    )
 
 
 def assert_error_shape(response: object, code: str) -> None:
