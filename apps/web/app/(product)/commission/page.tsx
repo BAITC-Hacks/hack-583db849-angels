@@ -18,10 +18,11 @@ const copy = {
     next: 'Next step',
     wait: { title: 'Candidate A has not finished the simulation', body: 'The report appears as soon as the candidate finishes. For the demo you can use candidate A’s recorded session.', action: 'Use the recorded session' },
     read: { title: 'Candidate A’s report is ready', body: 'D.R.I.V.E. scores with verbatim quotes, questions for the interview, English measured apart.', action: 'Open the report' },
-    columns: ['Candidate', 'Simulation', 'Report', 'Interview', 'Candidate feedback'],
+    columns: ['Candidate', 'Simulation', 'Report', 'Interview', 'Consistency', 'Candidate feedback'],
     simulation: { 'not-started': 'Not started', 'in-progress': 'In progress', completed: 'Finished' },
     report: { open: 'Open report', waiting: 'After the simulation' },
     interview: { none: 'Not scored yet', scored: 'Scored blind', draft: 'Scored · draft ready' },
+    consistency: { open: 'Open comparison', waiting: 'After the interviewer scores' },
     feedback: { open: 'Preview', waiting: 'After the report' },
     candidate: 'Candidate',
   },
@@ -34,10 +35,11 @@ const copy = {
     next: 'Следующий шаг',
     wait: { title: 'Кандидат A ещё не прошёл симуляцию', body: 'Отчёт появится, как только кандидат закончит. Для демо можно взять записанную сессию кандидата A.', action: 'Взять записанную сессию' },
     read: { title: 'Отчёт по кандидату A готов', body: 'Баллы D.R.I.V.E. с дословными цитатами, вопросы для интервью, английский отдельно.', action: 'Открыть отчёт' },
-    columns: ['Кандидат', 'Симуляция', 'Отчёт', 'Интервью', 'Отзыв кандидату'],
+    columns: ['Кандидат', 'Симуляция', 'Отчёт', 'Интервью', 'Сверка', 'Отзыв кандидату'],
     simulation: { 'not-started': 'Не начата', 'in-progress': 'Идёт', completed: 'Пройдена' },
     report: { open: 'Открыть отчёт', waiting: 'После симуляции' },
     interview: { none: 'Ещё не оценено', scored: 'Оценено вслепую', draft: 'Оценено · черновик готов' },
+    consistency: { open: 'Открыть сверку', waiting: 'После баллов интервьюера' },
     feedback: { open: 'Посмотреть', waiting: 'После отчёта' },
     candidate: 'Кандидат',
   },
@@ -136,6 +138,18 @@ export default function CommissionHome() {
                         </StatusPill>
                       </td>
                       <td className="px-4 py-3">
+                        {c.scoresSaved ? (
+                          <Link
+                            href={`/commission/consistency/${c.id}`}
+                            className="text-sm font-semibold text-brand-ink hover:underline"
+                          >
+                            {text.consistency.open}
+                          </Link>
+                        ) : (
+                          <StatusPill tone="locked">{text.consistency.waiting}</StatusPill>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
                         {c.assessmentReady ? (
                           <Link href="/feedback/preview" className="text-sm font-semibold text-brand-ink hover:underline">
                             {text.feedback.open}
@@ -146,7 +160,7 @@ export default function CommissionHome() {
                       </td>
                     </>
                   ) : (
-                    <td colSpan={4} className="px-4 py-3">
+                    <td colSpan={5} className="px-4 py-3">
                       <SeedPending />
                     </td>
                   )}

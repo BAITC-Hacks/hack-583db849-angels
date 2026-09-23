@@ -1,6 +1,7 @@
 'use client';
 
 import { AcademicCapIcon, ArrowsRightLeftIcon, LanguageIcon, SparklesIcon } from '@heroicons/react/24/outline';
+import { statusWords, topicWords } from '../../lib/consistency/labels';
 import { competencies } from '../../lib/drive';
 import { useStaffLocale } from '../../lib/i18n/StaffLocaleProvider';
 import type { BriefConsistencyItem, BriefEvidence, BriefFocus, InterviewerBrief } from '../../lib/brief/types';
@@ -24,22 +25,7 @@ const copy = {
     noCertificate: 'None on file',
     written: 'Written answers',
     englishNote: 'Judged separately: English never moves a D.R.I.V.E. score. Start with an easy question and listen for a minute.',
-    status: {
-      discrepancy: 'Does not match',
-      unverified: 'Not verified',
-      consistent: 'Matches',
-      confirmed: 'Confirmed in the interview',
-      resolved: 'Cleared up in the interview',
-    },
     focus: { invision_knowledge: 'inVision U', english: 'English', motivation: 'Motivation' },
-    topic: {
-      english: 'English',
-      invision_knowledge: 'inVision U',
-      motivation: 'Motivation',
-      experience: 'Experience',
-      achievements: 'Achievements',
-      other: 'Other',
-    },
   },
   ru: {
     questions: 'Вопросы, которые стоит задать',
@@ -57,22 +43,7 @@ const copy = {
     noCertificate: 'Нет в деле',
     written: 'Письменные ответы',
     englishNote: 'Оценивается отдельно: английский никогда не влияет на баллы D.R.I.V.E. Начните с простого вопроса и послушайте минуту.',
-    status: {
-      discrepancy: 'Не сходится',
-      unverified: 'Не проверено',
-      consistent: 'Сходится',
-      confirmed: 'Подтвердилось на интервью',
-      resolved: 'Снялось на интервью',
-    },
     focus: { invision_knowledge: 'inVision U', english: 'Английский', motivation: 'Мотивация' },
-    topic: {
-      english: 'Английский',
-      invision_knowledge: 'inVision U',
-      motivation: 'Мотивация',
-      experience: 'Опыт',
-      achievements: 'Достижения',
-      other: 'Другое',
-    },
   },
 };
 
@@ -169,9 +140,9 @@ export function BriefConsistency({ items }: { items: BriefConsistencyItem[] }) {
         >
           <h3 className="flex flex-wrap items-center gap-2 text-sm font-semibold text-text-primary">
             <ArrowsRightLeftIcon aria-hidden="true" className="h-4 w-4 text-status-flag" />
-            {text.topic[item.topic]}
+            {topicWords[locale][item.topic]}
             <span className="rounded-control bg-bg-elevated px-2 py-0.5 font-mono text-[0.58rem] tracking-[0.1em] text-text-muted uppercase">
-              {text.status[item.status]}
+              {statusWords[locale][item.status]}
             </span>
           </h3>
 
