@@ -25,7 +25,16 @@
     "/v1/candidates": {
       "post": {
         "operationId": "CandidatesController_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -38,7 +47,14 @@
         },
         "responses": {
           "201": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CandidateDto"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -47,10 +63,99 @@
       },
       "get": {
         "operationId": "CandidatesController_list",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "include",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "progress"
+              ],
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CandidateListDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "candidates"
+        ]
+      }
+    },
+    "/v1/candidates/{candidateId}/progress": {
+      "get": {
+        "operationId": "CandidatesController_progress",
+        "parameters": [
+          {
+            "name": "candidateId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CandidateProgressDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "candidates"
+        ]
+      }
+    },
+    "/v1/candidates/{candidateId}/accommodations": {
+      "put": {
+        "operationId": "CandidatesController_accommodation",
+        "parameters": [
+          {
+            "name": "candidateId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAccommodationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccommodationDto"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -73,11 +178,244 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CandidateDto"
+                }
+              }
+            }
           }
         },
         "tags": [
           "candidates"
+        ]
+      }
+    },
+    "/v1/scenarios": {
+      "get": {
+        "operationId": "ScenariosController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ScenarioSummaryDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "scenarios"
+        ]
+      }
+    },
+    "/v1/simulations": {
+      "post": {
+        "operationId": "SimulationsController_create",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSimulationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulationDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "simulations"
+        ]
+      }
+    },
+    "/v1/simulations/{simulationId}/turns": {
+      "post": {
+        "operationId": "SimulationsController_turn",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "simulationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TextTurnDto"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/AudioTurnDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TurnResultDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "simulations"
+        ]
+      }
+    },
+    "/v1/simulations/{simulationId}/turns/{turnId}/audio": {
+      "get": {
+        "operationId": "SimulationsController_audio",
+        "parameters": [
+          {
+            "name": "turnId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "simulationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "audio/mpeg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "simulations"
+        ]
+      }
+    },
+    "/v1/simulations/{simulationId}/complete": {
+      "post": {
+        "operationId": "SimulationsController_complete",
+        "parameters": [
+          {
+            "name": "simulationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompleteSimulationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulationDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "simulations"
+        ]
+      }
+    },
+    "/v1/simulations/{simulationId}": {
+      "get": {
+        "operationId": "SimulationsController_get",
+        "parameters": [
+          {
+            "name": "simulationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulationDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "simulations"
         ]
       }
     }
@@ -195,6 +533,611 @@
           "profile",
           "application",
           "test"
+        ]
+      },
+      "BriefProgressDto": {
+        "type": "object",
+        "properties": {
+          "briefId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "ready",
+              "failed"
+            ]
+          }
+        },
+        "required": [
+          "briefId",
+          "status"
+        ]
+      },
+      "SimulationProgressDto": {
+        "type": "object",
+        "properties": {
+          "simulationId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "completed"
+            ]
+          },
+          "ending": {
+            "type": "string",
+            "enum": [
+              "completed",
+              "stopped"
+            ],
+            "nullable": true
+          }
+        },
+        "required": [
+          "simulationId",
+          "status",
+          "ending"
+        ]
+      },
+      "AssessmentProgressDto": {
+        "type": "object",
+        "properties": {
+          "assessmentId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "ready",
+              "failed"
+            ]
+          }
+        },
+        "required": [
+          "assessmentId",
+          "status"
+        ]
+      },
+      "InterviewProgressDto": {
+        "type": "object",
+        "properties": {
+          "interviewId": {
+            "type": "string"
+          },
+          "transcriptStatus": {
+            "type": "string",
+            "enum": [
+              "none",
+              "transcribing",
+              "ready",
+              "failed"
+            ]
+          },
+          "scoresSaved": {
+            "type": "boolean"
+          },
+          "draftReady": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "interviewId",
+          "transcriptStatus",
+          "scoresSaved",
+          "draftReady"
+        ]
+      },
+      "SurpriseProgressDto": {
+        "type": "object",
+        "properties": {
+          "surpriseId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ready",
+              "started",
+              "transcribing",
+              "answered",
+              "expired",
+              "failed"
+            ]
+          }
+        },
+        "required": [
+          "surpriseId",
+          "status"
+        ]
+      },
+      "ConsistencyProgressDto": {
+        "type": "object",
+        "properties": {
+          "before": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "ready",
+              "failed"
+            ],
+            "nullable": true
+          },
+          "after": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "ready",
+              "failed",
+              "locked"
+            ],
+            "nullable": true
+          }
+        },
+        "required": [
+          "before",
+          "after"
+        ]
+      },
+      "CandidateProgressDto": {
+        "type": "object",
+        "properties": {
+          "candidateId": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "brief": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BriefProgressDto"
+              }
+            ]
+          },
+          "simulation": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SimulationProgressDto"
+              }
+            ]
+          },
+          "assessment": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AssessmentProgressDto"
+              }
+            ]
+          },
+          "interview": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InterviewProgressDto"
+              }
+            ]
+          },
+          "surprise": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SurpriseProgressDto"
+              }
+            ]
+          },
+          "consistency": {
+            "$ref": "#/components/schemas/ConsistencyProgressDto"
+          }
+        },
+        "required": [
+          "candidateId",
+          "label",
+          "brief",
+          "simulation",
+          "assessment",
+          "interview",
+          "surprise",
+          "consistency"
+        ]
+      },
+      "CandidateDto": {
+        "type": "object",
+        "properties": {
+          "candidateId": {
+            "type": "string"
+          },
+          "externalId": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "progress": {
+            "$ref": "#/components/schemas/CandidateProgressDto"
+          }
+        },
+        "required": [
+          "candidateId",
+          "externalId",
+          "label",
+          "createdAt"
+        ]
+      },
+      "CandidateListDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CandidateDto"
+            }
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "UpdateAccommodationDto": {
+        "type": "object",
+        "properties": {
+          "textMode": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "textMode",
+          "reason"
+        ]
+      },
+      "AccommodationDto": {
+        "type": "object",
+        "properties": {
+          "candidateId": {
+            "type": "string"
+          },
+          "textMode": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "setByRole": {
+            "type": "string",
+            "enum": [
+              "commission",
+              "admin"
+            ]
+          },
+          "setAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "candidateId",
+          "textMode",
+          "reason",
+          "setByRole",
+          "setAt"
+        ]
+      },
+      "ScenarioSummaryDto": {
+        "type": "object",
+        "properties": {
+          "scenarioId": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "ready"
+            ]
+          },
+          "competencies": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "D",
+                "R",
+                "I",
+                "V",
+                "E"
+              ]
+            }
+          },
+          "assignedCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "scenarioId",
+          "title",
+          "status",
+          "competencies",
+          "assignedCount"
+        ]
+      },
+      "CreateSimulationDto": {
+        "type": "object",
+        "properties": {
+          "candidateId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "candidateId"
+        ]
+      },
+      "CharacterDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "wants": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "role",
+          "wants"
+        ]
+      },
+      "ScenarioBriefDto": {
+        "type": "object",
+        "properties": {
+          "scenarioId": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "situation": {
+            "type": "string"
+          },
+          "yourRole": {
+            "type": "string"
+          },
+          "goal": {
+            "type": "string"
+          },
+          "character": {
+            "$ref": "#/components/schemas/CharacterDto"
+          },
+          "expectedMinutes": {
+            "type": "number"
+          },
+          "maxCandidateTurns": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "scenarioId",
+          "title",
+          "situation",
+          "yourRole",
+          "goal",
+          "character",
+          "expectedMinutes",
+          "maxCandidateTurns"
+        ]
+      },
+      "TurnDto": {
+        "type": "object",
+        "properties": {
+          "turnId": {
+            "type": "string"
+          },
+          "speaker": {
+            "type": "string",
+            "enum": [
+              "candidate",
+              "character"
+            ]
+          },
+          "text": {
+            "type": "string"
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "turnId",
+          "speaker",
+          "text",
+          "startedAt",
+          "endedAt"
+        ]
+      },
+      "SimulationDto": {
+        "type": "object",
+        "properties": {
+          "simulationId": {
+            "type": "string"
+          },
+          "candidateId": {
+            "type": "string"
+          },
+          "scenario": {
+            "$ref": "#/components/schemas/ScenarioBriefDto"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "voice",
+              "text"
+            ]
+          },
+          "accommodation": {
+            "type": "boolean"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "completed"
+            ]
+          },
+          "stage": {
+            "type": "string",
+            "enum": [
+              "opening",
+              "in-progress",
+              "wrapping-up",
+              "finished"
+            ]
+          },
+          "ending": {
+            "type": "string",
+            "enum": [
+              "completed",
+              "stopped"
+            ],
+            "nullable": true
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completedAt": {
+            "type": "object",
+            "format": "date-time",
+            "nullable": true
+          },
+          "turns": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TurnDto"
+            }
+          }
+        },
+        "required": [
+          "simulationId",
+          "candidateId",
+          "scenario",
+          "mode",
+          "accommodation",
+          "status",
+          "stage",
+          "ending",
+          "startedAt",
+          "completedAt",
+          "turns"
+        ]
+      },
+      "TextTurnDto": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ]
+      },
+      "AudioTurnDto": {
+        "type": "object",
+        "properties": {
+          "audio": {
+            "type": "string",
+            "format": "binary"
+          }
+        },
+        "required": [
+          "audio"
+        ]
+      },
+      "TurnResultDto": {
+        "type": "object",
+        "properties": {
+          "candidateTurn": {
+            "$ref": "#/components/schemas/TurnDto"
+          },
+          "characterTurn": {
+            "$ref": "#/components/schemas/TurnDto"
+          },
+          "stage": {
+            "type": "string",
+            "enum": [
+              "opening",
+              "in-progress",
+              "wrapping-up",
+              "finished"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "completed"
+            ]
+          },
+          "candidateTurns": {
+            "type": "number"
+          },
+          "recognitionConfidence": {
+            "type": "object",
+            "nullable": true
+          },
+          "characterAudioUrl": {
+            "type": "object",
+            "nullable": true
+          }
+        },
+        "required": [
+          "candidateTurn",
+          "characterTurn",
+          "stage",
+          "status",
+          "candidateTurns",
+          "recognitionConfidence",
+          "characterAudioUrl"
+        ]
+      },
+      "CompleteSimulationDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "enum": [
+              "completed",
+              "stopped"
+            ]
+          }
+        },
+        "required": [
+          "reason"
         ]
       }
     }

@@ -23,6 +23,12 @@ services:
       ML_INTERNAL_TOKEN: local-internal-token
       GATEWAY_MODE: replay
       BUDGET_USD_CAP: "20"
+      UPLOADS_DIR: /data/uploads
+      USAGE_LOG_PATH: /data/usage/gateway-usage.jsonl
+      DEMO_MODE: "true"
+    volumes:
+      - uploads-data:/data/uploads
+      - usage-data:/data/usage
     healthcheck:
       interval: 5s
       timeout: 3s
@@ -38,6 +44,9 @@ services:
       ML_SERVICE_URL: http://ml:8000
       ML_INTERNAL_TOKEN: local-internal-token
       DEMO_MODE: "true"
+      UPLOADS_DIR: /data/uploads
+    volumes:
+      - uploads-data:/data/uploads
     ports:
       - "3001:3001"
     depends_on:
@@ -53,6 +62,12 @@ services:
       args:
         NEXT_PUBLIC_API_MODE: mock
         NEXT_PUBLIC_API_URL: /api
+    environment:
+      API_INTERNAL_URL: http://api:3001
+      WEB_API_KEY_PLATFORM: local-platform
+      WEB_API_KEY_INTERVIEWER: local-interviewer
+      WEB_API_KEY_COMMISSION: local-commission
+      WEB_API_KEY_ADMIN: local-admin
     ports:
       - "3000:3000"
     depends_on:
@@ -61,3 +76,5 @@ services:
 
 volumes:
   postgres-data:
+  uploads-data:
+  usage-data:
