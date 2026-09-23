@@ -3,8 +3,16 @@ from decimal import Decimal
 from pathlib import Path
 
 from fastapi.testclient import TestClient
+import pytest
 
 from services.ml.app.config import Settings
+from services.ml.app.gateway.errors import (
+    GatewayBudgetError,
+    GatewayCassetteMissingError,
+    GatewayOutputError,
+    GatewayProviderError,
+    GatewayReplayError,
+)
 from services.ml.app.main import create_app
 
 
@@ -85,3 +93,39 @@ def test_validation_errors_do_not_echo_the_request() -> None:
     assert response.status_code == 422
     assert_error_shape(response, "VALIDATION_ERROR")
     assert "Do Not Echo" not in response.text
+
+
+@pytest.mark.parametrize(
+    ("path", "error", "status", "code"),
+    [
+        ("output", GatewayOutputError("unsafe details"), 502, "AI_INVALID_OUTPUT"),
+        ("provider", GatewayProviderError("unsafe details"), 503, "AI_UNAVAILABLE"),
+        (
+            "cassette",
+            GatewayCassetteMissingError("unsafe details"),
+            503,
+            "AI_UNAVAILABLE",
+        ),
+        ("replay", GatewayReplayError("unsafe details"), 503, "AI_UNAVAILABLE"),
+        (
+            "budget",
+            GatewayBudgetError("unsafe details"),
+            503,
+            "AI_BUDGET_EXCEEDED",
+        ),
+    ],
+)
+def test_gateway_errors_have_stable_safe_http_codes(
+    path: str, error: Exception, status: int, code: str
+) -> None:
+    app = client().app
+
+    @app.get(f"/test/{path}")
+    async def fail() -> None:
+        raise error
+
+    response = TestClient(app, raise_server_exceptions=False).get(f"/test/{path}")
+
+    assert response.status_code == status
+    assert_error_shape(response, code)
+    assert "unsafe details" not in response.text
