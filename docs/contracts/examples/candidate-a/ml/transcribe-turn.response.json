@@ -1,0 +1,12 @@
+{
+  "turns": [
+    {
+      "speaker": "candidate",
+      "text": "Okay, let's fix this fast. The demo is in three days, so we can't lose you now. Send me the list of what Timur changed and I'll look at it tonight.",
+      "startSec": 0.4,
+      "endSec": 29.6,
+      "confidence": 0.93
+    }
+  ],
+  "durationSec": 30.0
+}

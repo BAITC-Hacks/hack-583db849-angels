@@ -70,7 +70,7 @@
 | G4 | Бриф | Кто создаёт бриф | **API создаёт бриф сам** после `POST /v1/candidates`. `progress.brief`: `pending → ready`. В `DEMO_MODE` брифы A, B и C лежат в seed |
 | G5 | Отчёт | Имени персонажа для подписи реплик | В `Assessment.simulation` добавлено `characterName` |
 | G6 | Отчёт, интервью | Подписи «Кандидат A» | В `Assessment` и `Interview` добавлено `candidateLabel` |
-| G7 | Симуляция | Какой сценарий запускать | `GET /v1/scenarios` → `ScenarioBrief[]`. Веб берёт первый, в демо это `conflict-resolution` |
+| G7 | Симуляция | Какой сценарий запускать | ~~Веб берёт первый из `GET /v1/scenarios`~~ — **заменено G19 и G23:** сценарий назначает API при `POST /v1/simulations`, а `GET /v1/scenarios` → `ScenarioSummary[]` только для сотрудников |
 | G8 | Главная кандидата → симуляция | Продолжить свою симуляцию, а не начать новую | `progress.simulation.id`. Кнопка: есть `id` — переход, нет — `POST /v1/simulations`, затем переход |
 | G9 | Главная интервьюера → интервью | Кто создаёт запись интервью | Кнопка «Открыть интервью»: есть `progress.interview.id` — переход, нет — `POST /v1/interviews { candidateId, heldAt: now }`, затем переход |
 | G10 | Админ | Режима API, вызовов ИИ и расходов | `GET /v1/admin/overview` → `AdminOverview` (API берёт расходы из `GET /internal/v1/usage` ML-сервиса) |
