@@ -10,7 +10,13 @@ from typing import Literal
 from uuid import uuid4
 
 from .canonical import cassette_key
-from .config import ModelsConfiguration, Provider, TaskDefinition, TokenPricing
+from .config import (
+    MeteredPricing,
+    ModelsConfiguration,
+    Provider,
+    TaskDefinition,
+    TokenPricing,
+)
 from .errors import GatewayBudgetError
 from .types import GatewayRequest
 from .usage import FileUsageStore, UsageRecord
@@ -81,6 +87,43 @@ class GatewayBudget:
             source="provider",
             input_tokens=input_tokens,
             output_tokens=output_tokens,
+            estimated_usd=reservation.estimated_usd,
+            actual_usd=actual,
+            timestamp=self._store.timestamp(),
+            request_hash=cassette_key(request, provider, model),
+        )
+        async with self._lock:
+            try:
+                await self._store.append(record)
+            finally:
+                self._reservations.pop(reservation.identifier, None)
+        if actual > task.request_cost_limit_usd:
+            raise GatewayBudgetError("provider usage exceeded the request cost limit")
+
+    async def complete_metered(
+        self,
+        reservation: BudgetReservation,
+        request: GatewayRequest,
+        provider: Provider,
+        model: str,
+        mode: Literal["live", "record"],
+        billed_units: Decimal,
+    ) -> None:
+        task = self._configuration.tasks[request.task]
+        pricing = self._configuration.models[model].pricing
+        if not isinstance(pricing, MeteredPricing):
+            raise GatewayBudgetError("media operation has token pricing")
+        actual = billed_units * pricing.usd
+        record = UsageRecord(
+            task=request.task,
+            provider=provider,
+            model=model,
+            mode=mode,
+            source="provider",
+            input_tokens=0,
+            output_tokens=0,
+            metered_units=billed_units,
+            metered_unit=pricing.unit,
             estimated_usd=reservation.estimated_usd,
             actual_usd=actual,
             timestamp=self._store.timestamp(),
