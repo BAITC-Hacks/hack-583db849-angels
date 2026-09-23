@@ -32,17 +32,20 @@ The ML service is never exposed publicly. Only `api` calls it.
 
 | Variable | Read by | Meaning |
 | --- | --- | --- |
-| `NEXT_PUBLIC_API_URL` | web | where the browser reaches `api` |
+| `NEXT_PUBLIC_API_URL` | web | the stand only (inVision's own screens on MSW mocks). Product screens never reach `api` from the browser |
+| `API_INTERNAL_URL` | web (server) | where the web server's `/api/v1/*` proxy reaches `api`; in Compose `http://api:3001` |
+| `WEB_API_KEY_PLATFORM`, `WEB_API_KEY_INTERVIEWER`, `WEB_API_KEY_COMMISSION`, `WEB_API_KEY_ADMIN` | web (server) | the key the proxy adds for each demo role; the same values as `API_KEYS`, never `NEXT_PUBLIC_` |
 | `NEXT_PUBLIC_API_MODE` | web | `mock` (MSW) or `real` |
 | `DATABASE_URL` | api | PostgreSQL connection |
 | `API_KEYS` | api | demo clients as `key:role` pairs, comma-separated |
 | `ML_SERVICE_URL` | api | where `api` reaches `ml` |
 | `ML_INTERNAL_TOKEN` | api, ml | shared secret on every internal call |
-| `UPLOADS_DIR` | api, ml | a volume both mount at the same path. `api` saves audio there, sends its path relative to this folder as `audioRef`, and deletes it once the transcript is stored |
+| `UPLOADS_DIR` | api, ml | one volume both containers mount at this same path (Compose: a named `uploads` volume at `/data/uploads` on `api` and `ml`). `api` saves audio there, sends its path relative to this folder as `audioRef`, and deletes it once the transcript is stored. Without the shared volume the ML service answers `404 AUDIO_NOT_FOUND` |
 | `DEMO_MODE` | api, ml | serve seed results for A, B and C without model calls |
 | `OPENAI_API_KEY`, `DEEPGRAM_API_KEY` | ml only | provider keys |
 | `GATEWAY_MODE` | ml | `live`, `record` or `replay` |
 | `BUDGET_USD_CAP` | ml | the gateway refuses everything past this total |
+| `USAGE_LOG_PATH` | ml | where the gateway appends its token and cost log; `GET /internal/v1/usage` reads it |
 
 Provider keys exist only in the ML service's environment. Neither `web` nor `api` ever holds them.
 

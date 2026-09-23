@@ -34,11 +34,11 @@ Every request carries `X-Internal-Token`. Responses are the result object itself
 | --- | --- | --- | --- |
 | `GET` | `/internal/v1/health` | → `{ "status": "ok" }` | |
 | `GET` | `/internal/v1/scenarios` | → `ScenarioBrief[]` | |
-| `GET` | `/internal/v1/scenarios/{scenarioId}` | → `ScenarioBrief` | `simulation-created.json` → `scenario` |
+| `GET` | `/internal/v1/scenarios/{scenarioId}` | → `ScenarioBrief` | `ml/scenarios.response.json` — the item with that `scenarioId` |
 | `POST` | `/internal/v1/simulation/turn` | `TurnRequest` → `TurnResult` | `ml/simulation-turn.*` |
 | `POST` | `/internal/v1/simulation/assessment` | `AssessmentRequest` → `AssessmentResult` | `ml/simulation-assessment.*` |
 | `POST` | `/internal/v1/brief` | `BriefRequest` → `BriefResult` | `ml/brief.*` |
-| `POST` | `/internal/v1/transcribe` | `TranscribeRequest` → `TranscribeResult` | `ml/transcribe.*` |
+| `POST` | `/internal/v1/transcribe` | `TranscribeRequest` → `TranscribeResult` | `ml/transcribe.*` (interview), `ml/transcribe-turn.*` (spoken turn) |
 | `POST` | `/internal/v1/speech` | `SpeechRequest` → `audio/mpeg` | |
 | `POST` | `/internal/v1/consistency` | `ConsistencyRequest` → `ConsistencyResult` (C) | `ml/consistency-*.json` |
 | `POST` | `/internal/v1/surprise-question` | `SurpriseRequest` → `SurpriseResult` (S) | `ml/surprise-question.*` |
@@ -54,6 +54,16 @@ Every request carries `X-Internal-Token`. Responses are the result object itself
 
 **Who assigns what.** `api` assigns every `turnId` and stores the turns, and picks the scenario from `GET /internal/v1/scenarios` (only `ready` ones). You return only the character's text and the director's decision.
 
+**Where the story is — `state`.** You keep no memory between calls; `api` does. With every **candidate** turn, `api` sends `state`:
+- `beat` — the `nextBeat` of the latest `director` you returned (for the first candidate turn, the one from the opening line);
+- `candidateTurns` — how many candidate turns `turns` now holds, this one included.
+
+The opening line is the only call without `state`. A request whose `turns` holds a candidate turn and no `state` is refused with `422 VALIDATION_ERROR` — the model below says so — because guessing the beat from the transcript would silently restart the story.
+
+**The character's voice.** `api` calls `speech` with the `scenarioId`, never a voice name: the voice is in `config/scenarios/<id>.json`, which only you read. `voice` stays in the model for tests and tooling.
+
+**Recognition confidence.** Each transcribed segment carries the recogniser's `confidence` (0–1) when it has one. For a spoken turn, `api` shows the lowest one as `recognitionConfidence` — a flag for people, never a penalty.
+
 **How a turn is decided — the mini-ML.** The turn's text is already transcribed. You:
 1. embed it with a local sentence-embedding model (for example `all-MiniLM-L6-v2`, baked into the image, $0);
 2. compare it with the example phrases of each answer type in the current beat of `config/scenarios/<id>.json`;
@@ -61,6 +71,24 @@ Every request carries `X-Internal-Token`. Responses are the result object itself
 4. move to that branch's next beat and let the actor (OpenAI) write the character's line for its `characterIntent`.
 
 The matched type, its similarity and the branch go into `DirectorDecision` — logged, never shown to the candidate. **The matcher only steers the story; it never scores.** Every branch lets the candidate show all five competencies.
+
+## Errors
+
+Every error has the shape of `docs/SPEC.md`, section 4. `api` branches on `code`, so these are part of the contract as much as the models are.
+
+| Status | `code` | When | What `api` does |
+| --- | --- | --- | --- |
+| 401 | `UNAUTHORIZED` | `X-Internal-Token` missing or wrong | a deployment fault: logs it, answers `503 AI_UNAVAILABLE` |
+| 422 | `VALIDATION_ERROR` | the request does not match its model | a bug in `api`: logs it, answers `500` |
+| 400 | `INVALID_AUDIO_REF` | `audioRef` is empty, absolute or climbs out of `UPLOADS_DIR` | a bug in `api`: logs it, answers `500` |
+| 404 | `AUDIO_NOT_FOUND` | no file at `UPLOADS_DIR/<audioRef>` — almost always a volume `api` and `ml` do not share | a deployment fault: logs it, answers `503 AI_UNAVAILABLE` |
+| 404 | `SCENARIO_NOT_FOUND` | unknown `scenarioId` | a bug in `api`, which only uses ids you listed: answers `500` |
+| 502 | `AI_INVALID_OUTPUT` | model output failed its schema or the evidence check after one retry | passes it on as `502 AI_INVALID_OUTPUT` |
+| 503 | `AI_UNAVAILABLE` | the provider did not answer, or `replay` has no cassette for this call | passes it on as `503 AI_UNAVAILABLE` |
+| 503 | `AI_BUDGET_EXCEEDED` | `BUDGET_USD_CAP` or a task's cost limit reached, before the call | passes it on as `503 AI_BUDGET_EXCEEDED` |
+| 500 | `INTERNAL_ERROR` | anything else | answers `503 AI_UNAVAILABLE` |
+
+The three `AI_*` codes are the public ones on purpose: `api` hands them to the screen unchanged, so the gateway's own errors (`GatewayOutputError`, `GatewayProviderError`, `GatewayCassetteMissingError`, `GatewayBudgetError`) are mapped to them here, in the ML service, and nowhere else.
 
 ## Rules the screens rely on
 
@@ -255,7 +283,11 @@ class ScenarioConfig(Strict):
 
 
 class ScenarioBrief(Strict):
-    """The public part of a scenario. The hidden motive and the beats stay inside the service."""
+    """The public part of a scenario. The hidden motive and the beats stay inside the service.
+
+    `api` needs `status` to assign only ready scenarios. The public `ScenarioBrief` in api.md is this
+    same object without `status`: api drops it before a scenario reaches a candidate.
+    """
 
     scenarioId: str
     title: str
@@ -278,7 +310,13 @@ class TurnState(Strict):
 class TurnRequest(Strict):
     scenarioId: str
     turns: list[Turn]                      # the whole transcript so far; empty for the opening line
-    state: TurnState | None = None
+    state: TurnState | None = None         # absent only for the opening line
+
+    @model_validator(mode="after")
+    def state_with_every_candidate_turn(self) -> "TurnRequest":
+        if any(turn.speaker == "candidate" for turn in self.turns) and self.state is None:
+            raise ValueError("a candidate turn comes with state: the beat from the last director.nextBeat")
+        return self
 
 
 class DirectorDecision(Strict):
@@ -440,6 +478,7 @@ class TranscribedTurn(Strict):
     text: str
     startSec: float
     endSec: float
+    confidence: Annotated[float, Field(ge=0, le=1)] | None = None   # the recogniser's, when it gives one
 
 
 # ---- POST /internal/v1/transcribe
@@ -491,7 +530,14 @@ class ConsistencyResult(Strict):
 
 class SpeechRequest(Strict):
     text: str
-    voice: str                             # from the scenario's character
+    scenarioId: str | None = None          # what api sends: you look the character's voice up yourself
+    voice: str | None = None               # a voice name directly, for tests and tooling
+
+    @model_validator(mode="after")
+    def one_way_to_name_the_voice(self) -> "SpeechRequest":
+        if (self.scenarioId is None) == (self.voice is None):
+            raise ValueError("send scenarioId or voice, exactly one")
+        return self
 
 
 # ---- POST /internal/v1/surprise-question (S)

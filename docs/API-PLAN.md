@@ -103,7 +103,7 @@ export interface AiGateway {
 
 Правила вызова:
 - всегда через `CandidateAiService` там, где в теле есть данные кандидата: он прогоняет их через `toLLMView()`;
-- ошибка ML → `502 AI_INVALID_OUTPUT` (схема или доказательства) либо `503 AI_UNAVAILABLE` (сервис недоступен), как в `docs/contracts/api.md`, «Error codes»;
+- ошибки ML переводятся по таблице `docs/contracts/api.md`, раздел «When the ML service fails»: три кода `AI_*` проходят как есть, `AUDIO_NOT_FOUND` и `UNAUTHORIZED` — это `503 AI_UNAVAILABLE` плюс запись в лог, `VALIDATION_ERROR`, `INVALID_AUDIO_REF` и `SCENARIO_NOT_FOUND` — это `500`, потому что неверный запрос собрал сам API;
 - таймаут на вызов — 30 с для текста, 120 с для расшифровки.
 
 ### 3.3 Идемпотентность и ошибки
@@ -170,7 +170,31 @@ interface Candidate { candidateId: string; externalId: string; label: string; cr
 - при `DEMO_MODE=true` на старте загрузить `seed/candidates/{a,b,c}/snapshot.json` (они уже в `main`) и сделать upsert по `externalId`;
 - `GET /v1/scenarios` → `ScenarioSummary[]`, только для сотрудников (`platform` → `403`): берёшь список из ML (`GET /internal/v1/scenarios`), `assignedCount` считаешь по своим симуляциям.
 
-**г) Compose.** Web-контейнеру нужны переменные, которых там нет (иначе браузер получает `401`):
+**г) Compose.** Здесь три пробела. Без первого не работает ни один голосовой ход: API кладёт аудио к себе, ML его не видит и отвечает `404 AUDIO_NOT_FOUND` — это проверено на запущенном стеке.
+
+Общий том для аудио и переменные ML:
+
+```yaml
+  api:
+    environment:
+      UPLOADS_DIR: /data/uploads
+    volumes:
+      - uploads:/data/uploads
+  ml:
+    environment:
+      UPLOADS_DIR: /data/uploads
+      USAGE_LOG_PATH: /data/usage/gateway-usage.jsonl
+      DEMO_MODE: "true"
+    volumes:
+      - uploads:/data/uploads
+      - ml-usage:/data/usage
+
+volumes:
+  uploads:
+  ml-usage:
+```
+
+Web-контейнеру нужны переменные прокси, иначе браузер получает `401`:
 
 ```yaml
   web:
@@ -228,10 +252,12 @@ model Accommodation {
 ### 4.4 PR 2 — правила
 
 1. **Назначение сценария.** `GET /internal/v1/scenarios` → оставить `status: "ready"` → выбрать наименее назначенный (считая свои `Simulation.scenarioId`), при равенстве — случайно. Пусто → `503 NO_SCENARIO_READY`. Вторая симуляция кандидату → `409 SIMULATION_EXISTS` с `details.simulationId`.
-2. **Первая реплика.** `POST /internal/v1/simulation/turn` с `{ scenarioId, turns: [] }` → `TurnResult { text, stage, ended, director }`. Сохрани ход `turn_01` (`speaker: "character"`), озвучь через `POST /internal/v1/speech { text, voice }`, аудио положи в `UPLOADS_DIR`, путь — в `audioPath`.
+2. **Первая реплика.** `POST /internal/v1/simulation/turn` с `{ scenarioId, turns: [] }` и **без `state`** → `TurnResult { text, stage, ended, director }`. Сохрани ход `turn_01` (`speaker: "character"`) и его `director` — из него берётся `nextBeat` для следующего хода. Озвучь через `POST /internal/v1/speech { text, scenarioId }` — голос персонажа ML знает сам, имя голоса не передаётся. Аудио положи в `UPLOADS_DIR`, путь — в `audioPath`.
 3. **Голосовой ход.** multipart `audio` (webm/ogg, ≤ 60 с) → сохранить в `UPLOADS_DIR` → `POST /internal/v1/transcribe { purpose: "turn", audioRef, speakers: 1 }`, где `audioRef` — путь **относительно** `UPLOADS_DIR` (общий том, `docs/SPEC.md`, раздел 3).
    - пусто на выходе → `422 SPEECH_NOT_RECOGNISED`, ход **не сохранять**;
-   - иначе сохранить ход кандидата (текст = расшифровка, `recognitionConfidence`), вызвать `simulation/turn` со **всем** транскриптом, сохранить ответный ход и его аудио, `director` — в аудит;
+   - иначе сохранить ход кандидата: текст — расшифровка, `recognitionConfidence` — наименьший `confidence` среди сегментов (или `null`);
+   - вызвать `simulation/turn` со **всем** транскриптом и `state: { beat: <nextBeat последнего director>, candidateTurns: <сколько ходов кандидата, включая этот> }`. Без `state` ML откажет `422`: он не хранит, где находится сюжет, — это делаешь ты;
+   - сохранить ответный ход, его аудио и его `director` (наружу `director` не отдаётся никогда);
    - **аудио кандидата удалить** сразу после сохранения расшифровки.
 4. **Текстовый ход** принимается, только если у кандидата включена доступность: иначе `403 TEXT_MODE_NOT_ALLOWED`. Пустой текст или длиннее 1000 символов → `400`.
 5. **Один ход за раз.** Пока предыдущий ход в работе → `409 TURN_IN_FLIGHT`. Реализуй через поле-замок или транзакцию.
