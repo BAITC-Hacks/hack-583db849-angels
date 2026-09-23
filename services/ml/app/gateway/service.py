@@ -8,6 +8,7 @@ import logging
 from typing import Any
 
 from ..config import GatewayMode, Settings
+from .budget import BudgetReservation, GatewayBudget
 from .cache import InMemoryResponseCache, NullResponseCache
 from .cassettes import FileCassetteStore
 from .config import ModelsConfiguration, Provider
@@ -29,6 +30,7 @@ from .types import (
     ResponseCache,
 )
 from .validation import validate_output
+from .usage import FileUsageStore
 
 
 ProviderFactory = Callable[[], ModelProvider]
@@ -44,12 +46,14 @@ class ModelGateway:
         providers: Mapping[Provider, ModelProvider],
         cassettes: CassetteStore,
         cache: ResponseCache | None = None,
+        budget: GatewayBudget | None = None,
     ) -> None:
         self._mode = mode
         self._configuration = configuration
         self._providers = dict(providers)
         self._cassettes = cassettes
         self._cache = cache or NullResponseCache()
+        self._budget = budget
 
     async def execute(self, request: GatewayRequest[OutputT]) -> GatewayResult[OutputT]:
         task = self._configuration.tasks[request.task]
@@ -58,7 +62,7 @@ class ModelGateway:
         for candidate in candidates:
             cached = await self._cache.get(request, task.provider, candidate)
             if cached is not None:
-                return self._validated_result(
+                result = self._validated_result(
                     request,
                     cached,
                     provider=task.provider,
@@ -66,6 +70,17 @@ class ModelGateway:
                     replayed=self._mode == "replay",
                     cached=True,
                 )
+                if self._budget is not None:
+                    await self._budget.record_free(
+                        request,
+                        task.provider,
+                        candidate,
+                        mode=self._mode,
+                        source="cache",
+                        input_tokens=cached.input_tokens,
+                        output_tokens=cached.output_tokens,
+                    )
+                return result
 
         if self._mode == "replay":
             for candidate in candidates:
@@ -90,6 +105,16 @@ class ModelGateway:
                     response,
                     task.cache_ttl_seconds,
                 )
+                if self._budget is not None:
+                    await self._budget.record_free(
+                        request,
+                        task.provider,
+                        candidate,
+                        mode="replay",
+                        source="replay",
+                        input_tokens=response.input_tokens,
+                        output_tokens=response.output_tokens,
+                    )
                 return result
             raise GatewayReplayError("replay cassette is unavailable")
 
@@ -102,6 +127,9 @@ class ModelGateway:
         response: ProviderResponse | None = None
         result: GatewayResult[OutputT] | None = None
         selected_model = task.model
+        reservation: BudgetReservation | None = None
+        if self._budget is not None:
+            reservation = await self._budget.reserve(request, task.model)
         for candidate in candidates:
             attempt_responses: list[ProviderResponse] = []
             selected_model = candidate
@@ -129,9 +157,22 @@ class ModelGateway:
                 self._log_attempt(
                     request, task.provider, candidate, 1, "invalid", response
                 )
-                response = await provider.generate(
-                    self._provider_request(request, candidate, task.max_tokens)
-                )
+                try:
+                    response = await provider.generate(
+                        self._provider_request(request, candidate, task.max_tokens)
+                    )
+                except GatewayProviderError:
+                    if self._budget is not None and reservation is not None:
+                        await self._budget.complete(
+                            reservation,
+                            request,
+                            task.provider,
+                            candidate,
+                            self._mode,
+                            sum(item.input_tokens for item in attempt_responses),
+                            sum(item.output_tokens for item in attempt_responses),
+                        )
+                    raise
                 attempt_responses.append(response)
                 try:
                     result = self._validated_result(
@@ -149,6 +190,16 @@ class ModelGateway:
                     self._log_attempt(
                         request, task.provider, candidate, 2, "invalid", response
                     )
+                    if self._budget is not None and reservation is not None:
+                        await self._budget.complete(
+                            reservation,
+                            request,
+                            task.provider,
+                            candidate,
+                            self._mode,
+                            sum(item.input_tokens for item in attempt_responses),
+                            sum(item.output_tokens for item in attempt_responses),
+                        )
                     raise
             result = replace(
                 result,
@@ -158,7 +209,19 @@ class ModelGateway:
             break
 
         if response is None or result is None:
+            if self._budget is not None and reservation is not None:
+                await self._budget.cancel(reservation)
             raise GatewayProviderError("model provider failed")
+        if self._budget is not None and reservation is not None:
+            await self._budget.complete(
+                reservation,
+                request,
+                task.provider,
+                selected_model,
+                self._mode,
+                result.input_tokens,
+                result.output_tokens,
+            )
         if self._mode == "record":
             await self._cassettes.save(
                 request,
@@ -237,6 +300,7 @@ def create_gateway(
     *,
     cassettes: CassetteStore | None = None,
     cache: ResponseCache | None = None,
+    budget: GatewayBudget | None = None,
     provider_factories: Mapping[Provider, ProviderFactory] | None = None,
 ) -> ModelGateway:
     """Build a gateway without constructing provider clients in replay mode."""
@@ -247,12 +311,18 @@ def create_gateway(
     if settings.gateway_mode != "replay":
         factories = dict(provider_factories or _default_provider_factories())
         providers = {provider: factory() for provider, factory in factories.items()}
+    gateway_budget = budget or GatewayBudget(
+        configuration,
+        FileUsageStore(settings.usage_log_path),
+        settings.budget_usd_cap,
+    )
     return ModelGateway(
         mode=settings.gateway_mode,
         configuration=configuration,
         providers=providers,
         cassettes=stores,
         cache=response_cache,
+        budget=gateway_budget,
     )
 
 
