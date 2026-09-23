@@ -112,6 +112,8 @@ export const navItems: NavItem[] = [
     icon: ShieldCheckIcon,
     label: { en: 'Quality guard', ru: 'Контроль качества' },
     roles: ['commission', 'admin'],
+    href: '/commission/quality-guard',
+    preview: true,
     module: 'M5',
   },
   {
