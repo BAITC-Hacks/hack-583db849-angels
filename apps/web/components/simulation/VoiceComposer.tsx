@@ -2,7 +2,7 @@
 
 import { ArrowPathIcon, MicrophoneIcon, PaperAirplaneIcon } from '@heroicons/react/24/outline';
 import { useEffect } from 'react';
-import { MAX_RECORDING_SECONDS, useRecorder } from '../../lib/simulation/useRecorder';
+import { MAX_RECORDING_SECONDS, useRecorder } from '../../lib/media/useRecorder';
 
 /**
  * How a candidate takes a turn: press, speak, release.
