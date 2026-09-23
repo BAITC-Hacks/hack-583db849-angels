@@ -112,11 +112,12 @@ The brief's questions cover the five competencies **and** three topics the inter
 | `GET` | `/v1/simulations/:simulationId` | | `200 Simulation` with every turn | `404` |
 
 - **One turn at a time.** A second turn while the first is still with the ML service answers `409 TURN_IN_FLIGHT`.
+- **You keep the story's place.** Store each `director.nextBeat` the ML service returns, and send `state: { beat: <the latest nextBeat>, candidateTurns: <candidate turns so far, this one included> }` with every candidate turn. Only the opening line goes without `state`; the ML service refuses a candidate turn without it (`ml.md`, "Where the story is").
 - **`Idempotency-Key` on `/turns` matters.** A network retry must not add the candidate's turn twice.
 - **The simulation completes on its own** when the ML service reports `ended: true`. `/complete` with `stopped` is the candidate's stop button.
 - **When a simulation completes, you start its assessment yourself.** `progress.assessment.status` goes `pending → ready` (or `failed`). Nobody has to press anything.
 - **You assign the scenario.** Random among scenarios with `status: "ready"`, the least-assigned first, ties broken at random. One simulation per candidate: a second create answers `409 SIMULATION_EXISTS` with `details.simulationId`.
-- **Turns are spoken.** The candidate turn's `text` is the transcript, `recognitionConfidence` is the recogniser's, and `characterAudioUrl` points at the character's voice. Low confidence is a flag on the turn, never a penalty. Nothing was recognised → `422 SPEECH_NOT_RECOGNISED`, the turn is not stored, and the candidate records again.
+- **Turns are spoken.** The candidate turn's `text` is the transcript, `recognitionConfidence` is the lowest `confidence` among its transcribed segments (or `null`), and `characterAudioUrl` points at the character's voice. You ask for that voice with `speech { text, scenarioId }` — the ML service knows each character's voice; you never name one. Low confidence is a flag on the turn, never a penalty. Nothing was recognised → `422 SPEECH_NOT_RECOGNISED`, the turn is not stored, and the candidate records again.
 - **Text only with an accommodation.** `inputMode` is `text` only when staff switched it on for this candidate (`PUT /v1/candidates/:id/accommodations`) before the simulation started; otherwise a JSON turn answers `403 TEXT_MODE_NOT_ALLOWED`. The report shows `accommodation: true`.
 
 ### M3 — assessments and candidate feedback
@@ -541,6 +542,18 @@ interface QualitySignal {
 | `POST /v1/quality-checks/interview` | `POST /internal/v1/quality-check` with `kind: "interview"` and the transcript | the check |
 | `POST /v1/quality-checks/calibration` | `POST /internal/v1/quality-check` with `kind: "calibration"` and the pseudonymous score history | the check |
 
+### When the ML service fails
+
+The ML service answers with a code from `ml.md`, section "Errors". The three `AI_*` codes pass through unchanged; everything else is a fault in `api` or in the deployment, which you log with its `traceId` and do not show the candidate as such:
+
+| ML answers | You answer |
+| --- | --- |
+| `502 AI_INVALID_OUTPUT`, `503 AI_UNAVAILABLE`, `503 AI_BUDGET_EXCEEDED` | the same status and code |
+| `401 UNAUTHORIZED`, `404 AUDIO_NOT_FOUND`, `500 INTERNAL_ERROR`, no answer at all | `503 AI_UNAVAILABLE` |
+| `422 VALIDATION_ERROR`, `400 INVALID_AUDIO_REF`, `404 SCENARIO_NOT_FOUND` | `500` — the request you built was wrong |
+
+`AUDIO_NOT_FOUND` nearly always means `api` and `ml` do not share the `UPLOADS_DIR` volume — check Compose first.
+
 ## Tests this contract needs
 
 These go in the same PR as the rule they test, as `AGENTS.md` requires:
@@ -562,6 +575,8 @@ These go in the same PR as the rule they test, as `AGENTS.md` requires:
 - scenario assignment: only `ready` scenarios, least-assigned first; a second create → `409 SIMULATION_EXISTS`;
 - a JSON turn without an accommodation → `403 TEXT_MODE_NOT_ALLOWED`;
 - `consistency?stage=after` → `409 DRAFT_LOCKED` before the interviewer's scores;
+- every candidate turn sent to ML carries `state` with the previous `director.nextBeat` — a spy on `ai-client`;
+- an `AI_BUDGET_EXCEEDED` from ML reaches the client as `503 AI_BUDGET_EXCEEDED`, and an `AUDIO_NOT_FOUND` as `503 AI_UNAVAILABLE`;
 - an interview quality check without a transcript → `409 TRANSCRIPT_MISSING`, and a calibration over fewer than three interviews → `409 NOT_ENOUGH_HISTORY`;
 - no quality check, of either kind, contains a `candidateId` or a candidate label — a check is about the process;
 - the history sent for a calibration carries no candidate field at all — a spy on `ai-client`.
