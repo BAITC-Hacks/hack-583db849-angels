@@ -38,10 +38,12 @@ describe('preview simulation', () => {
     expect(simulation.send('Second')).toBe(true);
   });
 
-  it('completes after the last candidate turn with the closing line', () => {
+  it('completes when the story does, before the cap, with the closing line', () => {
     const simulation = start();
+    const storyTurns = previewLines.length - 1;
+    expect(storyTurns).toBeLessThan(previewScenario.maxCandidateTurns);
 
-    for (let turn = 1; turn <= previewScenario.maxCandidateTurns; turn += 1) {
+    for (let turn = 1; turn <= storyTurns; turn += 1) {
       simulation.send(`Turn ${turn}`);
       vi.advanceTimersByTime(100);
     }
@@ -49,11 +51,25 @@ describe('preview simulation', () => {
     const state = simulation.getSnapshot();
     expect(state.stage).toBe('finished');
     expect(state.ending).toBe('completed');
+    expect(state.candidateTurns).toBe(storyTurns);
     expect(state.turns.at(-1)?.text).toBe(previewLines.at(-1));
     expect(new Set(state.turns.filter((t) => t.speaker === 'character').map((t) => t.text)).size).toBe(
-      previewScenario.maxCandidateTurns + 1,
+      previewLines.length,
     );
     expect(simulation.send('One more')).toBe(false);
+  });
+
+  it('closes at the cap when the story is longer than the cap', () => {
+    const simulation = new PreviewSimulation({ ...previewScenario, maxCandidateTurns: 2 }, previewLines, 100);
+
+    for (let turn = 1; turn <= 2; turn += 1) {
+      simulation.send(`Turn ${turn}`);
+      vi.advanceTimersByTime(100);
+    }
+
+    const state = simulation.getSnapshot();
+    expect(state).toMatchObject({ stage: 'finished', ending: 'completed', candidateTurns: 2 });
+    expect(state.turns.at(-1)?.text).toBe(previewLines.at(-1));
   });
 
   it('lets the candidate stop mid-reply, and nothing arrives afterwards', () => {

@@ -18,7 +18,7 @@ export const previewScenario: ScenarioBrief = {
     wants: 'To be asked before her work is changed',
   },
   expectedMinutes: 8,
-  maxCandidateTurns: 5,
+  maxCandidateTurns: 8,
 };
 
 /** Dana's lines, in order. Each is under 60 words, as the real character's will be. */
