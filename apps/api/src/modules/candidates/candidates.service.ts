@@ -1,5 +1,3 @@
-import { randomUUID } from 'node:crypto';
-
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 
@@ -33,12 +31,11 @@ export class CandidatesService {
     const englishCertificate = input.englishCertificate === null
       ? Prisma.DbNull
       : input.englishCertificate as Prisma.InputJsonValue | undefined;
-    const candidateId = randomUUID();
-    const label = demoLabel ?? `Candidate ${candidateId.slice(0, 8).toUpperCase()}`;
+    const label = demoLabel ?? `Candidate ${input.externalId.slice(-4).toUpperCase()}`;
     const candidate = await this.prisma.candidate.upsert({
       where: { externalId: input.externalId },
-      create: { id: candidateId, externalId: input.externalId, label, profile, application, test, englishCertificate },
-      update: { ...(demoLabel ? { label: demoLabel } : {}), profile, application, test, englishCertificate },
+      create: { externalId: input.externalId, label, profile, application, test, englishCertificate },
+      update: { label, profile, application, test, englishCertificate },
       select: candidateSelect,
     });
     return this.toDto(candidate);
