@@ -27,14 +27,14 @@ class DeepgramProvider:
         opener: Callable[..., Any] = urlopen,
     ) -> None:
         self._api_key = api_key or os.environ.get("DEEPGRAM_API_KEY")
-        if not self._api_key:
-            raise GatewayConfigurationError("Deepgram API key is not configured")
         self._opener = opener
 
     async def execute(self, request: MediaProviderRequest) -> MediaProviderResponse:
         return await asyncio.to_thread(self._execute_sync, request)
 
     def _execute_sync(self, request: MediaProviderRequest) -> MediaProviderResponse:
+        if not self._api_key:
+            raise GatewayProviderError("Deepgram request failed")
         try:
             if request.operation == "transcribe":
                 return self._transcribe(request)

@@ -9,12 +9,60 @@ from fastapi.testclient import TestClient
 from services.ml.app.audio import resolve_audio_ref
 from services.ml.app.config import Settings
 from services.ml.app.errors import ServiceError
+from services.ml.app.gateway.config import Provider
+from services.ml.app.gateway.media import MediaGatewayResult, MediaRequest
 from services.ml.app.main import create_app
 
 
 ROOT = Path(__file__).resolve().parents[3]
 EXAMPLES = ROOT / "docs" / "contracts" / "examples" / "candidate-a" / "ml"
 TOKEN = {"X-Internal-Token": "test-internal-token"}
+
+
+class TurnExampleGateway:
+    async def execute(self, request: MediaRequest) -> MediaGatewayResult:
+        expected = json.loads(
+            (EXAMPLES / "transcribe-turn.response.json").read_text(encoding="utf-8")
+        )
+        turn = expected["turns"][0]
+        words = turn["text"].split()
+        payload = {
+            "metadata": {"duration": expected["durationSec"]},
+            "results": {
+                "channels": [
+                    {
+                        "alternatives": [
+                            {
+                                "transcript": turn["text"],
+                                "confidence": turn["confidence"],
+                                "words": [
+                                    {
+                                        "word": word,
+                                        "start": turn["startSec"]
+                                        if index == 0
+                                        else turn["startSec"] + index,
+                                        "end": turn["endSec"]
+                                        if index == len(words) - 1
+                                        else turn["startSec"] + index + 0.5,
+                                        "confidence": turn["confidence"],
+                                    }
+                                    for index, word in enumerate(words)
+                                ],
+                            }
+                        ]
+                    }
+                ]
+            },
+        }
+        return MediaGatewayResult(
+            content=json.dumps(payload).encode(),
+            media_type="application/json",
+            billed_units=Decimal("0.5"),
+            provider=Provider.DEEPGRAM,
+            model="nova-3",
+            replayed=True,
+            cached=False,
+        )
 
 
 def test_audio_ref_resolves_a_file_inside_uploads(tmp_path: Path) -> None:
@@ -113,7 +161,10 @@ def test_turn_transcription_uses_the_one_speaker_contract_example(tmp_path: Path
         budget_usd_cap=Decimal("20"),
         demo_mode=False,
     )
-    response = TestClient(create_app(settings), raise_server_exceptions=False).post(
+    response = TestClient(
+        create_app(settings, media_gateway=TurnExampleGateway()),
+        raise_server_exceptions=False,
+    ).post(
         "/internal/v1/transcribe",
         json={
             "purpose": "turn",

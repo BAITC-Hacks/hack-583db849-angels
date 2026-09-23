@@ -9,6 +9,7 @@ from fastapi import APIRouter, Depends, Response
 
 from ..audio import resolve_audio_ref
 from ..examples import PACKAGE_ROOT, ROOT, load_example
+from ..modules.transcription import TurnTranscriptionService
 from ..schemas.contracts import SpeechRequest, TranscribeRequest, TranscribeResult
 
 
@@ -20,7 +21,11 @@ def silent_mp3_path() -> Path:
     return ROOT_SILENT_MP3 if ROOT_SILENT_MP3.is_file() else PACKAGED_SILENT_MP3
 
 
-def audio_router(authenticate: Callable[..., None], uploads_dir: Path) -> APIRouter:
+def audio_router(
+    authenticate: Callable[..., None],
+    uploads_dir: Path,
+    turn_transcription: TurnTranscriptionService,
+) -> APIRouter:
     router = APIRouter(prefix="/internal/v1", dependencies=[Depends(authenticate)])
 
     @router.post(
@@ -29,7 +34,9 @@ def audio_router(authenticate: Callable[..., None], uploads_dir: Path) -> APIRou
         response_model_exclude_none=True,
     )
     async def transcribe(request: TranscribeRequest) -> TranscribeResult:
-        resolve_audio_ref(request.audioRef, uploads_dir)
+        audio_path = resolve_audio_ref(request.audioRef, uploads_dir)
+        if request.purpose == "turn" and request.speakers == 1:
+            return await turn_transcription.transcribe(request, audio_path)
         example = (
             "transcribe-turn.response.json"
             if request.purpose == "turn" and request.speakers == 1
