@@ -17,5 +17,9 @@ class GatewayReplayError(GatewayError):
     """Replay data is unavailable and live fallback is forbidden."""
 
 
+class GatewayCassetteMissingError(GatewayReplayError):
+    """No cassette exists for the exact canonical request."""
+
+
 class GatewayOutputError(GatewayError):
     """A provider or cassette returned output that failed validation."""

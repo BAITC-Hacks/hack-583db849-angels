@@ -8,8 +8,11 @@ from typing import Any
 from pydantic import ValidationError
 
 from ..config import GatewayMode, Settings
+from .cache import InMemoryResponseCache, NullResponseCache
+from .cassettes import FileCassetteStore
 from .config import ModelsConfiguration, Provider
 from .errors import (
+    GatewayCassetteMissingError,
     GatewayConfigurationError,
     GatewayOutputError,
     GatewayProviderError,
@@ -23,31 +26,11 @@ from .types import (
     OutputT,
     ProviderRequest,
     ProviderResponse,
+    ResponseCache,
 )
 
 
 ProviderFactory = Callable[[], ModelProvider]
-
-
-class MissingCassetteStore:
-    async def load(
-        self,
-        request: GatewayRequest[Any],
-        provider: Provider,
-        model: str,
-    ) -> ProviderResponse:
-        del request, provider, model
-        raise GatewayReplayError("replay cassette is unavailable")
-
-    async def save(
-        self,
-        request: GatewayRequest[Any],
-        provider: Provider,
-        model: str,
-        response: ProviderResponse,
-    ) -> None:
-        del request, provider, model, response
-        raise GatewayReplayError("record cassette store is unavailable")
 
 
 class ModelGateway:
@@ -58,25 +41,55 @@ class ModelGateway:
         configuration: ModelsConfiguration,
         providers: Mapping[Provider, ModelProvider],
         cassettes: CassetteStore,
+        cache: ResponseCache | None = None,
     ) -> None:
         self._mode = mode
         self._configuration = configuration
         self._providers = dict(providers)
         self._cassettes = cassettes
+        self._cache = cache or NullResponseCache()
 
     async def execute(self, request: GatewayRequest[OutputT]) -> GatewayResult[OutputT]:
         task = self._configuration.tasks[request.task]
-        model = task.model
+        candidates = (task.model, task.fallback_model)
+
+        for candidate in candidates:
+            cached = await self._cache.get(request, task.provider, candidate)
+            if cached is not None:
+                return self._validated_result(
+                    request,
+                    cached,
+                    provider=task.provider,
+                    model=candidate,
+                    replayed=self._mode == "replay",
+                    cached=True,
+                )
 
         if self._mode == "replay":
-            response = await self._cassettes.load(request, task.provider, model)
-            return self._validated_result(
-                request,
-                response,
-                provider=task.provider,
-                model=model,
-                replayed=True,
-            )
+            for candidate in candidates:
+                try:
+                    response = await self._cassettes.load(
+                        request, task.provider, candidate
+                    )
+                except GatewayCassetteMissingError:
+                    continue
+                result = self._validated_result(
+                    request,
+                    response,
+                    provider=task.provider,
+                    model=candidate,
+                    replayed=True,
+                    cached=False,
+                )
+                await self._cache.put(
+                    request,
+                    task.provider,
+                    candidate,
+                    response,
+                    task.cache_ttl_seconds,
+                )
+                return result
+            raise GatewayReplayError("replay cassette is unavailable")
 
         provider = self._providers.get(task.provider)
         if provider is None:
@@ -85,8 +98,8 @@ class ModelGateway:
             )
 
         response: ProviderResponse | None = None
-        selected_model = model
-        for candidate in (task.model, task.fallback_model):
+        selected_model = task.model
+        for candidate in candidates:
             selected_model = candidate
             try:
                 response = await provider.generate(
@@ -112,6 +125,7 @@ class ModelGateway:
             provider=task.provider,
             model=selected_model,
             replayed=False,
+            cached=False,
         )
         if self._mode == "record":
             await self._cassettes.save(
@@ -120,6 +134,13 @@ class ModelGateway:
                 selected_model,
                 response,
             )
+        await self._cache.put(
+            request,
+            task.provider,
+            selected_model,
+            response,
+            task.cache_ttl_seconds,
+        )
         return result
 
     @staticmethod
@@ -130,6 +151,7 @@ class ModelGateway:
         provider: Provider,
         model: str,
         replayed: bool,
+        cached: bool,
     ) -> GatewayResult[OutputT]:
         try:
             output = request.output_schema.model_validate_json(response.content)
@@ -142,6 +164,7 @@ class ModelGateway:
             input_tokens=response.input_tokens,
             output_tokens=response.output_tokens,
             replayed=replayed,
+            cached=cached,
         )
 
 
@@ -150,11 +173,13 @@ def create_gateway(
     configuration: ModelsConfiguration,
     *,
     cassettes: CassetteStore | None = None,
+    cache: ResponseCache | None = None,
     provider_factories: Mapping[Provider, ProviderFactory] | None = None,
 ) -> ModelGateway:
     """Build a gateway without constructing provider clients in replay mode."""
 
-    stores = cassettes or MissingCassetteStore()
+    stores = cassettes or FileCassetteStore()
+    response_cache = cache or InMemoryResponseCache()
     providers: dict[Provider, ModelProvider] = {}
     if settings.gateway_mode != "replay":
         factories = dict(provider_factories or _default_provider_factories())
@@ -164,6 +189,7 @@ def create_gateway(
         configuration=configuration,
         providers=providers,
         cassettes=stores,
+        cache=response_cache,
     )
 
 
