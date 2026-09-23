@@ -24,8 +24,11 @@ services:
       GATEWAY_MODE: replay
       BUDGET_USD_CAP: "20"
       UPLOADS_DIR: /data/uploads
+      USAGE_LOG_PATH: /data/usage/gateway-usage.jsonl
+      DEMO_MODE: "true"
     volumes:
       - uploads-data:/data/uploads
+      - usage-data:/data/usage
     healthcheck:
       interval: 5s
       timeout: 3s
@@ -74,3 +77,4 @@ services:
 volumes:
   postgres-data:
   uploads-data:
+  usage-data:

@@ -15,10 +15,12 @@ describe('CandidatesService', () => {
   };
 
   it('selects and returns only the public Candidate DTO for create, list, and GET', async () => {
+    const storedRow = { ...row, externalId: 'candidate-John', label: 'Candidate 00000000' };
+    const correctedRow = { ...storedRow, label: 'Candidate JOHN' };
     const prisma = { candidate: {
-      upsert: jest.fn().mockResolvedValue(row),
-      findMany: jest.fn().mockResolvedValue([row]),
-      findUnique: jest.fn().mockResolvedValue(row),
+      upsert: jest.fn().mockImplementation(({ update }) => Promise.resolve({ ...storedRow, label: update.label })),
+      findMany: jest.fn().mockResolvedValue([correctedRow]),
+      findUnique: jest.fn().mockResolvedValue(correctedRow),
     } };
     const service = new CandidatesService(prisma as never);
     const input = {
@@ -30,12 +32,12 @@ describe('CandidatesService', () => {
     const listed = await service.list(false, 'platform');
     const found = await service.find(row.id);
 
-    const newRecord = prisma.candidate.upsert.mock.calls[0][0].create;
-    expect(newRecord.id).toMatch(/^[0-9a-f-]{36}$/);
-    expect(newRecord.label).toBe(`Candidate ${newRecord.id.slice(0, 8).toUpperCase()}`);
-    expect(newRecord.label).not.toContain('John');
+    const upsert = prisma.candidate.upsert.mock.calls[0][0];
+    expect(upsert.create.label).toBe('Candidate JOHN');
+    expect(upsert.create.id).toBeUndefined();
+    expect(upsert.update.label).toBe('Candidate JOHN');
     expect(prisma.candidate.upsert.mock.calls[0][0].select).toEqual({ id: true, externalId: true, label: true, createdAt: true });
-    expect(created).toEqual({ candidateId: row.id, externalId: row.externalId, label: row.label, createdAt: row.createdAt.toISOString() });
+    expect(created).toEqual({ candidateId: row.id, externalId: correctedRow.externalId, label: 'Candidate JOHN', createdAt: row.createdAt.toISOString() });
     expect(listed).toEqual({ items: [created] });
     expect(found).toEqual(created);
     expect(JSON.stringify([created, listed, found])).not.toContain('Synthetic Person');
@@ -68,6 +70,8 @@ describe('CandidatesService', () => {
       englishCertificate: null,
     } as never, 'Candidate B');
     expect(upsert.mock.calls[0][0].create.englishCertificate).toBe(Prisma.DbNull);
+    expect(upsert.mock.calls[0][0].create.label).toBe('Candidate B');
+    expect(upsert.mock.calls[0][0].update.label).toBe('Candidate B');
   });
 
   it('filters populated progress by role according to the contract examples', () => {
