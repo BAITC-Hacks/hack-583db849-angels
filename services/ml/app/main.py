@@ -12,6 +12,7 @@ from .routes.core import core_router
 from .routes.extended import extended_router
 from .schemas.contracts import HealthResponse
 from .gateway.usage import FileUsageStore
+from .scenarios import load_scenario_repository
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -20,6 +21,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     install_error_handlers(app)
     authenticate = internal_auth_dependency(resolved.ml_internal_token)
     usage_store = FileUsageStore(resolved.usage_log_path)
+    scenario_repository = load_scenario_repository()
 
     @app.get(
         "/internal/v1/health",
@@ -28,7 +30,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     async def health() -> HealthResponse:
         return HealthResponse(status="ok")
 
-    app.include_router(core_router(authenticate))
+    app.include_router(core_router(authenticate, scenario_repository))
     app.include_router(audio_router(authenticate, resolved.uploads_dir))
     app.include_router(
         extended_router(

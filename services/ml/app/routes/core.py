@@ -7,7 +7,8 @@ from collections.abc import Callable
 from fastapi import APIRouter, Depends
 
 from ..errors import ServiceError
-from ..examples import load_example, load_scenarios
+from ..examples import load_example
+from ..scenarios import ScenarioRepository
 from ..schemas.contracts import (
     AssessmentRequest,
     AssessmentResult,
@@ -19,18 +20,20 @@ from ..schemas.contracts import (
 )
 
 
-def core_router(authenticate: Callable[..., None]) -> APIRouter:
+def core_router(
+    authenticate: Callable[..., None], scenarios_repository: ScenarioRepository
+) -> APIRouter:
     router = APIRouter(prefix="/internal/v1", dependencies=[Depends(authenticate)])
 
     @router.get("/scenarios", response_model=list[ScenarioBrief])
     async def scenarios() -> list[ScenarioBrief]:
-        return list(load_scenarios())
+        return list(scenarios_repository.briefs())
 
     @router.get("/scenarios/{scenarioId}", response_model=ScenarioBrief)
     async def scenario(scenarioId: str) -> ScenarioBrief:
-        for item in load_scenarios():
-            if item.scenarioId == scenarioId:
-                return item
+        item = scenarios_repository.brief(scenarioId)
+        if item is not None:
+            return item
         raise ServiceError(
             status_code=404,
             code="SCENARIO_NOT_FOUND",
