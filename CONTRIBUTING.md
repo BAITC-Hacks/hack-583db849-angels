@@ -50,7 +50,7 @@ Four people, each in their own part of the repository, each working down their o
 
 Each person works down their own list, top to bottom. Every issue repeats its place under **Order**: what comes before, what comes next, and whether it waits for anyone.
 
-**Aibek — API**
+**Aibek — API** — step by step, with every endpoint, migration and test: [`docs/API-PLAN.md`](docs/API-PLAN.md)
 
 | Step | Issue | Waits for other people |
 | --- | --- | --- |
