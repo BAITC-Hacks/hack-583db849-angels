@@ -29,7 +29,7 @@ export default function CandidateHome() {
         </p>
       </header>
 
-      <section className="grid gap-4 md:grid-cols-2">
+      <section className="grid gap-4 md:grid-cols-3">
         <article className="flex flex-col gap-3 rounded-panel border border-border-subtle bg-bg-surface p-5">
           <p className="font-mono text-[0.6rem] tracking-[0.14em] text-text-muted uppercase">Step 1 · the simulation</p>
           <p className="flex items-center gap-2 text-sm font-semibold text-text-primary">
@@ -40,7 +40,7 @@ export default function CandidateHome() {
             )}
             {simulation.status}
           </p>
-          <p className="text-[0.82rem] text-text-secondary">About 8 minutes, five of your turns, typed in English.</p>
+          <p className="text-[0.82rem] text-text-secondary">About 8 minutes, five of your turns, spoken in English.</p>
           {simulation.action ? (
             <Link
               href="/simulation/preview"
@@ -72,6 +72,24 @@ export default function CandidateHome() {
               <ArrowRightIcon aria-hidden="true" className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
             </Link>
           ) : null}
+        </article>
+        <article className="flex flex-col gap-3 rounded-panel border border-border-subtle bg-bg-surface p-5">
+          <p className="font-mono text-[0.6rem] tracking-[0.14em] text-text-muted uppercase">Step 3 · a short question</p>
+          <p className="flex items-center gap-2 text-sm font-semibold text-text-primary">
+            <ClockIcon aria-hidden="true" className="h-4 w-4 text-text-muted" />
+            One attempt, 90 seconds
+          </p>
+          <p className="text-[0.82rem] text-text-secondary">
+            One question about your own application, answered on camera. You have not seen it before — that is the
+            point.
+          </p>
+          <Link
+            href="/candidate/surprise/preview"
+            className="group mt-auto inline-flex w-fit items-center gap-1.5 rounded-control border border-border-strong px-4 py-2.5 text-sm font-semibold text-text-primary transition-colors hover:bg-bg-elevated"
+          >
+            Open the question
+            <ArrowRightIcon aria-hidden="true" className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
+          </Link>
         </article>
       </section>
 

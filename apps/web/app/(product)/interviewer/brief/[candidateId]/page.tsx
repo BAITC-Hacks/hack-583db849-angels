@@ -1,9 +1,11 @@
 import type { Metadata } from 'next';
 import { BriefClarify, BriefConsistency, BriefEnglish, BriefQuestions } from '../../../../../components/brief/BriefSections';
 import { SourcesPanel } from '../../../../../components/brief/SourcesPanel';
+import { SurpriseAnswer } from '../../../../../components/surprise/SurpriseAnswer';
 import { MarkBriefViewed } from '../../../../../components/home/MarkBriefViewed';
 import { getBrief } from '../../../../../lib/brief/preview';
 import { getStaffLocale } from '../../../../../lib/i18n/server';
+import { previewSurpriseAnswered } from '../../../../../lib/surprise/preview';
 
 export const metadata: Metadata = { title: 'Interviewer brief — AI Leader ID' };
 
@@ -64,6 +66,7 @@ export default async function BriefPage({ params }: { params: Promise<{ candidat
             </section>
             <BriefQuestions questions={brief.questions} />
             <BriefConsistency items={brief.consistency} />
+            <SurpriseAnswer surprise={previewSurpriseAnswered} />
             <div className="grid items-start gap-4 md:grid-cols-2">
               <BriefClarify items={brief.clarify} />
               <BriefEnglish english={brief.english} />
