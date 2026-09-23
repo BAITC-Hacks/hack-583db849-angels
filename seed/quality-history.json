@@ -1,0 +1,164 @@
+[
+  {
+    "interviewRef": "synthetic-interview-01",
+    "interviewerRef": "synthetic-interviewer-a",
+    "heldAt": "2026-09-10T09:00:00Z",
+    "scores": [
+      {
+        "competency": "D",
+        "score": 1
+      },
+      {
+        "competency": "R",
+        "score": 2
+      },
+      {
+        "competency": "I",
+        "score": 3
+      },
+      {
+        "competency": "V",
+        "score": 4
+      },
+      {
+        "competency": "E",
+        "score": 1
+      }
+    ]
+  },
+  {
+    "interviewRef": "synthetic-interview-02",
+    "interviewerRef": "synthetic-interviewer-a",
+    "heldAt": "2026-09-11T09:00:00Z",
+    "scores": [
+      {
+        "competency": "D",
+        "score": 2
+      },
+      {
+        "competency": "R",
+        "score": 3
+      },
+      {
+        "competency": "I",
+        "score": 4
+      },
+      {
+        "competency": "V",
+        "score": 1
+      },
+      {
+        "competency": "E",
+        "score": 2
+      }
+    ]
+  },
+  {
+    "interviewRef": "synthetic-interview-03",
+    "interviewerRef": "synthetic-interviewer-a",
+    "heldAt": "2026-09-12T09:00:00Z",
+    "scores": [
+      {
+        "competency": "D",
+        "score": 3
+      },
+      {
+        "competency": "R",
+        "score": 4
+      },
+      {
+        "competency": "I",
+        "score": 1
+      },
+      {
+        "competency": "V",
+        "score": 2
+      },
+      {
+        "competency": "E",
+        "score": 3
+      }
+    ]
+  },
+  {
+    "interviewRef": "synthetic-interview-04",
+    "interviewerRef": "synthetic-interviewer-b",
+    "heldAt": "2026-09-13T09:00:00Z",
+    "scores": [
+      {
+        "competency": "D",
+        "score": 4
+      },
+      {
+        "competency": "R",
+        "score": 1
+      },
+      {
+        "competency": "I",
+        "score": 2
+      },
+      {
+        "competency": "V",
+        "score": 3
+      },
+      {
+        "competency": "E",
+        "score": 4
+      }
+    ]
+  },
+  {
+    "interviewRef": "synthetic-interview-05",
+    "interviewerRef": "synthetic-interviewer-b",
+    "heldAt": "2026-09-14T09:00:00Z",
+    "scores": [
+      {
+        "competency": "D",
+        "score": 1
+      },
+      {
+        "competency": "R",
+        "score": 2
+      },
+      {
+        "competency": "I",
+        "score": 3
+      },
+      {
+        "competency": "V",
+        "score": 4
+      },
+      {
+        "competency": "E",
+        "score": 1
+      }
+    ]
+  },
+  {
+    "interviewRef": "synthetic-interview-06",
+    "interviewerRef": "synthetic-interviewer-b",
+    "heldAt": "2026-09-15T09:00:00Z",
+    "scores": [
+      {
+        "competency": "D",
+        "score": 2
+      },
+      {
+        "competency": "R",
+        "score": 3
+      },
+      {
+        "competency": "I",
+        "score": 4
+      },
+      {
+        "competency": "V",
+        "score": 1
+      },
+      {
+        "competency": "E",
+        "score": 2
+      }
+    ]
+  }
+]
