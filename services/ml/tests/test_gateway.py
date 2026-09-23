@@ -10,6 +10,7 @@ from pydantic import BaseModel, ConfigDict
 from services.ml.app.config import Settings
 from services.ml.app.gateway.config import Provider, TaskName, load_models_configuration
 from services.ml.app.gateway.errors import (
+    GatewayCassetteMissingError,
     GatewayConfigurationError,
     GatewayProviderError,
     GatewayReplayError,
@@ -56,7 +57,7 @@ class MemoryCassettes:
     async def load(self, gateway_request, provider, model) -> ProviderResponse:
         del gateway_request, provider, model
         if self.response is None:
-            raise GatewayReplayError("replay cassette is unavailable")
+            raise GatewayCassetteMissingError("replay cassette is unavailable")
         return self.response
 
     async def save(self, gateway_request, provider, model, response) -> None:
@@ -96,6 +97,7 @@ def test_live_routes_through_the_configured_provider() -> None:
 
     assert result.output == Answer(value="ok")
     assert result.replayed is False
+    assert result.cached is False
     assert provider.requests[0].model == "gpt-6-sol"
     assert provider.requests[0].max_tokens == 1800
 
@@ -151,6 +153,7 @@ def test_replay_never_constructs_or_calls_a_provider() -> None:
 
     assert constructed is False
     assert result.replayed is True
+    assert result.cached is False
     assert result.output.value == "replayed"
 
 

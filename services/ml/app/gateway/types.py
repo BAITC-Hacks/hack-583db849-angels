@@ -47,6 +47,7 @@ class GatewayResult(Generic[OutputT]):
     input_tokens: int
     output_tokens: int
     replayed: bool
+    cached: bool
 
 
 class ModelProvider(Protocol):
@@ -67,4 +68,22 @@ class CassetteStore(Protocol):
         provider: Provider,
         model: str,
         response: ProviderResponse,
+    ) -> None: ...
+
+
+class ResponseCache(Protocol):
+    async def get(
+        self,
+        request: GatewayRequest[Any],
+        provider: Provider,
+        model: str,
+    ) -> ProviderResponse | None: ...
+
+    async def put(
+        self,
+        request: GatewayRequest[Any],
+        provider: Provider,
+        model: str,
+        response: ProviderResponse,
+        ttl_seconds: int,
     ) -> None: ...
