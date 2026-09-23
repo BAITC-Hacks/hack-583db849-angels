@@ -1,6 +1,9 @@
-"""Contract-only F0 ML service; real module logic lands in later slices."""
+"""Uvicorn entry point for the internal ML service."""
 
-from services.ml.scripts.export_contract_openapi import build_app
+try:
+    from services.ml.app.main import create_app
+except ModuleNotFoundError:  # service-only Docker build context
+    from app.main import create_app
 
 
-app = build_app()
+app = create_app()

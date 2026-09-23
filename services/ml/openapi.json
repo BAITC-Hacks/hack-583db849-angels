@@ -20,6 +20,28 @@
               }
             }
           }
+        }
+      }
+    },
+    "/internal/v1/scenarios": {
+      "get": {
+        "summary": "Scenarios",
+        "operationId": "scenarios_internal_v1_scenarios_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ScenarioBrief"
+                  },
+                  "type": "array",
+                  "title": "Response Scenarios Internal V1 Scenarios Get"
+                }
+              }
+            }
+          }
         },
         "security": [
           {
@@ -28,10 +50,54 @@
         ]
       }
     },
+    "/internal/v1/scenarios/{scenarioId}": {
+      "get": {
+        "summary": "Scenario",
+        "operationId": "scenario_internal_v1_scenarios__scenarioId__get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "scenarioId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Scenarioid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScenarioBrief"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/internal/v1/simulation/turn": {
       "post": {
-        "summary": "Internal V1 Simulation Turn",
-        "operationId": "internal_v1_simulation_turn_internal_v1_simulation_turn_post",
+        "summary": "Simulation Turn",
+        "operationId": "simulation_turn_internal_v1_simulation_turn_post",
         "requestBody": {
           "content": {
             "application/json": {
@@ -73,8 +139,8 @@
     },
     "/internal/v1/simulation/assessment": {
       "post": {
-        "summary": "Internal V1 Simulation Assessment",
-        "operationId": "internal_v1_simulation_assessment_internal_v1_simulation_assessment_post",
+        "summary": "Simulation Assessment",
+        "operationId": "simulation_assessment_internal_v1_simulation_assessment_post",
         "requestBody": {
           "content": {
             "application/json": {
@@ -116,8 +182,8 @@
     },
     "/internal/v1/brief": {
       "post": {
-        "summary": "Internal V1 Brief",
-        "operationId": "internal_v1_brief_internal_v1_brief_post",
+        "summary": "Brief",
+        "operationId": "brief_internal_v1_brief_post",
         "requestBody": {
           "content": {
             "application/json": {
@@ -135,6 +201,283 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/BriefResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/internal/v1/transcribe": {
+      "post": {
+        "summary": "Transcribe",
+        "operationId": "transcribe_internal_v1_transcribe_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TranscribeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TranscribeResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/internal/v1/speech": {
+      "post": {
+        "summary": "Speech",
+        "operationId": "speech_internal_v1_speech_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SpeechRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "audio/mpeg": {}
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/internal/v1/consistency": {
+      "post": {
+        "summary": "Consistency",
+        "operationId": "consistency_internal_v1_consistency_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConsistencyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsistencyResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/internal/v1/surprise-question": {
+      "post": {
+        "summary": "Surprise Question",
+        "operationId": "surprise_question_internal_v1_surprise_question_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SurpriseRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SurpriseResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/internal/v1/usage": {
+      "get": {
+        "summary": "Usage",
+        "operationId": "usage_internal_v1_usage_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Usage"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/internal/v1/interview/draft": {
+      "post": {
+        "summary": "Interview Draft",
+        "operationId": "interview_draft_internal_v1_interview_draft_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DraftRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DraftResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/internal/v1/quality-check": {
+      "post": {
+        "summary": "Quality Check",
+        "operationId": "quality_check_internal_v1_quality_check_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QualityCheckRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QualityCheckResult"
                 }
               }
             }
@@ -519,6 +862,30 @@
         ],
         "title": "CertificateLevel"
       },
+      "Character": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "wants": {
+            "type": "string",
+            "title": "Wants"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name",
+          "role",
+          "wants"
+        ],
+        "title": "Character"
+      },
       "Claim": {
         "properties": {
           "text": {
@@ -605,6 +972,71 @@
         ],
         "title": "ConsistencyItem"
       },
+      "ConsistencyRequest": {
+        "properties": {
+          "stage": {
+            "type": "string",
+            "enum": [
+              "before",
+              "after"
+            ],
+            "title": "Stage"
+          },
+          "candidate": {
+            "$ref": "#/components/schemas/CandidateView"
+          },
+          "simulationEnglish": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EnglishMetrics"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "simulationTurns": {
+            "items": {
+              "$ref": "#/components/schemas/Turn"
+            },
+            "type": "array",
+            "title": "Simulationturns",
+            "default": []
+          },
+          "interviewTranscript": {
+            "items": {
+              "$ref": "#/components/schemas/InterviewTurn"
+            },
+            "type": "array",
+            "title": "Interviewtranscript",
+            "default": []
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "stage",
+          "candidate"
+        ],
+        "title": "ConsistencyRequest"
+      },
+      "ConsistencyResult": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ConsistencyItem"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "ConsistencyResult"
+      },
       "DirectorDecision": {
         "properties": {
           "beat": {
@@ -648,6 +1080,90 @@
         ],
         "title": "DirectorDecision",
         "description": "Logged for audit, never shown to the candidate."
+      },
+      "DraftRequest": {
+        "properties": {
+          "candidateId": {
+            "type": "string",
+            "title": "Candidateid"
+          },
+          "transcript": {
+            "items": {
+              "$ref": "#/components/schemas/InterviewTurn"
+            },
+            "type": "array",
+            "title": "Transcript"
+          },
+          "notes": {
+            "items": {
+              "$ref": "#/components/schemas/InterviewNote"
+            },
+            "type": "array",
+            "title": "Notes",
+            "default": []
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "candidateId",
+          "transcript"
+        ],
+        "title": "DraftRequest",
+        "description": "The transcript and any notes. The interviewer's scores are deliberately absent, and extra fields are refused."
+      },
+      "DraftResult": {
+        "properties": {
+          "scores": {
+            "items": {
+              "$ref": "#/components/schemas/DriveScore"
+            },
+            "type": "array",
+            "title": "Scores"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "scores"
+        ],
+        "title": "DraftResult"
+      },
+      "Drift": {
+        "properties": {
+          "competency": {
+            "type": "string",
+            "enum": [
+              "D",
+              "R",
+              "I",
+              "V",
+              "E"
+            ],
+            "title": "Competency"
+          },
+          "interviewerMean": {
+            "type": "number",
+            "title": "Interviewermean"
+          },
+          "panelMean": {
+            "type": "number",
+            "title": "Panelmean"
+          },
+          "delta": {
+            "type": "number",
+            "title": "Delta"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "competency",
+          "interviewerMean",
+          "panelMean",
+          "delta"
+        ],
+        "title": "Drift"
       },
       "DriveScore": {
         "properties": {
@@ -871,6 +1387,7 @@
         "properties": {
           "status": {
             "type": "string",
+            "const": "ok",
             "title": "Status"
           }
         },
@@ -880,6 +1397,25 @@
           "status"
         ],
         "title": "HealthResponse"
+      },
+      "InterviewNote": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "text"
+        ],
+        "title": "InterviewNote"
       },
       "InterviewQuestion": {
         "properties": {
@@ -911,6 +1447,45 @@
           "reason"
         ],
         "title": "InterviewQuestion"
+      },
+      "InterviewTurn": {
+        "properties": {
+          "turnId": {
+            "type": "string",
+            "pattern": "^iturn_\\d{2,}$",
+            "title": "Turnid"
+          },
+          "speaker": {
+            "type": "string",
+            "enum": [
+              "interviewer",
+              "candidate"
+            ],
+            "title": "Speaker"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "startSec": {
+            "type": "number",
+            "title": "Startsec"
+          },
+          "endSec": {
+            "type": "number",
+            "title": "Endsec"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "turnId",
+          "speaker",
+          "text",
+          "startSec",
+          "endSec"
+        ],
+        "title": "InterviewTurn"
       },
       "Metric": {
         "properties": {
@@ -989,6 +1564,380 @@
         ],
         "title": "Observation"
       },
+      "QualityCheckRequest": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "interview",
+              "calibration"
+            ],
+            "title": "Kind"
+          },
+          "transcript": {
+            "items": {
+              "$ref": "#/components/schemas/InterviewTurn"
+            },
+            "type": "array",
+            "title": "Transcript",
+            "default": []
+          },
+          "history": {
+            "items": {
+              "$ref": "#/components/schemas/ScoredInterview"
+            },
+            "type": "array",
+            "title": "History",
+            "default": []
+          },
+          "interviewerRef": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Interviewerref"
+          },
+          "periodFrom": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Periodfrom"
+          },
+          "periodTo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Periodto"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "kind"
+        ],
+        "title": "QualityCheckRequest"
+      },
+      "QualityCheckResult": {
+        "properties": {
+          "signals": {
+            "items": {
+              "$ref": "#/components/schemas/QualitySignal"
+            },
+            "type": "array",
+            "title": "Signals"
+          },
+          "talkShare": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TalkShare"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "drift": {
+            "items": {
+              "$ref": "#/components/schemas/Drift"
+            },
+            "type": "array",
+            "title": "Drift",
+            "default": []
+          },
+          "interviews": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Interviews"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "signals"
+        ],
+        "title": "QualityCheckResult"
+      },
+      "QualitySignal": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "leading_question",
+              "off_limits_question",
+              "coverage_gap",
+              "scale_drift"
+            ],
+            "title": "Kind"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "recommendation": {
+            "type": "string",
+            "title": "Recommendation"
+          },
+          "competencies": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "D",
+                "R",
+                "I",
+                "V",
+                "E"
+              ]
+            },
+            "type": "array",
+            "title": "Competencies",
+            "default": []
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/Evidence"
+            },
+            "type": "array",
+            "title": "Evidence",
+            "default": []
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "kind",
+          "message",
+          "recommendation"
+        ],
+        "title": "QualitySignal"
+      },
+      "ScenarioBrief": {
+        "properties": {
+          "scenarioId": {
+            "type": "string",
+            "title": "Scenarioid"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "situation": {
+            "type": "string",
+            "title": "Situation"
+          },
+          "yourRole": {
+            "type": "string",
+            "title": "Yourrole"
+          },
+          "goal": {
+            "type": "string",
+            "title": "Goal"
+          },
+          "character": {
+            "$ref": "#/components/schemas/Character"
+          },
+          "expectedMinutes": {
+            "type": "integer",
+            "title": "Expectedminutes"
+          },
+          "maxCandidateTurns": {
+            "type": "integer",
+            "title": "Maxcandidateturns"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "ready"
+            ],
+            "title": "Status"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "scenarioId",
+          "title",
+          "situation",
+          "yourRole",
+          "goal",
+          "character",
+          "expectedMinutes",
+          "maxCandidateTurns",
+          "status"
+        ],
+        "title": "ScenarioBrief",
+        "description": "The public part of a scenario. The hidden motive and the beats stay inside the service."
+      },
+      "ScoreValue": {
+        "properties": {
+          "competency": {
+            "type": "string",
+            "enum": [
+              "D",
+              "R",
+              "I",
+              "V",
+              "E"
+            ],
+            "title": "Competency"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 4.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "competency",
+          "score"
+        ],
+        "title": "ScoreValue"
+      },
+      "ScoredInterview": {
+        "properties": {
+          "interviewRef": {
+            "type": "string",
+            "title": "Interviewref"
+          },
+          "interviewerRef": {
+            "type": "string",
+            "title": "Interviewerref"
+          },
+          "heldAt": {
+            "type": "string",
+            "title": "Heldat"
+          },
+          "scores": {
+            "items": {
+              "$ref": "#/components/schemas/ScoreValue"
+            },
+            "type": "array",
+            "title": "Scores"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "interviewRef",
+          "interviewerRef",
+          "heldAt",
+          "scores"
+        ],
+        "title": "ScoredInterview",
+        "description": "One saved set of scores, pseudonymous: no candidate, no names."
+      },
+      "SpeechRequest": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "voice": {
+            "type": "string",
+            "title": "Voice"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "text",
+          "voice"
+        ],
+        "title": "SpeechRequest"
+      },
+      "SurpriseRequest": {
+        "properties": {
+          "candidate": {
+            "$ref": "#/components/schemas/CandidateView"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "candidate"
+        ],
+        "title": "SurpriseRequest"
+      },
+      "SurpriseResult": {
+        "properties": {
+          "question": {
+            "type": "string",
+            "title": "Question"
+          },
+          "competency": {
+            "type": "string",
+            "enum": [
+              "D",
+              "R",
+              "I",
+              "V",
+              "E"
+            ],
+            "title": "Competency"
+          },
+          "why": {
+            "type": "string",
+            "title": "Why"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "question",
+          "competency",
+          "why"
+        ],
+        "title": "SurpriseResult"
+      },
+      "TalkShare": {
+        "properties": {
+          "interviewer": {
+            "type": "number",
+            "title": "Interviewer"
+          },
+          "candidate": {
+            "type": "number",
+            "title": "Candidate"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "interviewer",
+          "candidate"
+        ],
+        "title": "TalkShare"
+      },
       "TestAnswer": {
         "properties": {
           "itemId": {
@@ -1024,6 +1973,100 @@
           "answers"
         ],
         "title": "TestAnswers"
+      },
+      "TranscribeRequest": {
+        "properties": {
+          "purpose": {
+            "type": "string",
+            "enum": [
+              "interview",
+              "surprise",
+              "turn"
+            ],
+            "title": "Purpose"
+          },
+          "audioRef": {
+            "type": "string",
+            "title": "Audioref"
+          },
+          "language": {
+            "type": "string",
+            "const": "en",
+            "title": "Language",
+            "default": "en"
+          },
+          "speakers": {
+            "type": "integer",
+            "enum": [
+              1,
+              2
+            ],
+            "title": "Speakers",
+            "default": 2
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "purpose",
+          "audioRef"
+        ],
+        "title": "TranscribeRequest"
+      },
+      "TranscribeResult": {
+        "properties": {
+          "turns": {
+            "items": {
+              "$ref": "#/components/schemas/TranscribedTurn"
+            },
+            "type": "array",
+            "title": "Turns"
+          },
+          "durationSec": {
+            "type": "number",
+            "title": "Durationsec"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "turns",
+          "durationSec"
+        ],
+        "title": "TranscribeResult"
+      },
+      "TranscribedTurn": {
+        "properties": {
+          "speaker": {
+            "type": "string",
+            "enum": [
+              "interviewer",
+              "candidate"
+            ],
+            "title": "Speaker"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "startSec": {
+            "type": "number",
+            "title": "Startsec"
+          },
+          "endSec": {
+            "type": "number",
+            "title": "Endsec"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "speaker",
+          "text",
+          "startSec",
+          "endSec"
+        ],
+        "title": "TranscribedTurn"
       },
       "Turn": {
         "properties": {
@@ -1148,6 +2191,45 @@
           "candidateTurns"
         ],
         "title": "TurnState"
+      },
+      "Usage": {
+        "properties": {
+          "gatewayMode": {
+            "type": "string",
+            "enum": [
+              "live",
+              "record",
+              "replay"
+            ],
+            "title": "Gatewaymode"
+          },
+          "liveCalls": {
+            "type": "integer",
+            "title": "Livecalls"
+          },
+          "replayedCalls": {
+            "type": "integer",
+            "title": "Replayedcalls"
+          },
+          "spentUsd": {
+            "type": "number",
+            "title": "Spentusd"
+          },
+          "capUsd": {
+            "type": "number",
+            "title": "Capusd"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "gatewayMode",
+          "liveCalls",
+          "replayedCalls",
+          "spentUsd",
+          "capUsd"
+        ],
+        "title": "Usage"
       },
       "ValidationError": {
         "properties": {
