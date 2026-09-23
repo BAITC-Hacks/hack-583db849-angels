@@ -11,8 +11,12 @@ from typing import Annotated, Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
-ROOT = Path(__file__).resolve().parents[4]
-DEFAULT_MODELS_PATH = ROOT / "config" / "models.json"
+PACKAGE_ROOT = Path(__file__).resolve().parents[2]
+ROOT_MODELS_PATH = Path(__file__).resolve().parents[4] / "config" / "models.json"
+PACKAGED_MODELS_PATH = PACKAGE_ROOT / "stub_data" / "models.json"
+DEFAULT_MODELS_PATH = (
+    ROOT_MODELS_PATH if ROOT_MODELS_PATH.is_file() else PACKAGED_MODELS_PATH
+)
 
 
 class ModelConfigurationError(ValueError):

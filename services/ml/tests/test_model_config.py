@@ -8,7 +8,9 @@ from services.ml.app.gateway.config import (
     DEFAULT_MODELS_PATH,
     ModelConfigurationError,
     ModelsConfiguration,
+    PACKAGED_MODELS_PATH,
     Provider,
+    ROOT_MODELS_PATH,
     TaskName,
     load_models_configuration,
 )
@@ -35,6 +37,12 @@ def test_checked_in_configuration_covers_every_gateway_task() -> None:
         task.request_cost_limit_usd > 0 for task in configuration.tasks.values()
     )
     assert all(task.cache_ttl_seconds > 0 for task in configuration.tasks.values())
+
+
+def test_packaged_configuration_matches_the_root_source() -> None:
+    assert json.loads(PACKAGED_MODELS_PATH.read_text(encoding="utf-8")) == json.loads(
+        ROOT_MODELS_PATH.read_text(encoding="utf-8")
+    )
 
 
 def test_replay_configuration_loads_without_provider_keys(
