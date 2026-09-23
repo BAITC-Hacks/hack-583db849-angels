@@ -18,6 +18,14 @@ async function generateOpenApi(): Promise<void> {
       .build(),
   );
 
+  const turn = document.paths['/v1/simulations/{simulationId}/turns']?.post;
+  if (turn?.requestBody && 'content' in turn.requestBody) {
+    turn.requestBody.content = {
+      'application/json': { schema: { $ref: '#/components/schemas/TextTurnDto' } },
+      'multipart/form-data': { schema: { $ref: '#/components/schemas/AudioTurnDto' } },
+    };
+  }
+
   await writeFile(join(process.cwd(), 'openapi.json'), `${JSON.stringify(document, null, 2)}\n`);
   await app.close();
 }
