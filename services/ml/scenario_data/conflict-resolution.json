@@ -1,0 +1,297 @@
+{
+  "scenarioId": "conflict-resolution",
+  "status": "ready",
+  "title": "A teammate is about to walk away",
+  "situation": "Your team of four is building an app for a city hackathon, and the demo is in three days. Dana wrote most of the backend. Last night Timur rewrote her module without asking, and this morning she says she is out.",
+  "yourRole": "You lead the team.",
+  "goal": "Get to the demo without losing anyone. There is no single right way to do it.",
+  "character": {
+    "name": "Dana",
+    "role": "Backend developer on your team",
+    "wants": "To be asked before her work is changed"
+  },
+  "hiddenMotive": "Dana has been quietly doing more than her share for weeks and fears being replaced rather than just overruled.",
+  "voice": "aura-asteria-en",
+  "matchThreshold": 0.45,
+  "expectedMinutes": 8,
+  "maxCandidateTurns": 8,
+  "beats": [
+    {
+      "beatId": "opening",
+      "goal": "Dana is angry and threatens to leave.",
+      "competencies": [
+        "V",
+        "I"
+      ],
+      "maxTurns": 2,
+      "answerTypes": [
+        {
+          "answerTypeId": "acknowledge",
+          "description": "Names what Dana feels and asks what happened",
+          "examples": [
+            "That sounds really unfair, what happened last night?",
+            "I get why you're upset. Can you tell me more?",
+            "You're right to be angry. Walk me through it."
+          ],
+          "next": "trust",
+          "characterIntent": "Calms a little, explains that nobody asked her"
+        },
+        {
+          "answerTypeId": "rush_to_fix",
+          "description": "Jumps to the plan or the deadline",
+          "examples": [
+            "Let's fix this fast, the demo is in three days.",
+            "We don't have time for this, let's just decide.",
+            "Send me what changed and I'll sort it out tonight."
+          ],
+          "next": "trust",
+          "characterIntent": "Stays guarded: it is not only about the code"
+        },
+        {
+          "answerTypeId": "blame_timur",
+          "description": "Takes a side against Timur at once",
+          "examples": [
+            "Timur shouldn't have done that, I'll talk to him.",
+            "That was Timur's mistake, not yours.",
+            "I'll tell Timur to undo everything."
+          ],
+          "next": "fairness",
+          "characterIntent": "Is relieved but worried about a fight with Timur"
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "trust",
+        "characterIntent": "Repeats that she is thinking of leaving and asks what the leader will do"
+      }
+    },
+    {
+      "beatId": "trust",
+      "goal": "Dana asks how she can know it will not happen again.",
+      "competencies": [
+        "V",
+        "R"
+      ],
+      "maxTurns": 2,
+      "answerTypes": [
+        {
+          "answerTypeId": "process_rule",
+          "description": "Proposes a rule that protects ownership",
+          "examples": [
+            "From now on nobody changes someone's module without their review.",
+            "Let's agree every change needs the owner's okay.",
+            "I'll set a review rule in the repo today."
+          ],
+          "next": "decision",
+          "characterIntent": "Accepts, asks who decides which version to keep"
+        },
+        {
+          "answerTypeId": "promise",
+          "description": "Promises without a mechanism",
+          "examples": [
+            "It won't happen again, I promise.",
+            "Trust me, I'll make sure of it.",
+            "Don't worry, it's a one-off."
+          ],
+          "next": "decision",
+          "characterIntent": "Is not convinced; asks for something concrete"
+        },
+        {
+          "answerTypeId": "ask_her",
+          "description": "Asks Dana what would make her feel safe",
+          "examples": [
+            "What would make this feel fair to you?",
+            "How would you like changes to work from now on?",
+            "What do you need from me to stay?"
+          ],
+          "next": "decision",
+          "characterIntent": "Suggests reviews herself and warms up"
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "I see"
+        ],
+        "next": "decision",
+        "characterIntent": "Asks again for something concrete"
+      }
+    },
+    {
+      "beatId": "fairness",
+      "goal": "Dana worries that siding with her will start a fight with Timur.",
+      "competencies": [
+        "V",
+        "I"
+      ],
+      "maxTurns": 2,
+      "answerTypes": [
+        {
+          "answerTypeId": "bring_both",
+          "description": "Proposes talking together with Timur",
+          "examples": [
+            "Let's sit down with Timur, all three of us.",
+            "I'd like us to talk about it together today.",
+            "Can we meet with Timur this afternoon?"
+          ],
+          "next": "decision",
+          "characterIntent": "Agrees if the leader runs the conversation"
+        },
+        {
+          "answerTypeId": "handle_alone",
+          "description": "Says they will handle Timur alone",
+          "examples": [
+            "Leave Timur to me.",
+            "I'll talk to him myself, you focus on work.",
+            "I'll deal with it, don't worry about him."
+          ],
+          "next": "decision",
+          "characterIntent": "Accepts, but wants to know what the decision will be"
+        },
+        {
+          "answerTypeId": "avoid",
+          "description": "Avoids the conflict",
+          "examples": [
+            "Let's not make it a big deal.",
+            "Maybe just forget about it for now.",
+            "We can talk about it after the demo."
+          ],
+          "next": "decision",
+          "characterIntent": "Gets more anxious and pushes for a decision"
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "right"
+        ],
+        "next": "decision",
+        "characterIntent": "Asks who decides which version stays"
+      }
+    },
+    {
+      "beatId": "decision",
+      "goal": "The demo is close and Timur’s version breaks login: which version, and who does what?",
+      "competencies": [
+        "E",
+        "R",
+        "D"
+      ],
+      "maxTurns": 3,
+      "answerTypes": [
+        {
+          "answerTypeId": "plan_with_owners",
+          "description": "Gives a plan with owners, deadlines and a checkpoint",
+          "examples": [
+            "You finish the payments endpoint, Timur fixes login, we freeze on Thursday.",
+            "Here's the plan: owners, a deadline and a full run before the demo.",
+            "Keep your version, Timur patches login in a branch, we test at six."
+          ],
+          "next": "setback",
+          "characterIntent": "Agrees to the plan, then brings bad news"
+        },
+        {
+          "answerTypeId": "vague",
+          "description": "Decides without owners or dates",
+          "examples": [
+            "We'll figure it out as we go.",
+            "Let's just use whatever works.",
+            "Everyone do their best."
+          ],
+          "next": "setback",
+          "characterIntent": "Asks what exactly she should do today"
+        },
+        {
+          "answerTypeId": "delegate_up",
+          "description": "Pushes the decision to someone else",
+          "examples": [
+            "Let's ask the mentor to decide.",
+            "Maybe the organisers can tell us.",
+            "You two decide between you."
+          ],
+          "next": "setback",
+          "characterIntent": "Is frustrated that nobody leads"
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "fine"
+        ],
+        "next": "setback",
+        "characterIntent": "Asks what she should do today"
+      }
+    },
+    {
+      "beatId": "setback",
+      "goal": "The Thursday run fails: what happens now, and how does the team keep going?",
+      "competencies": [
+        "D",
+        "E",
+        "V"
+      ],
+      "maxTurns": 2,
+      "answerTypes": [
+        {
+          "answerTypeId": "recover_with_team",
+          "description": "Recovers step by step and looks after the people",
+          "examples": [
+            "Let's cut one screen, take shifts, and nobody stays past midnight.",
+            "We regroup, pick what matters most and share the work.",
+            "It happens. Let's decide together what to drop."
+          ],
+          "next": "end",
+          "characterIntent": "Thanks the leader for listening and agrees"
+        },
+        {
+          "answerTypeId": "cut_scope_only",
+          "description": "Cuts scope without the people",
+          "examples": [
+            "We cut scope and move on.",
+            "Drop the analytics screen, that's it.",
+            "Just remove the features that don't work."
+          ],
+          "next": "end",
+          "characterIntent": "Agrees but sounds tired"
+        },
+        {
+          "answerTypeId": "push_harder",
+          "description": "Pushes everyone to work all night",
+          "examples": [
+            "We'll work all night and fix it.",
+            "Everyone stays until it works.",
+            "No sleep until the demo is ready."
+          ],
+          "next": "end",
+          "characterIntent": "Warns that the team is burning out"
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "end",
+        "characterIntent": "Asks what the plan is now"
+      }
+    }
+  ]
+}

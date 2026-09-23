@@ -15,6 +15,8 @@ SOURCE_MODELS = ROOT / "config" / "models.json"
 OUTPUT_MODELS = OUTPUT_DIR / "models.json"
 SOURCE_RUBRIC = ROOT / "config" / "rubric.drive.json"
 OUTPUT_RUBRIC = OUTPUT_DIR / "rubric.drive.json"
+SOURCE_SCENARIOS = ROOT / "config" / "scenarios"
+OUTPUT_SCENARIOS = ROOT / "services" / "ml" / "scenario_data"
 
 EXAMPLE_FILES = (
     "brief.response.json",
@@ -46,6 +48,11 @@ def export_stub_data() -> None:
     )
     shutil.copyfile(SOURCE_MODELS, OUTPUT_MODELS)
     shutil.copyfile(SOURCE_RUBRIC, OUTPUT_RUBRIC)
+    OUTPUT_SCENARIOS.mkdir(parents=True, exist_ok=True)
+    for destination in OUTPUT_SCENARIOS.glob("*.json"):
+        destination.unlink()
+    for source in sorted(SOURCE_SCENARIOS.glob("*.json")):
+        shutil.copyfile(source, OUTPUT_SCENARIOS / source.name)
 
 
 if __name__ == "__main__":

@@ -7,6 +7,7 @@ from fastapi.testclient import TestClient
 
 from services.ml.app.config import Settings
 from services.ml.app.main import create_app
+from services.ml.app.scenarios import ROOT_SCENARIOS, ScenarioRepository
 
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -30,11 +31,15 @@ def example(filename: str) -> object:
     return json.loads((EXAMPLES / filename).read_text(encoding="utf-8"))
 
 
-def test_scenario_list_matches_the_frozen_example(client: TestClient) -> None:
+def test_scenario_list_is_projected_from_the_validated_config(client: TestClient) -> None:
     response = client.get("/internal/v1/scenarios", headers=TOKEN)
+    expected = [
+        item.model_dump(mode="json")
+        for item in ScenarioRepository.load(ROOT_SCENARIOS).briefs()
+    ]
 
     assert response.status_code == 200
-    assert response.json() == example("scenarios.response.json")
+    assert response.json() == expected
 
 
 def test_scenario_detail_returns_only_the_public_scenario(client: TestClient) -> None:
@@ -44,7 +49,9 @@ def test_scenario_detail_returns_only_the_public_scenario(client: TestClient) ->
     )
 
     assert response.status_code == 200
-    assert response.json() == example("scenarios.response.json")[0]
+    expected = ScenarioRepository.load(ROOT_SCENARIOS).brief("conflict-resolution")
+    assert expected is not None
+    assert response.json() == expected.model_dump(mode="json")
     assert "hiddenMotive" not in response.json()
     assert "beats" not in response.json()
     assert "voice" not in response.json()
