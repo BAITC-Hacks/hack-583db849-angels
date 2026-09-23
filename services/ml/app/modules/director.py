@@ -15,7 +15,7 @@ from ..schemas.contracts import (
 from .matcher import MatchResult
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("uvicorn.error")
 Stage = Literal["opening", "in-progress", "wrapping-up", "finished"]
 
 
