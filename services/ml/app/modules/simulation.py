@@ -12,7 +12,7 @@ from ..schemas.contracts import ScenarioConfig, Turn, TurnRequest, TurnResult
 from .director import DirectorOutcome, DirectorStateError, ScenarioDirector
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("uvicorn.error")
 
 
 class Actor(Protocol):

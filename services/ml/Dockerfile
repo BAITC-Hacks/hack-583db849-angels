@@ -19,6 +19,7 @@ RUN if [ -f stub_data/embedding-model.json ]; then \
 
 ENV PYTHONPATH=/repo/context:/repo/context/services/ml \
     M2_EMBEDDING_MODEL_PATH=/opt/models/all-MiniLM-L6-v2 \
+    UPLOADS_DIR=/repo/context/fixtures/audio \
     HF_HUB_OFFLINE=1 \
     TRANSFORMERS_OFFLINE=1
 
