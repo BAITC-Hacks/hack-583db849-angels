@@ -1,0 +1,134 @@
+{
+  "version": 1,
+  "models": {
+    "gpt-6-luna": {
+      "provider": "openai",
+      "pricing": {
+        "unit": "million_tokens",
+        "input_usd": 0.10,
+        "cached_input_usd": 0.01,
+        "output_usd": 0.50
+      }
+    },
+    "gpt-6-sol": {
+      "provider": "openai",
+      "pricing": {
+        "unit": "million_tokens",
+        "input_usd": 2.00,
+        "cached_input_usd": 0.20,
+        "output_usd": 10.00
+      }
+    },
+    "nova-3": {
+      "provider": "deepgram",
+      "pricing": {
+        "unit": "audio_minute",
+        "usd": 0.0043
+      }
+    },
+    "whisper-large": {
+      "provider": "deepgram",
+      "pricing": {
+        "unit": "audio_minute",
+        "usd": 0.0048
+      }
+    },
+    "aura-2-thalia-en": {
+      "provider": "deepgram",
+      "pricing": {
+        "unit": "thousand_characters",
+        "usd": 0.030
+      }
+    },
+    "aura-asteria-en": {
+      "provider": "deepgram",
+      "pricing": {
+        "unit": "thousand_characters",
+        "usd": 0.015
+      }
+    }
+  },
+  "tasks": {
+    "simulation_actor": {
+      "provider": "openai",
+      "model": "gpt-6-luna",
+      "fallback_model": "gpt-6-sol",
+      "max_tokens": 180,
+      "request_cost_limit_usd": 0.02,
+      "cache_ttl_seconds": 86400,
+      "demo_seed_available": true
+    },
+    "simulation_assessment": {
+      "provider": "openai",
+      "model": "gpt-6-sol",
+      "fallback_model": "gpt-6-luna",
+      "max_tokens": 1800,
+      "request_cost_limit_usd": 0.05,
+      "cache_ttl_seconds": 604800,
+      "demo_seed_available": true
+    },
+    "brief": {
+      "provider": "openai",
+      "model": "gpt-6-sol",
+      "fallback_model": "gpt-6-luna",
+      "max_tokens": 1800,
+      "request_cost_limit_usd": 0.05,
+      "cache_ttl_seconds": 604800,
+      "demo_seed_available": true
+    },
+    "interview_draft": {
+      "provider": "openai",
+      "model": "gpt-6-sol",
+      "fallback_model": "gpt-6-luna",
+      "max_tokens": 2000,
+      "request_cost_limit_usd": 0.06,
+      "cache_ttl_seconds": 604800,
+      "demo_seed_available": true
+    },
+    "consistency": {
+      "provider": "openai",
+      "model": "gpt-6-luna",
+      "fallback_model": "gpt-6-sol",
+      "max_tokens": 1000,
+      "request_cost_limit_usd": 0.03,
+      "cache_ttl_seconds": 604800,
+      "demo_seed_available": true
+    },
+    "surprise_question": {
+      "provider": "openai",
+      "model": "gpt-6-luna",
+      "fallback_model": "gpt-6-sol",
+      "max_tokens": 256,
+      "request_cost_limit_usd": 0.02,
+      "cache_ttl_seconds": 604800,
+      "demo_seed_available": true
+    },
+    "quality_check": {
+      "provider": "openai",
+      "model": "gpt-6-luna",
+      "fallback_model": "gpt-6-sol",
+      "max_tokens": 1800,
+      "request_cost_limit_usd": 0.05,
+      "cache_ttl_seconds": 604800,
+      "demo_seed_available": true
+    },
+    "transcription": {
+      "provider": "deepgram",
+      "model": "nova-3",
+      "fallback_model": "whisper-large",
+      "max_tokens": 4000,
+      "request_cost_limit_usd": 0.05,
+      "cache_ttl_seconds": 604800,
+      "demo_seed_available": true
+    },
+    "speech": {
+      "provider": "deepgram",
+      "model": "aura-2-thalia-en",
+      "fallback_model": "aura-asteria-en",
+      "max_tokens": 256,
+      "request_cost_limit_usd": 0.02,
+      "cache_ttl_seconds": 604800,
+      "demo_seed_available": true
+    }
+  }
+}
