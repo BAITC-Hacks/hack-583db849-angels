@@ -109,7 +109,13 @@ def main() -> None:
             "GET",
             "/internal/v1/usage",
             None,
-            load_json("usage.response.json"),
+            {
+                "gatewayMode": "replay",
+                "liveCalls": 0,
+                "replayedCalls": 0,
+                "spentUsd": 0.0,
+                "capUsd": 20.0,
+            },
         ),
         (
             "POST",
