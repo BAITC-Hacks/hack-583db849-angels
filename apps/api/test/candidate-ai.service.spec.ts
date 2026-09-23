@@ -4,7 +4,7 @@ import { ToLlmViewService } from '../src/privacy/to-llm-view.service';
 describe('CandidateAiService', () => {
   it('sends only the LLM view to the gateway port', async () => {
     const sendCandidateContext = jest.fn().mockResolvedValue(undefined);
-    const service = new CandidateAiService(new ToLlmViewService(), { sendCandidateContext });
+    const service = new CandidateAiService(new ToLlmViewService(), { sendCandidateContext, scenarios: jest.fn() });
     await service.sendCandidateContext('candidate-id', {
       externalId: 'external-id',
       profile: { fullName: 'Ada Example', email: 'ada@example.test' },

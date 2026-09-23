@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import createClient from 'openapi-fetch';
 
 import { AiGateway } from './ai-gateway.port';
-import type { paths } from './schema';
+import type { components, paths } from './schema';
 import { LlmView } from '../privacy/to-llm-view.service';
 
 export const ML_FETCH = Symbol('ML_FETCH');
@@ -25,5 +25,18 @@ export class MlHttpAdapter implements AiGateway {
     if (error) {
       throw new ServiceUnavailableException({ code: 'ML_REQUEST_FAILED', message: 'The ML service rejected the request.' });
     }
+  }
+
+  async scenarios(): Promise<components['schemas']['ScenarioBrief'][]> {
+    const client = createClient<paths>({
+      baseUrl: this.config.get<string>('ML_SERVICE_URL', 'http://localhost:8000'),
+      headers: { 'X-Internal-Token': this.config.getOrThrow<string>('ML_INTERNAL_TOKEN') },
+      fetch: this.fetchImplementation,
+    });
+    const { data, error } = await client.GET('/internal/v1/scenarios');
+    if (error || !data) {
+      throw new ServiceUnavailableException({ code: 'AI_UNAVAILABLE', message: 'The ML service did not return scenarios.' });
+    }
+    return data;
   }
 }

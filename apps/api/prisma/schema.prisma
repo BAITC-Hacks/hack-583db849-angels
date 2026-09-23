@@ -32,6 +32,7 @@ enum TurnSpeaker {
 model Candidate {
   id                 String       @id @default(uuid()) @db.Uuid
   externalId         String       @unique
+  label              String
   profile            Json
   application        Json
   test               Json

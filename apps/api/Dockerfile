@@ -7,6 +7,9 @@ COPY apps/api/package.json apps/api/package.json
 RUN pnpm install --frozen-lockfile --filter @invision/api...
 COPY apps/api apps/api
 COPY services/ml/openapi.json services/ml/openapi.json
+COPY docs/contracts/examples/candidate-a docs/contracts/examples/candidate-a
+COPY seed/candidates seed/candidates
+COPY fixtures/audio/silence.mp3 fixtures/audio/silence.mp3
 RUN pnpm --filter @invision/api build
 
 EXPOSE 3001
