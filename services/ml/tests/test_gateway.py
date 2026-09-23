@@ -12,6 +12,7 @@ from services.ml.app.gateway.config import Provider, TaskName, load_models_confi
 from services.ml.app.gateway.errors import (
     GatewayCassetteMissingError,
     GatewayConfigurationError,
+    GatewayOutputError,
     GatewayProviderError,
     GatewayReplayError,
 )
@@ -132,6 +133,51 @@ def test_record_saves_only_a_validated_response() -> None:
     asyncio.run(gateway.execute(request()))
 
     assert cassettes.saved == [(Provider.OPENAI, "gpt-6-sol", provider_response)]
+
+
+def test_invalid_output_is_retried_once_and_then_succeeds(caplog) -> None:
+    invalid = ProviderResponse(
+        content='{"profile":"must-not-be-logged"}',
+        input_tokens=12,
+        output_tokens=3,
+    )
+    provider = FakeProvider([invalid, response("recovered")])
+    gateway = ModelGateway(
+        mode="live",
+        configuration=load_models_configuration(),
+        providers={Provider.OPENAI: provider},
+        cassettes=MemoryCassettes(),
+    )
+
+    with caplog.at_level("INFO"):
+        result = asyncio.run(gateway.execute(request()))
+
+    assert result.output.value == "recovered"
+    assert result.input_tokens == 24
+    assert result.output_tokens == 6
+    assert len(provider.requests) == 2
+    assert [item.max_tokens for item in provider.requests] == [1800, 1800]
+    assert "must-not-be-logged" not in caplog.text
+    assert "attempt=1 outcome=invalid" in caplog.text
+    assert "attempt=2 outcome=valid" in caplog.text
+
+
+def test_two_invalid_outputs_fail_after_exactly_two_calls() -> None:
+    invalid = ProviderResponse(content="not-json", input_tokens=12, output_tokens=3)
+    provider = FakeProvider([invalid, invalid])
+    cassettes = MemoryCassettes()
+    gateway = ModelGateway(
+        mode="record",
+        configuration=load_models_configuration(),
+        providers={Provider.OPENAI: provider},
+        cassettes=cassettes,
+    )
+
+    with pytest.raises(GatewayOutputError, match="schema validation"):
+        asyncio.run(gateway.execute(request()))
+
+    assert len(provider.requests) == 2
+    assert cassettes.saved == []
 
 
 def test_replay_never_constructs_or_calls_a_provider() -> None:
