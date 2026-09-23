@@ -66,13 +66,14 @@ class MemoryCassettes:
         self.saved.append((provider, model, response))
 
 
-def settings(mode: str) -> Settings:
+def settings(mode: str, usage_log_path: Path | None = None) -> Settings:
     return Settings(
         ml_internal_token=None,
         uploads_dir=Path("uploads"),
         gateway_mode=mode,
         budget_usd_cap=Decimal("20"),
         demo_mode=False,
+        usage_log_path=usage_log_path or Path("/data/gateway-usage.jsonl"),
     )
 
 
@@ -180,7 +181,7 @@ def test_two_invalid_outputs_fail_after_exactly_two_calls() -> None:
     assert cassettes.saved == []
 
 
-def test_replay_never_constructs_or_calls_a_provider() -> None:
+def test_replay_never_constructs_or_calls_a_provider(tmp_path: Path) -> None:
     constructed = False
 
     def forbidden_factory():
@@ -189,7 +190,7 @@ def test_replay_never_constructs_or_calls_a_provider() -> None:
         raise AssertionError("provider must not be constructed in replay")
 
     gateway = create_gateway(
-        settings("replay"),
+        settings("replay", tmp_path / "usage.jsonl"),
         load_models_configuration(),
         cassettes=MemoryCassettes(response("replayed")),
         provider_factories={Provider.OPENAI: forbidden_factory},

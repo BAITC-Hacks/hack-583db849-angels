@@ -23,3 +23,11 @@ class GatewayCassetteMissingError(GatewayReplayError):
 
 class GatewayOutputError(GatewayError):
     """A provider or cassette returned output that failed validation."""
+
+
+class GatewayBudgetError(GatewayError):
+    """A provider call was refused by a configured spending limit."""
+
+
+class GatewayUsageError(GatewayError):
+    """Usage accounting is unavailable or contains invalid data."""
