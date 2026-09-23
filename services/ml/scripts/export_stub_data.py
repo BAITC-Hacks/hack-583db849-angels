@@ -28,6 +28,8 @@ EXAMPLE_FILES = (
     "simulation-turn.response.json",
     "surprise-question.response.json",
     "transcribe.response.json",
+    "transcribe-turn.request.json",
+    "transcribe-turn.response.json",
     "usage.response.json",
 )
 

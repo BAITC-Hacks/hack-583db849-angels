@@ -659,6 +659,24 @@
     "question": "Your robot broke two days before the final. If you could go back, what would you do differently for the team, not the robot?",
     "why": "The setback story is about the machine; this asks about the people."
   },
+  "transcribe-turn.request.json": {
+    "audioRef": "turns/6f1c2a0e-0000-4000-8000-00000000a002/turn_02.webm",
+    "language": "en",
+    "purpose": "turn",
+    "speakers": 1
+  },
+  "transcribe-turn.response.json": {
+    "durationSec": 30.0,
+    "turns": [
+      {
+        "confidence": 0.93,
+        "endSec": 29.6,
+        "speaker": "candidate",
+        "startSec": 0.4,
+        "text": "Okay, let's fix this fast. The demo is in three days, so we can't lose you now. Send me the list of what Timur changed and I'll look at it tonight."
+      }
+    ]
+  },
   "transcribe.response.json": {
     "durationSec": 186,
     "turns": [

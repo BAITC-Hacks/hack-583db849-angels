@@ -23,10 +23,19 @@ def silent_mp3_path() -> Path:
 def audio_router(authenticate: Callable[..., None], uploads_dir: Path) -> APIRouter:
     router = APIRouter(prefix="/internal/v1", dependencies=[Depends(authenticate)])
 
-    @router.post("/transcribe", response_model=TranscribeResult)
+    @router.post(
+        "/transcribe",
+        response_model=TranscribeResult,
+        response_model_exclude_none=True,
+    )
     async def transcribe(request: TranscribeRequest) -> TranscribeResult:
         resolve_audio_ref(request.audioRef, uploads_dir)
-        return load_example("transcribe.response.json", TranscribeResult)
+        example = (
+            "transcribe-turn.response.json"
+            if request.purpose == "turn" and request.speakers == 1
+            else "transcribe.response.json"
+        )
+        return load_example(example, TranscribeResult)
 
     @router.post(
         "/speech",

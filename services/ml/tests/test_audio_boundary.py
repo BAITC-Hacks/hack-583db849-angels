@@ -100,3 +100,32 @@ def test_transcribe_rejects_an_unsafe_reference_over_http(tmp_path: Path) -> Non
 
     assert response.status_code == 400
     assert response.json()["error"]["code"] == "INVALID_AUDIO_REF"
+
+
+def test_turn_transcription_uses_the_one_speaker_contract_example(tmp_path: Path) -> None:
+    audio = tmp_path / "turns" / "synthetic" / "turn.webm"
+    audio.parent.mkdir(parents=True)
+    audio.write_bytes(b"synthetic-webm")
+    settings = Settings(
+        ml_internal_token="test-internal-token",
+        uploads_dir=tmp_path,
+        gateway_mode="replay",
+        budget_usd_cap=Decimal("20"),
+        demo_mode=False,
+    )
+    response = TestClient(create_app(settings), raise_server_exceptions=False).post(
+        "/internal/v1/transcribe",
+        json={
+            "purpose": "turn",
+            "audioRef": "turns/synthetic/turn.webm",
+            "language": "en",
+            "speakers": 1,
+        },
+        headers=TOKEN,
+    )
+
+    expected = json.loads(
+        (EXAMPLES / "transcribe-turn.response.json").read_text(encoding="utf-8")
+    )
+    assert response.status_code == 200
+    assert response.json() == expected

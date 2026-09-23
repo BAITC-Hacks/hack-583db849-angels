@@ -9,6 +9,13 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
+from .gateway.errors import (
+    GatewayBudgetError,
+    GatewayCassetteMissingError,
+    GatewayOutputError,
+    GatewayProviderError,
+    GatewayReplayError,
+)
 from .schemas.contracts import Strict
 
 
@@ -68,6 +75,47 @@ def _response(
 
 
 def install_error_handlers(app: FastAPI) -> None:
+    @app.exception_handler(GatewayOutputError)
+    async def gateway_output_error_handler(
+        request: Request, error: GatewayOutputError
+    ) -> JSONResponse:
+        del error
+        return _response(
+            request,
+            status_code=502,
+            code="AI_INVALID_OUTPUT",
+            message="AI output did not match the required schema.",
+        )
+
+    @app.exception_handler(GatewayBudgetError)
+    async def gateway_budget_error_handler(
+        request: Request, error: GatewayBudgetError
+    ) -> JSONResponse:
+        del error
+        return _response(
+            request,
+            status_code=503,
+            code="AI_BUDGET_EXCEEDED",
+            message="AI budget is unavailable for this request.",
+        )
+
+    @app.exception_handler(GatewayProviderError)
+    @app.exception_handler(GatewayCassetteMissingError)
+    @app.exception_handler(GatewayReplayError)
+    async def gateway_unavailable_error_handler(
+        request: Request,
+        error: GatewayProviderError
+        | GatewayCassetteMissingError
+        | GatewayReplayError,
+    ) -> JSONResponse:
+        del error
+        return _response(
+            request,
+            status_code=503,
+            code="AI_UNAVAILABLE",
+            message="AI service is unavailable.",
+        )
+
     @app.exception_handler(ServiceError)
     async def service_error_handler(request: Request, error: ServiceError) -> JSONResponse:
         return _response(
