@@ -521,7 +521,7 @@
       },
       "expectedMinutes": 8,
       "goal": "Get to the demo without losing anyone. There is no single right way to do it.",
-      "maxCandidateTurns": 5,
+      "maxCandidateTurns": 8,
       "scenarioId": "conflict-resolution",
       "situation": "Your team of four is building an app for a city hackathon, and the demo is in three days. Dana wrote most of the backend. Last night Timur rewrote her module without asking, and this morning she says she is out.",
       "status": "ready",
