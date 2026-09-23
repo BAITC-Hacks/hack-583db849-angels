@@ -6,6 +6,7 @@ import { NextStep } from '../../../components/home/NextStep';
 import { SeedPending } from '../../../components/home/SeedPending';
 import { StatusPill } from '../../../components/home/StatusPill';
 import { completeWithRecordedSession, useWorld } from '../../../lib/demo/world';
+import { previewCalibrationCheck, previewInterviewCheck } from '../../../lib/quality/preview';
 import { useStaffLocale } from '../../../lib/i18n/StaffLocaleProvider';
 
 const copy = {
@@ -14,7 +15,7 @@ const copy = {
     title: 'Candidates in review',
     lede: 'The evidence behind each candidate, in one place. Decisions are recorded in inVision’s system — nothing here accepts or rejects anyone.',
     tiles: { simulations: 'Simulations finished', reports: 'Reports ready', interviews: 'Interviews scored', quality: 'Quality signals' },
-    qualityLocked: 'arrives with M5',
+    qualityNote: 'about the interviews, not the candidates',
     next: 'Next step',
     wait: { title: 'Candidate A has not finished the simulation', body: 'The report appears as soon as the candidate finishes. For the demo you can use candidate A’s recorded session.', action: 'Use the recorded session' },
     read: { title: 'Candidate A’s report is ready', body: 'D.R.I.V.E. scores with verbatim quotes, questions for the interview, English measured apart.', action: 'Open the report' },
@@ -31,7 +32,7 @@ const copy = {
     title: 'Кандидаты на рассмотрении',
     lede: 'Доказательства по каждому кандидату в одном месте. Решения фиксируются в системе inVision — здесь никого не принимают и не отклоняют.',
     tiles: { simulations: 'Симуляций пройдено', reports: 'Отчётов готово', interviews: 'Интервью оценено', quality: 'Сигналов качества' },
-    qualityLocked: 'появится в M5',
+    qualityNote: 'о самих интервью, не о кандидатах',
     next: 'Следующий шаг',
     wait: { title: 'Кандидат A ещё не прошёл симуляцию', body: 'Отчёт появится, как только кандидат закончит. Для демо можно взять записанную сессию кандидата A.', action: 'Взять записанную сессию' },
     read: { title: 'Отчёт по кандидату A готов', body: 'Баллы D.R.I.V.E. с дословными цитатами, вопросы для интервью, английский отдельно.', action: 'Открыть отчёт' },
@@ -53,11 +54,15 @@ export default function CommissionHome() {
   const a = world.candidates.A;
   const all = Object.values(world.candidates);
 
+  // The two checks the quality guard runs on candidate A's interview and on
+  // that interviewer's month; both are scripted until #18.
+  const qualitySignals = previewInterviewCheck.signals.length + previewCalibrationCheck.signals.length;
+
   const tiles = [
     { label: text.tiles.simulations, value: `${all.filter((c) => c.simulation === 'completed').length} / 3` },
     { label: text.tiles.reports, value: `${all.filter((c) => c.assessmentReady).length} / 3` },
     { label: text.tiles.interviews, value: `${all.filter((c) => c.scoresSaved).length} / 3` },
-    { label: text.tiles.quality, value: '—', note: text.qualityLocked },
+    { label: text.tiles.quality, value: String(qualitySignals), note: text.qualityNote, href: '/commission/quality-guard' },
   ];
 
   return (
@@ -69,13 +74,24 @@ export default function CommissionHome() {
       </header>
 
       <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-panel border border-border-subtle bg-border-subtle lg:grid-cols-4">
-        {tiles.map((tile) => (
-          <div key={tile.label} className="flex flex-col gap-1 bg-bg-surface px-5 py-4">
-            <dt className="font-mono text-[0.58rem] tracking-[0.12em] text-text-muted uppercase">{tile.label}</dt>
-            <dd className="font-mono text-2xl font-bold tabular-nums text-text-primary">{tile.value}</dd>
-            {tile.note ? <dd className="text-[0.72rem] text-text-muted">{tile.note}</dd> : null}
-          </div>
-        ))}
+        {tiles.map((tile) => {
+          const body = (
+            <>
+              <dt className="font-mono text-[0.58rem] tracking-[0.12em] text-text-muted uppercase">{tile.label}</dt>
+              <dd className="font-mono text-2xl font-bold tabular-nums text-text-primary">{tile.value}</dd>
+              {tile.note ? <dd className="text-[0.72rem] text-text-muted">{tile.note}</dd> : null}
+            </>
+          );
+          return tile.href ? (
+            <Link key={tile.label} href={tile.href} className="flex flex-col gap-1 bg-bg-surface px-5 py-4 transition-colors hover:bg-bg-elevated">
+              {body}
+            </Link>
+          ) : (
+            <div key={tile.label} className="flex flex-col gap-1 bg-bg-surface px-5 py-4">
+              {body}
+            </div>
+          );
+        })}
       </dl>
 
       {a.assessmentReady ? (
