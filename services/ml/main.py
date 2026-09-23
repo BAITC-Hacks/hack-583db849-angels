@@ -1,6 +1,9 @@
 """Uvicorn entry point for the internal ML service."""
 
-from services.ml.app.main import create_app
+try:
+    from services.ml.app.main import create_app
+except ModuleNotFoundError:  # service-only Docker build context
+    from app.main import create_app
 
 
 app = create_app()

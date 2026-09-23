@@ -8,11 +8,16 @@ from pathlib import Path
 from fastapi import APIRouter, Depends, Response
 
 from ..audio import resolve_audio_ref
-from ..examples import ROOT, load_example
+from ..examples import PACKAGE_ROOT, ROOT, load_example
 from ..schemas.contracts import SpeechRequest, TranscribeRequest, TranscribeResult
 
 
-SILENT_MP3 = ROOT / "fixtures" / "audio" / "silence.mp3"
+ROOT_SILENT_MP3 = ROOT / "fixtures" / "audio" / "silence.mp3"
+PACKAGED_SILENT_MP3 = PACKAGE_ROOT / "stub_data" / "silence.mp3"
+
+
+def silent_mp3_path() -> Path:
+    return ROOT_SILENT_MP3 if ROOT_SILENT_MP3.is_file() else PACKAGED_SILENT_MP3
 
 
 def audio_router(authenticate: Callable[..., None], uploads_dir: Path) -> APIRouter:
@@ -30,6 +35,6 @@ def audio_router(authenticate: Callable[..., None], uploads_dir: Path) -> APIRou
     )
     async def speech(request: SpeechRequest) -> Response:
         del request
-        return Response(content=SILENT_MP3.read_bytes(), media_type="audio/mpeg")
+        return Response(content=silent_mp3_path().read_bytes(), media_type="audio/mpeg")
 
     return router
