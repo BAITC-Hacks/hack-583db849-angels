@@ -19,6 +19,8 @@ SOURCE_SCENARIOS = ROOT / "config" / "scenarios"
 OUTPUT_SCENARIOS = ROOT / "services" / "ml" / "scenario_data"
 SOURCE_EMBEDDING_MODEL = ROOT / "config" / "embedding-model.json"
 OUTPUT_EMBEDDING_MODEL = OUTPUT_DIR / "embedding-model.json"
+SOURCE_PROMPTS = ROOT / "config" / "prompts"
+OUTPUT_PROMPTS = OUTPUT_DIR / "prompts"
 
 EXAMPLE_FILES = (
     "brief.response.json",
@@ -51,6 +53,11 @@ def export_stub_data() -> None:
     shutil.copyfile(SOURCE_MODELS, OUTPUT_MODELS)
     shutil.copyfile(SOURCE_RUBRIC, OUTPUT_RUBRIC)
     shutil.copyfile(SOURCE_EMBEDDING_MODEL, OUTPUT_EMBEDDING_MODEL)
+    OUTPUT_PROMPTS.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(
+        SOURCE_PROMPTS / "simulation-actor.md",
+        OUTPUT_PROMPTS / "simulation-actor.md",
+    )
     OUTPUT_SCENARIOS.mkdir(parents=True, exist_ok=True)
     for destination in OUTPUT_SCENARIOS.glob("*.json"):
         destination.unlink()
