@@ -14,6 +14,7 @@ from .schemas.contracts import HealthResponse
 from .gateway.usage import FileUsageStore
 from .gateway.config import load_models_configuration
 from .gateway.media import MediaGateway, create_media_gateway
+from .modules.speech import SpeechService
 from .modules.transcription import TurnTranscriptionService
 from .scenarios import load_scenario_repository
 
@@ -33,6 +34,7 @@ def create_app(
         resolved, load_models_configuration()
     )
     turn_transcription = TurnTranscriptionService(resolved_media_gateway)
+    speech_service = SpeechService(resolved_media_gateway, scenario_repository)
 
     @app.get(
         "/internal/v1/health",
@@ -43,7 +45,12 @@ def create_app(
 
     app.include_router(core_router(authenticate, scenario_repository))
     app.include_router(
-        audio_router(authenticate, resolved.uploads_dir, turn_transcription)
+        audio_router(
+            authenticate,
+            resolved.uploads_dir,
+            turn_transcription,
+            speech_service,
+        )
     )
     app.include_router(
         extended_router(

@@ -65,6 +65,20 @@ class TurnExampleGateway:
         )
 
 
+class SyntheticSpeechGateway:
+    async def execute(self, request: MediaRequest) -> MediaGatewayResult:
+        assert request.operation == "speech"
+        return MediaGatewayResult(
+            content=(ROOT / "fixtures" / "audio" / "silence.mp3").read_bytes(),
+            media_type="audio/mpeg",
+            billed_units=request.estimated_units,
+            provider=Provider.DEEPGRAM,
+            model="aura-asteria-en",
+            replayed=True,
+            cached=False,
+        )
+
+
 def test_audio_ref_resolves_a_file_inside_uploads(tmp_path: Path) -> None:
     audio = tmp_path / "candidate-a" / "turn.webm"
     audio.parent.mkdir()
@@ -118,7 +132,10 @@ def test_speech_returns_the_synthetic_mp3(tmp_path: Path) -> None:
         budget_usd_cap=Decimal("20"),
         demo_mode=False,
     )
-    client = TestClient(create_app(settings), raise_server_exceptions=False)
+    client = TestClient(
+        create_app(settings, media_gateway=SyntheticSpeechGateway()),
+        raise_server_exceptions=False,
+    )
 
     response = client.post(
         "/internal/v1/speech",
