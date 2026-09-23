@@ -1,0 +1,12 @@
+{
+  "input_tokens": 40,
+  "model": "gpt-6-luna",
+  "output_tokens": 19,
+  "provider": "openai",
+  "recorded_at": "2026-09-24T00:00:00Z",
+  "request_hash": "fe49cc66afac9755652aa2d3fd9c6e43bfa4182c51e2ea8aa0c107fe5f503532",
+  "request_id": "synthetic-m2a-fixture",
+  "response": "{\"text\": \"Okay. I can stay if we protect the team and keep the work fair. Let us finish this together.\"}",
+  "task": "simulation_actor",
+  "version": 1
+}

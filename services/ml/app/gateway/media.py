@@ -109,8 +109,14 @@ class MediaCassetteEnvelope(BaseModel):
 
 
 class FileMediaCassetteStore:
-    def __init__(self, root: Path) -> None:
+    def __init__(
+        self,
+        root: Path,
+        *,
+        clock: Callable[[], datetime] = lambda: datetime.now(timezone.utc),
+    ) -> None:
         self._root = root
+        self._clock = clock
 
     def path_for(self, request: MediaRequest, provider: Provider, model: str) -> Path:
         return self._root / request.task.value / f"{cassette_key(request, provider, model)}.json"
@@ -158,7 +164,7 @@ class FileMediaCassetteStore:
             task=request.task,
             provider=provider,
             model=model,
-            recorded_at=datetime.now(timezone.utc),
+            recorded_at=self._clock(),
             response_base64=base64.b64encode(response.content).decode("ascii"),
             media_type=response.media_type,
             billed_units=response.billed_units,

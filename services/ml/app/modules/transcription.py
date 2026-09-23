@@ -109,6 +109,7 @@ class TurnTranscriptionService:
 
 def _audio_content_type(path: Path) -> str:
     media_types = {
+        ".wav": "audio/wav",
         ".webm": "audio/webm",
         ".ogg": "audio/ogg",
     }

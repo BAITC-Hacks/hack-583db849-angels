@@ -35,8 +35,9 @@ def test_every_candidate_has_the_complete_seed_layout_and_valid_shapes() -> None
             "transcript.json",
             "expected-assessment.json",
             "interview-notes.json",
-            "interviewer-scores.json",
-        }
+                "interviewer-scores.json",
+                "m2a-session.json",
+            }
         assert {path.name for path in directory.iterdir()} == expected
         BriefResult.model_validate(load(directory / "expected-brief.json"))
         AssessmentResult.model_validate(load(directory / "expected-assessment.json"))
