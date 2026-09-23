@@ -1,0 +1,665 @@
+{
+  "brief.response.json": {
+    "clarify": [
+      {
+        "evidence": [
+          {
+            "quote": "I led our robotics team to the regional final",
+            "source": "application_field",
+            "sourceId": "motivation"
+          }
+        ],
+        "topic": "Their own part in the robotics result, apart from the team\u2019s."
+      },
+      {
+        "evidence": [
+          {
+            "quote": "I learned to always have spare parts.",
+            "source": "application_field",
+            "sourceId": "setback"
+          }
+        ],
+        "topic": "What else changed after the setback, beyond spare parts."
+      }
+    ],
+    "consistency": [
+      {
+        "askInInterview": "In English and without preparing: tell me about the last thing you built and what went wrong.",
+        "claim": {
+          "evidence": [
+            {
+              "quote": "C2.",
+              "source": "application_field",
+              "sourceId": "english_self"
+            }
+          ],
+          "text": "Rates their English as C2."
+        },
+        "itemId": "c_01",
+        "observation": {
+          "evidence": [],
+          "metric": {
+            "name": "cefrEstimate",
+            "source": "simulation",
+            "value": "B2"
+          },
+          "text": "The simulation\u2019s speech measured B2; the certificate is IELTS 6.5 (B2)."
+        },
+        "status": "discrepancy",
+        "topic": "english",
+        "whatToDo": "Hold the first minutes of the interview in English on an unprepared topic, and ask inVision to check the certificate."
+      },
+      {
+        "askInInterview": "Walk me through the last decision you made for a team. Who did you ask first?",
+        "claim": {
+          "evidence": [
+            {
+              "quote": "I always ask everyone's opinion before I decide anything.",
+              "source": "application_field",
+              "sourceId": "motivation"
+            }
+          ],
+          "text": "Says they ask everyone before deciding."
+        },
+        "itemId": "c_02",
+        "observation": {
+          "evidence": [
+            {
+              "quote": "I prefer to decide quickly and explain my reasons later.",
+              "source": "test_item",
+              "sourceId": "block_03"
+            }
+          ],
+          "metric": null,
+          "text": "In the test they chose deciding quickly and explaining later."
+        },
+        "status": "discrepancy",
+        "topic": "other",
+        "whatToDo": "Ask for a recent decision and exactly how it was made."
+      },
+      {
+        "askInInterview": "What do you know about how inVision U teaches, and which part of it made you apply?",
+        "claim": {
+          "evidence": [
+            {
+              "quote": "inVision U is where I can learn to do this at a bigger scale.",
+              "source": "application_field",
+              "sourceId": "motivation"
+            }
+          ],
+          "text": "Wants to study at inVision U."
+        },
+        "itemId": "c_03",
+        "observation": {
+          "evidence": [],
+          "metric": null,
+          "text": "Nothing in the application or the simulation shows what they know about inVision U."
+        },
+        "status": "unverified",
+        "topic": "invision_knowledge",
+        "whatToDo": "Check what they know about the programme and why this university."
+      }
+    ],
+    "english": {
+      "basis": "Short sentences and a narrow range of vocabulary in the written answers; almost no errors.",
+      "certificate": {
+        "cefr": "B2",
+        "score": "6.5",
+        "type": "IELTS"
+      },
+      "writtenCefr": "B1+"
+    },
+    "questions": [
+      {
+        "evidence": [
+          {
+            "quote": "We rebuilt the arm overnight and still made it.",
+            "source": "application_field",
+            "sourceId": "setback"
+          }
+        ],
+        "focus": "D",
+        "question": "Your robot broke two days before the final. How was the team feeling, and what did you do for them \u2014 not only for the robot?",
+        "why": "The setback story is about fixing the machine; how the team came through is missing."
+      },
+      {
+        "evidence": [],
+        "focus": "R",
+        "question": "What was the riskiest decision in the clean-up or the final, and what could it have cost?",
+        "why": "No answer weighs a risk or its consequences."
+      },
+      {
+        "evidence": [
+          {
+            "quote": "I want to make an app that shows real bus times.",
+            "source": "application_field",
+            "sourceId": "community"
+          }
+        ],
+        "focus": "I",
+        "question": "Why do real bus times matter to the people who would use the app \u2014 and who might it leave out?",
+        "why": "The idea is clear; the thinking about its users is not."
+      },
+      {
+        "evidence": [],
+        "focus": "V",
+        "question": "Tell me about a time doing the right thing slowed you down. What did you choose, and why?",
+        "why": "No answer touches values or fairness."
+      },
+      {
+        "evidence": [
+          {
+            "quote": "Each team had a leader and a list of streets.",
+            "source": "application_field",
+            "sourceId": "leadership_example"
+          }
+        ],
+        "focus": "E",
+        "question": "Walk me through the clean-up: who chose the streets and the leaders, and what would you change?",
+        "why": "Strong execution evidence \u2014 confirm the plan was their own."
+      },
+      {
+        "evidence": [
+          {
+            "quote": "inVision U is where I can learn to do this at a bigger scale.",
+            "source": "application_field",
+            "sourceId": "motivation"
+          }
+        ],
+        "focus": "invision_knowledge",
+        "question": "What do you know about how inVision U teaches, and which part of it made you apply?",
+        "why": "The motivation answer is about scale, not about inVision U itself."
+      },
+      {
+        "evidence": [
+          {
+            "quote": "C2. I speak fluently and read everything in English.",
+            "source": "application_field",
+            "sourceId": "english_self"
+          }
+        ],
+        "focus": "english",
+        "question": "In English and without preparing: tell me about the last thing you built and what went wrong.",
+        "why": "The application claims C2; the certificate says IELTS 6.5 and the simulation measured B2."
+      },
+      {
+        "evidence": [],
+        "focus": "motivation",
+        "question": "What will you do in your first year at inVision U that you could not do anywhere else?",
+        "why": "Nothing in the application ties the choice to inVision U; this checks the choice was deliberate."
+      }
+    ],
+    "summary": "Concrete, fast execution with numbers and owners. Little about why decisions are fair, or about people after a setback. Written English is clear but simpler than the certificate suggests."
+  },
+  "consistency-after.response.json": {
+    "items": [
+      {
+        "askInInterview": null,
+        "claim": {
+          "evidence": [
+            {
+              "quote": "C2.",
+              "source": "application_field",
+              "sourceId": "english_self"
+            }
+          ],
+          "text": "Rates their English as C2."
+        },
+        "itemId": "c_01",
+        "observation": {
+          "evidence": [],
+          "metric": {
+            "name": "cefrEstimate",
+            "source": "interview",
+            "value": "B2"
+          },
+          "text": "The simulation and the interview both measured B2; the C2 self-rating is not supported."
+        },
+        "status": "confirmed",
+        "topic": "english",
+        "whatToDo": "Treat the English level as B2 against the English requirement, separately from leadership."
+      },
+      {
+        "askInInterview": null,
+        "claim": {
+          "evidence": [
+            {
+              "quote": "I always ask everyone's opinion before I decide anything.",
+              "source": "application_field",
+              "sourceId": "motivation"
+            }
+          ],
+          "text": "Says they ask everyone before deciding."
+        },
+        "itemId": "c_02",
+        "observation": {
+          "evidence": [
+            {
+              "quote": "I made a plan straight away: owners, a deadline and a full run on Thursday.",
+              "source": "interview_turn",
+              "sourceId": "iturn_02"
+            }
+          ],
+          "metric": null,
+          "text": "In the interview they again made the plan alone and at once."
+        },
+        "status": "confirmed",
+        "topic": "other",
+        "whatToDo": "The \u201casks everyone first\u201d claim is not supported; weigh it under Values-Driven Leadership."
+      },
+      {
+        "askInInterview": null,
+        "claim": {
+          "evidence": [
+            {
+              "quote": "inVision U is where I can learn to do this at a bigger scale.",
+              "source": "application_field",
+              "sourceId": "motivation"
+            }
+          ],
+          "text": "Wants to study at inVision U."
+        },
+        "itemId": "c_03",
+        "observation": {
+          "evidence": [],
+          "metric": null,
+          "text": "Nothing in the application or the simulation shows what they know about inVision U."
+        },
+        "status": "unverified",
+        "topic": "invision_knowledge",
+        "whatToDo": "Not asked in the interview \u2014 ask in a follow-up before the decision."
+      }
+    ]
+  },
+  "consistency-before.response.json": {
+    "items": [
+      {
+        "askInInterview": "In English and without preparing: tell me about the last thing you built and what went wrong.",
+        "claim": {
+          "evidence": [
+            {
+              "quote": "C2.",
+              "source": "application_field",
+              "sourceId": "english_self"
+            }
+          ],
+          "text": "Rates their English as C2."
+        },
+        "itemId": "c_01",
+        "observation": {
+          "evidence": [],
+          "metric": {
+            "name": "cefrEstimate",
+            "source": "simulation",
+            "value": "B2"
+          },
+          "text": "The simulation\u2019s speech measured B2; the certificate is IELTS 6.5 (B2)."
+        },
+        "status": "discrepancy",
+        "topic": "english",
+        "whatToDo": "Hold the first minutes of the interview in English on an unprepared topic, and ask inVision to check the certificate."
+      },
+      {
+        "askInInterview": "Walk me through the last decision you made for a team. Who did you ask first?",
+        "claim": {
+          "evidence": [
+            {
+              "quote": "I always ask everyone's opinion before I decide anything.",
+              "source": "application_field",
+              "sourceId": "motivation"
+            }
+          ],
+          "text": "Says they ask everyone before deciding."
+        },
+        "itemId": "c_02",
+        "observation": {
+          "evidence": [
+            {
+              "quote": "I prefer to decide quickly and explain my reasons later.",
+              "source": "test_item",
+              "sourceId": "block_03"
+            }
+          ],
+          "metric": null,
+          "text": "In the test they chose deciding quickly and explaining later."
+        },
+        "status": "discrepancy",
+        "topic": "other",
+        "whatToDo": "Ask for a recent decision and exactly how it was made."
+      },
+      {
+        "askInInterview": "What do you know about how inVision U teaches, and which part of it made you apply?",
+        "claim": {
+          "evidence": [
+            {
+              "quote": "inVision U is where I can learn to do this at a bigger scale.",
+              "source": "application_field",
+              "sourceId": "motivation"
+            }
+          ],
+          "text": "Wants to study at inVision U."
+        },
+        "itemId": "c_03",
+        "observation": {
+          "evidence": [],
+          "metric": null,
+          "text": "Nothing in the application or the simulation shows what they know about inVision U."
+        },
+        "status": "unverified",
+        "topic": "invision_knowledge",
+        "whatToDo": "Check what they know about the programme and why this university."
+      }
+    ]
+  },
+  "interview-draft.response.json": {
+    "scores": [
+      {
+        "competency": "D",
+        "confidence": "medium",
+        "evidence": [
+          {
+            "quote": "We cut scope and move on.",
+            "source": "interview_turn",
+            "sourceId": "iturn_12"
+          }
+        ],
+        "rationale": "Recovery is framed as cutting scope; the team itself does not come into it.",
+        "score": 2
+      },
+      {
+        "competency": "R",
+        "confidence": "medium",
+        "evidence": [
+          {
+            "quote": "I would add a 24-hour limit for reviews so nobody is blocked.",
+            "source": "interview_turn",
+            "sourceId": "iturn_14"
+          }
+        ],
+        "rationale": "Names a cost of their own rule and proposes a concrete limit for it.",
+        "score": 3
+      },
+      {
+        "competency": "I",
+        "confidence": null,
+        "evidence": [],
+        "rationale": null,
+        "score": null
+      },
+      {
+        "competency": "V",
+        "confidence": "low",
+        "evidence": [
+          {
+            "quote": "I felt bad, but rules are rules, so I told the teacher.",
+            "source": "interview_turn",
+            "sourceId": "iturn_10"
+          },
+          {
+            "quote": "It works, and that is what matters for the demo.",
+            "source": "interview_turn",
+            "sourceId": "iturn_06"
+          }
+        ],
+        "rationale": "One story, where following the rule outweighs the person; fairness to the teammate is not raised.",
+        "score": 2
+      },
+      {
+        "competency": "E",
+        "confidence": "high",
+        "evidence": [
+          {
+            "quote": "I made a plan straight away: owners, a deadline and a full run on Thursday.",
+            "source": "interview_turn",
+            "sourceId": "iturn_02"
+          }
+        ],
+        "rationale": "Restates a complete plan with owners and a checkpoint, unprompted.",
+        "score": 4
+      }
+    ]
+  },
+  "scenarios.response.json": [
+    {
+      "character": {
+        "name": "Dana",
+        "role": "Backend developer on your team",
+        "wants": "To be asked before her work is changed"
+      },
+      "expectedMinutes": 8,
+      "goal": "Get to the demo without losing anyone. There is no single right way to do it.",
+      "maxCandidateTurns": 5,
+      "scenarioId": "conflict-resolution",
+      "situation": "Your team of four is building an app for a city hackathon, and the demo is in three days. Dana wrote most of the backend. Last night Timur rewrote her module without asking, and this morning she says she is out.",
+      "status": "ready",
+      "title": "A teammate is about to walk away",
+      "yourRole": "You lead the team."
+    }
+  ],
+  "simulation-assessment.response.json": {
+    "candidateFeedback": {
+      "growth": [
+        "Say why a decision is fair to everyone involved, not only how it gets the work done.",
+        "When a plan might not work out, talk about how the team will get through it together, not only what you will cut."
+      ],
+      "nextTime": [
+        "Before you propose a plan, ask the other person what matters most to them.",
+        "After a conflict, check in with each person once the pressure is off."
+      ],
+      "strengths": [
+        "You turned a tense moment into a concrete plan: who does what, and by when.",
+        "You named a risk in your own plan and a way to keep it small.",
+        "You acted straight away instead of waiting for the conflict to settle by itself."
+      ]
+    },
+    "english": {
+      "cefrEstimate": "B2",
+      "fillerRate": 0.03,
+      "grammarErrorsPer100Words": 0.8,
+      "lexicalDiversity": 0.71,
+      "meanTurnLength": 33.8,
+      "wordsPerMinute": 112
+    },
+    "interviewQuestions": [
+      {
+        "competency": "V",
+        "question": "Tell me about a decision where doing the right thing cost you or your team something. What did you do?",
+        "reason": "No verified evidence for Values-Driven Leadership in the simulation."
+      },
+      {
+        "competency": "D",
+        "question": "The Thursday run fails and the analytics screen is already cut. What happens next, and how do you keep the team together?",
+        "reason": "A fallback was named, but not how the team recovers."
+      },
+      {
+        "competency": "R",
+        "question": "What could go wrong with the new review rule, and for whom?",
+        "reason": "One risk was named; its effect on people was not."
+      }
+    ],
+    "scores": [
+      {
+        "competency": "D",
+        "confidence": "medium",
+        "evidence": [
+          {
+            "quote": "If the Thursday run fails, we cut the analytics screen instead of working all night.",
+            "source": "simulation_turn",
+            "sourceId": "turn_10"
+          }
+        ],
+        "rationale": "Has a fallback if the run fails, but says nothing about how the team recovers from the conflict itself.",
+        "score": 2
+      },
+      {
+        "competency": "R",
+        "confidence": "low",
+        "evidence": [
+          {
+            "quote": "the risk is that we demo with a known bug, so I'll ask him to patch only that.",
+            "source": "simulation_turn",
+            "sourceId": "turn_06"
+          }
+        ],
+        "rationale": "Names one risk and a way to contain it; does not weigh what the decision costs the people involved.",
+        "score": 2
+      },
+      {
+        "competency": "I",
+        "confidence": "medium",
+        "evidence": [
+          {
+            "quote": "nobody merges into someone else's module without a review from its owner",
+            "source": "simulation_turn",
+            "sourceId": "turn_04"
+          }
+        ],
+        "rationale": "Sees the process gap behind the conflict, and treats it purely as a process problem.",
+        "score": 2
+      },
+      {
+        "competency": "V",
+        "confidence": null,
+        "evidence": [],
+        "rationale": null,
+        "score": null
+      },
+      {
+        "competency": "E",
+        "confidence": "high",
+        "evidence": [
+          {
+            "quote": "Today you finish the payment endpoint, Timur fixes the login in his branch, and I write the demo script.",
+            "source": "simulation_turn",
+            "sourceId": "turn_08"
+          },
+          {
+            "quote": "We freeze the backend by Thursday noon and do a full run at six.",
+            "source": "simulation_turn",
+            "sourceId": "turn_08"
+          },
+          {
+            "quote": "I'll put the owners in the team chat in ten minutes and call Timur right after.",
+            "source": "simulation_turn",
+            "sourceId": "turn_10"
+          }
+        ],
+        "rationale": "Turns the conflict into owners, deadlines and a checkpoint without being asked, and starts acting at once.",
+        "score": 4
+      }
+    ]
+  },
+  "simulation-turn.response.json": {
+    "director": {
+      "beat": "opening",
+      "matchedAnswerType": "rush_to_fix",
+      "nextBeat": "trust",
+      "reason": "The answer offers speed without acknowledging Dana; the trust beat follows.",
+      "similarity": 0.71
+    },
+    "ended": false,
+    "stage": "in-progress",
+    "text": "Okay\u2026 I hear you. But it isn't only about the code. Nobody asked me anything. How do I know it won't happen again next week?"
+  },
+  "surprise-question.response.json": {
+    "competency": "D",
+    "question": "Your robot broke two days before the final. If you could go back, what would you do differently for the team, not the robot?",
+    "why": "The setback story is about the machine; this asks about the people."
+  },
+  "transcribe.response.json": {
+    "durationSec": 186,
+    "turns": [
+      {
+        "endSec": 12,
+        "speaker": "interviewer",
+        "startSec": 5,
+        "text": "Thanks for coming in. Tell me about the conflict in the simulation. What did you do first?"
+      },
+      {
+        "endSec": 29,
+        "speaker": "candidate",
+        "startSec": 14,
+        "text": "I made a plan straight away: owners, a deadline and a full run on Thursday. When a demo is close, speed matters."
+      },
+      {
+        "endSec": 45,
+        "speaker": "interviewer",
+        "startSec": 41,
+        "text": "You would agree that finishing on time matters most, right?"
+      },
+      {
+        "endSec": 51,
+        "speaker": "candidate",
+        "startSec": 46,
+        "text": "Yes, finishing on time is what matters for a demo."
+      },
+      {
+        "endSec": 61,
+        "speaker": "interviewer",
+        "startSec": 58,
+        "text": "Why did you keep Dana's version?"
+      },
+      {
+        "endSec": 72,
+        "speaker": "candidate",
+        "startSec": 63,
+        "text": "It works, and that is what matters for the demo. Timur can bring his changes in later."
+      },
+      {
+        "endSec": 93,
+        "speaker": "interviewer",
+        "startSec": 90,
+        "text": "What do your parents do for a living?"
+      },
+      {
+        "endSec": 98,
+        "speaker": "candidate",
+        "startSec": 95,
+        "text": "Sorry, is that part of the interview?"
+      },
+      {
+        "endSec": 106,
+        "speaker": "interviewer",
+        "startSec": 99,
+        "text": "Fair point, let me move on. Tell me about a time doing the right thing cost you something."
+      },
+      {
+        "endSec": 124,
+        "speaker": "candidate",
+        "startSec": 112,
+        "text": "I once reported a classmate who copied homework. I felt bad, but rules are rules, so I told the teacher."
+      },
+      {
+        "endSec": 144,
+        "speaker": "interviewer",
+        "startSec": 140,
+        "text": "If the Thursday run fails, what happens next?"
+      },
+      {
+        "endSec": 152,
+        "speaker": "candidate",
+        "startSec": 146,
+        "text": "We cut scope and move on. The analytics screen can wait."
+      },
+      {
+        "endSec": 174,
+        "speaker": "interviewer",
+        "startSec": 170,
+        "text": "What could go wrong with the new review rule?"
+      },
+      {
+        "endSec": 186,
+        "speaker": "candidate",
+        "startSec": 176,
+        "text": "Merges get slower. I would add a 24-hour limit for reviews so nobody is blocked."
+      }
+    ]
+  },
+  "usage.response.json": {
+    "capUsd": 20.0,
+    "gatewayMode": "replay",
+    "liveCalls": 0,
+    "replayedCalls": 14,
+    "spentUsd": 0.0
+  }
+}
