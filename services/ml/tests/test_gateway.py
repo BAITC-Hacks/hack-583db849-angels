@@ -2,12 +2,14 @@ import asyncio
 from dataclasses import dataclass
 from decimal import Decimal
 from pathlib import Path
+import socket
 from types import SimpleNamespace
 
 import pytest
 from pydantic import BaseModel, ConfigDict
 
 from services.ml.app.config import Settings
+from services.ml.app.gateway.cassettes import FileCassetteStore
 from services.ml.app.gateway.config import Provider, TaskName, load_models_configuration
 from services.ml.app.gateway.errors import (
     GatewayCassetteMissingError,
@@ -213,6 +215,39 @@ def test_missing_replay_never_falls_back_to_live() -> None:
 
     with pytest.raises(GatewayReplayError, match="unavailable"):
         asyncio.run(gateway.execute(request()))
+
+
+def test_file_replay_succeeds_with_network_sockets_blocked(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root = Path(__file__).resolve().parents[3]
+    offline_request = GatewayRequest(
+        task=TaskName.BRIEF,
+        prompt="Synthetic offline replay probe.",
+        payload={"candidateId": "candidate-a", "probe": True},
+        output_schema=Answer,
+    )
+
+    def forbidden_socket(*args, **kwargs):
+        del args, kwargs
+        raise AssertionError("replay mode must not create a network socket")
+
+    gateway = create_gateway(
+        settings("replay", tmp_path / "usage.jsonl"),
+        load_models_configuration(),
+        cassettes=FileCassetteStore(root / "fixtures" / "cassettes"),
+    )
+
+    async def execute_without_network():
+        with monkeypatch.context() as blocked:
+            blocked.setattr(socket, "socket", forbidden_socket)
+            return await gateway.execute(offline_request)
+
+    result = asyncio.run(execute_without_network())
+
+    assert result.output == Answer(value="offline")
+    assert result.replayed is True
+    assert result.cached is False
 
 
 def test_live_rejects_a_task_without_its_provider() -> None:
