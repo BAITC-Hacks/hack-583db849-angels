@@ -11,7 +11,7 @@ export default async function ProductLayout({ children }: { children: React.Reac
 
   return (
     <StaffLocaleProvider locale={locale}>
-      <DemoRoleProvider role={role}>
+      <DemoRoleProvider key={role} role={role}>
         <QueryProvider>
           <AppShell>{children}</AppShell>
         </QueryProvider>
