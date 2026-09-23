@@ -185,8 +185,24 @@ export function navFor(role: DemoRole): NavItem[] {
   return navItems.filter((item) => item.roles.includes(role));
 }
 
-/** The item a path belongs to, so the sidebar can mark where the reader is. */
+/** Whether a path falls under an item at all — its own page or anything below it. */
 export function isActive(item: NavItem, pathname: string): boolean {
   const base = item.match ?? item.href;
   return Boolean(base && (pathname === base || pathname.startsWith(`${base}/`)));
+}
+
+/**
+ * The one item the sidebar marks for a path. A home such as `/interviewer`
+ * sits above every screen of its role, so several items can contain the same
+ * path; the reader is on the most specific one — the longest matching base —
+ * and only that one is marked.
+ */
+export function activeItemId(items: NavItem[], pathname: string): string | null {
+  let best: { id: string; length: number } | null = null;
+  for (const item of items) {
+    if (!isActive(item, pathname)) continue;
+    const length = (item.match ?? item.href ?? '').length;
+    if (!best || length > best.length) best = { id: item.id, length };
+  }
+  return best?.id ?? null;
 }
