@@ -294,6 +294,19 @@ class ModelGateway:
         )
 
 
+class LazyModelGateway:
+    """Construct providers only when a model-backed operation is executed."""
+
+    def __init__(self, factory: Callable[[], ModelGateway]) -> None:
+        self._factory = factory
+        self._gateway: ModelGateway | None = None
+
+    async def execute(self, request: GatewayRequest[OutputT]) -> GatewayResult[OutputT]:
+        if self._gateway is None:
+            self._gateway = self._factory()
+        return await self._gateway.execute(request)
+
+
 def create_gateway(
     settings: Settings,
     configuration: ModelsConfiguration,

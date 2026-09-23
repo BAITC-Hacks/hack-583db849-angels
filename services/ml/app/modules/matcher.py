@@ -194,6 +194,20 @@ class ScenarioMatcher:
         return cached
 
 
+class LazyLocalMatcher:
+    """Delay ONNX loading so health and OpenAPI do not initialize the model."""
+
+    def __init__(self) -> None:
+        self._matcher: ScenarioMatcher | None = None
+
+    def match(
+        self, scenario: ScenarioConfig, beat_id: str, candidate_text: str
+    ) -> MatchResult:
+        if self._matcher is None:
+            self._matcher = create_local_matcher()
+        return self._matcher.match(scenario, beat_id, candidate_text)
+
+
 def load_embedding_configuration(
     path: Path = DEFAULT_MODEL_CONFIG,
 ) -> EmbeddingModelConfiguration:
