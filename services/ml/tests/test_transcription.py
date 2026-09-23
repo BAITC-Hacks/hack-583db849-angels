@@ -128,8 +128,8 @@ def test_invalid_provider_payload_is_a_gateway_output_error(tmp_path: Path) -> N
 
 
 def test_unsupported_audio_type_is_rejected_before_gateway_use(tmp_path: Path) -> None:
-    audio = tmp_path / "synthetic.wav"
-    audio.write_bytes(b"synthetic-wav")
+    audio = tmp_path / "synthetic.mp3"
+    audio.write_bytes(b"synthetic-mp3")
     gateway = FakeMediaGateway(provider_payload())
 
     with pytest.raises(GatewayOutputError, match="unsupported"):

@@ -1,0 +1,12 @@
+{
+  "input_tokens": 40,
+  "model": "gpt-6-luna",
+  "output_tokens": 20,
+  "provider": "openai",
+  "recorded_at": "2026-09-24T00:00:00Z",
+  "request_hash": "c409787624ffecac53f0a3e7cb257c214a21cd23f75117d11de28d42daf2dd46",
+  "request_id": "synthetic-m2a-fixture",
+  "response": "{\"text\": \"I appreciate that, but I do not want this to become a fight. How will we talk with him fairly?\"}",
+  "task": "simulation_actor",
+  "version": 1
+}
