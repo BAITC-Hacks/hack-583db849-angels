@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { APP_FILTER } from '@nestjs/core';
 
 import { DatabaseModule } from './database/database.module';
 import { HealthController } from './health/health.controller';
@@ -13,9 +14,12 @@ import { InterviewsModule } from './modules/interviews/interviews.module';
 import { QualityGuardModule } from './modules/quality-guard/quality-guard.module';
 import { SimulationAssessmentsModule } from './modules/simulation-assessments/simulation-assessments.module';
 import { SimulationsModule } from './modules/simulations/simulations.module';
+import { ScenariosModule } from './modules/scenarios/scenarios.module';
+import { ApiExceptionFilter } from './api-exception.filter';
 
 @Module({
-  imports: [AuthModule, DatabaseModule, IdempotencyModule, PrivacyModule, AiClientModule, AuditModule, CandidatesModule, BriefsModule, SimulationsModule, SimulationAssessmentsModule, InterviewsModule, QualityGuardModule],
+  imports: [AuthModule, DatabaseModule, IdempotencyModule, PrivacyModule, AiClientModule, AuditModule, CandidatesModule, ScenariosModule, BriefsModule, SimulationsModule, SimulationAssessmentsModule, InterviewsModule, QualityGuardModule],
   controllers: [HealthController],
+  providers: [{ provide: APP_FILTER, useClass: ApiExceptionFilter }],
 })
 export class AppModule {}
