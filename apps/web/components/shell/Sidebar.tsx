@@ -4,7 +4,7 @@ import { BeakerIcon, ChevronDoubleLeftIcon, ChevronDoubleRightIcon, LockClosedIc
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { StaffLocale } from '../../lib/i18n/staffLocale';
-import { isActive, navFor, sectionLabel, type NavItem, type NavSection } from '../../lib/navigation';
+import { activeItemId, navFor, sectionLabel, type NavItem, type NavSection } from '../../lib/navigation';
 import { homeFor } from '../../lib/demo/world';
 import { isStaff, type DemoRole } from '../../lib/roles';
 import { ThemeToggle } from '../ui/ThemeToggle';
@@ -113,6 +113,7 @@ export function Sidebar({
   // A candidate's screens are English only, and so is the navigation around them.
   const shown: StaffLocale = staff ? locale : 'en';
   const items = navFor(role);
+  const activeId = activeItemId(items, pathname);
   const text = copy[shown];
 
   return (
@@ -154,7 +155,7 @@ export function Sidebar({
                   item={item}
                   locale={shown}
                   collapsed={collapsed}
-                  active={isActive(item, pathname)}
+                  active={item.id === activeId}
                   onNavigate={onNavigate}
                 />
               ))}
