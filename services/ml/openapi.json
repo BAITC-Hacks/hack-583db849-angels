@@ -456,6 +456,49 @@
           }
         ]
       }
+    },
+    "/internal/v1/quality-check": {
+      "post": {
+        "summary": "Quality Check",
+        "operationId": "quality_check_internal_v1_quality_check_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QualityCheckRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QualityCheckResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -1086,6 +1129,42 @@
         ],
         "title": "DraftResult"
       },
+      "Drift": {
+        "properties": {
+          "competency": {
+            "type": "string",
+            "enum": [
+              "D",
+              "R",
+              "I",
+              "V",
+              "E"
+            ],
+            "title": "Competency"
+          },
+          "interviewerMean": {
+            "type": "number",
+            "title": "Interviewermean"
+          },
+          "panelMean": {
+            "type": "number",
+            "title": "Panelmean"
+          },
+          "delta": {
+            "type": "number",
+            "title": "Delta"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "competency",
+          "interviewerMean",
+          "panelMean",
+          "delta"
+        ],
+        "title": "Drift"
+      },
       "DriveScore": {
         "properties": {
           "competency": {
@@ -1485,6 +1564,172 @@
         ],
         "title": "Observation"
       },
+      "QualityCheckRequest": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "interview",
+              "calibration"
+            ],
+            "title": "Kind"
+          },
+          "transcript": {
+            "items": {
+              "$ref": "#/components/schemas/InterviewTurn"
+            },
+            "type": "array",
+            "title": "Transcript",
+            "default": []
+          },
+          "history": {
+            "items": {
+              "$ref": "#/components/schemas/ScoredInterview"
+            },
+            "type": "array",
+            "title": "History",
+            "default": []
+          },
+          "interviewerRef": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Interviewerref"
+          },
+          "periodFrom": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Periodfrom"
+          },
+          "periodTo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Periodto"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "kind"
+        ],
+        "title": "QualityCheckRequest"
+      },
+      "QualityCheckResult": {
+        "properties": {
+          "signals": {
+            "items": {
+              "$ref": "#/components/schemas/QualitySignal"
+            },
+            "type": "array",
+            "title": "Signals"
+          },
+          "talkShare": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TalkShare"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "drift": {
+            "items": {
+              "$ref": "#/components/schemas/Drift"
+            },
+            "type": "array",
+            "title": "Drift",
+            "default": []
+          },
+          "interviews": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Interviews"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "signals"
+        ],
+        "title": "QualityCheckResult"
+      },
+      "QualitySignal": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "leading_question",
+              "off_limits_question",
+              "coverage_gap",
+              "scale_drift"
+            ],
+            "title": "Kind"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "recommendation": {
+            "type": "string",
+            "title": "Recommendation"
+          },
+          "competencies": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "D",
+                "R",
+                "I",
+                "V",
+                "E"
+              ]
+            },
+            "type": "array",
+            "title": "Competencies",
+            "default": []
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/Evidence"
+            },
+            "type": "array",
+            "title": "Evidence",
+            "default": []
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "kind",
+          "message",
+          "recommendation"
+        ],
+        "title": "QualitySignal"
+      },
       "ScenarioBrief": {
         "properties": {
           "scenarioId": {
@@ -1542,6 +1787,74 @@
         ],
         "title": "ScenarioBrief",
         "description": "The public part of a scenario. The hidden motive and the beats stay inside the service."
+      },
+      "ScoreValue": {
+        "properties": {
+          "competency": {
+            "type": "string",
+            "enum": [
+              "D",
+              "R",
+              "I",
+              "V",
+              "E"
+            ],
+            "title": "Competency"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 4.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "competency",
+          "score"
+        ],
+        "title": "ScoreValue"
+      },
+      "ScoredInterview": {
+        "properties": {
+          "interviewRef": {
+            "type": "string",
+            "title": "Interviewref"
+          },
+          "interviewerRef": {
+            "type": "string",
+            "title": "Interviewerref"
+          },
+          "heldAt": {
+            "type": "string",
+            "title": "Heldat"
+          },
+          "scores": {
+            "items": {
+              "$ref": "#/components/schemas/ScoreValue"
+            },
+            "type": "array",
+            "title": "Scores"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "interviewRef",
+          "interviewerRef",
+          "heldAt",
+          "scores"
+        ],
+        "title": "ScoredInterview",
+        "description": "One saved set of scores, pseudonymous: no candidate, no names."
       },
       "SpeechRequest": {
         "properties": {
@@ -1605,6 +1918,25 @@
           "why"
         ],
         "title": "SurpriseResult"
+      },
+      "TalkShare": {
+        "properties": {
+          "interviewer": {
+            "type": "number",
+            "title": "Interviewer"
+          },
+          "candidate": {
+            "type": "number",
+            "title": "Candidate"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "interviewer",
+          "candidate"
+        ],
+        "title": "TalkShare"
       },
       "TestAnswer": {
         "properties": {

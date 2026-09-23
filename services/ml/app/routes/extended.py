@@ -12,6 +12,8 @@ from ..schemas.contracts import (
     ConsistencyResult,
     DraftRequest,
     DraftResult,
+    QualityCheckRequest,
+    QualityCheckResult,
     SurpriseRequest,
     SurpriseResult,
     Usage,
@@ -39,5 +41,10 @@ def extended_router(authenticate: Callable[..., None]) -> APIRouter:
     async def interview_draft(request: DraftRequest) -> DraftResult:
         del request
         return load_example("interview-draft.response.json", DraftResult)
+
+    @router.post("/quality-check", response_model=QualityCheckResult)
+    async def quality_check(request: QualityCheckRequest) -> QualityCheckResult:
+        filename = f"quality-check-{request.kind}.response.json"
+        return load_example(filename, QualityCheckResult)
 
     return router

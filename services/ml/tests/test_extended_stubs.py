@@ -57,6 +57,16 @@ def example(filename: str) -> object:
             "interview-draft.request.json",
             "interview-draft.response.json",
         ),
+        (
+            "/internal/v1/quality-check",
+            "quality-check-interview.request.json",
+            "quality-check-interview.response.json",
+        ),
+        (
+            "/internal/v1/quality-check",
+            "quality-check-calibration.request.json",
+            "quality-check-calibration.response.json",
+        ),
     ],
 )
 def test_extended_post_stubs_return_the_frozen_examples(
