@@ -26,7 +26,7 @@ class CassetteEnvelope(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     version: Literal[1]
-    key: str = Field(pattern=r"^[0-9a-f]{64}$")
+    request_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     task: TaskName
     provider: Provider
     model: str = Field(min_length=1)
@@ -76,7 +76,7 @@ class FileCassetteStore:
         except (OSError, ValidationError) as error:
             raise GatewayReplayError("replay cassette is invalid") from error
         if (
-            envelope.key != key
+            envelope.request_hash != key
             or envelope.task != request.task
             or envelope.provider != provider
             or envelope.model != model
@@ -100,7 +100,7 @@ class FileCassetteStore:
         path = self.path_for(request, provider, model)
         envelope = CassetteEnvelope(
             version=1,
-            key=key,
+            request_hash=key,
             task=request.task,
             provider=provider,
             model=model,

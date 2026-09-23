@@ -1,0 +1,12 @@
+{
+  "input_tokens": 11,
+  "request_hash": "91050b8788cc3b21c85b8d180ad7aa3e5a6bdb51e477f283853ab9c50cfcc12b",
+  "model": "gpt-6-sol",
+  "output_tokens": 2,
+  "provider": "openai",
+  "recorded_at": "2026-09-23T00:00:00Z",
+  "request_id": "synthetic-offline-probe",
+  "response": "{\"value\":\"offline\"}",
+  "task": "brief",
+  "version": 1
+}
