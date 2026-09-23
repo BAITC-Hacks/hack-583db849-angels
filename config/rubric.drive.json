@@ -1,0 +1,92 @@
+{
+  "version": 1,
+  "title": "D.R.I.V.E.",
+  "scoring_principles": {
+    "insufficient_evidence_score": null,
+    "english_proficiency_affects_scores": false,
+    "human_decision_required": true,
+    "evidence_must_be_verbatim": true
+  },
+  "competencies": [
+    {
+      "code": "D",
+      "name": "Disciplined Resilience",
+      "description": "Responds to setbacks with a deliberate recovery process and sustained follow-through.",
+      "levels": [
+        {"score": 0, "label": "Counterproductive", "behavioral_indicators": ["Abandons the goal or repeats the failed approach without reflection."]},
+        {"score": 1, "label": "Reactive", "behavioral_indicators": ["Acknowledges the setback but offers no workable recovery sequence."]},
+        {"score": 2, "label": "Developing", "behavioral_indicators": ["Names a recovery step but leaves ownership or follow-through unclear."]},
+        {"score": 3, "label": "Effective", "behavioral_indicators": ["Builds a sequenced recovery plan, assigns ownership, and checks progress."]},
+        {"score": 4, "label": "Adaptive", "behavioral_indicators": ["Recovers systematically, learns from the setback, and adapts the system to reduce recurrence."]}
+      ],
+      "insufficient_evidence_rule": "Use null, with null confidence and rationale, when no verified source shows the candidate responding to a setback.",
+      "forbidden_inferences": ["Do not infer resilience from age, health, disability, family circumstances, region, school, or socioeconomic background.", "Do not turn this competency score into an admissions recommendation, ranking, or verdict."],
+      "evidence_examples": [{"quote": "I listed the failed handoffs, assigned one owner to each, and checked them every morning.", "source": {"source": "simulation_turn", "source_id": "turn_d_01", "text": "After the launch slipped, I listed the failed handoffs, assigned one owner to each, and checked them every morning."}, "interpretation": "The quote provides a recovery sequence, ownership, and follow-through."}],
+      "interview_question_templates": ["Tell me about a plan that failed. What did you do first, and how did you know the recovery was working?"]
+    },
+    {
+      "code": "R",
+      "name": "Responsible Innovation",
+      "description": "Introduces useful change while identifying risks, consequences, safeguards, and personal accountability.",
+      "levels": [
+        {"score": 0, "label": "Unbounded", "behavioral_indicators": ["Pushes a change while dismissing foreseeable harm or responsibility."]},
+        {"score": 1, "label": "Idea only", "behavioral_indicators": ["Suggests novelty without naming a material risk or safeguard."]},
+        {"score": 2, "label": "Risk aware", "behavioral_indicators": ["Names a risk but provides a weak safeguard or unclear owner."]},
+        {"score": 3, "label": "Responsible", "behavioral_indicators": ["Pairs the change with a concrete safeguard, success check, and accountable owner."]},
+        {"score": 4, "label": "Systemic", "behavioral_indicators": ["Tests the change reversibly, includes affected people, and updates safeguards from evidence."]}
+      ],
+      "insufficient_evidence_rule": "Use null, with null confidence and rationale, when no verified source links an initiative to risks and safeguards.",
+      "forbidden_inferences": ["Do not infer innovation from access to technology, school prestige, wealth, job title, or polished vocabulary.", "Do not treat risk-taking as proof that a person should be accepted, rejected, or ranked."],
+      "evidence_examples": [{"quote": "We piloted it with one team and kept the old process ready if complaints increased.", "source": {"source": "interview_turn", "source_id": "iturn_r_01", "text": "We piloted it with one team and kept the old process ready if complaints increased."}, "interpretation": "The quote identifies a bounded experiment and a reversible safeguard."}],
+      "interview_question_templates": ["Describe a change you initiated. What could have gone wrong, and what safeguard did you put in place?"]
+    },
+    {
+      "code": "I",
+      "name": "Insightful Vision",
+      "description": "Connects immediate choices to context, root causes, a clear shared goal, and longer-term effects.",
+      "levels": [
+        {"score": 0, "label": "Disconnected", "behavioral_indicators": ["Acts on a surface symptom while ignoring stated context and consequences."]},
+        {"score": 1, "label": "Narrow", "behavioral_indicators": ["States a goal but cannot connect it to the underlying situation."]},
+        {"score": 2, "label": "Context aware", "behavioral_indicators": ["Identifies relevant context or a root cause but leaves the long-term direction vague."]},
+        {"score": 3, "label": "Coherent", "behavioral_indicators": ["Explains the root issue, shared goal, and how the proposed steps support it."]},
+        {"score": 4, "label": "Foresighted", "behavioral_indicators": ["Integrates competing perspectives, anticipates second-order effects, and revises the direction when evidence changes."]}
+      ],
+      "insufficient_evidence_rule": "Use null, with null confidence and rationale, when verified sources do not show contextual or longer-term reasoning.",
+      "forbidden_inferences": ["Do not infer vision from accent, fluency, confidence, school, region, culture, or familiarity with business jargon.", "Do not convert a vision score into a prediction of admission, status, or personal worth."],
+      "evidence_examples": [{"quote": "The argument was about deadlines, but the shared problem was that neither group knew who could change the scope.", "source": {"source": "simulation_turn", "source_id": "turn_i_01", "text": "The argument was about deadlines, but the shared problem was that neither group knew who could change the scope."}, "interpretation": "The quote distinguishes a surface conflict from an underlying coordination problem."}],
+      "interview_question_templates": ["Think of a conflict that looked simple at first. What was the deeper issue, and what longer-term goal guided you?"]
+    },
+    {
+      "code": "V",
+      "name": "Values-Driven Leadership",
+      "description": "Makes choices with explicit values, respect for people, and defensible ethical boundaries.",
+      "levels": [
+        {"score": 0, "label": "Harmful", "behavioral_indicators": ["Knowingly uses deception, coercion, or disrespect to obtain the result."]},
+        {"score": 1, "label": "Unexamined", "behavioral_indicators": ["Claims a value without applying it to the difficult choice or affected people."]},
+        {"score": 2, "label": "Partly applied", "behavioral_indicators": ["Names a relevant value and respectful intent but leaves the boundary or tradeoff unclear."]},
+        {"score": 3, "label": "Principled", "behavioral_indicators": ["Applies an explicit value, protects affected people, and explains the tradeoff honestly."]},
+        {"score": 4, "label": "Consistent", "behavioral_indicators": ["Maintains an ethical boundary under pressure, invites challenge, and repairs harm when the process falls short."]}
+      ],
+      "insufficient_evidence_rule": "Use null, with null confidence and rationale, when no verified source contains a values-based choice or ethical boundary.",
+      "forbidden_inferences": ["Do not infer values from religion, gender, family, ethnicity, nationality, income, appearance, or personal background.", "Do not label the whole person moral or immoral and do not issue an admissions verdict."],
+      "evidence_examples": [{"quote": "I told the sponsor we would not publish individual names, even if that made the report less dramatic.", "source": {"source": "interview_turn", "source_id": "iturn_v_01", "text": "I told the sponsor we would not publish individual names, even if that made the report less dramatic."}, "interpretation": "The quote states an ethical privacy boundary and its cost."}],
+      "interview_question_templates": ["Tell me about a time doing the right thing had a real cost. What boundary did you set, and how did you explain it?"]
+    },
+    {
+      "code": "E",
+      "name": "Entrepreneurial Execution",
+      "description": "Turns an idea into prioritized action with owners, deadlines, feedback, and accountability for results.",
+      "levels": [
+        {"score": 0, "label": "No execution", "behavioral_indicators": ["Produces no actionable next step or repeatedly avoids ownership."]},
+        {"score": 1, "label": "Activity only", "behavioral_indicators": ["Lists activity without priorities, owners, or a way to check the result."]},
+        {"score": 2, "label": "Basic plan", "behavioral_indicators": ["Defines initial steps but leaves a key owner, deadline, or feedback loop unclear."]},
+        {"score": 3, "label": "Executable", "behavioral_indicators": ["Prioritizes steps, assigns owners and deadlines, and defines a result check."]},
+        {"score": 4, "label": "Iterative", "behavioral_indicators": ["Delivers in stages, measures outcomes, removes constraints, and changes the plan based on feedback."]}
+      ],
+      "insufficient_evidence_rule": "Use null, with null confidence and rationale, when verified sources do not show movement from idea to owned action.",
+      "forbidden_inferences": ["Do not infer execution from employment, family resources, income, access to networks, or prior opportunity.", "Do not use speed or activity alone to recommend acceptance, rejection, or ranking."],
+      "evidence_examples": [{"quote": "By Friday, Dana owned the supplier call, I owned the revised schedule, and we agreed to review both at noon.", "source": {"source": "simulation_turn", "source_id": "turn_e_01", "text": "By Friday, Dana owned the supplier call, I owned the revised schedule, and we agreed to review both at noon."}, "interpretation": "The quote provides priorities, owners, a deadline, and a review point."}],
+      "interview_question_templates": ["Choose an idea you actually delivered. How did you prioritize the work, assign ownership, and measure the result?"]
+    }
+  ]
+}

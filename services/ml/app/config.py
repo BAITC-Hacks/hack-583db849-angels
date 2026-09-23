@@ -19,6 +19,7 @@ class Settings:
     gateway_mode: GatewayMode
     budget_usd_cap: Decimal
     demo_mode: bool
+    usage_log_path: Path = Path("/data/gateway-usage.jsonl")
 
 
 def _boolean(value: str, name: str) -> bool:
@@ -49,4 +50,7 @@ def load_settings(environment: Mapping[str, str] | None = None) -> Settings:
         gateway_mode=gateway_mode,
         budget_usd_cap=budget_usd_cap,
         demo_mode=_boolean(values.get("DEMO_MODE", "false"), "DEMO_MODE"),
+        usage_log_path=Path(
+            values.get("USAGE_LOG_PATH", "/data/gateway-usage.jsonl")
+        ),
     )

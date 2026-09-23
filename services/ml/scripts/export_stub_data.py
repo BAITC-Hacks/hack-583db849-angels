@@ -4,12 +4,17 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import shutil
 
 
 ROOT = Path(__file__).resolve().parents[3]
 SOURCE = ROOT / "docs" / "contracts" / "examples" / "candidate-a" / "ml"
 OUTPUT_DIR = ROOT / "services" / "ml" / "stub_data"
 OUTPUT_JSON = OUTPUT_DIR / "examples.json"
+SOURCE_MODELS = ROOT / "config" / "models.json"
+OUTPUT_MODELS = OUTPUT_DIR / "models.json"
+SOURCE_RUBRIC = ROOT / "config" / "rubric.drive.json"
+OUTPUT_RUBRIC = OUTPUT_DIR / "rubric.drive.json"
 
 EXAMPLE_FILES = (
     "brief.response.json",
@@ -37,6 +42,8 @@ def export_stub_data() -> None:
         json.dumps(payloads, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
+    shutil.copyfile(SOURCE_MODELS, OUTPUT_MODELS)
+    shutil.copyfile(SOURCE_RUBRIC, OUTPUT_RUBRIC)
 
 
 if __name__ == "__main__":

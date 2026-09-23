@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from decimal import Decimal
 
 from fastapi import APIRouter, Depends
 
+from ..config import GatewayMode
 from ..examples import load_example
+from ..gateway.usage import FileUsageStore
 from ..schemas.contracts import (
     ConsistencyRequest,
     ConsistencyResult,
@@ -18,9 +21,15 @@ from ..schemas.contracts import (
     SurpriseResult,
     Usage,
 )
+from .usage import usage_summary
 
 
-def extended_router(authenticate: Callable[..., None]) -> APIRouter:
+def extended_router(
+    authenticate: Callable[..., None],
+    usage_store: FileUsageStore,
+    gateway_mode: GatewayMode,
+    cap_usd: Decimal,
+) -> APIRouter:
     router = APIRouter(prefix="/internal/v1", dependencies=[Depends(authenticate)])
 
     @router.post("/consistency", response_model=ConsistencyResult)
@@ -35,7 +44,7 @@ def extended_router(authenticate: Callable[..., None]) -> APIRouter:
 
     @router.get("/usage", response_model=Usage)
     async def usage() -> Usage:
-        return load_example("usage.response.json", Usage)
+        return await usage_summary(usage_store, gateway_mode, cap_usd)
 
     @router.post("/interview/draft", response_model=DraftResult)
     async def interview_draft(request: DraftRequest) -> DraftResult:

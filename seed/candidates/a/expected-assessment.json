@@ -1,0 +1,113 @@
+{
+  "scores": [
+    {
+      "competency": "D",
+      "score": 2,
+      "confidence": "medium",
+      "rationale": "Has a fallback if the run fails, but says nothing about how the team recovers from the conflict itself.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_10",
+          "quote": "If the Thursday run fails, we cut the analytics screen instead of working all night."
+        }
+      ]
+    },
+    {
+      "competency": "R",
+      "score": 2,
+      "confidence": "low",
+      "rationale": "Names one risk and a way to contain it; does not weigh what the decision costs the people involved.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_06",
+          "quote": "the risk is that we demo with a known bug, so I'll ask him to patch only that."
+        }
+      ]
+    },
+    {
+      "competency": "I",
+      "score": 2,
+      "confidence": "medium",
+      "rationale": "Sees the process gap behind the conflict, and treats it purely as a process problem.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_04",
+          "quote": "nobody merges into someone else's module without a review from its owner"
+        }
+      ]
+    },
+    {
+      "competency": "V",
+      "score": null,
+      "confidence": null,
+      "rationale": null,
+      "evidence": []
+    },
+    {
+      "competency": "E",
+      "score": 4,
+      "confidence": "high",
+      "rationale": "Turns the conflict into owners, deadlines and a checkpoint without being asked, and starts acting at once.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_08",
+          "quote": "Today you finish the payment endpoint, Timur fixes the login in his branch, and I write the demo script."
+        },
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_08",
+          "quote": "We freeze the backend by Thursday noon and do a full run at six."
+        },
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_10",
+          "quote": "I'll put the owners in the team chat in ten minutes and call Timur right after."
+        }
+      ]
+    }
+  ],
+  "english": {
+    "cefrEstimate": "B2",
+    "wordsPerMinute": 112,
+    "fillerRate": 0.03,
+    "meanTurnLength": 33.8,
+    "lexicalDiversity": 0.71,
+    "grammarErrorsPer100Words": 0.8
+  },
+  "interviewQuestions": [
+    {
+      "competency": "V",
+      "question": "Tell me about a decision where doing the right thing cost you or your team something. What did you do?",
+      "reason": "No verified evidence for Values-Driven Leadership in the simulation."
+    },
+    {
+      "competency": "D",
+      "question": "The Thursday run fails and the analytics screen is already cut. What happens next, and how do you keep the team together?",
+      "reason": "A fallback was named, but not how the team recovers."
+    },
+    {
+      "competency": "R",
+      "question": "What could go wrong with the new review rule, and for whom?",
+      "reason": "One risk was named; its effect on people was not."
+    }
+  ],
+  "candidateFeedback": {
+    "strengths": [
+      "You turned a tense moment into a concrete plan: who does what, and by when.",
+      "You named a risk in your own plan and a way to keep it small.",
+      "You acted straight away instead of waiting for the conflict to settle by itself."
+    ],
+    "growth": [
+      "Say why a decision is fair to everyone involved, not only how it gets the work done.",
+      "When a plan might not work out, talk about how the team will get through it together, not only what you will cut."
+    ],
+    "nextTime": [
+      "Before you propose a plan, ask the other person what matters most to them.",
+      "After a conflict, check in with each person once the pressure is off."
+    ]
+  }
+}

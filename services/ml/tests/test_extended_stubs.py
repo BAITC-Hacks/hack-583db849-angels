@@ -81,11 +81,17 @@ def test_extended_post_stubs_return_the_frozen_examples(
     assert response.json() == example(response_name)
 
 
-def test_usage_stub_returns_the_frozen_example(client: TestClient) -> None:
+def test_empty_usage_log_returns_zero_counts(client: TestClient) -> None:
     response = client.get("/internal/v1/usage", headers=TOKEN)
 
     assert response.status_code == 200
-    assert response.json() == example("usage.response.json")
+    assert response.json() == {
+        "gatewayMode": "replay",
+        "liveCalls": 0,
+        "replayedCalls": 0,
+        "spentUsd": 0.0,
+        "capUsd": 20.0,
+    }
 
 
 def test_draft_rejects_interviewer_scores(client: TestClient) -> None:

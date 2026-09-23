@@ -1,0 +1,95 @@
+{
+  "scores": [
+    {
+      "competency": "D",
+      "score": 1,
+      "confidence": "medium",
+      "rationale": "The synthetic transcript contains a concrete behavior matching the rubric.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_02",
+          "quote": "I paused until a teammate helped me restart the discussion."
+        }
+      ]
+    },
+    {
+      "competency": "R",
+      "score": 3,
+      "confidence": "medium",
+      "rationale": "The synthetic transcript contains a concrete behavior matching the rubric.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_04",
+          "quote": "I would test one small group first and ask beginners what made them leave."
+        }
+      ]
+    },
+    {
+      "competency": "I",
+      "score": 4,
+      "confidence": "medium",
+      "rationale": "The synthetic transcript contains a concrete behavior matching the rubric.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_06",
+          "quote": "The goal is a path from first practice to confident participation, not just attendance."
+        }
+      ]
+    },
+    {
+      "competency": "V",
+      "score": 3,
+      "confidence": "medium",
+      "rationale": "The synthetic transcript contains a concrete behavior matching the rubric.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_08",
+          "quote": "Beginners choose what feedback is shared, and mentors cannot publish private notes."
+        }
+      ]
+    },
+    {
+      "competency": "E",
+      "score": 2,
+      "confidence": "medium",
+      "rationale": "The synthetic transcript contains a concrete behavior matching the rubric.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_10",
+          "quote": "I will recruit two mentors this week and review the first group after a month."
+        }
+      ]
+    }
+  ],
+  "english": {
+    "wordsPerMinute": 104.0,
+    "fillerRate": 0.04,
+    "meanTurnLength": 26.0,
+    "lexicalDiversity": 0.61,
+    "grammarErrorsPer100Words": 2.0,
+    "cefrEstimate": "B2"
+  },
+  "interviewQuestions": [
+    {
+      "competency": "D",
+      "question": "What helped you restart after the pause?",
+      "reason": "The recovery depended on another person restarting the discussion."
+    }
+  ],
+  "candidateFeedback": {
+    "strengths": [
+      "You connected the immediate problem to a longer-term goal."
+    ],
+    "growth": [
+      "When momentum drops, name the first action you will take yourself."
+    ],
+    "nextTime": [
+      "Set a restart checkpoint before ending the conversation."
+    ]
+  }
+}
