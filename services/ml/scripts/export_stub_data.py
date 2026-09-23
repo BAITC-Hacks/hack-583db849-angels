@@ -19,6 +19,8 @@ EXAMPLE_FILES = (
     "consistency-after.response.json",
     "consistency-before.response.json",
     "interview-draft.response.json",
+    "quality-check-calibration.response.json",
+    "quality-check-interview.response.json",
     "scenarios.response.json",
     "simulation-assessment.response.json",
     "simulation-turn.response.json",

@@ -15,6 +15,7 @@ EXPECTED_PATHS = {
     "/internal/v1/surprise-question",
     "/internal/v1/usage",
     "/internal/v1/interview/draft",
+    "/internal/v1/quality-check",
 }
 
 

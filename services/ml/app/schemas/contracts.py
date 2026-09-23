@@ -426,6 +426,82 @@ class SurpriseResult(Strict):
         return question
 
 
+SignalKind = Literal[
+    "leading_question",
+    "off_limits_question",
+    "coverage_gap",
+    "scale_drift",
+]
+
+
+class ScoreValue(Strict):
+    competency: Competency
+    score: Score
+
+
+class ScoredInterview(Strict):
+    """One saved set of scores, pseudonymous: no candidate, no names."""
+
+    interviewRef: str
+    interviewerRef: str
+    heldAt: str
+    scores: list[ScoreValue]
+
+
+class QualityCheckRequest(Strict):
+    kind: Literal["interview", "calibration"]
+    transcript: list[InterviewTurn] = []
+    history: list[ScoredInterview] = []
+    interviewerRef: str | None = None
+    periodFrom: str | None = None
+    periodTo: str | None = None
+
+    @model_validator(mode="after")
+    def one_kind_of_input(self) -> "QualityCheckRequest":
+        if self.kind == "interview" and (not self.transcript or self.history):
+            raise ValueError("an interview check reads a transcript and nothing else")
+        if self.kind == "calibration" and (
+            not self.history or self.transcript or not self.interviewerRef
+        ):
+            raise ValueError("a calibration check reads a history and needs an interviewerRef")
+        return self
+
+
+class QualitySignal(Strict):
+    kind: SignalKind
+    message: str
+    recommendation: str
+    competencies: list[Competency] = []
+    evidence: list[Evidence] = []
+
+    @model_validator(mode="after")
+    def a_question_signal_quotes_the_question(self) -> "QualitySignal":
+        if self.kind in ("leading_question", "off_limits_question") and not self.evidence:
+            raise ValueError("a signal about a question quotes that question")
+        if self.kind == "scale_drift" and not self.competencies:
+            raise ValueError("drift names the competency it drifted on")
+        return self
+
+
+class TalkShare(Strict):
+    interviewer: float
+    candidate: float
+
+
+class Drift(Strict):
+    competency: Competency
+    interviewerMean: float
+    panelMean: float
+    delta: float
+
+
+class QualityCheckResult(Strict):
+    signals: list[QualitySignal]
+    talkShare: TalkShare | None = None
+    drift: list[Drift] = []
+    interviews: int | None = None
+
+
 class Usage(Strict):
     gatewayMode: Literal["live", "record", "replay"]
     liveCalls: int

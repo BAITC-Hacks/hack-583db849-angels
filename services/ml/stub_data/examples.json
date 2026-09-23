@@ -419,6 +419,99 @@
       }
     ]
   },
+  "quality-check-calibration.response.json": {
+    "drift": [
+      {
+        "competency": "D",
+        "delta": -0.1,
+        "interviewerMean": 2.2,
+        "panelMean": 2.3
+      },
+      {
+        "competency": "R",
+        "delta": 0.0,
+        "interviewerMean": 2.2,
+        "panelMean": 2.2
+      },
+      {
+        "competency": "I",
+        "delta": 0.1,
+        "interviewerMean": 2.4,
+        "panelMean": 2.3
+      },
+      {
+        "competency": "V",
+        "delta": 1.1,
+        "interviewerMean": 3.4,
+        "panelMean": 2.3
+      },
+      {
+        "competency": "E",
+        "delta": 0.1,
+        "interviewerMean": 2.8,
+        "panelMean": 2.7
+      }
+    ],
+    "interviews": 15,
+    "signals": [
+      {
+        "competencies": [
+          "V"
+        ],
+        "evidence": [],
+        "kind": "scale_drift",
+        "message": "Values scores run 1.1 above the panel across this interviewer's 5 interviews in the period (3.4 against 2.3).",
+        "recommendation": "Score two recent Values answers again against the rubric's indicators, with another interviewer."
+      }
+    ],
+    "talkShare": null
+  },
+  "quality-check-interview.response.json": {
+    "drift": [],
+    "interviews": null,
+    "signals": [
+      {
+        "competencies": [],
+        "evidence": [
+          {
+            "quote": "You would agree that finishing on time matters most, right?",
+            "source": "interview_turn",
+            "sourceId": "iturn_03"
+          }
+        ],
+        "kind": "leading_question",
+        "message": "The question suggests its own answer.",
+        "recommendation": "Ask openly: \u201cWhat mattered most to you in that moment, and why?\u201d"
+      },
+      {
+        "competencies": [],
+        "evidence": [
+          {
+            "quote": "What do your parents do for a living?",
+            "source": "interview_turn",
+            "sourceId": "iturn_07"
+          }
+        ],
+        "kind": "off_limits_question",
+        "message": "Family income and background are not assessed and must not be asked about.",
+        "recommendation": "Remove the question; it cannot inform any D.R.I.V.E. competency."
+      },
+      {
+        "competencies": [
+          "V",
+          "I"
+        ],
+        "evidence": [],
+        "kind": "coverage_gap",
+        "message": "No question addressed Values-Driven Leadership or Insightful Vision.",
+        "recommendation": "Use the brief\u2019s questions for V and I."
+      }
+    ],
+    "talkShare": {
+      "candidate": 0.66,
+      "interviewer": 0.34
+    }
+  },
   "scenarios.response.json": [
     {
       "character": {
