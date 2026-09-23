@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
+from dataclasses import replace
+import logging
 from typing import Any
-
-from pydantic import ValidationError
 
 from ..config import GatewayMode, Settings
 from .cache import InMemoryResponseCache, NullResponseCache
@@ -28,9 +28,11 @@ from .types import (
     ProviderResponse,
     ResponseCache,
 )
+from .validation import validate_output
 
 
 ProviderFactory = Callable[[], ModelProvider]
+logger = logging.getLogger(__name__)
 
 
 class ModelGateway:
@@ -98,35 +100,65 @@ class ModelGateway:
             )
 
         response: ProviderResponse | None = None
+        result: GatewayResult[OutputT] | None = None
         selected_model = task.model
         for candidate in candidates:
+            attempt_responses: list[ProviderResponse] = []
             selected_model = candidate
             try:
                 response = await provider.generate(
-                    ProviderRequest(
-                        task=request.task,
-                        model=candidate,
-                        prompt=request.prompt,
-                        payload=request.payload,
-                        output_schema=request.output_schema,
-                        max_tokens=task.max_tokens,
-                    )
+                    self._provider_request(request, candidate, task.max_tokens)
                 )
-                break
+                attempt_responses.append(response)
             except GatewayProviderError:
                 continue
 
-        if response is None:
-            raise GatewayProviderError("model provider failed")
+            try:
+                result = self._validated_result(
+                    request,
+                    response,
+                    provider=task.provider,
+                    model=selected_model,
+                    replayed=False,
+                    cached=False,
+                )
+                self._log_attempt(
+                    request, task.provider, candidate, 1, "valid", response
+                )
+            except GatewayOutputError:
+                self._log_attempt(
+                    request, task.provider, candidate, 1, "invalid", response
+                )
+                response = await provider.generate(
+                    self._provider_request(request, candidate, task.max_tokens)
+                )
+                attempt_responses.append(response)
+                try:
+                    result = self._validated_result(
+                        request,
+                        response,
+                        provider=task.provider,
+                        model=selected_model,
+                        replayed=False,
+                        cached=False,
+                    )
+                    self._log_attempt(
+                        request, task.provider, candidate, 2, "valid", response
+                    )
+                except GatewayOutputError:
+                    self._log_attempt(
+                        request, task.provider, candidate, 2, "invalid", response
+                    )
+                    raise
+            result = replace(
+                result,
+                input_tokens=sum(item.input_tokens for item in attempt_responses),
+                output_tokens=sum(item.output_tokens for item in attempt_responses),
+            )
+            break
 
-        result = self._validated_result(
-            request,
-            response,
-            provider=task.provider,
-            model=selected_model,
-            replayed=False,
-            cached=False,
-        )
+        if response is None or result is None:
+            raise GatewayProviderError("model provider failed")
         if self._mode == "record":
             await self._cassettes.save(
                 request,
@@ -144,6 +176,40 @@ class ModelGateway:
         return result
 
     @staticmethod
+    def _provider_request(
+        request: GatewayRequest[OutputT], model: str, max_tokens: int
+    ) -> ProviderRequest:
+        return ProviderRequest(
+            task=request.task,
+            model=model,
+            prompt=request.prompt,
+            payload=request.payload,
+            output_schema=request.output_schema,
+            max_tokens=max_tokens,
+        )
+
+    @staticmethod
+    def _log_attempt(
+        request: GatewayRequest[Any],
+        provider: Provider,
+        model: str,
+        attempt: int,
+        outcome: str,
+        response: ProviderResponse,
+    ) -> None:
+        logger.info(
+            "model output validation task=%s provider=%s model=%s attempt=%d "
+            "outcome=%s input_tokens=%d output_tokens=%d",
+            request.task.value,
+            provider.value,
+            model,
+            attempt,
+            outcome,
+            response.input_tokens,
+            response.output_tokens,
+        )
+
+    @staticmethod
     def _validated_result(
         request: GatewayRequest[OutputT],
         response: ProviderResponse,
@@ -153,10 +219,7 @@ class ModelGateway:
         replayed: bool,
         cached: bool,
     ) -> GatewayResult[OutputT]:
-        try:
-            output = request.output_schema.model_validate_json(response.content)
-        except ValidationError as error:
-            raise GatewayOutputError("model output failed schema validation") from error
+        output = validate_output(request.output_schema, response.content)
         return GatewayResult(
             output=output,
             provider=provider,
