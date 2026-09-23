@@ -1,4 +1,5 @@
 import type { EvidenceSource } from '../../components/evidence/EvidenceQuote';
+import type { ConsistencyItem, ConsistencyTopic } from '../consistency/types';
 import type { Competency } from '../drive';
 
 export interface BriefEvidence {
@@ -14,27 +15,13 @@ export interface BriefEvidence {
  */
 export type BriefFocus = Competency | 'invision_knowledge' | 'english' | 'motivation';
 
-export type ConsistencyTopic = 'english' | 'invision_knowledge' | 'motivation' | 'experience' | 'achievements' | 'other';
-
 /**
- * One thing the candidate said about themselves, against what was measured or
- * heard. A signal with its evidence and a suggested question — never a verdict
- * and never a score.
+ * The brief carries the before-interview stage of the consistency layer, and
+ * the commission's screen carries both stages. Same item, same words for it,
+ * defined once in `lib/consistency/types.ts`.
  */
-export interface BriefConsistencyItem {
-  itemId: string;
-  topic: ConsistencyTopic;
-  claim: { text: string; evidence: BriefEvidence[] };
-  observation: {
-    text: string;
-    evidence: BriefEvidence[];
-    /** A measured value, such as the CEFR estimate from the simulation's speech. */
-    metric: { name: string; value: string | number; source: 'simulation' | 'surprise' | 'interview' } | null;
-  };
-  status: 'consistent' | 'discrepancy' | 'unverified' | 'confirmed' | 'resolved';
-  whatToDo: string;
-  askInInterview: string | null;
-}
+export type BriefConsistencyItem = ConsistencyItem;
+export type { ConsistencyTopic };
 
 /**
  * What the interviewer brief renders. The screen's own shape, not a wire type;
