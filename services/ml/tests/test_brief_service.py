@@ -65,6 +65,13 @@ def test_certificate_level_is_not_taken_from_unverified_model_mapping() -> None:
     assert result.english.certificate.cefr == "not verified"
 
 
+def test_model_cannot_invent_written_cefr() -> None:
+    request, proposed = example()
+    proposed.english.writtenCefr = "C2"
+    result = asyncio.run(BriefService(BriefGenerator(FakeGateway([proposed]))).prepare(request))
+    assert result.english.writtenCefr == "not assessed"
+
+
 def test_no_simulation_metric_cannot_be_invented_by_model() -> None:
     request, proposed = example()
     request.simulationEnglish = None
