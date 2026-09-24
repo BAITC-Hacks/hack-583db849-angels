@@ -118,8 +118,8 @@ def brief(candidate: str, snapshot: dict) -> dict:
                 {"type": certificate["type"], "score": certificate["score"], "cefr": "not verified"}
                 if certificate else None
             ),
-            "writtenCefr": "B1+" if candidate == "a" else "B2" if candidate == "b" else "B1",
-            "basis": "Estimate based on supplied written application answers; verify live.",
+            "writtenCefr": "not assessed",
+            "basis": "Written English is not independently measured; verify live.",
         },
     }
 

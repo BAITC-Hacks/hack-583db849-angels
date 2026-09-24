@@ -172,10 +172,6 @@ def _ground(
             score=supplied_certificate.score,
             cefr="not verified",
         )
-    written = (
-        proposed.english.writtenCefr
-        if request.candidate.application.answers else "not assessed"
-    )
     result = BriefResult(
         summary="Interview preparation based on the supplied application and test responses.",
         questions=questions,
@@ -183,12 +179,8 @@ def _ground(
         clarify=clarify,
         english=BriefEnglish(
             certificate=certificate,
-            writtenCefr=written,
-            basis=(
-                "Estimate based on supplied written application answers; verify live."
-                if request.candidate.application.answers else
-                "No written application answers were supplied."
-            ),
+            writtenCefr="not assessed",
+            basis="Written English is not independently measured; verify live.",
         ),
     )
     return result, submitted, dropped
