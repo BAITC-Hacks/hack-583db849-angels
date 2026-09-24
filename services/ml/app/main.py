@@ -17,6 +17,7 @@ from .gateway.media import MediaGateway, create_media_gateway
 from .gateway.service import LazyModelGateway, ModelGateway, create_gateway
 from .modules.actor import ScenarioActor
 from .modules.assessment import AssessmentService
+from .modules.brief import BriefGenerator, BriefService
 from .modules.judge import SimulationJudge
 from .metrics.languagetool import LocalLanguageTool
 from .modules.director import ScenarioDirector
@@ -34,6 +35,7 @@ def create_app(
     model_gateway: ModelGateway | None = None,
     simulation_service: SimulationService | None = None,
     assessment_service: AssessmentService | None = None,
+    brief_service: BriefService | None = None,
 ) -> FastAPI:
     resolved = settings or load_settings()
     app = FastAPI(title="AI Leader ID ML API", version="1.0.0")
@@ -58,6 +60,9 @@ def create_app(
         SimulationJudge(resolved_model_gateway),
         LocalLanguageTool(),
     )
+    resolved_brief_service = brief_service or BriefService(
+        BriefGenerator(resolved_model_gateway)
+    )
 
     @app.get(
         "/internal/v1/health",
@@ -72,6 +77,7 @@ def create_app(
             scenario_repository,
             resolved_simulation_service,
             resolved_assessment_service,
+            resolved_brief_service,
         )
     )
     app.include_router(
