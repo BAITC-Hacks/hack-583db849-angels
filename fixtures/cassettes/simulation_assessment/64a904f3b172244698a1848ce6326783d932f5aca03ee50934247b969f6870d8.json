@@ -1,0 +1,12 @@
+{
+  "input_tokens": 120,
+  "model": "gpt-6-sol",
+  "output_tokens": 160,
+  "provider": "openai",
+  "recorded_at": "2026-09-24T00:00:00Z",
+  "request_hash": "64a904f3b172244698a1848ce6326783d932f5aca03ee50934247b969f6870d8",
+  "request_id": "synthetic-m3-judge-fixture",
+  "response": "{\"scores\":[{\"competency\":\"D\",\"score\":1,\"confidence\":\"medium\",\"rationale\":\"The cited action supports this rubric level in the synthetic walkthrough.\",\"evidence\":[{\"source\":\"simulation_turn\",\"sourceId\":\"turn_04\",\"quote\":\"It won't happen again, I promise.\"}]},{\"competency\":\"R\",\"score\":null,\"confidence\":null,\"rationale\":null,\"evidence\":[]},{\"competency\":\"I\",\"score\":null,\"confidence\":null,\"rationale\":null,\"evidence\":[]},{\"competency\":\"V\",\"score\":0,\"confidence\":\"medium\",\"rationale\":\"The cited action supports this rubric level in the synthetic walkthrough.\",\"evidence\":[{\"source\":\"simulation_turn\",\"sourceId\":\"turn_08\",\"quote\":\"Everyone stays until it works.\"}]},{\"competency\":\"E\",\"score\":0,\"confidence\":\"medium\",\"rationale\":\"The cited action supports this rubric level in the synthetic walkthrough.\",\"evidence\":[{\"source\":\"simulation_turn\",\"sourceId\":\"turn_06\",\"quote\":\"You two decide between you.\"}]}]}",
+  "task": "simulation_assessment",
+  "version": 1
+}

@@ -1,0 +1,12 @@
+{
+  "input_tokens": 40,
+  "model": "gpt-6-luna",
+  "output_tokens": 12,
+  "provider": "openai",
+  "recorded_at": "2026-09-24T00:00:00Z",
+  "request_hash": "47dc2c95da769e960b071c47f45fc775c32995373c5d86cbcaea65ae6a255971",
+  "request_id": "synthetic-m2a-fixture",
+  "response": "{\"text\": \"I cannot agree to work without a limit. We need another plan.\"}",
+  "task": "simulation_actor",
+  "version": 1
+}

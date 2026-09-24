@@ -53,7 +53,11 @@ def test_every_candidate_has_the_complete_seed_layout_and_valid_shapes() -> None
 def test_assessment_evidence_is_verbatim_and_null_scores_are_not_low_scores() -> None:
     for candidate in CANDIDATES:
         directory = SEED / "candidates" / candidate
-        turns = {item["turnId"]: item["text"] for item in load(directory / "transcript.json")}
+        turns = {
+            item["turnId"]: item["text"]
+            for item in load(directory / "transcript.json")
+            if item["speaker"] == "candidate"
+        }
         assessment = load(directory / "expected-assessment.json")
         assert [item["competency"] for item in assessment["scores"]] == list("DRIVE")
         for score in assessment["scores"]:
@@ -62,6 +66,8 @@ def test_assessment_evidence_is_verbatim_and_null_scores_are_not_low_scores() ->
                 assert score["rationale"] is None
                 assert score["evidence"] == []
             for evidence in score["evidence"]:
+                assert evidence["source"] == "simulation_turn"
+                assert evidence["sourceId"] in turns
                 assert evidence["quote"] in turns[evidence["sourceId"]]
 
 
@@ -95,7 +101,17 @@ def test_candidate_result_patterns_are_distinct() -> None:
         patterns.append(tuple(item["score"] for item in assessment["scores"]))
 
     assert len(set(patterns)) == 3
-    assert patterns[2] == (None, None, None, None, None)
+    assert patterns[1] == (1, 2, 4, 2, 3)
+    assert patterns[2] == (1, None, None, 0, 0)
+
+
+def test_b_and_c_seed_stories_are_conflict_resolution_walkthroughs() -> None:
+    for candidate, answer_count in (("b", 5), ("c", 4)):
+        turns = load(SEED / "candidates" / candidate / "transcript.json")
+        assert len([turn for turn in turns if turn["speaker"] == "candidate"]) == answer_count
+        assert "Timur replaced my module" in turns[0]["text"]
+        assert "Thursday run failed" in turns[-3]["text"]
+        assert all("mentoring pilot" not in turn["text"].lower() for turn in turns)
 
 
 def test_candidate_feedback_contains_no_numbers_or_decision_language() -> None:

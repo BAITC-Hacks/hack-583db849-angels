@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 import sys
 
@@ -43,7 +44,35 @@ def verify() -> None:
     )
     if not fallback.used_fallback or fallback.answer_type.answerTypeId != "other":
         raise RuntimeError("below-threshold text did not use the opening fallback")
-    print(f"verified {checked} scenario matcher phrases")
+
+    seed_paths = {
+        "a": ["opening", "trust", "fairness", "decision", "setback", "end"],
+        "b": ["opening", "trust", "fairness", "decision", "setback", "end"],
+        "c": ["opening", "trust", "decision", "setback", "end"],
+    }
+    for candidate, expected_path in seed_paths.items():
+        transcript = json.loads(
+            (REPOSITORY_ROOT / f"seed/candidates/{candidate}/transcript.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        candidate_turns = [
+            turn for turn in transcript if turn["speaker"] == "candidate"
+        ]
+        if len(candidate_turns) != len(expected_path) - 1:
+            raise RuntimeError(f"candidate {candidate} has the wrong answer count")
+        beat = expected_path[0]
+        for turn, expected_next in zip(
+            candidate_turns, expected_path[1:], strict=True
+        ):
+            result = matcher.match(scenario, beat, turn["text"])
+            if result.used_fallback or result.answer_type.next != expected_next:
+                raise RuntimeError(
+                    f"candidate {candidate} {turn['turnId']} went from {beat} "
+                    f"to {result.answer_type.next}, expected {expected_next}"
+                )
+            beat = result.answer_type.next
+    print(f"verified {checked} matcher phrases and the A/B/C seed paths")
 
 
 if __name__ == "__main__":

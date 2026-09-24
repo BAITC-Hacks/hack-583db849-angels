@@ -1,0 +1,12 @@
+{
+  "input_tokens": 40,
+  "model": "gpt-6-luna",
+  "output_tokens": 6,
+  "provider": "openai",
+  "recorded_at": "2026-09-24T00:00:00Z",
+  "request_hash": "24ab49cb6a2997028380e666560bdac3d8e665a23853801f1c9f56e5145d9141",
+  "request_id": "synthetic-m2a-fixture",
+  "response": "{\"text\": \"The Thursday run failed. What now?\"}",
+  "task": "simulation_actor",
+  "version": 1
+}

@@ -1,0 +1,12 @@
+{
+  "input_tokens": 40,
+  "model": "gpt-6-luna",
+  "output_tokens": 11,
+  "provider": "openai",
+  "recorded_at": "2026-09-24T00:00:00Z",
+  "request_hash": "05606507f761ffcafdf54f629e248885c61341a91d2c5ce0ab2e8b38f613dc66",
+  "request_id": "synthetic-m2a-fixture",
+  "response": "{\"text\": \"Okay. Let's try it your way. And thanks for actually listening.\"}",
+  "task": "simulation_actor",
+  "version": 1
+}

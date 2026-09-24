@@ -1,0 +1,12 @@
+{
+  "input_tokens": 40,
+  "model": "gpt-6-luna",
+  "output_tokens": 9,
+  "provider": "openai",
+  "recorded_at": "2026-09-24T00:00:00Z",
+  "request_hash": "baa6c1b00860715177a7af824f7468d0628bf39eb5b76e595c0337bf4511d673",
+  "request_id": "synthetic-m2a-fixture",
+  "response": "{\"text\": \"Who decides which version we keep for the demo?\"}",
+  "task": "simulation_actor",
+  "version": 1
+}
