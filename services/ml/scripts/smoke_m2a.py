@@ -9,7 +9,7 @@ import os
 from pathlib import Path
 from statistics import median
 from time import perf_counter
-from typing import Any, Protocol
+from typing import Any, Callable, Protocol
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
@@ -74,7 +74,11 @@ class HttpTransport:
             )
 
 
-def run(transport: Transport) -> dict[str, Any]:
+def run(
+    transport: Transport,
+    *,
+    on_complete: Callable[[str, list[dict[str, Any]]], None] | None = None,
+) -> dict[str, Any]:
     timings: list[float] = []
     status, _, content, elapsed = transport.request(
         "GET", "/internal/v1/health", authenticated=False
@@ -165,6 +169,8 @@ def run(transport: Transport) -> dict[str, Any]:
 
         if not result["ended"] or result["stage"] != "finished":
             raise RuntimeError("synthetic session did not finish")
+        if on_complete is not None:
+            on_complete(candidate, transcript)
         reports.append({"candidateId": session["candidateId"], "candidateTurns": len(session["turns"])})
 
     ordered = sorted(timings)
