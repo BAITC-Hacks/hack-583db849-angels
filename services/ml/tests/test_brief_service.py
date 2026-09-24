@@ -52,6 +52,7 @@ def test_service_grounds_a_and_embeds_before_consistency() -> None:
     assert result.consistency[0].observation.metric.value == "B2"
     assert result.consistency[0].askInInterview
     assert result.consistency[1].claim.evidence[0].sourceId == "motivation"
+    assert result.consistency[1].status == "unverified"
     assert result.english.certificate.score == "6.5"
     assert result.english.certificate.cefr == "not verified"
 
@@ -89,13 +90,25 @@ def test_invented_metric_and_certificate_are_not_returned() -> None:
     )
     proposed.english.certificate.score = "9.0"
     result = asyncio.run(BriefService(BriefGenerator(FakeGateway([proposed]))).prepare(request))
-    assert len(result.consistency) == 2  # deterministic English and sourced test disagreement
+    assert len(result.consistency) == 2  # No model-selected metric for another topic.
     assert all(
         item.observation.metric is None or item.observation.metric.value == "B2"
         for item in result.consistency
     )
     assert result.english.certificate.score == "6.5"
     assert result.english.certificate.cefr == "not verified"
+
+
+@pytest.mark.parametrize("model_status", ["consistent", "discrepancy", "confirmed"])
+def test_verified_quotes_do_not_validate_model_consistency_status(model_status: str) -> None:
+    request, proposed = example()
+    proposed.consistency[1].status = model_status
+    result = asyncio.run(BriefService(BriefGenerator(FakeGateway([proposed]))).prepare(request))
+    item = result.consistency[1]
+    assert item.claim.evidence
+    assert item.observation.evidence
+    assert item.status == "unverified"
+    assert "clarify" in item.whatToDo.lower()
 
 
 def test_fabricated_quote_gets_a_safe_open_question() -> None:
