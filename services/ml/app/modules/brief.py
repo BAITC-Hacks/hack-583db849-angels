@@ -167,17 +167,10 @@ def _ground(
     certificate = None
     supplied_certificate = request.candidate.englishCertificate
     if supplied_certificate is not None:
-        suggested_level = proposed.english.certificate
         certificate = CertificateLevel(
             type=supplied_certificate.type,
             score=supplied_certificate.score,
-            cefr=(
-                suggested_level.cefr
-                if suggested_level is not None
-                and suggested_level.type == supplied_certificate.type
-                and suggested_level.score == supplied_certificate.score
-                else "not verified"
-            ),
+            cefr="not verified",
         )
     written = (
         proposed.english.writtenCefr

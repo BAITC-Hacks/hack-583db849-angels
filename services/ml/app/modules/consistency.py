@@ -22,7 +22,10 @@ def english_claim(request: BriefRequest) -> tuple[str, Evidence] | None:
     """Return an explicit self-rating, never infer one from writing style."""
 
     for answer in request.candidate.application.answers:
-        if answer.fieldId != "english_self":
+        if (
+            "english" not in answer.fieldId.lower()
+            and "english" not in answer.question.lower()
+        ):
             continue
         matches = list(_CEFR.finditer(answer.answer))
         levels = {match.group().upper() for match in matches}
