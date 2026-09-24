@@ -34,7 +34,7 @@ class ScenarioBriefDto {
   @ApiProperty() maxCandidateTurns!: number;
 }
 
-class TurnDto {
+export class TurnDto {
   @ApiProperty() turnId!: string;
   @ApiProperty({ enum: ['candidate', 'character'] }) speaker!: 'candidate' | 'character';
   @ApiProperty() text!: string;

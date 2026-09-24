@@ -1,3 +1,6 @@
 import { Module } from '@nestjs/common';
-@Module({})
+
+import { SimulationAssessmentsController } from './simulation-assessments.controller';
+
+@Module({ controllers: [SimulationAssessmentsController] })
 export class SimulationAssessmentsModule {}
