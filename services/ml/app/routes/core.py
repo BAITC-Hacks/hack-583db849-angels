@@ -7,8 +7,8 @@ from collections.abc import Callable
 from fastapi import APIRouter, Depends
 
 from ..errors import ServiceError
-from ..examples import load_example
 from ..modules.assessment import AssessmentService
+from ..modules.brief import BriefService
 from ..modules.simulation import SimulationService
 from ..scenarios import ScenarioRepository
 from ..schemas.contracts import (
@@ -27,6 +27,7 @@ def core_router(
     scenarios_repository: ScenarioRepository,
     simulation_service: SimulationService,
     assessment_service: AssessmentService,
+    brief_service: BriefService,
 ) -> APIRouter:
     router = APIRouter(prefix="/internal/v1", dependencies=[Depends(authenticate)])
 
@@ -55,7 +56,6 @@ def core_router(
 
     @router.post("/brief", response_model=BriefResult)
     async def brief(request: BriefRequest) -> BriefResult:
-        del request
-        return load_example("brief.response.json", BriefResult)
+        return await brief_service.prepare(request)
 
     return router

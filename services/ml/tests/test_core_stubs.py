@@ -1,4 +1,3 @@
-import json
 from decimal import Decimal
 from pathlib import Path
 
@@ -10,8 +9,6 @@ from services.ml.app.main import create_app
 from services.ml.app.scenarios import ROOT_SCENARIOS, ScenarioRepository
 
 
-ROOT = Path(__file__).resolve().parents[3]
-EXAMPLES = ROOT / "docs" / "contracts" / "examples" / "candidate-a" / "ml"
 TOKEN = {"X-Internal-Token": "test-internal-token"}
 
 
@@ -25,10 +22,6 @@ def client() -> TestClient:
         demo_mode=False,
     )
     return TestClient(create_app(settings), raise_server_exceptions=False)
-
-
-def example(filename: str) -> object:
-    return json.loads((EXAMPLES / filename).read_text(encoding="utf-8"))
 
 
 def test_scenario_list_is_projected_from_the_validated_config(client: TestClient) -> None:
@@ -62,21 +55,3 @@ def test_unknown_scenario_returns_a_safe_error(client: TestClient) -> None:
 
     assert response.status_code == 404
     assert response.json()["error"]["code"] == "SCENARIO_NOT_FOUND"
-
-
-@pytest.mark.parametrize(
-    ("path", "request_name", "response_name"),
-    [
-        ("/internal/v1/brief", "brief.request.json", "brief.response.json"),
-    ],
-)
-def test_core_post_stubs_return_the_frozen_examples(
-    client: TestClient,
-    path: str,
-    request_name: str,
-    response_name: str,
-) -> None:
-    response = client.post(path, json=example(request_name), headers=TOKEN)
-
-    assert response.status_code == 200
-    assert response.json() == example(response_name)
