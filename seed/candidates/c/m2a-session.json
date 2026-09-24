@@ -2,35 +2,35 @@
   "version": 1,
   "candidateId": "candidate-c",
   "scenarioId": "conflict-resolution",
-  "openingLine": "I am done. Timur replaced my module without even asking me, and I am thinking of leaving the team.",
+  "openingLine": "Timur replaced my module without asking. I want to leave this team.",
   "turns": [
     {
-      "audioRef": "m2a/candidate-c/turn-01.wav",
-      "text": "Let's fix this fast, the demo is in three days.",
-      "expectedAnswerType": "rush_to_fix",
+      "audioRef": "m2a/candidate-c/turn-01.ogg",
+      "text": "You're right to be angry. Walk me through it.",
+      "expectedAnswerType": "acknowledge",
       "expectedNextBeat": "trust",
-      "characterLine": "The deadline matters, but this is not only about code. How do I know nobody will replace my work again?"
+      "characterLine": "How do I know this will not happen again?"
     },
     {
-      "audioRef": "m2a/candidate-c/turn-02.wav",
+      "audioRef": "m2a/candidate-c/turn-02.ogg",
       "text": "It won't happen again, I promise.",
       "expectedAnswerType": "promise",
       "expectedNextBeat": "decision",
-      "characterLine": "A promise is not enough for me yet. What concrete rule will protect our work, and which version are we using?"
+      "characterLine": "What is your concrete plan for the demo?"
     },
     {
-      "audioRef": "m2a/candidate-c/turn-03.wav",
-      "text": "Let's ask the mentor to decide.",
+      "audioRef": "m2a/candidate-c/turn-03.ogg",
+      "text": "You two decide between you.",
       "expectedAnswerType": "delegate_up",
       "expectedNextBeat": "setback",
-      "characterLine": "I need you to lead this team, not pass the decision away. The Thursday run has failed. What will we do?"
+      "characterLine": "The Thursday run failed. What now?"
     },
     {
-      "audioRef": "m2a/candidate-c/turn-04.wav",
-      "text": "We'll work all night and fix it.",
+      "audioRef": "m2a/candidate-c/turn-04.ogg",
+      "text": "Everyone stays until it works.",
       "expectedAnswerType": "push_harder",
       "expectedNextBeat": "end",
-      "characterLine": "The team is already exhausted. I will help tonight, but this cannot become how we solve every setback."
+      "characterLine": "I cannot agree to work without a limit. We need another plan."
     }
   ]
 }

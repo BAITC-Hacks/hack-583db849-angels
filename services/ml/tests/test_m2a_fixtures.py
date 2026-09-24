@@ -4,7 +4,6 @@ from decimal import Decimal
 import json
 from pathlib import Path
 import socket
-import wave
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -39,7 +38,7 @@ class Strict(BaseModel):
 
 
 class SessionTurn(Strict):
-    audioRef: str = Field(pattern=r"^m2a/candidate-[abc]/turn-0[1-4]\.wav$")
+    audioRef: str = Field(pattern=r"^m2a/candidate-[abc]/turn-0[1-5]\.ogg$")
     text: str = Field(min_length=1)
     expectedAnswerType: str = Field(min_length=1)
     expectedNextBeat: str = Field(min_length=1)
@@ -51,7 +50,7 @@ class Session(Strict):
     candidateId: str = Field(pattern=r"^candidate-[abc]$")
     scenarioId: str
     openingLine: str = Field(min_length=1)
-    turns: list[SessionTurn] = Field(min_length=4, max_length=4)
+    turns: list[SessionTurn] = Field(min_length=4, max_length=5)
 
 
 def sessions() -> list[Session]:
@@ -92,19 +91,26 @@ def test_sessions_and_generated_audio_are_complete_and_distinct() -> None:
         assert session.version == 1
         assert session.scenarioId == "conflict-resolution"
         assert len(session.openingLine.split()) <= 60
+        candidate = session.candidateId[-1]
+        transcript = json.loads(
+            (ROOT / "seed" / "candidates" / candidate / "transcript.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        assert [item.text for item in session.turns] == [
+            turn["text"] for turn in transcript if turn["speaker"] == "candidate"
+        ]
         for item in session.turns:
             assert len(item.characterLine.split()) <= 60
             path = AUDIO / item.audioRef
-            with wave.open(str(path), "rb") as source:
-                assert source.getnchannels() == 1
-                assert source.getsampwidth() == 2
-                assert source.getnframes() > 0
             content = path.read_bytes()
-            assert content[:4] == b"RIFF"
+            assert content.startswith(b"OggS")
+            assert b"OpusHead" in content[:128]
+            assert len(content) > 1000
             hashes.add(__import__("hashlib").sha256(content).hexdigest())
-    assert len(hashes) == 12
+    assert len(hashes) == 14
     provenance = (AUDIO / "m2a" / "README.md").read_text(encoding="utf-8")
-    assert "eSpeak" in provenance
+    assert "eSpeak NG" in provenance
     assert "no recording or voice of a real person" in provenance
 
 

@@ -2,35 +2,42 @@
   "version": 1,
   "candidateId": "candidate-b",
   "scenarioId": "conflict-resolution",
-  "openingLine": "I am done. Timur replaced my module without even asking me, and I am thinking of leaving the team.",
+  "openingLine": "Timur replaced my module without asking. I want to leave this team.",
   "turns": [
     {
-      "audioRef": "m2a/candidate-b/turn-01.wav",
-      "text": "Timur shouldn't have done that, I'll talk to him.",
-      "expectedAnswerType": "blame_timur",
+      "audioRef": "m2a/candidate-b/turn-01.ogg",
+      "text": "Let's fix this fast, the demo is in three days.",
+      "expectedAnswerType": "rush_to_fix",
+      "expectedNextBeat": "trust",
+      "characterLine": "How do I know this will not happen again?"
+    },
+    {
+      "audioRef": "m2a/candidate-b/turn-02.ogg",
+      "text": "From now on nobody changes someone's module without their review.",
+      "expectedAnswerType": "process_rule",
       "expectedNextBeat": "fairness",
-      "characterLine": "I appreciate that, but I do not want this to become a fight. How will we talk with him fairly?"
+      "characterLine": "Will you make Timur the villain for this?"
     },
     {
-      "audioRef": "m2a/candidate-b/turn-02.wav",
-      "text": "Let's sit down with Timur, all three of us.",
-      "expectedAnswerType": "bring_both",
+      "audioRef": "m2a/candidate-b/turn-03.ogg",
+      "text": "I'll talk to him myself, you focus on work.",
+      "expectedAnswerType": "handle_alone",
       "expectedNextBeat": "decision",
-      "characterLine": "I will join if you lead the conversation. We still need a decision: which version stays, and who owns each fix?"
+      "characterLine": "Who decides which version we keep for the demo?"
     },
     {
-      "audioRef": "m2a/candidate-b/turn-03.wav",
-      "text": "We'll figure it out as we go.",
-      "expectedAnswerType": "vague",
+      "audioRef": "m2a/candidate-b/turn-04.ogg",
+      "text": "We assign owners now, freeze by Thursday, and run the full demo at six. After the demo we will keep reviews so nobody loses ownership again.",
+      "expectedAnswerType": "plan_with_owners",
       "expectedNextBeat": "setback",
-      "characterLine": "That is still unclear. What exactly should I do today? The Thursday run has already failed."
+      "characterLine": "The Thursday run failed. What now?"
     },
     {
-      "audioRef": "m2a/candidate-b/turn-04.wav",
-      "text": "We cut scope and move on.",
-      "expectedAnswerType": "cut_scope_only",
+      "audioRef": "m2a/candidate-b/turn-05.ogg",
+      "text": "We'll work all night and fix it.",
+      "expectedAnswerType": "push_harder",
       "expectedNextBeat": "end",
-      "characterLine": "All right, we can cut scope. I am tired, but I will help finish the smaller demo."
+      "characterLine": "I will stay for the demo, but the team needs a safer recovery plan."
     }
   ]
 }

@@ -203,6 +203,7 @@ def export_seed() -> None:
             turn("turn_08", "candidate", "We assign owners now, freeze by Thursday, and run the full demo at six. After the demo we will keep reviews so nobody loses ownership again.", 7),
             turn("turn_09", "character", "The Thursday run failed. What now?", 8),
             turn("turn_10", "candidate", "We'll work all night and fix it.", 9),
+            turn("turn_11", "character", "I will stay for the demo, but the team needs a safer recovery plan.", 10),
         ],
         "c": [
             turn("turn_01", "character", "Timur replaced my module without asking. I want to leave this team.", 0),
@@ -213,6 +214,7 @@ def export_seed() -> None:
             turn("turn_06", "candidate", "You two decide between you.", 5),
             turn("turn_07", "character", "The Thursday run failed. What now?", 6),
             turn("turn_08", "candidate", "Everyone stays until it works.", 7),
+            turn("turn_09", "character", "I cannot agree to work without a limit. We need another plan.", 8),
         ],
     }
     for candidate, turns in synthetic_turns.items():

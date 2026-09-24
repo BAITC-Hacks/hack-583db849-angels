@@ -68,5 +68,12 @@
     "text": "We'll work all night and fix it.",
     "startedAt": "2026-09-25T10:09:00Z",
     "endedAt": "2026-09-25T10:09:30Z"
+  },
+  {
+    "turnId": "turn_11",
+    "speaker": "character",
+    "text": "I will stay for the demo, but the team needs a safer recovery plan.",
+    "startedAt": "2026-09-25T10:10:00Z",
+    "endedAt": "2026-09-25T10:10:30Z"
   }
 ]
