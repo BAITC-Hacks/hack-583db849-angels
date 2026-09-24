@@ -6,7 +6,7 @@ from dataclasses import dataclass
 import logging
 from typing import Iterable, Mapping
 
-from services.ml.app.schemas.contracts import DriveScore, Evidence, Turn
+from services.ml.app.schemas.contracts import CandidateView, DriveScore, Evidence, Turn
 
 
 logger = logging.getLogger(__name__)
@@ -33,6 +33,23 @@ def candidate_turn_sources(turns: Iterable[Turn]) -> dict[SourceKey, str]:
         for turn in turns
         if turn.speaker == "candidate"
     }
+
+
+def candidate_view_sources(candidate: CandidateView) -> dict[SourceKey, str]:
+    """Index only the application and test text supplied to the brief."""
+
+    sources: dict[SourceKey, str] = {}
+    for answer in candidate.application.answers:
+        key = ("application_field", answer.fieldId)
+        if key in sources:
+            raise ValueError("duplicate application source id")
+        sources[key] = answer.answer
+    for answer in candidate.test.answers:
+        key = ("test_item", answer.itemId)
+        if key in sources:
+            raise ValueError("duplicate test source id")
+        sources[key] = answer.response
+    return sources
 
 
 @dataclass(frozen=True)
