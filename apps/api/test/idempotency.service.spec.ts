@@ -31,4 +31,26 @@ describe('IdempotencyService', () => {
     const service = new IdempotencyService(prisma as never);
     await expect(service.execute('same-key', { externalId: 'a' }, async () => response)).rejects.toMatchObject({ status: 409 });
   });
+
+  it('coalesces concurrent retries for the same key before running the side effect', async () => {
+    const store = new Map<string, { requestHash: string; response: unknown }>();
+    const prisma = {
+      idempotencyKey: {
+        findUnique: jest.fn(async ({ where: { key } }) => store.get(key) ?? null),
+        create: jest.fn(async ({ data }) => {
+          store.set(data.key, { requestHash: data.requestHash, response: data.response });
+          return data;
+        }),
+      },
+    };
+    const service = new IdempotencyService(prisma as never);
+    let release!: (value: typeof response) => void;
+    const create = jest.fn(() => new Promise<typeof response>((resolve) => { release = resolve; }));
+    const first = service.execute('turn-key', { text: 'Synthetic answer' }, create, 200);
+    const second = service.execute('turn-key', { text: 'Synthetic answer' }, create, 200);
+    await new Promise<void>((resolve) => setImmediate(resolve));
+    release(response);
+    await expect(Promise.all([first, second])).resolves.toEqual([response, response]);
+    expect(create).toHaveBeenCalledTimes(1);
+  });
 });

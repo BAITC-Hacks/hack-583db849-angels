@@ -18,15 +18,18 @@ export interface LlmView {
 @Injectable()
 export class ToLlmViewService {
   toLlmView(candidateId: string, snapshot: CandidateSnapshot): LlmView {
-    const values = Object.values(snapshot.profile)
-      .filter((value): value is string => typeof value === 'string' && value.length > 0)
-      .sort((left, right) => right.length - left.length);
-    const redact = (text: string): string => values.reduce((result, value) => result.split(value).join('[redacted]'), text);
     return {
       candidateId,
-      application: { answers: snapshot.application.answers.map((answer) => ({ ...answer, answer: redact(answer.answer) })) },
-      test: { answers: snapshot.test.answers.map((answer) => ({ ...answer, response: redact(answer.response) })) },
+      application: { answers: snapshot.application.answers.map((answer) => ({ ...answer, answer: this.redactText(snapshot.profile, answer.answer) })) },
+      test: { answers: snapshot.test.answers.map((answer) => ({ ...answer, response: this.redactText(snapshot.profile, answer.response) })) },
       ...(snapshot.englishCertificate ? { englishCertificate: snapshot.englishCertificate } : {}),
     };
+  }
+
+  redactText(profile: Record<string, unknown>, text: string): string {
+    const values = Object.values(profile)
+      .filter((value): value is string => typeof value === 'string' && value.length > 0)
+      .sort((left, right) => right.length - left.length);
+    return values.reduce((result, value) => result.split(value).join('[redacted]'), text);
   }
 }

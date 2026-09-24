@@ -13,7 +13,7 @@ const candidateWithSimulationSelect = {
   simulations: {
     orderBy: { createdAt: 'desc' },
     take: 1,
-    select: { id: true, status: true },
+    select: { id: true, status: true, ending: true },
   },
 } as const satisfies Prisma.CandidateSelect;
 
@@ -84,7 +84,7 @@ export class CandidatesService {
       simulation: simulation ? {
         simulationId: simulation.id,
         status: simulation.status,
-        ending: null,
+        ending: simulation.ending as 'completed' | 'stopped' | null,
       } : null,
       assessment: null,
       interview: null,

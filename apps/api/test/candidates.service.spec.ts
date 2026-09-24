@@ -11,7 +11,7 @@ describe('CandidatesService', () => {
     label: 'Candidate A',
     createdAt: new Date('2026-09-23T08:00:00Z'),
     profile: { fullName: 'Synthetic Person', email: 'synthetic@example.test' },
-    simulations: [{ id: 'simulation-id', status: 'active' }],
+    simulations: [{ id: 'simulation-id', status: 'active', ending: null }],
   };
 
   it('selects and returns only the public Candidate DTO for create, list, and GET', async () => {
