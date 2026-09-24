@@ -31,6 +31,10 @@ export class MlHttpAdapter implements AiGateway {
     return this.invoke('simulation/turn', () => this.client().POST('/internal/v1/simulation/turn', { body: request }));
   }
 
+  simulationAssessment(request: components['schemas']['AssessmentRequest']): Promise<components['schemas']['AssessmentResult']> {
+    return this.invoke('simulation/assessment', () => this.client().POST('/internal/v1/simulation/assessment', { body: request }));
+  }
+
   transcribeTurn(audioRef: string): Promise<components['schemas']['TranscribeResult']> {
     return this.invoke('transcribe', () => this.client().POST('/internal/v1/transcribe', {
       body: { purpose: 'turn', audioRef, language: 'en', speakers: 1 },

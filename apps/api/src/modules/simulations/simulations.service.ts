@@ -11,6 +11,7 @@ import { ToLlmViewService } from '../../privacy/to-llm-view.service';
 import { AccommodationDto, UpdateAccommodationDto } from '../candidates/dto/accommodation.dto';
 import { SimulationDto, TurnResultDto } from './dto/simulation.dto';
 import { AudioStorageService } from './audio-storage.service';
+import { SimulationAssessmentsService } from '../simulation-assessments/simulation-assessments.service';
 
 export interface UploadedAudio {
   buffer: Buffer;
@@ -29,6 +30,7 @@ export class SimulationsService {
     private readonly audio: AudioStorageService,
     private readonly privacy: ToLlmViewService,
     private readonly audit: AuditService,
+    private readonly assessments: SimulationAssessmentsService,
   ) {}
 
   async create(candidateId: string, actorRole: ApiRole): Promise<SimulationDto> {
@@ -92,6 +94,7 @@ export class SimulationsService {
     }
     await this.audit.record({ action: 'simulation.created', targetType: 'simulation', targetId: created.id, candidateId, actorRole,
       metadata: { scenarioId: scenario.scenarioId, nextBeat: opening.director.nextBeat } });
+    if (created.status === 'completed') await this.assessments.startAutomatically(created.id);
     return this.toDto(created);
   }
 
@@ -195,6 +198,7 @@ export class SimulationsService {
       if (answer.ended) {
         await this.audit.record({ action: 'simulation.completed', targetType: 'simulation', targetId: simulationId,
           candidateId: latest.candidateId, actorRole, metadata: { ending: 'completed' } });
+        await this.assessments.startAutomatically(simulationId);
       }
       return {
         candidateTurn: this.toTurn(savedCandidate), characterTurn: this.toTurn(characterTurn),
@@ -229,6 +233,7 @@ export class SimulationsService {
     const simulation = await this.load(simulationId);
     await this.audit.record({ action: 'simulation.completed', targetType: 'simulation', targetId: simulationId,
       candidateId: simulation.candidateId, actorRole, metadata: { ending: reason } });
+    await this.assessments.startAutomatically(simulationId);
     return this.toDto(simulation);
   }
 

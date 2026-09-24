@@ -6,6 +6,7 @@ describe('CandidateAiService', () => {
     const sendCandidateContext = jest.fn().mockResolvedValue(undefined);
     const service = new CandidateAiService(new ToLlmViewService(), {
       sendCandidateContext, scenarios: jest.fn(), simulationTurn: jest.fn(), transcribeTurn: jest.fn(), speech: jest.fn(),
+      simulationAssessment: jest.fn(),
     });
     await service.sendCandidateContext('candidate-id', {
       externalId: 'external-id',
