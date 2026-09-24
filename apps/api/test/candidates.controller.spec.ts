@@ -8,7 +8,7 @@ describe('CandidatesController', () => {
     const candidates = { find: jest.fn().mockResolvedValue(safeCandidate) };
     const idempotency = { execute: jest.fn().mockResolvedValue({ id: 'candidate-id', profile: { email: 'private@example.test' } }) };
     const audit = { record: jest.fn().mockResolvedValue({ id: 'audit-id' }) };
-    const controller = new CandidatesController(candidates as never, idempotency as never, audit as never);
+    const controller = new CandidatesController(candidates as never, idempotency as never, audit as never, {} as never);
 
     const response = await controller.create(
       { externalId: 'external', profile: { email: 'private@example.test' }, application: { answers: [] }, test: { answers: [] } },
