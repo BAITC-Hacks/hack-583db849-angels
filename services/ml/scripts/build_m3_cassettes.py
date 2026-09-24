@@ -25,6 +25,7 @@ from services.ml.app.gateway.service import ModelGateway
 from services.ml.app.gateway.types import ProviderRequest, ProviderResponse
 from services.ml.app.modules.judge import JudgeOutput, SimulationJudge
 from services.ml.app.schemas.contracts import AssessmentRequest, DriveScore, Evidence, Turn
+from services.ml.scripts.smoke_m2a import _turn as spoken_turn
 
 
 RECORDED_AT = datetime(2026, 9, 24, tzinfo=timezone.utc)
@@ -98,17 +99,25 @@ async def build() -> None:
                 (SEED_ROOT / candidate / "transcript.json").read_text(encoding="utf-8")
             )
         ]
-        provider.next_output = authored_output(candidate, turns)
-        result = await judge.judge(
-            AssessmentRequest(
-                candidateId=f"candidate-{candidate}", scenarioId="conflict-resolution",
-                mode="voice", turns=turns,
-            )
+        session = json.loads(
+            (SEED_ROOT / candidate / "m2a-session.json").read_text(encoding="utf-8")
         )
-        if [score.model_dump() for score in result] != [
-            score.model_dump() for score in provider.next_output.scores
-        ]:
-            raise RuntimeError("synthetic judge evidence failed verification")
+        played = [Turn.model_validate(spoken_turn(1, "character", session["openingLine"], 0))]
+        for index, item in enumerate(session["turns"], start=1):
+            played.append(Turn.model_validate(spoken_turn(index * 2, "candidate", item["text"], index * 10)))
+            played.append(Turn.model_validate(spoken_turn(index * 2 + 1, "character", item["characterLine"], index * 10 + 5)))
+        for walkthrough in (turns, played):
+            provider.next_output = authored_output(candidate, walkthrough)
+            result = await judge.judge(
+                AssessmentRequest(
+                    candidateId=f"candidate-{candidate}", scenarioId="conflict-resolution",
+                    mode="voice", turns=walkthrough,
+                )
+            )
+            if [score.model_dump() for score in result] != [
+                score.model_dump() for score in provider.next_output.scores
+            ]:
+                raise RuntimeError("synthetic judge evidence failed verification")
 
 
 if __name__ == "__main__":

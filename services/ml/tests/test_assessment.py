@@ -187,3 +187,23 @@ def test_language_tool_failure_is_safe_and_does_not_leak_text(tmp_path: Path) ->
     assert response.status_code == 503
     assert response.json()["error"]["code"] == "AI_UNAVAILABLE"
     assert "I checked the revised plan" not in response.text
+
+
+def test_language_error_does_not_change_leadership_scores() -> None:
+    class GrammarVariation:
+        def count_errors(self, text: str) -> int:
+            return 2 if "is is" in text else 0
+
+    assessment = AssessmentService(
+        ScenarioRepository.load(ROOT_SCENARIOS), FakeJudge(), GrammarVariation(),
+    )
+    clean = request()
+    with_error = request()
+    with_error.turns[1].text += " It is is working."
+    clean_result = asyncio.run(assessment.assess(clean))
+    error_result = asyncio.run(assessment.assess(with_error))
+    assert [score.score for score in clean_result.scores] == [
+        score.score for score in error_result.scores
+    ]
+    assert clean_result.english.grammarErrorsPer100Words == 0
+    assert error_result.english.grammarErrorsPer100Words > 0
