@@ -91,3 +91,35 @@ def test_http_brief_rejects_ambiguous_source_ids(tmp_path: Path) -> None:
     assert response.status_code == 422
     assert response.json()["error"]["code"] == "VALIDATION_ERROR"
     assert gateway.requests == []
+
+
+def test_http_brief_returns_safe_error_for_fabricated_evidence(tmp_path: Path) -> None:
+    http, gateway = client(tmp_path)
+    for item in gateway.output.questions:
+        for evidence in item.evidence:
+            evidence.quote = "fabricated candidate claim"
+    for item in gateway.output.consistency:
+        for evidence in item.claim.evidence + item.observation.evidence:
+            evidence.quote = "fabricated candidate claim"
+    for item in gateway.output.clarify:
+        for evidence in item.evidence:
+            evidence.quote = "fabricated candidate claim"
+    response = http.post("/internal/v1/brief", json=payload(), headers=TOKEN)
+    assert response.status_code == 502
+    assert response.json()["error"]["code"] == "AI_INVALID_OUTPUT"
+    assert "fabricated" not in str(response.json())
+    assert len(gateway.requests) == 2
+
+
+def test_missing_replay_cassette_never_calls_a_live_provider(tmp_path: Path) -> None:
+    settings = Settings(
+        ml_internal_token="test-internal-token", uploads_dir=tmp_path,
+        gateway_mode="replay", budget_usd_cap=Decimal("20"), demo_mode=False,
+        usage_log_path=tmp_path / "usage.jsonl",
+    )
+    http = TestClient(create_app(settings), raise_server_exceptions=False)
+    request = payload()
+    request["candidate"]["candidateId"] = "new-synthetic-id-without-a-cassette"
+    response = http.post("/internal/v1/brief", json=request, headers=TOKEN)
+    assert response.status_code == 503
+    assert response.json()["error"]["code"] == "AI_UNAVAILABLE"
