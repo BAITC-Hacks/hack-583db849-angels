@@ -7,15 +7,16 @@ import { CandidatesService } from './candidates.service';
 import { IdempotencyService } from '../../idempotency/idempotency.service';
 import { AuditService } from '../audit/audit.service';
 import { ApiRole } from '../../auth/roles';
-import { contractExample } from '../../contract-example';
 import { AccommodationDto, UpdateAccommodationDto } from './dto/accommodation.dto';
 import { CandidateDto, CandidateListDto, CandidateProgressDto } from './dto/candidate.dto';
+import { SimulationsService } from '../simulations/simulations.service';
 
 @ApiTags('candidates')
 @Controller('candidates')
 @Roles('platform', 'interviewer', 'commission', 'admin')
 export class CandidatesController {
-  constructor(private readonly candidates: CandidatesService, private readonly idempotency: IdempotencyService, private readonly audit: AuditService) {}
+  constructor(private readonly candidates: CandidatesService, private readonly idempotency: IdempotencyService,
+    private readonly audit: AuditService, private readonly simulations: SimulationsService) {}
   @Post()
   @ApiHeader({ name: 'Idempotency-Key', required: false })
   @ApiCreatedResponse({ type: CandidateDto })
@@ -45,10 +46,9 @@ export class CandidatesController {
   @Put(':candidateId/accommodations')
   @Roles('commission', 'admin')
   @ApiOkResponse({ type: AccommodationDto })
-  accommodation(@Param('candidateId') _candidateId: string, @Body() _input: UpdateAccommodationDto): AccommodationDto {
-    void _candidateId;
-    void _input;
-    return contractExample<AccommodationDto>('accommodation.json');
+  accommodation(@Param('candidateId') candidateId: string, @Body() input: UpdateAccommodationDto,
+    @Req() request: Request & { apiRole: 'commission' | 'admin' }): Promise<AccommodationDto> {
+    return this.simulations.accommodation(candidateId, input, request.apiRole);
   }
 
   @Get(':candidateId')
