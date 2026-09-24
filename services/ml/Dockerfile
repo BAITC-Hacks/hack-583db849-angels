@@ -9,7 +9,19 @@ RUN if [ -f requirements.txt ]; then \
       pip install --no-cache-dir -r services/ml/requirements.txt; \
     fi
 
-ENV PYTHONPATH=/repo/context:/repo/context/services/ml
+RUN if [ -f stub_data/embedding-model.json ]; then \
+      python scripts/download_embedding_model.py \
+        stub_data/embedding-model.json /opt/models/all-MiniLM-L6-v2; \
+    else \
+      python services/ml/scripts/download_embedding_model.py \
+        config/embedding-model.json /opt/models/all-MiniLM-L6-v2; \
+    fi
+
+ENV PYTHONPATH=/repo/context:/repo/context/services/ml \
+    M2_EMBEDDING_MODEL_PATH=/opt/models/all-MiniLM-L6-v2 \
+    UPLOADS_DIR=/repo/context/fixtures/audio \
+    HF_HUB_OFFLINE=1 \
+    TRANSFORMERS_OFFLINE=1
 
 EXPOSE 8000
 HEALTHCHECK --interval=10s --timeout=3s --retries=5 \

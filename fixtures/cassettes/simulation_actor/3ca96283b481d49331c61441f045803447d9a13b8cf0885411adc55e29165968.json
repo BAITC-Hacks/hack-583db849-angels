@@ -1,0 +1,12 @@
+{
+  "input_tokens": 40,
+  "model": "gpt-6-luna",
+  "output_tokens": 19,
+  "provider": "openai",
+  "recorded_at": "2026-09-24T00:00:00Z",
+  "request_hash": "3ca96283b481d49331c61441f045803447d9a13b8cf0885411adc55e29165968",
+  "request_id": "synthetic-m2a-fixture",
+  "response": "{\"text\": \"I am done. Timur replaced my module without even asking me, and I am thinking of leaving the team.\"}",
+  "task": "simulation_actor",
+  "version": 1
+}

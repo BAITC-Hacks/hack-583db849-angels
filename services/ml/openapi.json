@@ -1862,16 +1862,33 @@
             "type": "string",
             "title": "Text"
           },
+          "scenarioId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scenarioid"
+          },
           "voice": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Voice"
           }
         },
         "additionalProperties": false,
         "type": "object",
         "required": [
-          "text",
-          "voice"
+          "text"
         ],
         "title": "SpeechRequest"
       },
@@ -2056,6 +2073,19 @@
           "endSec": {
             "type": "number",
             "title": "Endsec"
+          },
+          "confidence": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 1.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence"
           }
         },
         "additionalProperties": false,

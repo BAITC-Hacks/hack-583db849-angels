@@ -1,0 +1,12 @@
+{
+  "input_tokens": 40,
+  "model": "gpt-6-luna",
+  "output_tokens": 21,
+  "provider": "openai",
+  "recorded_at": "2026-09-24T00:00:00Z",
+  "request_hash": "79c085ab16dc2d7d4eccc6944b78f45a7573d488b9fc6de33a5955f304cc18ad",
+  "request_id": "synthetic-m2a-fixture",
+  "response": "{\"text\": \"I need you to lead this team, not pass the decision away. The Thursday run has failed. What will we do?\"}",
+  "task": "simulation_actor",
+  "version": 1
+}

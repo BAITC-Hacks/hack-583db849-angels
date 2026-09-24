@@ -3,15 +3,31 @@ from decimal import Decimal
 from pathlib import Path
 
 from fastapi.testclient import TestClient
+import pytest
 
 from services.ml.app.config import Settings
+from services.ml.app.gateway.errors import (
+    GatewayBudgetError,
+    GatewayCassetteMissingError,
+    GatewayOutputError,
+    GatewayProviderError,
+    GatewayReplayError,
+)
 from services.ml.app.main import create_app
+from services.ml.app.schemas.contracts import TurnResult
 
 
 ROOT = Path(__file__).resolve().parents[3]
 TURN_REQUEST = (
     ROOT / "docs" / "contracts" / "examples" / "candidate-a" / "ml" / "simulation-turn.request.json"
 )
+TURN_RESPONSE = TURN_REQUEST.with_name("simulation-turn.response.json")
+
+
+class ContractExampleSimulation:
+    async def turn(self, request) -> TurnResult:
+        del request
+        return TurnResult.model_validate_json(TURN_RESPONSE.read_text(encoding="utf-8"))
 
 
 def client() -> TestClient:
@@ -22,7 +38,10 @@ def client() -> TestClient:
         budget_usd_cap=Decimal("20"),
         demo_mode=False,
     )
-    return TestClient(create_app(settings), raise_server_exceptions=False)
+    return TestClient(
+        create_app(settings, simulation_service=ContractExampleSimulation()),
+        raise_server_exceptions=False,
+    )
 
 
 def assert_error_shape(response: object, code: str) -> None:
@@ -85,3 +104,39 @@ def test_validation_errors_do_not_echo_the_request() -> None:
     assert response.status_code == 422
     assert_error_shape(response, "VALIDATION_ERROR")
     assert "Do Not Echo" not in response.text
+
+
+@pytest.mark.parametrize(
+    ("path", "error", "status", "code"),
+    [
+        ("output", GatewayOutputError("unsafe details"), 502, "AI_INVALID_OUTPUT"),
+        ("provider", GatewayProviderError("unsafe details"), 503, "AI_UNAVAILABLE"),
+        (
+            "cassette",
+            GatewayCassetteMissingError("unsafe details"),
+            503,
+            "AI_UNAVAILABLE",
+        ),
+        ("replay", GatewayReplayError("unsafe details"), 503, "AI_UNAVAILABLE"),
+        (
+            "budget",
+            GatewayBudgetError("unsafe details"),
+            503,
+            "AI_BUDGET_EXCEEDED",
+        ),
+    ],
+)
+def test_gateway_errors_have_stable_safe_http_codes(
+    path: str, error: Exception, status: int, code: str
+) -> None:
+    app = client().app
+
+    @app.get(f"/test/{path}")
+    async def fail() -> None:
+        raise error
+
+    response = TestClient(app, raise_server_exceptions=False).get(f"/test/{path}")
+
+    assert response.status_code == status
+    assert_error_shape(response, code)
+    assert "unsafe details" not in response.text

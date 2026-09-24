@@ -1,0 +1,12 @@
+{
+  "input_tokens": 40,
+  "model": "gpt-6-luna",
+  "output_tokens": 20,
+  "provider": "openai",
+  "recorded_at": "2026-09-24T00:00:00Z",
+  "request_hash": "dd823a252d6009833a76354f05591d74140b56ceb9ff5ebeadb6e002827fd20a",
+  "request_id": "synthetic-m2a-fixture",
+  "response": "{\"text\": \"The deadline matters, but this is not only about code. How do I know nobody will replace my work again?\"}",
+  "task": "simulation_actor",
+  "version": 1
+}
