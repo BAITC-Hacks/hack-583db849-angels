@@ -1,4 +1,4 @@
-"""Candidate-A F0 stubs for the first internal ML operations."""
+"""Core internal ML operations and the M3 assessment pipeline."""
 
 from __future__ import annotations
 
@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends
 
 from ..errors import ServiceError
 from ..examples import load_example
+from ..modules.assessment import AssessmentService
 from ..modules.simulation import SimulationService
 from ..scenarios import ScenarioRepository
 from ..schemas.contracts import (
@@ -25,6 +26,7 @@ def core_router(
     authenticate: Callable[..., None],
     scenarios_repository: ScenarioRepository,
     simulation_service: SimulationService,
+    assessment_service: AssessmentService,
 ) -> APIRouter:
     router = APIRouter(prefix="/internal/v1", dependencies=[Depends(authenticate)])
 
@@ -49,8 +51,7 @@ def core_router(
 
     @router.post("/simulation/assessment", response_model=AssessmentResult)
     async def simulation_assessment(request: AssessmentRequest) -> AssessmentResult:
-        del request
-        return load_example("simulation-assessment.response.json", AssessmentResult)
+        return await assessment_service.assess(request)
 
     @router.post("/brief", response_model=BriefResult)
     async def brief(request: BriefRequest) -> BriefResult:
