@@ -1,70 +1,82 @@
 {
-  "summary": "Concrete, fast execution with numbers and owners. Little about why decisions are fair, or about people after a setback. Written English is clear but simpler than the certificate suggests.",
+  "summary": "Interview preparation based on the supplied application and test responses.",
   "questions": [
     {
       "focus": "D",
-      "question": "Your robot broke two days before the final. How was the team feeling, and what did you do for them — not only for the robot?",
-      "why": "The setback story is about fixing the machine; how the team came through is missing.",
+      "question": "After a setback, what did you do for the people involved?",
+      "why": "The cited response is worth exploring in the interview.",
       "evidence": [
         {
           "source": "application_field",
           "sourceId": "setback",
-          "quote": "We rebuilt the arm overnight and still made it."
+          "quote": "Our robot broke two days before the final. We rebuilt the arm overnight and still made it. I learned to always have spare parts."
         }
       ]
     },
     {
       "focus": "R",
-      "question": "What was the riskiest decision in the clean-up or the final, and what could it have cost?",
-      "why": "No answer weighs a risk or its consequences.",
-      "evidence": []
+      "question": "Describe a decision with a risk. What alternatives did you weigh?",
+      "why": "The cited response is worth exploring in the interview.",
+      "evidence": [
+        {
+          "source": "application_field",
+          "sourceId": "leadership_example",
+          "quote": "I organised a weekend clean-up with twelve volunteers and split them into three teams. Each team had a leader and a list of streets. We finished by two and collected forty bags."
+        }
+      ]
     },
     {
       "focus": "I",
-      "question": "Why do real bus times matter to the people who would use the app — and who might it leave out?",
-      "why": "The idea is clear; the thinking about its users is not.",
+      "question": "What need did your idea address, and how did you test it?",
+      "why": "The cited response is worth exploring in the interview.",
       "evidence": [
         {
           "source": "application_field",
           "sourceId": "community",
-          "quote": "I want to make an app that shows real bus times."
+          "quote": "Public transport in Almaty is hard to plan. I want to make an app that shows real bus times."
         }
       ]
     },
     {
       "focus": "V",
-      "question": "Tell me about a time doing the right thing slowed you down. What did you choose, and why?",
-      "why": "No answer touches values or fairness.",
-      "evidence": []
-    },
-    {
-      "focus": "E",
-      "question": "Walk me through the clean-up: who chose the streets and the leaders, and what would you change?",
-      "why": "Strong execution evidence — confirm the plan was their own.",
+      "question": "Describe a time fairness changed your plan. What did you choose?",
+      "why": "The cited response is worth exploring in the interview.",
       "evidence": [
         {
           "source": "application_field",
           "sourceId": "leadership_example",
-          "quote": "Each team had a leader and a list of streets."
+          "quote": "I organised a weekend clean-up with twelve volunteers and split them into three teams. Each team had a leader and a list of streets. We finished by two and collected forty bags."
+        }
+      ]
+    },
+    {
+      "focus": "E",
+      "question": "How did you divide responsibility and check that the plan worked?",
+      "why": "The cited response is worth exploring in the interview.",
+      "evidence": [
+        {
+          "source": "application_field",
+          "sourceId": "leadership_example",
+          "quote": "I organised a weekend clean-up with twelve volunteers and split them into three teams. Each team had a leader and a list of streets. We finished by two and collected forty bags."
         }
       ]
     },
     {
       "focus": "invision_knowledge",
-      "question": "What do you know about how inVision U teaches, and which part of it made you apply?",
-      "why": "The motivation answer is about scale, not about inVision U itself.",
+      "question": "What do you know about how inVision U teaches?",
+      "why": "The cited response is worth exploring in the interview.",
       "evidence": [
         {
           "source": "application_field",
           "sourceId": "motivation",
-          "quote": "inVision U is where I can learn to do this at a bigger scale."
+          "quote": "I want to build products that people in my city actually use. At school I led our robotics team to the regional final, and I always ask everyone's opinion before I decide anything. inVision U is where I can learn to do this at a bigger scale."
         }
       ]
     },
     {
       "focus": "english",
-      "question": "In English and without preparing: tell me about the last thing you built and what went wrong.",
-      "why": "The application claims C2; the certificate says IELTS 6.5 and the simulation measured B2.",
+      "question": "In English, describe a recent project without preparing.",
+      "why": "The cited response is worth exploring in the interview.",
       "evidence": [
         {
           "source": "application_field",
@@ -75,9 +87,15 @@
     },
     {
       "focus": "motivation",
-      "question": "What will you do in your first year at inVision U that you could not do anywhere else?",
-      "why": "Nothing in the application ties the choice to inVision U; this checks the choice was deliberate.",
-      "evidence": []
+      "question": "Why did you choose to apply to inVision U?",
+      "why": "The cited response is worth exploring in the interview.",
+      "evidence": [
+        {
+          "source": "application_field",
+          "sourceId": "motivation",
+          "quote": "I want to build products that people in my city actually use. At school I led our robotics team to the regional final, and I always ask everyone's opinion before I decide anything. inVision U is where I can learn to do this at a bigger scale."
+        }
+      ]
     }
   ],
   "consistency": [
@@ -85,17 +103,17 @@
       "itemId": "c_01",
       "topic": "english",
       "claim": {
-        "text": "Rates their English as C2.",
+        "text": "Self-rated English as C2.",
         "evidence": [
           {
             "source": "application_field",
             "sourceId": "english_self",
-            "quote": "C2."
+            "quote": "C2"
           }
         ]
       },
       "observation": {
-        "text": "The simulation’s speech measured B2; the certificate is IELTS 6.5 (B2).",
+        "text": "Simulation English was estimated at B2.",
         "evidence": [],
         "metric": {
           "name": "cefrEstimate",
@@ -104,82 +122,11 @@
         }
       },
       "status": "discrepancy",
-      "whatToDo": "Hold the first minutes of the interview in English on an unprepared topic, and ask inVision to check the certificate.",
-      "askInInterview": "In English and without preparing: tell me about the last thing you built and what went wrong."
-    },
-    {
-      "itemId": "c_02",
-      "topic": "other",
-      "claim": {
-        "text": "Says they ask everyone before deciding.",
-        "evidence": [
-          {
-            "source": "application_field",
-            "sourceId": "motivation",
-            "quote": "I always ask everyone's opinion before I decide anything."
-          }
-        ]
-      },
-      "observation": {
-        "text": "In the test they chose deciding quickly and explaining later.",
-        "evidence": [
-          {
-            "source": "test_item",
-            "sourceId": "block_03",
-            "quote": "I prefer to decide quickly and explain my reasons later."
-          }
-        ],
-        "metric": null
-      },
-      "status": "discrepancy",
-      "whatToDo": "Ask for a recent decision and exactly how it was made.",
-      "askInInterview": "Walk me through the last decision you made for a team. Who did you ask first?"
-    },
-    {
-      "itemId": "c_03",
-      "topic": "invision_knowledge",
-      "claim": {
-        "text": "Wants to study at inVision U.",
-        "evidence": [
-          {
-            "source": "application_field",
-            "sourceId": "motivation",
-            "quote": "inVision U is where I can learn to do this at a bigger scale."
-          }
-        ]
-      },
-      "observation": {
-        "text": "Nothing in the application or the simulation shows what they know about inVision U.",
-        "evidence": [],
-        "metric": null
-      },
-      "status": "unverified",
-      "whatToDo": "Check what they know about the programme and why this university.",
-      "askInInterview": "What do you know about how inVision U teaches, and which part of it made you apply?"
+      "whatToDo": "Ask an unprepared English question and review the evidence together.",
+      "askInInterview": "In English, describe a recent project and an unexpected problem you solved."
     }
   ],
-  "clarify": [
-    {
-      "topic": "Their own part in the robotics result, apart from the team’s.",
-      "evidence": [
-        {
-          "source": "application_field",
-          "sourceId": "motivation",
-          "quote": "I led our robotics team to the regional final"
-        }
-      ]
-    },
-    {
-      "topic": "What else changed after the setback, beyond spare parts.",
-      "evidence": [
-        {
-          "source": "application_field",
-          "sourceId": "setback",
-          "quote": "I learned to always have spare parts."
-        }
-      ]
-    }
-  ],
+  "clarify": [],
   "english": {
     "certificate": {
       "type": "IELTS",
@@ -187,6 +134,6 @@
       "cefr": "B2"
     },
     "writtenCefr": "B1+",
-    "basis": "Short sentences and a narrow range of vocabulary in the written answers; almost no errors."
+    "basis": "Estimate based on supplied written application answers; verify live."
   }
 }

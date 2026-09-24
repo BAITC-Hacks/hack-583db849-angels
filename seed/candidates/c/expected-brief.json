@@ -1,10 +1,10 @@
 {
-  "summary": "Synthetic preparation brief for candidate C.",
+  "summary": "Interview preparation based on the supplied application and test responses.",
   "questions": [
     {
       "focus": "D",
-      "question": "Candidate C: give a specific recent example for D.",
-      "why": "The written answer needs a concrete, verifiable example.",
+      "question": "After a setback, what did you do for the people involved?",
+      "why": "The cited response is worth exploring in the interview.",
       "evidence": [
         {
           "source": "application_field",
@@ -15,8 +15,8 @@
     },
     {
       "focus": "R",
-      "question": "Candidate C: give a specific recent example for R.",
-      "why": "The written answer needs a concrete, verifiable example.",
+      "question": "Describe a decision with a risk. What alternatives did you weigh?",
+      "why": "The cited response is worth exploring in the interview.",
       "evidence": [
         {
           "source": "application_field",
@@ -27,8 +27,8 @@
     },
     {
       "focus": "I",
-      "question": "Candidate C: give a specific recent example for I.",
-      "why": "The written answer needs a concrete, verifiable example.",
+      "question": "What need did your idea address, and how did you test it?",
+      "why": "The cited response is worth exploring in the interview.",
       "evidence": [
         {
           "source": "application_field",
@@ -39,8 +39,8 @@
     },
     {
       "focus": "V",
-      "question": "Candidate C: give a specific recent example for V.",
-      "why": "The written answer needs a concrete, verifiable example.",
+      "question": "Describe a time fairness changed your plan. What did you choose?",
+      "why": "The cited response is worth exploring in the interview.",
       "evidence": [
         {
           "source": "application_field",
@@ -51,8 +51,8 @@
     },
     {
       "focus": "E",
-      "question": "Candidate C: give a specific recent example for E.",
-      "why": "The written answer needs a concrete, verifiable example.",
+      "question": "How did you divide responsibility and check that the plan worked?",
+      "why": "The cited response is worth exploring in the interview.",
       "evidence": [
         {
           "source": "application_field",
@@ -63,8 +63,8 @@
     },
     {
       "focus": "invision_knowledge",
-      "question": "Candidate C: give a specific recent example for invision_knowledge.",
-      "why": "The written answer needs a concrete, verifiable example.",
+      "question": "What do you know about how inVision U teaches?",
+      "why": "The cited response is worth exploring in the interview.",
       "evidence": [
         {
           "source": "application_field",
@@ -75,8 +75,8 @@
     },
     {
       "focus": "english",
-      "question": "Candidate C: give a specific recent example for english.",
-      "why": "The written answer needs a concrete, verifiable example.",
+      "question": "In English, describe a recent project without preparing.",
+      "why": "The cited response is worth exploring in the interview.",
       "evidence": [
         {
           "source": "application_field",
@@ -87,8 +87,8 @@
     },
     {
       "focus": "motivation",
-      "question": "Candidate C: give a specific recent example for motivation.",
-      "why": "The written answer needs a concrete, verifiable example.",
+      "question": "Why did you choose to apply to inVision U?",
+      "why": "The cited response is worth exploring in the interview.",
       "evidence": [
         {
           "source": "application_field",
@@ -98,11 +98,38 @@
       ]
     }
   ],
-  "consistency": [],
+  "consistency": [
+    {
+      "itemId": "c_01",
+      "topic": "english",
+      "claim": {
+        "text": "Self-rated English as C1.",
+        "evidence": [
+          {
+            "source": "application_field",
+            "sourceId": "english_self",
+            "quote": "C1"
+          }
+        ]
+      },
+      "observation": {
+        "text": "No simulation English estimate is available yet.",
+        "evidence": [],
+        "metric": null
+      },
+      "status": "unverified",
+      "whatToDo": "Ask an unprepared English question and review the evidence together.",
+      "askInInterview": "In English, describe a recent project and an unexpected problem you solved."
+    }
+  ],
   "clarify": [],
   "english": {
-    "certificate": null,
+    "certificate": {
+      "type": "IELTS",
+      "score": "5.5",
+      "cefr": "B2"
+    },
     "writtenCefr": "B1",
-    "basis": "Estimated from synthetic written answers only; leadership scoring is separate."
+    "basis": "Estimate based on supplied written application answers; verify live."
   }
 }

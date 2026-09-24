@@ -44,14 +44,24 @@ def brief(candidate: str, snapshot: dict) -> dict:
         "english": "english_self",
         "motivation": "motivation",
     }
+    focus_questions = {
+        "D": "After a setback, what did you do for the people involved?",
+        "R": "Describe a decision with a risk. What alternatives did you weigh?",
+        "I": "What need did your idea address, and how did you test it?",
+        "V": "Describe a time fairness changed your plan. What did you choose?",
+        "E": "How did you divide responsibility and check that the plan worked?",
+        "invision_knowledge": "What do you know about how inVision U teaches?",
+        "english": "In English, describe a recent project without preparing.",
+        "motivation": "Why did you choose to apply to inVision U?",
+    }
     questions = []
     for focus in FOCUSES:
         answer = answers[focus_fields[focus]]
         questions.append(
             {
                 "focus": focus,
-                "question": f"Candidate {candidate.upper()}: give a specific recent example for {focus}.",
-                "why": "The written answer needs a concrete, verifiable example.",
+                "question": focus_questions[focus],
+                "why": "The cited response is worth exploring in the interview.",
                 "evidence": [
                     {
                         "source": "application_field",
@@ -61,15 +71,55 @@ def brief(candidate: str, snapshot: dict) -> dict:
                 ],
             }
         )
+    english_self = answers.get("english_self")
+    rating = english_self["answer"].split(".", 1)[0].upper() if english_self else None
+    consistency = []
+    if rating in {"A1", "A2", "B1", "B2", "C1", "C2"}:
+        simulation_english = (
+            json.loads((EXAMPLES / "brief.request.json").read_text(encoding="utf-8"))
+            ["simulationEnglish"] if candidate == "a" else None
+        )
+        measured = simulation_english["cefrEstimate"] if simulation_english else None
+        consistency.append({
+            "itemId": "c_01",
+            "topic": "english",
+            "claim": {
+                "text": f"Self-rated English as {rating}.",
+                "evidence": [{
+                    "source": "application_field", "sourceId": "english_self", "quote": rating,
+                }],
+            },
+            "observation": {
+                "text": (
+                    f"Simulation English was estimated at {measured}." if measured
+                    else "No simulation English estimate is available yet."
+                ),
+                "evidence": [],
+                "metric": (
+                    {"name": "cefrEstimate", "value": measured, "source": "simulation"}
+                    if measured else None
+                ),
+            },
+            "status": (
+                "unverified" if not measured
+                else "consistent" if rating == measured else "discrepancy"
+            ),
+            "whatToDo": "Ask an unprepared English question and review the evidence together.",
+            "askInInterview": "In English, describe a recent project and an unexpected problem you solved.",
+        })
+    certificate = snapshot.get("englishCertificate")
     return {
-        "summary": f"Synthetic preparation brief for candidate {candidate.upper()}.",
+        "summary": "Interview preparation based on the supplied application and test responses.",
         "questions": questions,
-        "consistency": [],
+        "consistency": consistency,
         "clarify": [],
         "english": {
-            "certificate": None,
-            "writtenCefr": "B2" if candidate == "b" else "B1",
-            "basis": "Estimated from synthetic written answers only; leadership scoring is separate.",
+            "certificate": (
+                {"type": certificate["type"], "score": certificate["score"], "cefr": "B2"}
+                if certificate else None
+            ),
+            "writtenCefr": "B1+" if candidate == "a" else "B2" if candidate == "b" else "B1",
+            "basis": "Estimate based on supplied written application answers; verify live.",
         },
     }
 
@@ -181,7 +231,8 @@ def assessment(candidate: str, turns: list[dict]) -> dict:
 
 def export_seed() -> None:
     a_dir = SEED / "a"
-    shutil.copyfile(EXAMPLES / "brief.response.json", a_dir / "expected-brief.json")
+    a_snapshot = json.loads((a_dir / "snapshot.json").read_text(encoding="utf-8"))
+    write(a_dir / "expected-brief.json", brief("a", a_snapshot))
     shutil.copyfile(
         EXAMPLES / "simulation-assessment.response.json",
         a_dir / "expected-assessment.json",
