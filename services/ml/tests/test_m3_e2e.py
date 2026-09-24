@@ -2,9 +2,11 @@ import json
 from pathlib import Path
 
 from fastapi.testclient import TestClient
+import pytest
 
 from services.ml.app.config import Settings
 from services.ml.app.main import create_app
+from services.ml.app.metrics.languagetool import LocalLanguageTool
 from services.ml.scripts.smoke_m3 import run
 
 
@@ -25,6 +27,8 @@ class TestClientTransport:
 
 
 def test_spoken_a_b_c_replay_into_grounded_assessment(tmp_path: Path) -> None:
+    if not LocalLanguageTool()._jar.is_file():
+        pytest.skip("voice-to-report integration needs bundled offline LanguageTool")
     from decimal import Decimal
 
     settings = Settings(

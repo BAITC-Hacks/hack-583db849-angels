@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pytest
 
+from services.ml.app.metrics.languagetool import LocalLanguageTool
 from services.ml.app.schemas.contracts import AssessmentResult, Evidence, Turn
 from services.ml.app.gateway.cassettes import CassetteEnvelope
 from services.ml.app.gateway.config import TaskName
@@ -87,6 +88,8 @@ def test_synthetic_judge_cassettes_are_schema_valid_and_do_not_contain_profile()
 
 
 def test_quality_bench_replays_all_three_cases_without_network() -> None:
+    if not LocalLanguageTool()._jar.is_file():
+        pytest.skip("HTTP bench needs the bundled offline LanguageTool image")
     report = run_bench()
     assert report == {
         "scenarioId": "conflict-resolution", "cases": 3,
