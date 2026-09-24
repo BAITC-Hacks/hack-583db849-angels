@@ -74,8 +74,8 @@ Each person works down their own list, top to bottom. Every issue repeats its pl
 | 2 | #7 M2a — speech in and out, mini-ML, beat engine, actor, first scenario | — |
 | 3 | #10 M3 — judge, evidence check, English metrics, quality bench | — |
 | 4 | #13 M1 — brief with eight focuses and the before-interview consistency | — |
-| 5 | #52 C — consistency after the interview | — |
-| 6 | #16 M4 — two-speaker transcription, interview draft | — |
+| 5 | #16 M4 — two-speaker transcription, interview draft | — |
+| 6 | #52 C — consistency after the interview | — |
 | 7 | #19 M5 — quality guard | the final M5 contract, #17 PR 1; if it is not there, do step 8 first |
 | 8 | #22 M2b — scenarios 2–10 through the quality bench | Beknur's stories, #53, batch by batch |
 | 9 | #56 S — the surprise question | — |

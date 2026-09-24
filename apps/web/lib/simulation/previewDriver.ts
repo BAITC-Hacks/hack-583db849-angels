@@ -10,6 +10,9 @@ const REPLY_DELAY_MS = 1400;
  * simulations API exists. It keeps the rules the real one will enforce: one
  * turn in flight at a time, no empty turns, turn ids assigned in order, and a
  * candidate who can stop whenever they like.
+ *
+ * Like the real beat engine, it ends when the story does: the script runs out
+ * before `maxCandidateTurns`, which is only the cap.
  */
 export class PreviewSimulation {
   private state: SimulationState;
@@ -33,6 +36,11 @@ export class PreviewSimulation {
 
   getSnapshot = (): SimulationState => this.state;
 
+  /** The candidate turn the closing line answers: the script's end, or the cap if it comes first. */
+  private get lastTurn(): number {
+    return Math.min(this.scenario.maxCandidateTurns, this.lines.length - 1);
+  }
+
   subscribe = (listener: () => void): (() => void) => {
     this.listeners.add(listener);
     return () => this.listeners.delete(listener);
@@ -49,12 +57,12 @@ export class PreviewSimulation {
       turns: [...this.state.turns, this.turn('candidate', trimmed)],
       replying: true,
       candidateTurns,
-      stage: stageFor(candidateTurns, this.scenario.maxCandidateTurns),
+      stage: stageFor(candidateTurns, this.lastTurn),
     });
 
     this.pending = setTimeout(() => {
       this.pending = null;
-      const last = candidateTurns >= this.scenario.maxCandidateTurns;
+      const last = candidateTurns >= this.lastTurn;
       const line = last ? this.lines[this.lines.length - 1] : this.lines[Math.min(this.nextLine, this.lines.length - 2)];
       this.nextLine += 1;
 
