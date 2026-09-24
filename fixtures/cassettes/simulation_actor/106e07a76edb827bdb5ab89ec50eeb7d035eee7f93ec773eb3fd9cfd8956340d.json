@@ -1,0 +1,12 @@
+{
+  "input_tokens": 40,
+  "model": "gpt-6-luna",
+  "output_tokens": 9,
+  "provider": "openai",
+  "recorded_at": "2026-09-24T00:00:00Z",
+  "request_hash": "106e07a76edb827bdb5ab89ec50eeb7d035eee7f93ec773eb3fd9cfd8956340d",
+  "request_id": "synthetic-m2a-fixture",
+  "response": "{\"text\": \"How do I know this will not happen again?\"}",
+  "task": "simulation_actor",
+  "version": 1
+}

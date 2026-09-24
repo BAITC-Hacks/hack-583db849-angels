@@ -1,0 +1,12 @@
+{
+  "input_tokens": 40,
+  "model": "gpt-6-luna",
+  "output_tokens": 8,
+  "provider": "openai",
+  "recorded_at": "2026-09-24T00:00:00Z",
+  "request_hash": "92eae4f8c44804fff640c66d4c4cb6da6dcafb72d0ac1c35de7e7f56bff9fa2a",
+  "request_id": "synthetic-m2a-fixture",
+  "response": "{\"text\": \"Will you make Timur the villain for this?\"}",
+  "task": "simulation_actor",
+  "version": 1
+}

@@ -165,7 +165,7 @@ def run(transport: Transport) -> dict[str, Any]:
 
         if not result["ended"] or result["stage"] != "finished":
             raise RuntimeError("synthetic session did not finish")
-        reports.append({"candidateId": session["candidateId"], "candidateTurns": 4})
+        reports.append({"candidateId": session["candidateId"], "candidateTurns": len(session["turns"])})
 
     ordered = sorted(timings)
     return {

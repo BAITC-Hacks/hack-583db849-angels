@@ -2,7 +2,7 @@
   "version": 1,
   "candidateId": "candidate-c",
   "scenarioId": "conflict-resolution",
-  "openingLine": "Timur replaced my module without asking. I want to leave this team.",
+  "openingLine": "Honestly, I'm done. Timur rewrote my whole module last night without a word to me. If my work can just be thrown away, why am I even here? Maybe the three of you can finish the demo without me.",
   "turns": [
     {
       "audioRef": "m2a/candidate-c/turn-01.ogg",
