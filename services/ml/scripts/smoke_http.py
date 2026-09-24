@@ -85,7 +85,9 @@ def main() -> None:
             "POST",
             "/internal/v1/brief",
             load_json("brief.request.json"),
-            load_json("brief.response.json"),
+            json.loads(
+                (ROOT / "seed/candidates/a/expected-brief.json").read_text(encoding="utf-8")
+            ),
         ),
         (
             "POST",
