@@ -102,9 +102,15 @@ def test_complete_stateless_path_reaches_finished() -> None:
         stages.append(result.stage)
         next_beat = result.director.nextBeat
 
-    assert stages == ["in-progress", "in-progress", "wrapping-up", "finished"]
+    assert stages == [
+        "in-progress",
+        "in-progress",
+        "in-progress",
+        "wrapping-up",
+        "finished",
+    ]
     assert result.director.nextBeat == "end"
-    assert len(candidates) == 4
+    assert len(candidates) == 5
 
 
 def test_real_http_route_uses_pipeline_and_returns_contract_shape(tmp_path: Path) -> None:

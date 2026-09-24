@@ -38,6 +38,9 @@ ROUTES = {
 
 def export_sessions() -> list[dict]:
     sessions = []
+    shared_opening = json.loads(
+        (SEED / "a" / "transcript.json").read_text(encoding="utf-8")
+    )[0]["text"]
     for candidate, route in ROUTES.items():
         directory = SEED / candidate
         transcript = json.loads(
@@ -68,7 +71,7 @@ def export_sessions() -> list[dict]:
             "version": 1,
             "candidateId": f"candidate-{candidate}",
             "scenarioId": "conflict-resolution",
-            "openingLine": transcript[0]["text"],
+            "openingLine": shared_opening,
             "turns": turns,
         }
         (directory / "m2a-session.json").write_text(

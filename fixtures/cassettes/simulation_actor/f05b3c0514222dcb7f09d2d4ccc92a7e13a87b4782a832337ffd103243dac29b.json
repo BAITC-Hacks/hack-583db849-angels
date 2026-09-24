@@ -1,0 +1,12 @@
+{
+  "input_tokens": 40,
+  "model": "gpt-6-luna",
+  "output_tokens": 25,
+  "provider": "openai",
+  "recorded_at": "2026-09-24T00:00:00Z",
+  "request_hash": "f05b3c0514222dcb7f09d2d4ccc92a7e13a87b4782a832337ffd103243dac29b",
+  "request_id": "synthetic-m2a-fixture",
+  "response": "{\"text\": \"That sounds fair, I guess. So what do I actually do today? I don't want to sit around waiting for Timur to agree with me.\"}",
+  "task": "simulation_actor",
+  "version": 1
+}

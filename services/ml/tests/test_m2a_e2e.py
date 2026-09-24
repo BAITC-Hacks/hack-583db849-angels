@@ -91,10 +91,10 @@ def test_http_harness_completes_a_b_c_and_reports_only_safe_metrics(
         report = run(TestClientTransport(client))
 
     assert report["mode"] == "replay"
-    assert report["requests"] == 45
+    assert report["requests"] == 51
     assert report["sessions"] == [
-        {"candidateId": "candidate-a", "candidateTurns": 4},
-        {"candidateId": "candidate-b", "candidateTurns": 4},
+        {"candidateId": "candidate-a", "candidateTurns": 5},
+        {"candidateId": "candidate-b", "candidateTurns": 5},
         {"candidateId": "candidate-c", "candidateTurns": 4},
     ]
     assert report["latencyMs"] == {"median": 1.0, "p95": 1.0, "max": 1.0}
@@ -102,7 +102,7 @@ def test_http_harness_completes_a_b_c_and_reports_only_safe_metrics(
     assert "Timur" not in serialized
     assert "Dana" not in serialized
     assert "test-internal-token" not in serialized
-    assert caplog.text.count("scenario_director_decision") == 15
+    assert caplog.text.count("scenario_director_decision") == 17
     for marker in (
         "That sounds really unfair",
         "We'll figure it out",
