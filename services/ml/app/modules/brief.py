@@ -19,7 +19,6 @@ from ..schemas.contracts import (
     CertificateLevel,
     Claim,
     ConsistencyItem,
-    Metric,
     Observation,
 )
 from .consistency import before_consistency
@@ -136,14 +135,10 @@ def _ground(
         observation_evidence = checked(item.observation.evidence)
         if item.topic == "english" or not claim_evidence:
             continue  # English is measured deterministically above.
-        metric = _verified_metric(item.observation.metric, request)
-        if item.observation.metric is not None and metric is None:
-            continue
-        if item.status != "unverified" and not observation_evidence and metric is None:
+        if item.observation.metric is not None:
+            # Only the deterministic English comparison may interpret a metric.
             continue
         observation_text = (
-            f"The supplied simulation metric is {metric.name}: {metric.value}."
-            if metric is not None else
             f"The cited test or application response is: {observation_evidence[0].quote}"
             if observation_evidence else "No comparable observation was supplied."
         )
@@ -157,9 +152,11 @@ def _ground(
             observation=Observation(
                 text=observation_text,
                 evidence=observation_evidence,
-                metric=metric,
+                metric=None,
             ),
-            status=item.status if observation_evidence or metric else "unverified",
+            # Verified quotes establish the two source texts, not their semantic
+            # agreement. Keep the comparison open for the interviewer.
+            status="unverified",
             whatToDo="Ask the candidate to clarify these points with a concrete example.",
             askInInterview="How do these two points fit together in a recent example?",
         ))
@@ -184,12 +181,3 @@ def _ground(
         ),
     )
     return result, submitted, dropped
-
-
-def _verified_metric(metric: Metric | None, request: BriefRequest) -> Metric | None:
-    if metric is None or metric.source != "simulation" or request.simulationEnglish is None:
-        return None
-    actual = getattr(request.simulationEnglish, metric.name)
-    if actual is None or str(actual) != str(metric.value):
-        return None
-    return metric
