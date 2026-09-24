@@ -54,3 +54,9 @@ def test_ambiguous_self_rating_does_not_pick_one() -> None:
     source = request()
     source.candidate.application.answers[-1].answer = "I was B2; now I think C2."
     assert before_consistency(source) == []
+
+
+def test_self_rating_can_be_found_by_question_not_only_seed_field_id() -> None:
+    source = request()
+    source.candidate.application.answers[-1].fieldId = "language_level"
+    assert before_consistency(source)[0].claim.evidence[0].sourceId == "language_level"

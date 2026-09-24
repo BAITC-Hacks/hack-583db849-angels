@@ -53,6 +53,16 @@ def test_service_grounds_a_and_embeds_before_consistency() -> None:
     assert result.consistency[0].askInInterview
     assert result.consistency[1].claim.evidence[0].sourceId == "motivation"
     assert result.english.certificate.score == "6.5"
+    assert result.english.certificate.cefr == "not verified"
+
+
+def test_certificate_level_is_not_taken_from_unverified_model_mapping() -> None:
+    request, proposed = example()
+    proposed.english.certificate.cefr = "C2"
+    result = asyncio.run(BriefService(BriefGenerator(FakeGateway([proposed]))).prepare(request))
+    assert result.english.certificate.type == "IELTS"
+    assert result.english.certificate.score == "6.5"
+    assert result.english.certificate.cefr == "not verified"
 
 
 def test_no_simulation_metric_cannot_be_invented_by_model() -> None:

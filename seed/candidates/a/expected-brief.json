@@ -131,7 +131,7 @@
     "certificate": {
       "type": "IELTS",
       "score": "6.5",
-      "cefr": "B2"
+      "cefr": "not verified"
     },
     "writtenCefr": "B1+",
     "basis": "Estimate based on supplied written application answers; verify live."

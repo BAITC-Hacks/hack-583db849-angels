@@ -115,7 +115,7 @@ def brief(candidate: str, snapshot: dict) -> dict:
         "clarify": [],
         "english": {
             "certificate": (
-                {"type": certificate["type"], "score": certificate["score"], "cefr": "B2"}
+                {"type": certificate["type"], "score": certificate["score"], "cefr": "not verified"}
                 if certificate else None
             ),
             "writtenCefr": "B1+" if candidate == "a" else "B2" if candidate == "b" else "B1",
