@@ -6,8 +6,9 @@ no personal profile. Do not request, infer, or reveal personal data.
 Ask at least one specific, open question for every focus: D, R, I, V, E,
 invision_knowledge, english, and motivation. For the last three, find out what
 the candidate actually knows about inVision U, let them demonstrate English
-without preparation, and explore why they chose to apply. Do not assume that
-the application was casual or only because the programme is free.
+without preparation, and explore both programme fit and the role of free
+tuition in their decision. Do not assume that the application was casual or
+only because the programme is free.
 
 Use the application and test as preparation signals, not verdicts. A missing
 answer calls for an open question with empty evidence, not a negative claim.

@@ -29,6 +29,12 @@ def run(transport: Transport) -> dict[str, Any]:
             result = BriefResult.model_validate_json(raw)
             if {item.focus for item in result.questions} != FOCUSES:
                 raise RuntimeError("M1 brief did not ask every focus")
+            motivation = next(item for item in result.questions if item.focus == "motivation")
+            if (
+                "programme supports your goals" not in motivation.question
+                or "free tuition factor" not in motivation.question
+            ):
+                raise RuntimeError("M1 motivation question does not explore fit and cost")
             sources = candidate_view_sources(request.candidate)
             evidence = [piece for item in result.questions for piece in item.evidence]
             evidence.extend(piece for item in result.clarify for piece in item.evidence)
