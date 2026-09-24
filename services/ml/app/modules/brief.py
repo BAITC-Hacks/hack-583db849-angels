@@ -64,7 +64,10 @@ _OPEN_QUESTIONS = {
     "E": "Describe a plan you carried out. Who owned each step?",
     "invision_knowledge": "What do you know about how inVision U teaches?",
     "english": "In English, describe a recent project without preparing.",
-    "motivation": "Why did you choose to apply to inVision U?",
+    "motivation": (
+        "What in the programme supports your goals, and how did its free tuition "
+        "factor into your decision to apply?"
+    ),
 }
 
 
@@ -112,10 +115,16 @@ def _ground(
             first = evidence[0]
             source = "application" if first.source == "application_field" else "test"
             question = f'Your {source} response says, "{first.quote}" {question}'
-        why = (
-            "The cited response is worth exploring in the interview."
-            if evidence else "This focus needs a direct interview example."
-        )
+        if item.focus == "motivation":
+            why = (
+                "Explore programme fit and the role of cost without assuming either "
+                "is the candidate's only reason."
+            )
+        else:
+            why = (
+                "The cited response is worth exploring in the interview."
+                if evidence else "This focus needs a direct interview example."
+            )
         questions.append(BriefQuestion(
             focus=item.focus, question=question, why=why, evidence=evidence,
         ))

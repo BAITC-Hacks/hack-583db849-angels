@@ -129,6 +129,29 @@ def test_valid_quote_cannot_license_an_invented_question_premise() -> None:
     assert proposed.questions[0].evidence[0].quote in result.questions[0].question
 
 
+def test_motivation_question_checks_programme_fit_and_cost_without_a_verdict() -> None:
+    request, proposed = example()
+    motivation = next(item for item in proposed.questions if item.focus == "motivation")
+    motivation.question = "You only applied because the programme is free, right?"
+    result = asyncio.run(BriefService(BriefGenerator(FakeGateway([proposed]))).prepare(request))
+    question = next(item for item in result.questions if item.focus == "motivation")
+    assert "programme supports your goals" in question.question
+    assert "free tuition factor" in question.question
+    assert "only applied" not in question.question
+    assert "without assuming" in question.why
+
+
+def test_motivation_question_stays_neutral_without_application_evidence() -> None:
+    request, proposed = example()
+    motivation = next(item for item in proposed.questions if item.focus == "motivation")
+    motivation.evidence = []
+    result = asyncio.run(BriefService(BriefGenerator(FakeGateway([proposed]))).prepare(request))
+    question = next(item for item in result.questions if item.focus == "motivation")
+    assert question.evidence == []
+    assert question.question.startswith("What in the programme")
+    assert "Your application response says" not in question.question
+
+
 def test_majority_fabricated_evidence_retries_once_then_errors() -> None:
     request, proposed = example()
     for item in proposed.questions:

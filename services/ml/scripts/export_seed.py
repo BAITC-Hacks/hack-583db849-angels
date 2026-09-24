@@ -52,7 +52,10 @@ def brief(candidate: str, snapshot: dict) -> dict:
         "E": "Describe a plan you carried out. Who owned each step?",
         "invision_knowledge": "What do you know about how inVision U teaches?",
         "english": "In English, describe a recent project without preparing.",
-        "motivation": "Why did you choose to apply to inVision U?",
+        "motivation": (
+            "What in the programme supports your goals, and how did its free tuition "
+            "factor into your decision to apply?"
+        ),
     }
     questions = []
     for focus in FOCUSES:
@@ -61,7 +64,12 @@ def brief(candidate: str, snapshot: dict) -> dict:
             {
                 "focus": focus,
                 "question": f'Your application response says, "{answer["answer"]}" {focus_questions[focus]}',
-                "why": "The cited response is worth exploring in the interview.",
+                "why": (
+                    "Explore programme fit and the role of cost without assuming either "
+                    "is the candidate's only reason."
+                    if focus == "motivation"
+                    else "The cited response is worth exploring in the interview."
+                ),
                 "evidence": [
                     {
                         "source": "application_field",
