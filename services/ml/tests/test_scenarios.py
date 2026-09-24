@@ -32,12 +32,25 @@ def write_scenario(directory: Path, value: dict[str, object]) -> Path:
     return target
 
 
-def test_owned_scenario_is_the_frozen_template() -> None:
+def test_owned_scenario_changes_only_candidate_a_story_routing() -> None:
     owned = json.loads(
         (ROOT_SCENARIOS / "conflict-resolution.json").read_text(encoding="utf-8")
     )
+    expected = payload()
+    beats = {beat["beatId"]: beat for beat in expected["beats"]}
+    process_rule = beats["trust"]["answerTypes"][0]
+    process_rule["next"] = "fairness"
+    process_rule["characterIntent"] = (
+        "Accepts the review rule but worries about a fight with Timur"
+    )
+    beats["fairness"]["answerTypes"][1]["examples"].append(
+        "We keep your version for the demo and move Timur's changes to a separate branch."
+    )
+    beats["setback"]["answerTypes"][0]["examples"].append(
+        "If the run fails, we cut the analytics screen instead of working all night."
+    )
 
-    assert owned == payload()
+    assert owned == expected
     assert owned["status"] == "ready"
 
 
