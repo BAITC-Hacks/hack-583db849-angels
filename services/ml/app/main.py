@@ -16,6 +16,9 @@ from .gateway.config import load_models_configuration
 from .gateway.media import MediaGateway, create_media_gateway
 from .gateway.service import LazyModelGateway, ModelGateway, create_gateway
 from .modules.actor import ScenarioActor
+from .modules.assessment import AssessmentService
+from .modules.judge import SimulationJudge
+from .metrics.languagetool import LocalLanguageTool
 from .modules.director import ScenarioDirector
 from .modules.matcher import LazyLocalMatcher
 from .modules.simulation import SimulationService
@@ -30,6 +33,7 @@ def create_app(
     media_gateway: MediaGateway | None = None,
     model_gateway: ModelGateway | None = None,
     simulation_service: SimulationService | None = None,
+    assessment_service: AssessmentService | None = None,
 ) -> FastAPI:
     resolved = settings or load_settings()
     app = FastAPI(title="AI Leader ID ML API", version="1.0.0")
@@ -49,6 +53,11 @@ def create_app(
         ScenarioDirector(LazyLocalMatcher()),
         ScenarioActor(resolved_model_gateway),
     )
+    resolved_assessment_service = assessment_service or AssessmentService(
+        scenario_repository,
+        SimulationJudge(resolved_model_gateway),
+        LocalLanguageTool(),
+    )
 
     @app.get(
         "/internal/v1/health",
@@ -58,7 +67,12 @@ def create_app(
         return HealthResponse(status="ok")
 
     app.include_router(
-        core_router(authenticate, scenario_repository, resolved_simulation_service)
+        core_router(
+            authenticate,
+            scenario_repository,
+            resolved_simulation_service,
+            resolved_assessment_service,
+        )
     )
     app.include_router(
         audio_router(
