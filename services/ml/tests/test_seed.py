@@ -110,7 +110,7 @@ def test_b_and_c_seed_stories_are_conflict_resolution_walkthroughs() -> None:
         turns = load(SEED / "candidates" / candidate / "transcript.json")
         assert len([turn for turn in turns if turn["speaker"] == "candidate"]) == answer_count
         assert "Timur replaced my module" in turns[0]["text"]
-        assert "Thursday run failed" in turns[-2]["text"]
+        assert "Thursday run failed" in turns[-3]["text"]
         assert all("mentoring pilot" not in turn["text"].lower() for turn in turns)
 
 

@@ -54,5 +54,12 @@
     "text": "Everyone stays until it works.",
     "startedAt": "2026-09-25T10:07:00Z",
     "endedAt": "2026-09-25T10:07:30Z"
+  },
+  {
+    "turnId": "turn_09",
+    "speaker": "character",
+    "text": "I cannot agree to work without a limit. We need another plan.",
+    "startedAt": "2026-09-25T10:08:00Z",
+    "endedAt": "2026-09-25T10:08:30Z"
   }
 ]

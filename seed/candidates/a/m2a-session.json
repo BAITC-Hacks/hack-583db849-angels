@@ -2,35 +2,42 @@
   "version": 1,
   "candidateId": "candidate-a",
   "scenarioId": "conflict-resolution",
-  "openingLine": "I am done. Timur replaced my module without even asking me, and I am thinking of leaving the team.",
+  "openingLine": "Honestly, I'm done. Timur rewrote my whole module last night without a word to me. If my work can just be thrown away, why am I even here? Maybe the three of you can finish the demo without me.",
   "turns": [
     {
-      "audioRef": "m2a/candidate-a/turn-01.wav",
-      "text": "That sounds really unfair, what happened last night?",
-      "expectedAnswerType": "acknowledge",
+      "audioRef": "m2a/candidate-a/turn-01.ogg",
+      "text": "Okay, let's fix this fast. The demo is in three days, so we can't lose you now. Send me the list of what Timur changed and I'll look at it tonight.",
+      "expectedAnswerType": "rush_to_fix",
       "expectedNextBeat": "trust",
-      "characterLine": "He replaced the whole module and told everyone afterward. How do I know this will not happen again?"
+      "characterLine": "Okay… I hear you. But it isn't only about the code. Nobody asked me anything. How do I know it won't happen again next week?"
     },
     {
-      "audioRef": "m2a/candidate-a/turn-02.wav",
-      "text": "From now on nobody changes someone's module without their review.",
+      "audioRef": "m2a/candidate-a/turn-02.ogg",
+      "text": "From now on nobody merges into someone else's module without a review from its owner. I'll set that rule in the repo today.",
       "expectedAnswerType": "process_rule",
-      "expectedNextBeat": "decision",
-      "characterLine": "That review rule would help. But which version do we keep now, and who is fixing the broken login?"
+      "expectedNextBeat": "fairness",
+      "characterLine": "Fine, I could talk to him. But the demo is in three days and his version still breaks the login. Who decides which version we keep?"
     },
     {
-      "audioRef": "m2a/candidate-a/turn-03.wav",
-      "text": "You finish the payments endpoint, Timur fixes login, we freeze on Thursday.",
+      "audioRef": "m2a/candidate-a/turn-03.ogg",
+      "text": "We keep your version for the demo because it works. Timur moves his changes to a separate branch and we look at them after Thursday. If his login fix is really needed, the risk is that we demo with a known bug, so I'll ask him to patch only that.",
+      "expectedAnswerType": "handle_alone",
+      "expectedNextBeat": "decision",
+      "characterLine": "That sounds fair, I guess. So what do I actually do today? I don't want to sit around waiting for Timur to agree with me."
+    },
+    {
+      "audioRef": "m2a/candidate-a/turn-04.ogg",
+      "text": "Today you finish the payment endpoint, Timur fixes the login in his branch, and I write the demo script. We freeze the backend by Thursday noon and do a full run at six.",
       "expectedAnswerType": "plan_with_owners",
       "expectedNextBeat": "setback",
-      "characterLine": "I can do that. But the Thursday run just failed, and we still have two screens unfinished. What now?"
+      "characterLine": "Alright. If we write down who owns what, I'm in. But you tell Timur, not me. I don't want another argument tonight."
     },
     {
-      "audioRef": "m2a/candidate-a/turn-04.wav",
-      "text": "Let's cut one screen, take shifts, and nobody stays past midnight.",
+      "audioRef": "m2a/candidate-a/turn-05.ogg",
+      "text": "Deal. I'll put the owners in the team chat in ten minutes and call Timur right after. If the Thursday run fails, we cut the analytics screen instead of working all night.",
       "expectedAnswerType": "recover_with_team",
       "expectedNextBeat": "end",
-      "characterLine": "Okay. I can stay if we protect the team and keep the work fair. Let us finish this together."
+      "characterLine": "Okay. Let's try it your way. And thanks for actually listening."
     }
   ]
 }
