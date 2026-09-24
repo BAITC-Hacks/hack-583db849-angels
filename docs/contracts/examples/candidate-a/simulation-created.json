@@ -13,7 +13,7 @@
       "wants": "To be asked before her work is changed"
     },
     "expectedMinutes": 8,
-    "maxCandidateTurns": 5
+    "maxCandidateTurns": 8
   },
   "mode": "voice",
   "accommodation": false,
