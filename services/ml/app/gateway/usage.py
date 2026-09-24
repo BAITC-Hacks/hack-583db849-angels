@@ -28,6 +28,8 @@ class UsageRecord(BaseModel):
     source: Literal["provider", "replay", "cache"]
     input_tokens: int = Field(ge=0)
     output_tokens: int = Field(ge=0)
+    metered_units: Decimal | None = Field(default=None, ge=0, allow_inf_nan=False)
+    metered_unit: Literal["audio_minute", "thousand_characters"] | None = None
     estimated_usd: Decimal = Field(ge=0, allow_inf_nan=False)
     actual_usd: Decimal = Field(ge=0, allow_inf_nan=False)
     timestamp: datetime

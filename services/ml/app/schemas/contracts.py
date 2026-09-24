@@ -184,6 +184,14 @@ class TurnRequest(Strict):
     turns: list[Turn]
     state: TurnState | None = None
 
+    @model_validator(mode="after")
+    def state_with_every_candidate_turn(self) -> "TurnRequest":
+        if any(turn.speaker == "candidate" for turn in self.turns) and self.state is None:
+            raise ValueError(
+                "a candidate turn comes with state: the beat from the last director.nextBeat"
+            )
+        return self
+
 
 class DirectorDecision(Strict):
     """Logged for audit, never shown to the candidate."""
@@ -361,6 +369,7 @@ class TranscribedTurn(Strict):
     text: str
     startSec: float
     endSec: float
+    confidence: Annotated[float, Field(ge=0, le=1)] | None = None
 
 
 class TranscribeRequest(Strict):
@@ -406,7 +415,14 @@ class ConsistencyResult(Strict):
 
 class SpeechRequest(Strict):
     text: str
-    voice: str
+    scenarioId: str | None = None
+    voice: str | None = None
+
+    @model_validator(mode="after")
+    def one_way_to_name_the_voice(self) -> "SpeechRequest":
+        if (self.scenarioId is None) == (self.voice is None):
+            raise ValueError("send scenarioId or voice, exactly one")
+        return self
 
 
 class SurpriseRequest(Strict):

@@ -12,14 +12,43 @@ from .routes.core import core_router
 from .routes.extended import extended_router
 from .schemas.contracts import HealthResponse
 from .gateway.usage import FileUsageStore
+from .gateway.config import load_models_configuration
+from .gateway.media import MediaGateway, create_media_gateway
+from .gateway.service import LazyModelGateway, ModelGateway, create_gateway
+from .modules.actor import ScenarioActor
+from .modules.director import ScenarioDirector
+from .modules.matcher import LazyLocalMatcher
+from .modules.simulation import SimulationService
+from .modules.speech import SpeechService
+from .modules.transcription import TurnTranscriptionService
+from .scenarios import load_scenario_repository
 
 
-def create_app(settings: Settings | None = None) -> FastAPI:
+def create_app(
+    settings: Settings | None = None,
+    *,
+    media_gateway: MediaGateway | None = None,
+    model_gateway: ModelGateway | None = None,
+    simulation_service: SimulationService | None = None,
+) -> FastAPI:
     resolved = settings or load_settings()
     app = FastAPI(title="AI Leader ID ML API", version="1.0.0")
     install_error_handlers(app)
     authenticate = internal_auth_dependency(resolved.ml_internal_token)
     usage_store = FileUsageStore(resolved.usage_log_path)
+    scenario_repository = load_scenario_repository()
+    models = load_models_configuration()
+    resolved_media_gateway = media_gateway or create_media_gateway(resolved, models)
+    turn_transcription = TurnTranscriptionService(resolved_media_gateway)
+    speech_service = SpeechService(resolved_media_gateway, scenario_repository)
+    resolved_model_gateway = model_gateway or LazyModelGateway(
+        lambda: create_gateway(resolved, models)
+    )
+    resolved_simulation_service = simulation_service or SimulationService(
+        scenario_repository,
+        ScenarioDirector(LazyLocalMatcher()),
+        ScenarioActor(resolved_model_gateway),
+    )
 
     @app.get(
         "/internal/v1/health",
@@ -28,8 +57,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     async def health() -> HealthResponse:
         return HealthResponse(status="ok")
 
-    app.include_router(core_router(authenticate))
-    app.include_router(audio_router(authenticate, resolved.uploads_dir))
+    app.include_router(
+        core_router(authenticate, scenario_repository, resolved_simulation_service)
+    )
+    app.include_router(
+        audio_router(
+            authenticate,
+            resolved.uploads_dir,
+            turn_transcription,
+            speech_service,
+        )
+    )
     app.include_router(
         extended_router(
             authenticate, usage_store, resolved.gateway_mode, resolved.budget_usd_cap

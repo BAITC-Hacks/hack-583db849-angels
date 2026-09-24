@@ -9,12 +9,74 @@ from fastapi.testclient import TestClient
 from services.ml.app.audio import resolve_audio_ref
 from services.ml.app.config import Settings
 from services.ml.app.errors import ServiceError
+from services.ml.app.gateway.config import Provider
+from services.ml.app.gateway.media import MediaGatewayResult, MediaRequest
 from services.ml.app.main import create_app
 
 
 ROOT = Path(__file__).resolve().parents[3]
 EXAMPLES = ROOT / "docs" / "contracts" / "examples" / "candidate-a" / "ml"
 TOKEN = {"X-Internal-Token": "test-internal-token"}
+
+
+class TurnExampleGateway:
+    async def execute(self, request: MediaRequest) -> MediaGatewayResult:
+        expected = json.loads(
+            (EXAMPLES / "transcribe-turn.response.json").read_text(encoding="utf-8")
+        )
+        turn = expected["turns"][0]
+        words = turn["text"].split()
+        payload = {
+            "metadata": {"duration": expected["durationSec"]},
+            "results": {
+                "channels": [
+                    {
+                        "alternatives": [
+                            {
+                                "transcript": turn["text"],
+                                "confidence": turn["confidence"],
+                                "words": [
+                                    {
+                                        "word": word,
+                                        "start": turn["startSec"]
+                                        if index == 0
+                                        else turn["startSec"] + index,
+                                        "end": turn["endSec"]
+                                        if index == len(words) - 1
+                                        else turn["startSec"] + index + 0.5,
+                                        "confidence": turn["confidence"],
+                                    }
+                                    for index, word in enumerate(words)
+                                ],
+                            }
+                        ]
+                    }
+                ]
+            },
+        }
+        return MediaGatewayResult(
+            content=json.dumps(payload).encode(),
+            media_type="application/json",
+            billed_units=Decimal("0.5"),
+            provider=Provider.DEEPGRAM,
+            model="nova-3",
+            replayed=True,
+            cached=False,
+        )
+
+
+class SyntheticSpeechGateway:
+    async def execute(self, request: MediaRequest) -> MediaGatewayResult:
+        assert request.operation == "speech"
+        return MediaGatewayResult(
+            content=(ROOT / "fixtures" / "audio" / "silence.mp3").read_bytes(),
+            media_type="audio/mpeg",
+            billed_units=request.estimated_units,
+            provider=Provider.DEEPGRAM,
+            model="aura-asteria-en",
+            replayed=True,
+            cached=False,
+        )
 
 
 def test_audio_ref_resolves_a_file_inside_uploads(tmp_path: Path) -> None:
@@ -70,7 +132,10 @@ def test_speech_returns_the_synthetic_mp3(tmp_path: Path) -> None:
         budget_usd_cap=Decimal("20"),
         demo_mode=False,
     )
-    client = TestClient(create_app(settings), raise_server_exceptions=False)
+    client = TestClient(
+        create_app(settings, media_gateway=SyntheticSpeechGateway()),
+        raise_server_exceptions=False,
+    )
 
     response = client.post(
         "/internal/v1/speech",
@@ -100,3 +165,35 @@ def test_transcribe_rejects_an_unsafe_reference_over_http(tmp_path: Path) -> Non
 
     assert response.status_code == 400
     assert response.json()["error"]["code"] == "INVALID_AUDIO_REF"
+
+
+def test_turn_transcription_uses_the_one_speaker_contract_example(tmp_path: Path) -> None:
+    audio = tmp_path / "turns" / "synthetic" / "turn.webm"
+    audio.parent.mkdir(parents=True)
+    audio.write_bytes(b"synthetic-webm")
+    settings = Settings(
+        ml_internal_token="test-internal-token",
+        uploads_dir=tmp_path,
+        gateway_mode="replay",
+        budget_usd_cap=Decimal("20"),
+        demo_mode=False,
+    )
+    response = TestClient(
+        create_app(settings, media_gateway=TurnExampleGateway()),
+        raise_server_exceptions=False,
+    ).post(
+        "/internal/v1/transcribe",
+        json={
+            "purpose": "turn",
+            "audioRef": "turns/synthetic/turn.webm",
+            "language": "en",
+            "speakers": 1,
+        },
+        headers=TOKEN,
+    )
+
+    expected = json.loads(
+        (EXAMPLES / "transcribe-turn.response.json").read_text(encoding="utf-8")
+    )
+    assert response.status_code == 200
+    assert response.json() == expected

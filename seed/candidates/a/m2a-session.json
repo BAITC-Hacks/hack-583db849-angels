@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "candidateId": "candidate-a",
+  "scenarioId": "conflict-resolution",
+  "openingLine": "I am done. Timur replaced my module without even asking me, and I am thinking of leaving the team.",
+  "turns": [
+    {
+      "audioRef": "m2a/candidate-a/turn-01.wav",
+      "text": "That sounds really unfair, what happened last night?",
+      "expectedAnswerType": "acknowledge",
+      "expectedNextBeat": "trust",
+      "characterLine": "He replaced the whole module and told everyone afterward. How do I know this will not happen again?"
+    },
+    {
+      "audioRef": "m2a/candidate-a/turn-02.wav",
+      "text": "From now on nobody changes someone's module without their review.",
+      "expectedAnswerType": "process_rule",
+      "expectedNextBeat": "decision",
+      "characterLine": "That review rule would help. But which version do we keep now, and who is fixing the broken login?"
+    },
+    {
+      "audioRef": "m2a/candidate-a/turn-03.wav",
+      "text": "You finish the payments endpoint, Timur fixes login, we freeze on Thursday.",
+      "expectedAnswerType": "plan_with_owners",
+      "expectedNextBeat": "setback",
+      "characterLine": "I can do that. But the Thursday run just failed, and we still have two screens unfinished. What now?"
+    },
+    {
+      "audioRef": "m2a/candidate-a/turn-04.wav",
+      "text": "Let's cut one screen, take shifts, and nobody stays past midnight.",
+      "expectedAnswerType": "recover_with_team",
+      "expectedNextBeat": "end",
+      "characterLine": "Okay. I can stay if we protect the team and keep the work fair. Let us finish this together."
+    }
+  ]
+}

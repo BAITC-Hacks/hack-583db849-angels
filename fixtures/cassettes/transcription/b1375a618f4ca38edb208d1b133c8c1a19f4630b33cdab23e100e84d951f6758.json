@@ -1,0 +1,12 @@
+{
+  "billed_units": "0.039771730914588055",
+  "media_type": "application/json",
+  "model": "nova-3",
+  "provider": "deepgram",
+  "recorded_at": "2026-09-24T00:00:00Z",
+  "request_hash": "b1375a618f4ca38edb208d1b133c8c1a19f4630b33cdab23e100e84d951f6758",
+  "request_id": "synthetic-m2a-transcription",
+  "response_base64": "eyJtZXRhZGF0YSI6eyJkdXJhdGlvbiI6Mi4zODYzMDM4NTQ4NzUyODMzfSwicmVzdWx0cyI6eyJjaGFubmVscyI6W3siYWx0ZXJuYXRpdmVzIjpbeyJ0cmFuc2NyaXB0IjoiV2UgY3V0IHNjb3BlIGFuZCBtb3ZlIG9uLiIsImNvbmZpZGVuY2UiOjAuOTksIndvcmRzIjpbeyJ3b3JkIjoid2UiLCJwdW5jdHVhdGVkX3dvcmQiOiJXZSIsInN0YXJ0IjowLjAsImVuZCI6MC4zOTgsImNvbmZpZGVuY2UiOjAuOTl9LHsid29yZCI6ImN1dCIsInB1bmN0dWF0ZWRfd29yZCI6ImN1dCIsInN0YXJ0IjowLjM5OCwiZW5kIjowLjc5NSwiY29uZmlkZW5jZSI6MC45OX0seyJ3b3JkIjoic2NvcGUiLCJwdW5jdHVhdGVkX3dvcmQiOiJzY29wZSIsInN0YXJ0IjowLjc5NSwiZW5kIjoxLjE5MywiY29uZmlkZW5jZSI6MC45OX0seyJ3b3JkIjoiYW5kIiwicHVuY3R1YXRlZF93b3JkIjoiYW5kIiwic3RhcnQiOjEuMTkzLCJlbmQiOjEuNTkxLCJjb25maWRlbmNlIjowLjk5fSx7IndvcmQiOiJtb3ZlIiwicHVuY3R1YXRlZF93b3JkIjoibW92ZSIsInN0YXJ0IjoxLjU5MSwiZW5kIjoxLjk4OSwiY29uZmlkZW5jZSI6MC45OX0seyJ3b3JkIjoib24iLCJwdW5jdHVhdGVkX3dvcmQiOiJvbi4iLCJzdGFydCI6MS45ODksImVuZCI6Mi4zODYsImNvbmZpZGVuY2UiOjAuOTl9XX1dfV19fQ==",
+  "task": "transcription",
+  "version": 1
+}

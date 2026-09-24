@@ -1,0 +1,12 @@
+{
+  "input_tokens": 40,
+  "model": "gpt-6-luna",
+  "output_tokens": 21,
+  "provider": "openai",
+  "recorded_at": "2026-09-24T00:00:00Z",
+  "request_hash": "07eebab3acf5070498a7246ccce95dfd429a7eb6456511681749aed78fde6e20",
+  "request_id": "synthetic-m2a-fixture",
+  "response": "{\"text\": \"A promise is not enough for me yet. What concrete rule will protect our work, and which version are we using?\"}",
+  "task": "simulation_actor",
+  "version": 1
+}
