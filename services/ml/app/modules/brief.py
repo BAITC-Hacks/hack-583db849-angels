@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-import re
 from typing import Protocol
 
 from ..evidence import candidate_view_sources, verify_evidence
@@ -58,11 +57,6 @@ class BriefGenerator:
         return result.output
 
 
-_DECISION_WORDS = re.compile(
-    r"\b(?:admit|admitted|reject|rejected|accept|accepted|rank|ranking|verdict)\b",
-    re.IGNORECASE,
-)
-
 _OPEN_QUESTIONS = {
     "D": "Describe a time you helped someone through a setback. What did you do?",
     "R": "Describe a decision with a real risk. What alternatives did you weigh?",
@@ -97,10 +91,6 @@ class BriefService:
         raise GatewayOutputError("brief evidence did not match candidate sources")
 
 
-def _safe_text(text: str, fallback: str) -> str:
-    return fallback if not text.strip() or _DECISION_WORDS.search(text) else text.strip()
-
-
 def _ground(
     proposed: BriefResult,
     request: BriefRequest,
@@ -118,10 +108,11 @@ def _ground(
     questions = []
     for item in proposed.questions:
         evidence = checked(item.evidence)
-        question = (
-            _safe_text(item.question, _OPEN_QUESTIONS[item.focus])
-            if evidence else _OPEN_QUESTIONS[item.focus]
-        )
+        question = _OPEN_QUESTIONS[item.focus]
+        if evidence:
+            first = evidence[0]
+            source = "application" if first.source == "application_field" else "test"
+            question = f'Your {source} response says, "{first.quote}" {question}'
         why = (
             "The cited response is worth exploring in the interview."
             if evidence else "This focus needs a direct interview example."

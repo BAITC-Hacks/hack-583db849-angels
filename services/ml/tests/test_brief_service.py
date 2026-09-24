@@ -91,6 +91,14 @@ def test_fabricated_quote_gets_a_safe_open_question() -> None:
     assert "invented" not in str(result.model_dump()).lower()
 
 
+def test_valid_quote_cannot_license_an_invented_question_premise() -> None:
+    request, proposed = example()
+    proposed.questions[0].question = "Why did you falsify the result?"
+    result = asyncio.run(BriefService(BriefGenerator(FakeGateway([proposed]))).prepare(request))
+    assert "falsify" not in result.questions[0].question
+    assert proposed.questions[0].evidence[0].quote in result.questions[0].question
+
+
 def test_majority_fabricated_evidence_retries_once_then_errors() -> None:
     request, proposed = example()
     for item in proposed.questions:
