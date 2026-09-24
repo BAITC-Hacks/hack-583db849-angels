@@ -84,4 +84,22 @@ describe('MlHttpAdapter', () => {
       status: expectedStatus, response: { code: expectedCode },
     });
   });
+  it('posts the full assessment request to ML and returns its result', async () => {
+    const result = { scores: [], english: {}, interviewQuestions: [],
+      candidateFeedback: { strengths: [], growth: [], nextTime: [] } };
+    const fetchImplementation = jest.fn().mockResolvedValue(new Response(JSON.stringify(result), {
+      status: 200, headers: { 'Content-Type': 'application/json' },
+    }));
+    const adapter = new MlHttpAdapter(config, fetchImplementation);
+    const body = {
+      candidateId: 'synthetic-id', scenarioId: 'conflict-resolution', mode: 'voice' as const,
+      turns: [{ turnId: 'turn_01', speaker: 'candidate' as const, text: 'Synthetic answer',
+        startedAt: '2026-09-25T10:05:00Z', endedAt: '2026-09-25T10:05:20Z' }],
+    };
+    await expect(adapter.simulationAssessment(body)).resolves.toEqual(result);
+    const [request] = fetchImplementation.mock.calls[0] as [Request];
+    expect(request.url).toBe('http://ml:8000/internal/v1/simulation/assessment');
+    await expect(request.clone().json()).resolves.toEqual(body);
+  });
+
 });

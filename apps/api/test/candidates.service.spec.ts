@@ -12,6 +12,7 @@ describe('CandidatesService', () => {
     createdAt: new Date('2026-09-23T08:00:00Z'),
     profile: { fullName: 'Synthetic Person', email: 'synthetic@example.test' },
     simulations: [{ id: 'simulation-id', status: 'active', ending: null }],
+    assessments: [],
   };
 
   it('selects and returns only the public Candidate DTO for create, list, and GET', async () => {
@@ -80,4 +81,18 @@ describe('CandidatesService', () => {
     expect(filterProgressForRole(full, 'interviewer')).toEqual(contractExample('candidate-progress.interviewer.json'));
     expect(filterProgressForRole(full, 'commission')).toEqual(full);
   });
+  it('reports assessment progress after the simulation completes, except to a blind interviewer', async () => {
+    const assessed = { ...row, simulations: [{ id: 'simulation-id', status: 'completed', ending: 'completed' }],
+      assessments: [{ id: 'assessment-id', status: 'pending' }] };
+    const prisma = { candidate: { findUnique: jest.fn().mockResolvedValue(assessed) } };
+    const service = new CandidatesService(prisma as never);
+    expect((await service.progress(row.id, 'commission'))?.assessment).toEqual({
+      assessmentId: 'assessment-id', status: 'pending',
+    });
+    expect((await service.progress(row.id, 'platform'))?.assessment).toEqual({
+      assessmentId: 'assessment-id', status: 'pending',
+    });
+    expect((await service.progress(row.id, 'interviewer'))?.assessment).toBeNull();
+  });
+
 });

@@ -94,8 +94,9 @@ function harness(options: { scenarios?: ReturnType<typeof scenario>[]; counts?: 
       ? (operation as (client: unknown) => Promise<unknown>)(prisma) : Promise.all(operation as Promise<unknown>[])),
   };
   const audit = { record: jest.fn().mockResolvedValue({}) };
-  const service = new SimulationsService(prisma as never, gateway as never, audio, new ToLlmViewService(), audit as never);
-  return { service, prisma, gateway, audio, audit, turns };
+  const assessments = { startAutomatically: jest.fn().mockResolvedValue(undefined) };
+  const service = new SimulationsService(prisma as never, gateway as never, audio, new ToLlmViewService(), audit as never, assessments as never);
+  return { service, prisma, gateway, audio, audit, assessments, turns };
 }
 
 describe('SimulationsService', () => {
@@ -106,6 +107,7 @@ describe('SimulationsService', () => {
     expect(created.scenario.scenarioId).toBe('least');
     expect(created.scenario).not.toHaveProperty('status');
     expect(created.turns.map((turn) => turn.turnId)).toEqual(['turn_01']);
+    expect(fixture.assessments.startAutomatically).not.toHaveBeenCalled();
     expect(fixture.gateway.simulationTurn).toHaveBeenCalledWith({ scenarioId: 'least', turns: [] });
     expect(fixture.gateway.speech).toHaveBeenCalledWith(opening.text, 'least');
     await expect(fixture.service.create(candidateId, 'platform')).rejects.toMatchObject({
@@ -257,6 +259,8 @@ describe('SimulationsService', () => {
     fixture.gateway.simulationTurn.mockResolvedValueOnce({ ...answer, stage: 'finished', ended: true });
     const result = await fixture.service.turn(id, { text: 'We agree' }, 'platform');
     expect(result.status).toBe('completed');
+    expect(fixture.assessments.startAutomatically).toHaveBeenCalledTimes(1);
+    expect(fixture.assessments.startAutomatically).toHaveBeenCalledWith(id);
     expect(await fixture.service.get(id)).toMatchObject({ status: 'completed', ending: 'completed' });
     expect(fixture.audit.record).toHaveBeenCalledWith(expect.objectContaining({
       action: 'simulation.completed', metadata: { ending: 'completed' },
@@ -267,6 +271,9 @@ describe('SimulationsService', () => {
     const fixture = harness();
     const id = (await fixture.service.create(candidateId, 'platform')).simulationId;
     const stopped = await fixture.service.complete(id, 'stopped', 'platform');
+    expect(fixture.assessments.startAutomatically).toHaveBeenCalledTimes(1);
+    await expect(fixture.service.complete(id, 'stopped', 'platform')).rejects.toMatchObject({ status: 409 });
+    expect(fixture.assessments.startAutomatically).toHaveBeenCalledTimes(1);
     expect(stopped).toMatchObject({ status: 'completed', stage: 'finished', ending: 'stopped' });
     await expect(fixture.service.turn(id, { text: 'Later' }, 'platform')).rejects.toMatchObject({
       status: 409, response: { code: 'SIMULATION_FINISHED' },
