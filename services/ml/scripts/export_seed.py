@@ -45,11 +45,11 @@ def brief(candidate: str, snapshot: dict) -> dict:
         "motivation": "motivation",
     }
     focus_questions = {
-        "D": "After a setback, what did you do for the people involved?",
-        "R": "Describe a decision with a risk. What alternatives did you weigh?",
+        "D": "Describe a time you helped someone through a setback. What did you do?",
+        "R": "Describe a decision with a real risk. What alternatives did you weigh?",
         "I": "What need did your idea address, and how did you test it?",
         "V": "Describe a time fairness changed your plan. What did you choose?",
-        "E": "How did you divide responsibility and check that the plan worked?",
+        "E": "Describe a plan you carried out. Who owned each step?",
         "invision_knowledge": "What do you know about how inVision U teaches?",
         "english": "In English, describe a recent project without preparing.",
         "motivation": "Why did you choose to apply to inVision U?",
@@ -60,7 +60,7 @@ def brief(candidate: str, snapshot: dict) -> dict:
         questions.append(
             {
                 "focus": focus,
-                "question": focus_questions[focus],
+                "question": f'Your application response says, "{answer["answer"]}" {focus_questions[focus]}',
                 "why": "The cited response is worth exploring in the interview.",
                 "evidence": [
                     {

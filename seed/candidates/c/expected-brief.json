@@ -3,7 +3,7 @@
   "questions": [
     {
       "focus": "D",
-      "question": "After a setback, what did you do for the people involved?",
+      "question": "Your application response says, \"Nothing important has gone wrong in my projects. Usually everything works as expected.\" Describe a time you helped someone through a setback. What did you do?",
       "why": "The cited response is worth exploring in the interview.",
       "evidence": [
         {
@@ -15,7 +15,7 @@
     },
     {
       "focus": "R",
-      "question": "Describe a decision with a risk. What alternatives did you weigh?",
+      "question": "Your application response says, \"I was listed as the leader of a class event. The group completed it, but I do not remember who planned each part or what I personally changed.\" Describe a decision with a real risk. What alternatives did you weigh?",
       "why": "The cited response is worth exploring in the interview.",
       "evidence": [
         {
@@ -27,7 +27,7 @@
     },
     {
       "focus": "I",
-      "question": "What need did your idea address, and how did you test it?",
+      "question": "Your application response says, \"I might create a volunteering project, although I have not chosen the problem, users or first step yet.\" What need did your idea address, and how did you test it?",
       "why": "The cited response is worth exploring in the interview.",
       "evidence": [
         {
@@ -39,7 +39,7 @@
     },
     {
       "focus": "V",
-      "question": "Describe a time fairness changed your plan. What did you choose?",
+      "question": "Your application response says, \"I was listed as the leader of a class event. The group completed it, but I do not remember who planned each part or what I personally changed.\" Describe a time fairness changed your plan. What did you choose?",
       "why": "The cited response is worth exploring in the interview.",
       "evidence": [
         {
@@ -51,7 +51,7 @@
     },
     {
       "focus": "E",
-      "question": "How did you divide responsibility and check that the plan worked?",
+      "question": "Your application response says, \"I was listed as the leader of a class event. The group completed it, but I do not remember who planned each part or what I personally changed.\" Describe a plan you carried out. Who owned each step?",
       "why": "The cited response is worth exploring in the interview.",
       "evidence": [
         {
@@ -63,7 +63,7 @@
     },
     {
       "focus": "invision_knowledge",
-      "question": "What do you know about how inVision U teaches?",
+      "question": "Your application response says, \"I applied because several people recommended the programme. I prefer to make decisions independently and usually do not ask for advice.\" What do you know about how inVision U teaches?",
       "why": "The cited response is worth exploring in the interview.",
       "evidence": [
         {
@@ -75,7 +75,7 @@
     },
     {
       "focus": "english",
-      "question": "In English, describe a recent project without preparing.",
+      "question": "Your application response says, \"C1. I use English every day.\" In English, describe a recent project without preparing.",
       "why": "The cited response is worth exploring in the interview.",
       "evidence": [
         {
@@ -87,7 +87,7 @@
     },
     {
       "focus": "motivation",
-      "question": "Why did you choose to apply to inVision U?",
+      "question": "Your application response says, \"I applied because several people recommended the programme. I prefer to make decisions independently and usually do not ask for advice.\" Why did you choose to apply to inVision U?",
       "why": "The cited response is worth exploring in the interview.",
       "evidence": [
         {

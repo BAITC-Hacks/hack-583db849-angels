@@ -3,7 +3,7 @@
   "questions": [
     {
       "focus": "D",
-      "question": "After a setback, what did you do for the people involved?",
+      "question": "Your application response says, \"Our first mentoring plan was rejected because it needed too many volunteers. I was disappointed and stopped working on it until another student restarted the discussion several weeks later.\" Describe a time you helped someone through a setback. What did you do?",
       "why": "The cited response is worth exploring in the interview.",
       "evidence": [
         {
@@ -15,7 +15,7 @@
     },
     {
       "focus": "R",
-      "question": "Describe a decision with a risk. What alternatives did you weigh?",
+      "question": "Your application response says, \"I helped our debate club redesign its mentoring programme. I interviewed new members, found that beginners left after the first month, and proposed smaller groups with one experienced mentor each.\" Describe a decision with a real risk. What alternatives did you weigh?",
       "why": "The cited response is worth exploring in the interview.",
       "evidence": [
         {
@@ -27,7 +27,7 @@
     },
     {
       "focus": "I",
-      "question": "What need did your idea address, and how did you test it?",
+      "question": "Your application response says, \"Students can find individual courses, but they struggle to see a path from one skill to a real project. I would build a map that connects learning goals, mentors and local projects.\" What need did your idea address, and how did you test it?",
       "why": "The cited response is worth exploring in the interview.",
       "evidence": [
         {
@@ -39,7 +39,7 @@
     },
     {
       "focus": "V",
-      "question": "Describe a time fairness changed your plan. What did you choose?",
+      "question": "Your application response says, \"I helped our debate club redesign its mentoring programme. I interviewed new members, found that beginners left after the first month, and proposed smaller groups with one experienced mentor each.\" Describe a time fairness changed your plan. What did you choose?",
       "why": "The cited response is worth exploring in the interview.",
       "evidence": [
         {
@@ -51,7 +51,7 @@
     },
     {
       "focus": "E",
-      "question": "How did you divide responsibility and check that the plan worked?",
+      "question": "Your application response says, \"I helped our debate club redesign its mentoring programme. I interviewed new members, found that beginners left after the first month, and proposed smaller groups with one experienced mentor each.\" Describe a plan you carried out. Who owned each step?",
       "why": "The cited response is worth exploring in the interview.",
       "evidence": [
         {
@@ -63,7 +63,7 @@
     },
     {
       "focus": "invision_knowledge",
-      "question": "What do you know about how inVision U teaches?",
+      "question": "Your application response says, \"I want to learn how to turn a long-term idea into a service that improves access to learning. inVision U interests me because I want to test that idea with people from different disciplines.\" What do you know about how inVision U teaches?",
       "why": "The cited response is worth exploring in the interview.",
       "evidence": [
         {
@@ -75,7 +75,7 @@
     },
     {
       "focus": "english",
-      "question": "In English, describe a recent project without preparing.",
+      "question": "Your application response says, \"B2. I can discuss school projects and read articles, but I still pause when explaining unfamiliar topics.\" In English, describe a recent project without preparing.",
       "why": "The cited response is worth exploring in the interview.",
       "evidence": [
         {
@@ -87,7 +87,7 @@
     },
     {
       "focus": "motivation",
-      "question": "Why did you choose to apply to inVision U?",
+      "question": "Your application response says, \"I want to learn how to turn a long-term idea into a service that improves access to learning. inVision U interests me because I want to test that idea with people from different disciplines.\" Why did you choose to apply to inVision U?",
       "why": "The cited response is worth exploring in the interview.",
       "evidence": [
         {
