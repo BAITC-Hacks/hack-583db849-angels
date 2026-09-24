@@ -2,70 +2,70 @@
   {
     "turnId": "turn_01",
     "speaker": "character",
-    "text": "The mentoring pilot has stopped. What now?",
+    "text": "Timur replaced my module without asking. I want to leave this team.",
     "startedAt": "2026-09-25T10:00:00Z",
     "endedAt": "2026-09-25T10:00:30Z"
   },
   {
     "turnId": "turn_02",
     "speaker": "candidate",
-    "text": "I paused until a teammate helped me restart the discussion.",
+    "text": "Let's fix this fast, the demo is in three days.",
     "startedAt": "2026-09-25T10:01:00Z",
     "endedAt": "2026-09-25T10:01:30Z"
   },
   {
     "turnId": "turn_03",
     "speaker": "character",
-    "text": "How would you change the pilot?",
+    "text": "How do I know this will not happen again?",
     "startedAt": "2026-09-25T10:02:00Z",
     "endedAt": "2026-09-25T10:02:30Z"
   },
   {
     "turnId": "turn_04",
     "speaker": "candidate",
-    "text": "I would test one small group first and ask beginners what made them leave.",
+    "text": "From now on nobody changes someone's module without their review.",
     "startedAt": "2026-09-25T10:03:00Z",
     "endedAt": "2026-09-25T10:03:30Z"
   },
   {
     "turnId": "turn_05",
     "speaker": "character",
-    "text": "What is the larger goal?",
+    "text": "Will you make Timur the villain for this?",
     "startedAt": "2026-09-25T10:04:00Z",
     "endedAt": "2026-09-25T10:04:30Z"
   },
   {
     "turnId": "turn_06",
     "speaker": "candidate",
-    "text": "The goal is a path from first practice to confident participation, not just attendance.",
+    "text": "I'll talk to him myself, you focus on work.",
     "startedAt": "2026-09-25T10:05:00Z",
     "endedAt": "2026-09-25T10:05:30Z"
   },
   {
     "turnId": "turn_07",
     "speaker": "character",
-    "text": "What boundary matters?",
+    "text": "Who decides which version we keep for the demo?",
     "startedAt": "2026-09-25T10:06:00Z",
     "endedAt": "2026-09-25T10:06:30Z"
   },
   {
     "turnId": "turn_08",
     "speaker": "candidate",
-    "text": "Beginners choose what feedback is shared, and mentors cannot publish private notes.",
+    "text": "We assign owners now, freeze by Thursday, and run the full demo at six. After the demo we will keep reviews so nobody loses ownership again.",
     "startedAt": "2026-09-25T10:07:00Z",
     "endedAt": "2026-09-25T10:07:30Z"
   },
   {
     "turnId": "turn_09",
     "speaker": "character",
-    "text": "What happens next?",
+    "text": "The Thursday run failed. What now?",
     "startedAt": "2026-09-25T10:08:00Z",
     "endedAt": "2026-09-25T10:08:30Z"
   },
   {
     "turnId": "turn_10",
     "speaker": "candidate",
-    "text": "I will recruit two mentors this week and review the first group after a month.",
+    "text": "We'll work all night and fix it.",
     "startedAt": "2026-09-25T10:09:00Z",
     "endedAt": "2026-09-25T10:09:30Z"
   }

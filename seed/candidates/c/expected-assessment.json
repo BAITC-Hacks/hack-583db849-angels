@@ -2,10 +2,16 @@
   "scores": [
     {
       "competency": "D",
-      "score": null,
-      "confidence": null,
-      "rationale": null,
-      "evidence": []
+      "score": 1,
+      "confidence": "medium",
+      "rationale": "Pushes through the setback without a recovery sequence.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_08",
+          "quote": "Everyone stays until it works."
+        }
+      ]
     },
     {
       "competency": "R",
@@ -23,17 +29,34 @@
     },
     {
       "competency": "V",
-      "score": null,
-      "confidence": null,
-      "rationale": null,
-      "evidence": []
+      "score": 0,
+      "confidence": "medium",
+      "rationale": "Demands exhausting work after first recognizing the teammate's concern.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_02",
+          "quote": "You're right to be angry. Walk me through it."
+        },
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_08",
+          "quote": "Everyone stays until it works."
+        }
+      ]
     },
     {
       "competency": "E",
-      "score": null,
-      "confidence": null,
-      "rationale": null,
-      "evidence": []
+      "score": 0,
+      "confidence": "medium",
+      "rationale": "Passes the decision to teammates without an owned next step.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_06",
+          "quote": "You two decide between you."
+        }
+      ]
     }
   ],
   "english": {
@@ -46,11 +69,6 @@
   },
   "interviewQuestions": [
     {
-      "competency": "D",
-      "question": "Tell me about a specific situation where you demonstrated D.",
-      "reason": "There is not enough verified behavioral evidence yet."
-    },
-    {
       "competency": "R",
       "question": "Tell me about a specific situation where you demonstrated R.",
       "reason": "There is not enough verified behavioral evidence yet."
@@ -59,27 +77,17 @@
       "competency": "I",
       "question": "Tell me about a specific situation where you demonstrated I.",
       "reason": "There is not enough verified behavioral evidence yet."
-    },
-    {
-      "competency": "V",
-      "question": "Tell me about a specific situation where you demonstrated V.",
-      "reason": "There is not enough verified behavioral evidence yet."
-    },
-    {
-      "competency": "E",
-      "question": "Tell me about a specific situation where you demonstrated E.",
-      "reason": "There is not enough verified behavioral evidence yet."
     }
   ],
   "candidateFeedback": {
     "strengths": [
-      "You stayed engaged with the conversation."
+      "You first invited the teammate to explain what happened."
     ],
     "growth": [
-      "Use a real example and explain your own action and its effect."
+      "When pressure rises, keep that concern in the plan for everyone involved."
     ],
     "nextTime": [
-      "Prepare one recent situation with a challenge, action, and outcome."
+      "Name a workable next step and who will carry it out."
     ]
   }
 }
