@@ -8,6 +8,7 @@ import { ApiKeyGuard } from '../src/auth/api-key.guard';
 import { RolesGuard } from '../src/auth/roles.guard';
 import { contractExample } from '../src/contract-example';
 import { PrismaService } from '../src/database/prisma.service';
+import { SimulationsService } from '../src/modules/simulations/simulations.service';
 
 describe('PR 1 contract routes', () => {
   let app: INestApplication;
@@ -25,6 +26,16 @@ describe('PR 1 contract routes', () => {
     process.env.API_KEYS = 'platform-key:platform,interviewer-key:interviewer,commission-key:commission,admin-key:admin';
     process.env.DEMO_MODE = 'false';
     const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
+      .overrideProvider(SimulationsService)
+      .useValue({
+        create: jest.fn().mockImplementation(() => contractExample('simulation-created.json')),
+        turn: jest.fn().mockImplementation(() => contractExample('simulation-turn.json')),
+        complete: jest.fn().mockImplementation(() => contractExample('simulation-completed.json')),
+        get: jest.fn().mockImplementation(() => contractExample('simulation-created.json')),
+        characterAudio: jest.fn().mockReturnValue(Buffer.from('synthetic audio')),
+        accommodation: jest.fn().mockImplementation(() => contractExample('accommodation.json')),
+        idempotencyBody: jest.fn().mockReturnValue({ operation: 'simulation.turn' }),
+      })
       .overrideProvider(PrismaService)
       .useValue({
         candidate: {
@@ -107,6 +118,7 @@ describe('PR 1 contract routes', () => {
     const audio = await request(app.getHttpServer()).get(`/v1/simulations/${id}/turns/turn_03/audio`)
       .set('X-API-Key', 'platform-key').expect(200);
     expect(audio.headers['content-type']).toMatch(/^audio\/mpeg/);
+    expect(audio.body).toEqual(Buffer.from('synthetic audio'));
   });
 
   it('returns the contract validation envelope for malformed requests', async () => {
@@ -116,6 +128,9 @@ describe('PR 1 contract routes', () => {
       code: 'VALIDATION_ERROR', message: expect.any(String),
       details: { fields: ['candidateId'] }, traceId: expect.any(String),
     });
+    const multipartText = await request(app.getHttpServer()).post('/v1/simulations/synthetic-id/turns')
+      .set('X-API-Key', 'platform-key').field('text', 'Text belongs in JSON').expect(400);
+    expect(multipartText.body.error.code).toBe('VALIDATION_ERROR');
   });
 
   it('keeps accommodation access limited to commission and admin', async () => {

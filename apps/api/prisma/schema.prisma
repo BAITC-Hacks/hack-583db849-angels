@@ -40,6 +40,7 @@ model Candidate {
   createdAt          DateTime     @default(now())
   updatedAt          DateTime     @updatedAt
   simulations        Simulation[]
+  accommodation      Accommodation?
   assessments        Assessment[]
   interviews         Interview[]
   auditEvents        AuditEvent[]
@@ -47,10 +48,15 @@ model Candidate {
 
 model Simulation {
   id         String           @id @default(uuid()) @db.Uuid
-  candidateId String           @db.Uuid
+  candidateId String           @unique @db.Uuid
   scenarioId String
+  scenario   Json?
   mode       SimulationMode
   status     SimulationStatus @default(active)
+  stage      String           @default("opening")
+  ending     String?
+  accommodation Boolean       @default(false)
+  turnInFlight Boolean        @default(false)
   createdAt  DateTime         @default(now())
   completedAt DateTime?
   candidate  Candidate        @relation(fields: [candidateId], references: [id], onDelete: Cascade)
@@ -64,12 +70,25 @@ model SimulationTurn {
   sequence     Int
   speaker      TurnSpeaker
   text         String
+  recognitionConfidence Float?
+  audioPath    String?
+  director     Json?
   startedAt    DateTime?
   endedAt      DateTime?
   createdAt    DateTime    @default(now())
   simulation   Simulation  @relation(fields: [simulationId], references: [id], onDelete: Cascade)
 
   @@unique([simulationId, sequence])
+}
+
+model Accommodation {
+  id          String    @id @default(uuid()) @db.Uuid
+  candidateId String    @unique @db.Uuid
+  textMode    Boolean   @default(false)
+  reason      String
+  setByRole   String
+  updatedAt   DateTime  @updatedAt
+  candidate   Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
 }
 
 model Assessment {

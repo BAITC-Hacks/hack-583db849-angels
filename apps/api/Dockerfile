@@ -1,6 +1,7 @@
 FROM node:22-alpine
 
 WORKDIR /repo
+RUN apk add --no-cache ffmpeg
 RUN corepack enable && corepack prepare pnpm@11.20.0 --activate
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/api/package.json apps/api/package.json
