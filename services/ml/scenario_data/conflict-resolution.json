@@ -88,8 +88,8 @@
             "Let's agree every change needs the owner's okay.",
             "I'll set a review rule in the repo today."
           ],
-          "next": "decision",
-          "characterIntent": "Accepts, asks who decides which version to keep"
+          "next": "fairness",
+          "characterIntent": "Accepts the review rule but worries about a fight with Timur"
         },
         {
           "answerTypeId": "promise",
@@ -152,7 +152,8 @@
           "examples": [
             "Leave Timur to me.",
             "I'll talk to him myself, you focus on work.",
-            "I'll deal with it, don't worry about him."
+            "I'll deal with it, don't worry about him.",
+            "We keep your version for the demo and move Timur's changes to a separate branch."
           ],
           "next": "decision",
           "characterIntent": "Accepts, but wants to know what the decision will be"
@@ -253,7 +254,8 @@
           "examples": [
             "Let's cut one screen, take shifts, and nobody stays past midnight.",
             "We regroup, pick what matters most and share the work.",
-            "It happens. Let's decide together what to drop."
+            "It happens. Let's decide together what to drop.",
+            "If the run fails, we cut the analytics screen instead of working all night."
           ],
           "next": "end",
           "characterIntent": "Thanks the leader for listening and agrees"

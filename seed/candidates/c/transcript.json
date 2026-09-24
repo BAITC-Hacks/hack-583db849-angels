@@ -2,15 +2,64 @@
   {
     "turnId": "turn_01",
     "speaker": "character",
-    "text": "The group is waiting for a plan. What do you do?",
+    "text": "Timur replaced my module without asking. I want to leave this team.",
     "startedAt": "2026-09-25T10:00:00Z",
     "endedAt": "2026-09-25T10:00:30Z"
   },
   {
     "turnId": "turn_02",
     "speaker": "candidate",
-    "text": "I would probably make a good plan, but I cannot think of a similar situation.",
+    "text": "You're right to be angry. Walk me through it.",
     "startedAt": "2026-09-25T10:01:00Z",
     "endedAt": "2026-09-25T10:01:30Z"
+  },
+  {
+    "turnId": "turn_03",
+    "speaker": "character",
+    "text": "How do I know this will not happen again?",
+    "startedAt": "2026-09-25T10:02:00Z",
+    "endedAt": "2026-09-25T10:02:30Z"
+  },
+  {
+    "turnId": "turn_04",
+    "speaker": "candidate",
+    "text": "It won't happen again, I promise.",
+    "startedAt": "2026-09-25T10:03:00Z",
+    "endedAt": "2026-09-25T10:03:30Z"
+  },
+  {
+    "turnId": "turn_05",
+    "speaker": "character",
+    "text": "What is your concrete plan for the demo?",
+    "startedAt": "2026-09-25T10:04:00Z",
+    "endedAt": "2026-09-25T10:04:30Z"
+  },
+  {
+    "turnId": "turn_06",
+    "speaker": "candidate",
+    "text": "You two decide between you.",
+    "startedAt": "2026-09-25T10:05:00Z",
+    "endedAt": "2026-09-25T10:05:30Z"
+  },
+  {
+    "turnId": "turn_07",
+    "speaker": "character",
+    "text": "The Thursday run failed. What now?",
+    "startedAt": "2026-09-25T10:06:00Z",
+    "endedAt": "2026-09-25T10:06:30Z"
+  },
+  {
+    "turnId": "turn_08",
+    "speaker": "candidate",
+    "text": "Everyone stays until it works.",
+    "startedAt": "2026-09-25T10:07:00Z",
+    "endedAt": "2026-09-25T10:07:30Z"
+  },
+  {
+    "turnId": "turn_09",
+    "speaker": "character",
+    "text": "I cannot agree to work without a limit. We need another plan.",
+    "startedAt": "2026-09-25T10:08:00Z",
+    "endedAt": "2026-09-25T10:08:30Z"
   }
 ]

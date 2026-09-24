@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "competencies": {
+    "D": {
+      "strength": "You showed a way to regroup after a setback and keep the team moving.",
+      "growth": "When a plan changes, explain how you will learn from the setback and check recovery with the team.",
+      "nextTime": "Describe the first recovery action, who owns it, and how you will know it worked."
+    },
+    "R": {
+      "strength": "You considered risks and safeguards while proposing a change.",
+      "growth": "For a new idea, name a practical safeguard and how you would test it responsibly.",
+      "nextTime": "Explain what could go wrong, what safeguard you would use, and who would monitor it."
+    },
+    "I": {
+      "strength": "You connected the immediate choice to the wider situation and a shared direction.",
+      "growth": "Look beyond the immediate disagreement and explain the underlying issue and longer-term goal.",
+      "nextTime": "Describe the root issue, the shared goal, and how your action supports that goal."
+    },
+    "V": {
+      "strength": "You considered the people affected by your choice and the values guiding it.",
+      "growth": "Make your ethical boundary clear, especially when a fast result could affect others unfairly.",
+      "nextTime": "Explain which people may be affected and what boundary you would keep under pressure."
+    },
+    "E": {
+      "strength": "You translated an idea into owned actions and a way to check progress.",
+      "growth": "Turn your idea into clear priorities, owners, and a way to review the outcome.",
+      "nextTime": "Name the next action, its owner, and the checkpoint for reviewing progress."
+    }
+  }
+}

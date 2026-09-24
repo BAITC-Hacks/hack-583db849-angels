@@ -95,49 +95,84 @@ def score(code: str, value: int | None, turn_id: str, quote: str) -> dict:
 
 
 def assessment(candidate: str, turns: list[dict]) -> dict:
-    candidate_turns = [item for item in turns if item["speaker"] == "candidate"]
+    candidate_turns = {
+        item["turnId"]: item["text"]
+        for item in turns
+        if item["speaker"] == "candidate"
+    }
     if candidate == "b":
-        values = [1, 3, 4, 3, 2]
         scores = [
-            score(code, value, item["turnId"], item["text"])
-            for code, value, item in zip("DRIVE", values, candidate_turns, strict=True)
+            score("D", 1, "turn_10", candidate_turns["turn_10"]),
+            score("R", 2, "turn_04", candidate_turns["turn_04"]),
+            score("I", 4, "turn_08", "After the demo we will keep reviews so nobody loses ownership again."),
+            score("V", 2, "turn_06", candidate_turns["turn_06"]),
+            score("E", 3, "turn_08", "We assign owners now, freeze by Thursday, and run the full demo at six."),
         ]
+        for item, rationale in zip(
+            scores,
+            (
+                "Responds to the failed run by demanding more work without a recovery sequence.",
+                "Protects ownership with a review rule but leaves the tradeoff and rollout unclear.",
+                "Connects today's conflict to a lasting review practice after the demo.",
+                "Protects Dana but leaves Timur outside the conversation.",
+                "Names owners, a freeze deadline, and a full-run checkpoint.",
+            ),
+            strict=True,
+        ):
+            item["rationale"] = rationale
         questions = [
             {
                 "competency": "D",
-                "question": "What helped you restart after the pause?",
-                "reason": "The recovery depended on another person restarting the discussion.",
+                "question": "If the extra night of work fails, how would you reset the plan and protect the team?",
+                "reason": "The response to the failed run did not include a workable recovery sequence.",
             }
         ]
         feedback = {
-            "strengths": ["You connected the immediate problem to a longer-term goal."],
-            "growth": ["When momentum drops, name the first action you will take yourself."],
-            "nextTime": ["Set a restart checkpoint before ending the conversation."],
+            "strengths": ["You connected today's conflict to a longer-term review practice."],
+            "growth": ["When a run fails, protect the team's energy while choosing what to fix."],
+            "nextTime": ["Name a recovery checkpoint before extending anyone's work."],
         }
     else:
-        scores = [score(code, None, "", "") for code in "DRIVE"]
+        scores = [
+            score("D", 1, "turn_08", candidate_turns["turn_08"]),
+            score("R", None, "", ""),
+            score("I", None, "", ""),
+            score("V", 0, "turn_08", candidate_turns["turn_08"]),
+            score("E", 0, "turn_06", candidate_turns["turn_06"]),
+        ]
+        scores[0]["rationale"] = "Pushes through the setback without a recovery sequence."
+        scores[3]["rationale"] = "Demands exhausting work after first recognizing the teammate's concern."
+        scores[3]["evidence"].insert(
+            0,
+            {
+                "source": "simulation_turn",
+                "sourceId": "turn_02",
+                "quote": candidate_turns["turn_02"],
+            },
+        )
+        scores[4]["rationale"] = "Passes the decision to teammates without an owned next step."
         questions = [
             {
                 "competency": code,
                 "question": f"Tell me about a specific situation where you demonstrated {code}.",
                 "reason": "There is not enough verified behavioral evidence yet.",
             }
-            for code in "DRIVE"
+            for code in "RI"
         ]
         feedback = {
-            "strengths": ["You stayed engaged with the conversation."],
-            "growth": ["Use a real example and explain your own action and its effect."],
-            "nextTime": ["Prepare one recent situation with a challenge, action, and outcome."],
+            "strengths": ["You first invited the teammate to explain what happened."],
+            "growth": ["When pressure rises, keep that concern in the plan for everyone involved."],
+            "nextTime": ["Name a workable next step and who will carry it out."],
         }
     return {
         "scores": scores,
         "english": {
-            "wordsPerMinute": 104.0 if candidate == "b" else None,
-            "fillerRate": 0.04 if candidate == "b" else None,
-            "meanTurnLength": 26.0 if candidate == "b" else None,
-            "lexicalDiversity": 0.61 if candidate == "b" else None,
-            "grammarErrorsPer100Words": 2.0 if candidate == "b" else None,
-            "cefrEstimate": "B2" if candidate == "b" else None,
+            "wordsPerMinute": None,
+            "fillerRate": None,
+            "meanTurnLength": None,
+            "lexicalDiversity": None,
+            "grammarErrorsPer100Words": None,
+            "cefrEstimate": None,
         },
         "interviewQuestions": questions,
         "candidateFeedback": feedback,
@@ -158,20 +193,28 @@ def export_seed() -> None:
 
     synthetic_turns = {
         "b": [
-            turn("turn_01", "character", "The mentoring pilot has stopped. What now?", 0),
-            turn("turn_02", "candidate", "I paused until a teammate helped me restart the discussion.", 1),
-            turn("turn_03", "character", "How would you change the pilot?", 2),
-            turn("turn_04", "candidate", "I would test one small group first and ask beginners what made them leave.", 3),
-            turn("turn_05", "character", "What is the larger goal?", 4),
-            turn("turn_06", "candidate", "The goal is a path from first practice to confident participation, not just attendance.", 5),
-            turn("turn_07", "character", "What boundary matters?", 6),
-            turn("turn_08", "candidate", "Beginners choose what feedback is shared, and mentors cannot publish private notes.", 7),
-            turn("turn_09", "character", "What happens next?", 8),
-            turn("turn_10", "candidate", "I will recruit two mentors this week and review the first group after a month.", 9),
+            turn("turn_01", "character", "Timur replaced my module without asking. I want to leave this team.", 0),
+            turn("turn_02", "candidate", "Let's fix this fast, the demo is in three days.", 1),
+            turn("turn_03", "character", "How do I know this will not happen again?", 2),
+            turn("turn_04", "candidate", "From now on nobody changes someone's module without their review.", 3),
+            turn("turn_05", "character", "Will you make Timur the villain for this?", 4),
+            turn("turn_06", "candidate", "I'll talk to him myself, you focus on work.", 5),
+            turn("turn_07", "character", "Who decides which version we keep for the demo?", 6),
+            turn("turn_08", "candidate", "We assign owners now, freeze by Thursday, and run the full demo at six. After the demo we will keep reviews so nobody loses ownership again.", 7),
+            turn("turn_09", "character", "The Thursday run failed. What now?", 8),
+            turn("turn_10", "candidate", "We'll work all night and fix it.", 9),
+            turn("turn_11", "character", "I will stay for the demo, but the team needs a safer recovery plan.", 10),
         ],
         "c": [
-            turn("turn_01", "character", "The group is waiting for a plan. What do you do?", 0),
-            turn("turn_02", "candidate", "I would probably make a good plan, but I cannot think of a similar situation.", 1),
+            turn("turn_01", "character", "Timur replaced my module without asking. I want to leave this team.", 0),
+            turn("turn_02", "candidate", "You're right to be angry. Walk me through it.", 1),
+            turn("turn_03", "character", "How do I know this will not happen again?", 2),
+            turn("turn_04", "candidate", "It won't happen again, I promise.", 3),
+            turn("turn_05", "character", "What is your concrete plan for the demo?", 4),
+            turn("turn_06", "candidate", "You two decide between you.", 5),
+            turn("turn_07", "character", "The Thursday run failed. What now?", 6),
+            turn("turn_08", "candidate", "Everyone stays until it works.", 7),
+            turn("turn_09", "character", "I cannot agree to work without a limit. We need another plan.", 8),
         ],
     }
     for candidate, turns in synthetic_turns.items():

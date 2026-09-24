@@ -7,9 +7,9 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from decimal import Decimal
 import json
+import os
 from pathlib import Path
 import sys
-import wave
 
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -42,7 +42,7 @@ from services.ml.app.schemas.contracts import (
 
 
 RECORDED_AT = datetime(2026, 9, 24, tzinfo=timezone.utc)
-CASSETTES = ROOT / "fixtures" / "cassettes"
+CASSETTES = Path(os.environ.get("M2A_CASSETTES_DIR", ROOT / "fixtures" / "cassettes"))
 AUDIO = ROOT / "fixtures" / "audio"
 
 
@@ -213,8 +213,9 @@ def _transcript_inventory(sessions: list[dict]) -> dict[str, tuple[str, float]]:
     for session in sessions:
         for item in session["turns"]:
             path = AUDIO / item["audioRef"]
-            with wave.open(str(path), "rb") as source:
-                duration = source.getnframes() / source.getframerate()
+            # eSpeak fixtures are rendered at 150 WPM. Stable synthetic timing
+            # avoids depending on ffmpeg when rebuilding offline cassettes.
+            duration = max(1.0, len(item["text"].split()) / 2.5)
             result[_sha256(path.read_bytes())] = (item["text"], duration)
     return result
 

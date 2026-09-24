@@ -1,0 +1,12 @@
+{
+  "input_tokens": 40,
+  "model": "gpt-6-luna",
+  "output_tokens": 22,
+  "provider": "openai",
+  "recorded_at": "2026-09-24T00:00:00Z",
+  "request_hash": "da32fbee7a4bde162a4d0ffec35b569816495563e234c1fa1223071c7e86c927",
+  "request_id": "synthetic-m2a-fixture",
+  "response": "{\"text\": \"Alright. If we write down who owns what, I'm in. But you tell Timur, not me. I don't want another argument tonight.\"}",
+  "task": "simulation_actor",
+  "version": 1
+}

@@ -1,0 +1,12 @@
+{
+  "input_tokens": 40,
+  "model": "gpt-6-luna",
+  "output_tokens": 8,
+  "provider": "openai",
+  "recorded_at": "2026-09-24T00:00:00Z",
+  "request_hash": "4766c0a50d424da30130d497d33e8e12dde33176bfee9e2793b062b1ac90c7b3",
+  "request_id": "synthetic-m2a-fixture",
+  "response": "{\"text\": \"What is your concrete plan for the demo?\"}",
+  "task": "simulation_actor",
+  "version": 1
+}

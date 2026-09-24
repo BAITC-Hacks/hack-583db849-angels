@@ -1,0 +1,12 @@
+{
+  "input_tokens": 120,
+  "model": "gpt-6-sol",
+  "output_tokens": 160,
+  "provider": "openai",
+  "recorded_at": "2026-09-24T00:00:00Z",
+  "request_hash": "71c886f06ffbfdd1b25462293febbbdd8a431a02cbb4cba618d05c246d6cd337",
+  "request_id": "synthetic-m3-judge-fixture",
+  "response": "{\"scores\":[{\"competency\":\"D\",\"score\":1,\"confidence\":\"medium\",\"rationale\":\"The cited action supports this rubric level in the synthetic walkthrough.\",\"evidence\":[{\"source\":\"simulation_turn\",\"sourceId\":\"turn_10\",\"quote\":\"We'll work all night and fix it.\"}]},{\"competency\":\"R\",\"score\":2,\"confidence\":\"medium\",\"rationale\":\"The cited action supports this rubric level in the synthetic walkthrough.\",\"evidence\":[{\"source\":\"simulation_turn\",\"sourceId\":\"turn_04\",\"quote\":\"From now on nobody changes someone's module without their review.\"}]},{\"competency\":\"I\",\"score\":4,\"confidence\":\"medium\",\"rationale\":\"The cited action supports this rubric level in the synthetic walkthrough.\",\"evidence\":[{\"source\":\"simulation_turn\",\"sourceId\":\"turn_08\",\"quote\":\"We assign owners now, freeze by Thursday, and run the full demo at six. After the demo we will keep reviews so nobody loses ownership again.\"}]},{\"competency\":\"V\",\"score\":2,\"confidence\":\"medium\",\"rationale\":\"The cited action supports this rubric level in the synthetic walkthrough.\",\"evidence\":[{\"source\":\"simulation_turn\",\"sourceId\":\"turn_06\",\"quote\":\"I'll talk to him myself, you focus on work.\"}]},{\"competency\":\"E\",\"score\":3,\"confidence\":\"medium\",\"rationale\":\"The cited action supports this rubric level in the synthetic walkthrough.\",\"evidence\":[{\"source\":\"simulation_turn\",\"sourceId\":\"turn_08\",\"quote\":\"We assign owners now, freeze by Thursday, and run the full demo at six. After the demo we will keep reviews so nobody loses ownership again.\"}]}]}",
+  "task": "simulation_assessment",
+  "version": 1
+}

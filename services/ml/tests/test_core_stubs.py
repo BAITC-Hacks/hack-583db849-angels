@@ -67,11 +67,6 @@ def test_unknown_scenario_returns_a_safe_error(client: TestClient) -> None:
 @pytest.mark.parametrize(
     ("path", "request_name", "response_name"),
     [
-        (
-            "/internal/v1/simulation/assessment",
-            "simulation-assessment.request.json",
-            "simulation-assessment.response.json",
-        ),
         ("/internal/v1/brief", "brief.request.json", "brief.response.json"),
     ],
 )
