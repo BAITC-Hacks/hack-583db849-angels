@@ -1,0 +1,86 @@
+[
+  {
+    "turnId": "iturn_01",
+    "speaker": "interviewer",
+    "text": "Thanks for coming. What happened in the simulation, in your words?",
+    "startSec": 5.0,
+    "endSec": 10.0
+  },
+  {
+    "turnId": "iturn_02",
+    "speaker": "candidate",
+    "text": "I let the team decide. I did not want to push my own idea.",
+    "startSec": 12.0,
+    "endSec": 19.0
+  },
+  {
+    "turnId": "iturn_03",
+    "speaker": "interviewer",
+    "text": "You wrote that you prefer to make decisions independently. How does that fit?",
+    "startSec": 31.0,
+    "endSec": 37.0
+  },
+  {
+    "turnId": "iturn_04",
+    "speaker": "candidate",
+    "text": "I am not sure. It depends on the situation.",
+    "startSec": 39.0,
+    "endSec": 44.0
+  },
+  {
+    "turnId": "iturn_05",
+    "speaker": "interviewer",
+    "text": "You were listed as the leader of a class event. What did you personally do?",
+    "startSec": 56.0,
+    "endSec": 62.0
+  },
+  {
+    "turnId": "iturn_06",
+    "speaker": "candidate",
+    "text": "I do not remember exactly. The group did most of it.",
+    "startSec": 64.0,
+    "endSec": 70.0
+  },
+  {
+    "turnId": "iturn_07",
+    "speaker": "interviewer",
+    "text": "When the plan in the simulation fell apart, what did you do?",
+    "startSec": 82.0,
+    "endSec": 87.0
+  },
+  {
+    "turnId": "iturn_08",
+    "speaker": "candidate",
+    "text": "I think we just kept going.",
+    "startSec": 89.0,
+    "endSec": 93.0
+  },
+  {
+    "turnId": "iturn_09",
+    "speaker": "interviewer",
+    "text": "Is there a time you proposed something new?",
+    "startSec": 105.0,
+    "endSec": 109.0
+  },
+  {
+    "turnId": "iturn_10",
+    "speaker": "candidate",
+    "text": "Not really. I usually wait to see what others think.",
+    "startSec": 111.0,
+    "endSec": 117.0
+  },
+  {
+    "turnId": "iturn_11",
+    "speaker": "interviewer",
+    "text": "Why do you want to study at inVision U?",
+    "startSec": 129.0,
+    "endSec": 133.0
+  },
+  {
+    "turnId": "iturn_12",
+    "speaker": "candidate",
+    "text": "Several people recommended it, so I applied.",
+    "startSec": 135.0,
+    "endSec": 140.0
+  }
+]
