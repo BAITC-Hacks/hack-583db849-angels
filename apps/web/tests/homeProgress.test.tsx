@@ -1,10 +1,11 @@
-import { act, waitFor } from '@testing-library/react';
+import { act, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { somethingPending } from '../lib/api/candidates';
 import type { WireCandidate } from '../lib/api/contract';
 import { record, resetWorld } from '../lib/demo/world';
 import { useHomeProgress } from '../lib/home/useHomeProgress';
-import { example, hookWithQuery, json, mockApi } from './apiHarness';
+import CommissionHome from '../app/(product)/commission/page';
+import { example, hookWithQuery, json, mockApi, withQuery } from './apiHarness';
 
 const list = example<{ items: WireCandidate[] }>('candidates.json');
 
@@ -29,6 +30,32 @@ describe('where each candidate is, for the staff homes', () => {
     const { result } = hookWithQuery(() => useHomeProgress());
     await waitFor(() => expect(result.current.apiError).not.toBeNull());
     expect(result.current.candidates.A).toMatchObject({ simulation: 'not-started', assessmentReady: false });
+  });
+
+  it('says so on the commission home when the API cannot be read', async () => {
+    mockApi({ 'GET /api/v1/candidates': () => json({ error: { code: 'AI_UNAVAILABLE', message: 'down' } }, 503) });
+    withQuery(<CommissionHome />);
+    expect((await screen.findByRole('alert')).textContent).toMatch(/may be out of date/);
+  });
+
+  it('tells the commission what comes next: preparing, failed, or not finished', async () => {
+    const at = (simulation: unknown, assessment: unknown) => ({
+      items: list.items.map((item, index) => (index === 0 ? { ...item, progress: { ...item.progress!, simulation, assessment } } : item)),
+    });
+    const done = { simulationId: 's', status: 'completed', ending: 'completed' };
+    mockApi({ 'GET /api/v1/candidates': () => json(at(done, { assessmentId: 'a', status: 'pending' })) });
+    const preparing = withQuery(<CommissionHome />);
+    expect(await screen.findByText('Candidate A’s report is being prepared')).toBeTruthy();
+    preparing.unmount();
+
+    mockApi({ 'GET /api/v1/candidates': () => json(at(done, { assessmentId: 'a', status: 'failed' })) });
+    const failed = withQuery(<CommissionHome />);
+    expect(await screen.findByText('The assessment of candidate A failed')).toBeTruthy();
+    failed.unmount();
+
+    mockApi({ 'GET /api/v1/candidates': () => json(at(null, null)) });
+    withQuery(<CommissionHome />);
+    expect(await screen.findByText('Candidate A has not finished the simulation')).toBeTruthy();
   });
 
   it('polls only while a simulation runs or an assessment is being written', () => {

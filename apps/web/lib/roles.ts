@@ -66,3 +66,11 @@ export const apiRoleFor: Record<DemoRole, 'platform' | 'interviewer' | 'commissi
   commission: 'commission',
   admin: 'admin',
 };
+
+/** Where each role lands. */
+export const homeFor: Record<DemoRole, string> = {
+  interviewer: '/interviewer',
+  commission: '/commission',
+  admin: '/admin',
+  candidate: '/candidate',
+};

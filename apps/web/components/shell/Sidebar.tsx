@@ -1,12 +1,12 @@
 'use client';
 
+import { BrandMark } from '../ui/BrandMark';
 import { BeakerIcon, ChevronDoubleLeftIcon, ChevronDoubleRightIcon, LockClosedIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { StaffLocale } from '../../lib/i18n/staffLocale';
 import { activeItemId, navFor, sectionLabel, type NavItem, type NavSection } from '../../lib/navigation';
-import { homeFor } from '../../lib/demo/world';
-import { isStaff, type DemoRole } from '../../lib/roles';
+import { homeFor, isStaff, type DemoRole } from '../../lib/roles';
 import { ThemeToggle } from '../ui/ThemeToggle';
 import { LanguageSwitch } from './LanguageSwitch';
 import { RoleSwitcher } from './RoleSwitcher';
@@ -18,14 +18,6 @@ const copy = {
 
 const sections: NavSection[] = ['workspace', 'reference', 'demo'];
 
-function Mark() {
-  return (
-    <svg width={28} height={28} viewBox="0 0 64 64" aria-hidden="true" className="shrink-0">
-      <rect width="64" height="64" rx="16" fill="#131313" stroke="var(--line-strong)" />
-      <path d="M16 18 L32 46 L48 18" stroke="var(--brand)" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-    </svg>
-  );
-}
 
 function Item({
   item,
@@ -125,7 +117,7 @@ export function Sidebar({
           collapsed ? 'justify-center' : 'px-1'
         }`}
       >
-        <Mark />
+        <BrandMark size={28} />
         {collapsed ? null : (
           <span className="flex flex-col leading-tight">
             <span className="text-sm font-semibold tracking-tight text-text-primary">AI Leader ID</span>
