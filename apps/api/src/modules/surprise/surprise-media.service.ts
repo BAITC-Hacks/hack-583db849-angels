@@ -1,6 +1,5 @@
 import { randomUUID } from 'node:crypto';
 import { execFile } from 'node:child_process';
-import { createReadStream, type ReadStream } from 'node:fs';
 import { mkdir, stat, unlink, writeFile } from 'node:fs/promises';
 import { dirname, extname, join, resolve } from 'node:path';
 import { promisify } from 'node:util';
@@ -9,6 +8,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import { audioDurationSeconds } from '../../media/audio-duration';
+import type { VideoFile } from '../../media/video-range';
 
 const execFileAsync = promisify(execFile);
 
@@ -65,12 +65,12 @@ export class SurpriseMediaService {
     return audioDurationSeconds(this.absolute(videoRef));
   }
 
-  async open(videoRef: string): Promise<{ stream: ReadStream; type: string; length: number }> {
+  async open(videoRef: string): Promise<VideoFile> {
     const file = this.absolute(videoRef);
     try {
       const { size } = await stat(file);
       const extension = extname(file).slice(1) as VideoExtension;
-      return { stream: createReadStream(file), type: videoTypes[extension] ?? 'application/octet-stream', length: size };
+      return { path: file, type: videoTypes[extension] ?? 'application/octet-stream', size };
     } catch {
       throw new NotFoundException({ code: 'NOT_FOUND', message: 'The video was not found.' });
     }

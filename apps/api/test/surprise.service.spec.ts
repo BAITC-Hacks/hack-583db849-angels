@@ -61,7 +61,7 @@ function harness({ transcribeFails = false } = {}) {
   const media = {
     saveVideo: jest.fn().mockResolvedValue('surprise/surprise-1/answer.webm'),
     extractAudio: jest.fn().mockResolvedValue('surprise/surprise-1/answer.wav'),
-    open: jest.fn().mockResolvedValue({ stream: Buffer.from('v'), type: 'video/webm', length: 1 }),
+    open: jest.fn().mockResolvedValue({ path: '/synthetic/video.webm', type: 'video/webm', size: 1000 }),
     delete: jest.fn().mockResolvedValue(undefined),
   };
   const briefs = { startFor: jest.fn().mockResolvedValue(undefined) };

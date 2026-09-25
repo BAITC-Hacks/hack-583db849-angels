@@ -1,12 +1,13 @@
 import { createHash } from 'node:crypto';
 
-import { Body, Controller, Get, Headers, HttpCode, Param, Post, Req, StreamableFile, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Headers, HttpCode, Param, Post, Req, Res, StreamableFile, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { ApiAcceptedResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiHeader, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 
 import { ApiRole } from '../../auth/roles';
 import { Roles } from '../../auth/roles.decorator';
+import { sendVideo } from '../../media/video-range';
 import { EntityId } from '../../entity-id.pipe';
 import { IdempotencyService } from '../../idempotency/idempotency.service';
 import { CreateSurpriseDto, SurpriseAnswerDto, SurpriseQuestionDto } from './dto/surprise.dto';
@@ -72,7 +73,8 @@ export class SurpriseController {
   @Roles('interviewer', 'commission', 'admin')
   @ApiParam({ name: 'surpriseId', type: String })
   @ApiOkResponse({ content: { 'video/webm': { schema: { type: 'string', format: 'binary' } }, 'video/mp4': { schema: { type: 'string', format: 'binary' } } } })
-  video(@Param('surpriseId', EntityId) surpriseId: string, @Req() request: RoleRequest): Promise<StreamableFile> {
-    return this.surprise.video(surpriseId, request.apiRole);
+  async video(@Param('surpriseId', EntityId) surpriseId: string, @Req() request: RoleRequest, @Headers('range') range: string | undefined,
+    @Res({ passthrough: true }) response: Response): Promise<StreamableFile> {
+    return sendVideo(response, await this.surprise.video(surpriseId, request.apiRole, range), range);
   }
 }
