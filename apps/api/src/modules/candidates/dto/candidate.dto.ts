@@ -39,6 +39,14 @@ class PresentationProgressDto {
   @ApiProperty({ enum: ['transcribing', 'ready', 'failed'] }) status!: 'transcribing' | 'ready' | 'failed';
 }
 
+const slotStatuses = ['open', 'closed', 'booked', 'waiting', 'live', 'done', 'missed'] as const;
+
+class InterviewSlotProgressDto {
+  @ApiProperty() slotId!: string;
+  @ApiProperty({ format: 'date-time' }) startsAt!: string;
+  @ApiProperty({ enum: slotStatuses }) status!: (typeof slotStatuses)[number];
+}
+
 class ConsistencyProgressDto {
   @ApiProperty({ enum: ['pending', 'ready', 'failed'], nullable: true }) before!: 'pending' | 'ready' | 'failed' | null;
   @ApiProperty({ enum: ['pending', 'ready', 'failed', 'locked'], nullable: true }) after!: 'pending' | 'ready' | 'failed' | 'locked' | null;
@@ -53,6 +61,7 @@ export class CandidateProgressDto {
   @ApiProperty({ type: () => InterviewProgressDto, nullable: true }) interview!: InterviewProgressDto | null;
   @ApiProperty({ type: () => SurpriseProgressDto, nullable: true }) surprise!: SurpriseProgressDto | null;
   @ApiProperty({ type: () => PresentationProgressDto, nullable: true }) presentation!: PresentationProgressDto | null;
+  @ApiProperty({ type: () => InterviewSlotProgressDto, nullable: true }) interviewSlot!: InterviewSlotProgressDto | null;
   @ApiProperty({ type: () => ConsistencyProgressDto }) consistency!: ConsistencyProgressDto;
   @ApiProperty({ type: () => AccommodationProgressDto, nullable: true }) accommodation!: AccommodationProgressDto | null;
 }

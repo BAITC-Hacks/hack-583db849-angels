@@ -8,6 +8,7 @@ import { CreateCandidateDto } from './create-candidate.dto';
 import { CandidateDto, CandidateProgressDto } from './dto/candidate.dto';
 import { filterProgressForRole } from './filter-progress-for-role';
 import { surpriseStatus } from '../surprise/surprise-status';
+import { slotStatus } from '../interview-slots/slot-status';
 
 const candidateSelect = { id: true, externalId: true, label: true, createdAt: true } as const;
 const candidateWithSimulationSelect = {
@@ -26,6 +27,11 @@ const candidateWithSimulationSelect = {
   briefs: { orderBy: { createdAt: 'desc' }, take: 1, select: { id: true, status: true } },
   surprise: { select: { id: true, status: true, answerDeadline: true } },
   presentation: { select: { id: true, status: true } },
+  interviewSlots: {
+    orderBy: { startsAt: 'desc' },
+    take: 1,
+    select: { id: true, startsAt: true, durationMin: true, candidateId: true, candidateJoinedAt: true, interviewerJoinedAt: true },
+  },
   interviews: {
     orderBy: { createdAt: 'desc' },
     take: 1,
@@ -102,6 +108,7 @@ export class CandidatesService {
     const assessment = candidate.assessments[0];
     const brief = candidate.briefs[0];
     const interview = candidate.interviews[0];
+    const slot = candidate.interviewSlots[0];
     const progress: CandidateProgressDto = {
       candidateId: candidate.id,
       label: candidate.label,
@@ -122,6 +129,7 @@ export class CandidatesService {
       presentation: candidate.presentation
         ? { presentationId: candidate.presentation.id, status: candidate.presentation.status as 'transcribing' | 'ready' | 'failed' }
         : null,
+      interviewSlot: slot ? { slotId: slot.id, startsAt: slot.startsAt.toISOString(), status: slotStatus(slot) } : null,
       consistency: {
         before: brief ? (brief.status as 'pending' | 'ready' | 'failed') : null,
         // The after stage reads the interview, so it stays locked until the interviewer has scored blind.

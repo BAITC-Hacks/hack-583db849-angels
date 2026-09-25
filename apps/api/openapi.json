@@ -737,6 +737,46 @@
         ]
       }
     },
+    "/v1/interviews/{interviewId}/notes": {
+      "put": {
+        "operationId": "InterviewsController_notes",
+        "parameters": [
+          {
+            "name": "interviewId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveNotesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InterviewDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "interviews"
+        ]
+      }
+    },
     "/v1/interviews/{interviewId}/interviewer-scores": {
       "post": {
         "operationId": "InterviewsController_scores",
@@ -1499,6 +1539,223 @@
           "presentations"
         ]
       }
+    },
+    "/v1/interview-slots": {
+      "post": {
+        "operationId": "InterviewSlotsController_create",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSlotDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InterviewSlotDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "interview-slots"
+        ]
+      },
+      "get": {
+        "operationId": "InterviewSlotsController_list",
+        "parameters": [
+          {
+            "name": "open",
+            "required": false,
+            "in": "query",
+            "description": "Only slots nobody has booked, from now on.",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "candidateId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InterviewSlotListDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "interview-slots"
+        ]
+      }
+    },
+    "/v1/interview-slots/{slotId}": {
+      "get": {
+        "operationId": "InterviewSlotsController_get",
+        "parameters": [
+          {
+            "name": "slotId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InterviewSlotDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "interview-slots"
+        ]
+      },
+      "delete": {
+        "operationId": "InterviewSlotsController_remove",
+        "parameters": [
+          {
+            "name": "slotId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "interview-slots"
+        ]
+      }
+    },
+    "/v1/interview-slots/{slotId}/booking": {
+      "post": {
+        "operationId": "InterviewSlotsController_book",
+        "parameters": [
+          {
+            "name": "slotId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookSlotDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InterviewSlotDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "interview-slots"
+        ]
+      }
+    },
+    "/v1/interview-slots/{slotId}/join": {
+      "post": {
+        "operationId": "InterviewSlotsController_join",
+        "parameters": [
+          {
+            "name": "slotId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JoinCallDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CallAccessDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "interview-slots"
+        ]
+      }
     }
   },
   "info": {
@@ -1756,6 +2013,35 @@
           "status"
         ]
       },
+      "InterviewSlotProgressDto": {
+        "type": "object",
+        "properties": {
+          "slotId": {
+            "type": "string"
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "closed",
+              "booked",
+              "waiting",
+              "live",
+              "done",
+              "missed"
+            ]
+          }
+        },
+        "required": [
+          "slotId",
+          "startsAt",
+          "status"
+        ]
+      },
       "ConsistencyProgressDto": {
         "type": "object",
         "properties": {
@@ -1856,6 +2142,14 @@
               }
             ]
           },
+          "interviewSlot": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InterviewSlotProgressDto"
+              }
+            ]
+          },
           "consistency": {
             "$ref": "#/components/schemas/ConsistencyProgressDto"
           },
@@ -1877,6 +2171,7 @@
           "interview",
           "surprise",
           "presentation",
+          "interviewSlot",
           "consistency",
           "accommodation"
         ]
@@ -3305,6 +3600,20 @@
           "consent"
         ]
       },
+      "SaveNotesDto": {
+        "type": "object",
+        "properties": {
+          "notes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "notes"
+        ]
+      },
       "SaveInterviewerScoresDto": {
         "type": "object",
         "properties": {
@@ -3905,6 +4214,9 @@
               "presentation.submitted",
               "presentation.video.viewed",
               "presentation.video.deleted",
+              "slot.created",
+              "slot.booked",
+              "call.joined",
               "demo.reset"
             ]
           },
@@ -4096,6 +4408,199 @@
           "prompt",
           "durationSec",
           "submittedAt"
+        ]
+      },
+      "CreateSlotDto": {
+        "type": "object",
+        "properties": {
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "interviewerRef": {
+            "type": "string",
+            "description": "A pseudonym for the interviewer, such as `interviewer-2`; never a name.",
+            "example": "interviewer-2"
+          },
+          "durationMin": {
+            "type": "number",
+            "minimum": 15,
+            "maximum": 90,
+            "default": 30
+          }
+        },
+        "required": [
+          "startsAt",
+          "interviewerRef"
+        ]
+      },
+      "InterviewSlotDto": {
+        "type": "object",
+        "properties": {
+          "slotId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "interviewerRef": {
+            "type": "string"
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "durationMin": {
+            "type": "number"
+          },
+          "waitUntil": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "closed",
+              "booked",
+              "waiting",
+              "live",
+              "done",
+              "missed"
+            ]
+          },
+          "candidateId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "candidateLabel": {
+            "type": "string",
+            "nullable": true
+          },
+          "candidateJoinedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "interviewerJoinedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "missedBy": {
+            "type": "string",
+            "enum": [
+              "candidate",
+              "interviewer",
+              "both"
+            ],
+            "nullable": true
+          },
+          "consentRecording": {
+            "type": "boolean"
+          },
+          "interviewId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "required": [
+          "slotId",
+          "interviewerRef",
+          "startsAt",
+          "endsAt",
+          "durationMin",
+          "waitUntil",
+          "status",
+          "candidateId",
+          "candidateLabel",
+          "candidateJoinedAt",
+          "interviewerJoinedAt",
+          "missedBy",
+          "consentRecording",
+          "interviewId"
+        ]
+      },
+      "InterviewSlotListDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InterviewSlotDto"
+            }
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "BookSlotDto": {
+        "type": "object",
+        "properties": {
+          "candidateId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "candidateId"
+        ]
+      },
+      "JoinCallDto": {
+        "type": "object",
+        "properties": {
+          "consentRecording": {
+            "type": "boolean",
+            "description": "The candidate's answer: may the call be recorded, as audio, for transcription."
+          }
+        }
+      },
+      "CallAccessDto": {
+        "type": "object",
+        "properties": {
+          "slotId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "side": {
+            "type": "string",
+            "enum": [
+              "candidate",
+              "interviewer"
+            ]
+          },
+          "url": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          },
+          "room": {
+            "type": "string"
+          },
+          "waitUntil": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "interviewId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "required": [
+          "slotId",
+          "side",
+          "url",
+          "token",
+          "room",
+          "waitUntil",
+          "interviewId"
         ]
       }
     }
