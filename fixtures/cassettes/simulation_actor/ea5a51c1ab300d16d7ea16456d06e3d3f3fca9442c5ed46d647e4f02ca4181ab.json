@@ -4,7 +4,7 @@
   "output_tokens": 25,
   "provider": "openai",
   "recorded_at": "2026-09-24T00:00:00Z",
-  "request_hash": "91d3180fedc49d34281a599dad3594f8273adfc72e22937e66b1d77c4e76b2a1",
+  "request_hash": "ea5a51c1ab300d16d7ea16456d06e3d3f3fca9442c5ed46d647e4f02ca4181ab",
   "request_id": "synthetic-m2a-fixture",
   "response": "{\"text\": \"Okay\\u2026 I hear you. But it isn't only about the code. Nobody asked me anything. How do I know it won't happen again next week?\"}",
   "task": "simulation_actor",

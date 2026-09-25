@@ -13,6 +13,7 @@ from ..gateway.errors import GatewayOutputError
 from ..gateway.types import GatewayRequest, GatewayResult
 from ..rubric import DriveRubric, load_drive_rubric
 from ..schemas.contracts import AssessmentRequest, DriveScore, all_five
+from .model_view import model_turns
 
 
 ROOT_PROMPT = Path(__file__).resolve().parents[4] / "config" / "prompts" / "m3-judge.md"
@@ -81,7 +82,7 @@ class SimulationJudge:
                                 for item in self._rubric.competencies
                             ],
                         },
-                        "turns": [turn.model_dump(mode="json") for turn in request.turns],
+                        "turns": model_turns(request.turns),
                         "attempt": attempt,
                     },
                     output_schema=JudgeOutput,

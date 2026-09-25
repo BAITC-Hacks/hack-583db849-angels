@@ -4,7 +4,7 @@
   "output_tokens": 11,
   "provider": "openai",
   "recorded_at": "2026-09-24T00:00:00Z",
-  "request_hash": "05606507f761ffcafdf54f629e248885c61341a91d2c5ce0ab2e8b38f613dc66",
+  "request_hash": "8326689d24ff1cb7fc9392af20df6015cf8cfb0898c25959bb1ad35eeb79298d",
   "request_id": "synthetic-m2a-fixture",
   "response": "{\"text\": \"Okay. Let's try it your way. And thanks for actually listening.\"}",
   "task": "simulation_actor",

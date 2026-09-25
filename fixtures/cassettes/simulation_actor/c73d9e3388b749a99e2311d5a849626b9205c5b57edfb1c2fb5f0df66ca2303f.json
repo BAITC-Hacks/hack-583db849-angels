@@ -4,7 +4,7 @@
   "output_tokens": 26,
   "provider": "openai",
   "recorded_at": "2026-09-24T00:00:00Z",
-  "request_hash": "8475c59fd08d4be8b7f6e86e877095498e2801ee3e7b4e3857dc2a5c6320a97a",
+  "request_hash": "c73d9e3388b749a99e2311d5a849626b9205c5b57edfb1c2fb5f0df66ca2303f",
   "request_id": "synthetic-m2a-fixture",
   "response": "{\"text\": \"Fine, I could talk to him. But the demo is in three days and his version still breaks the login. Who decides which version we keep?\"}",
   "task": "simulation_actor",
