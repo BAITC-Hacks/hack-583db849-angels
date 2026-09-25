@@ -1,4 +1,4 @@
-import { act, render, screen } from '@testing-library/react';
+import { act, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import CommissionHome from '../app/(product)/commission/page';
 import InterviewerHome from '../app/(product)/interviewer/page';
@@ -66,8 +66,16 @@ describe('the demo world', () => {
 });
 
 describe('each role has its own working home', () => {
-  it('moves the interviewer’s next step forward as things happen', () => {
-    render(<InterviewerHome />);
+  const list = example<{ items: WireCandidate[] }>('candidates.json');
+  const withProgress = (simulation: unknown, assessment: unknown) => ({
+    items: list.items.map((item, index) =>
+      index === 0 ? { ...item, progress: { ...item.progress!, simulation, assessment } } : item,
+    ),
+  });
+
+  it('moves the interviewer’s next step forward as things happen', async () => {
+    mockApi({ 'GET /api/v1/candidates': () => json(withProgress(null, null)) });
+    withQuery(<InterviewerHome />);
     expect(screen.getByText('Read candidate A’s brief')).toBeTruthy();
     act(() => record('brief-viewed', 'A', { briefViewed: true }));
     expect(screen.getByText('Interview candidate A and record it')).toBeTruthy();
@@ -75,11 +83,18 @@ describe('each role has its own working home', () => {
     expect(screen.getByText('Score candidate A blind')).toBeTruthy();
   });
 
-  it('opens the report for the commission only once the simulation is finished', () => {
-    mockApi({ 'GET /api/v1/candidates': () => json(example<{ items: WireCandidate[] }>('candidates.json')) });
-    withQuery(<CommissionHome />);
+  it('shows the commission the simulation and the report as the API has them', async () => {
+    vi.useRealTimers();
+    mockApi({ 'GET /api/v1/candidates': () => json(withProgress({ simulationId: 's', status: 'active', ending: null }, null)) });
+    const running = withQuery(<CommissionHome />);
+    expect(await screen.findByText('In progress')).toBeTruthy();
     expect(screen.queryByRole('link', { name: 'Open report' })).toBeNull();
-    act(() => record('assessment-ready', 'A', { assessmentReady: true }));
-    expect(screen.getAllByRole('link', { name: /Open (the )?report/ }).length).toBeGreaterThan(0);
+    running.unmount();
+
+    mockApi({ 'GET /api/v1/candidates': () => json(list) });
+    withQuery(<CommissionHome />);
+    await waitFor(() => expect(screen.getAllByRole('link', { name: /Open (the )?report/ }).length).toBeGreaterThan(0));
+    // One simulation finished and one report ready, both from the API.
+    expect(screen.getAllByText('1 / 3')).toHaveLength(2);
   });
 });
