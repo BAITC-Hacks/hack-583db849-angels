@@ -16,5 +16,7 @@ export interface AiGateway {
   transcribeInterview(audioRef: string): Promise<components['schemas']['TranscribeResult']>;
   /** The draft reads the transcript and the notes, and never the interviewer's scores. */
   interviewDraft(request: components['schemas']['DraftRequest']): Promise<components['schemas']['DraftResult']>;
+  /** C: claimed against measured. After the interview it reads the transcript, and never the interviewer's scores. */
+  consistency(request: components['schemas']['ConsistencyRequest']): Promise<components['schemas']['ConsistencyResult']>;
   speech(text: string, scenarioId: string): Promise<Buffer>;
 }

@@ -14,6 +14,7 @@ import { SimulationAssessmentsService } from '../src/modules/simulation-assessme
 import { SurpriseService } from '../src/modules/surprise/surprise.service';
 import { QualityGuardService } from '../src/modules/quality-guard/quality-guard.service';
 import { InterviewsService } from '../src/modules/interviews/interviews.service';
+import { ConsistencyService } from '../src/modules/consistency/consistency.service';
 
 const briefs = {
   startFor: jest.fn().mockResolvedValue(undefined),
@@ -49,6 +50,12 @@ const interviews = {
   getDraft: jest.fn().mockImplementation(() => contractExample('assessment-draft.json')),
 };
 
+const consistency = {
+  before: jest.fn().mockImplementation(() => contractExample('consistency-before.json')),
+  after: jest.fn().mockImplementation(() => contractExample('consistency-after.json')),
+  startAfter: jest.fn().mockResolvedValue(undefined),
+};
+
 describe('PR 1 contract routes', () => {
   let app: INestApplication;
   const candidateId = '00000000-0000-4000-8000-00000000000a';
@@ -60,6 +67,7 @@ describe('PR 1 contract routes', () => {
     assessments: [],
     briefs: [],
     interviews: [],
+    consistencyReports: [],
   };
   const previousKeys = process.env.API_KEYS;
   const previousDemoMode = process.env.DEMO_MODE;
@@ -92,6 +100,8 @@ describe('PR 1 contract routes', () => {
       .useValue(quality)
       .overrideProvider(InterviewsService)
       .useValue(interviews)
+      .overrideProvider(ConsistencyService)
+      .useValue(consistency)
       .overrideProvider(PrismaService)
       .useValue({
         candidate: {
@@ -225,6 +235,16 @@ describe('PR 1 contract routes', () => {
     await request(server).post(`/v1/interviews/${interviewId}/interviewer-scores`).set('X-API-Key', 'commission-key').send(scores).expect(403);
     await request(server).post('/v1/interviews').set('X-API-Key', 'platform-key').send({ candidateId, heldAt: '2026-09-26T09:30:00Z' }).expect(403);
     await request(server).post('/v1/interviews').set('X-API-Key', 'interviewer-key').send({ candidateId, heldAt: 'yesterday' }).expect(400);
+  });
+
+  it('shows the before stage to whoever interviews or decides, and the after stage only to the commission', async () => {
+    const server = app.getHttpServer();
+    const path = `/v1/candidates/${candidateId}/consistency`;
+    await request(server).get(`${path}?stage=before`).set('X-API-Key', 'interviewer-key').expect(200);
+    await request(server).get(`${path}?stage=after`).set('X-API-Key', 'interviewer-key').expect(403);
+    await request(server).get(`${path}?stage=after`).set('X-API-Key', 'commission-key').expect(200);
+    await request(server).get(`${path}?stage=before`).set('X-API-Key', 'platform-key').expect(403);
+    await request(server).get(`${path}?stage=during`).set('X-API-Key', 'commission-key').expect(400);
   });
 
   it('answers 404, not 500, for an id that is not a UUID', async () => {

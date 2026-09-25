@@ -9,6 +9,7 @@ import { ApiRole } from '../../auth/roles';
 import { PrismaService } from '../../database/prisma.service';
 import { ToLlmViewService } from '../../privacy/to-llm-view.service';
 import { AuditService } from '../audit/audit.service';
+import { ConsistencyService } from '../consistency/consistency.service';
 import {
   AssessmentDraftDto, CreateInterviewDto, InterviewDto, InterviewerScoresSavedDto, InterviewTurnDto,
 } from './dto/interview.dto';
@@ -44,6 +45,7 @@ export class InterviewsService {
     private readonly audio: InterviewAudioService,
     private readonly privacy: ToLlmViewService,
     private readonly audit: AuditService,
+    private readonly consistency: ConsistencyService,
   ) {}
 
   /** An interview, with inVision's own transcript or without one yet — then a recording brings it. */
@@ -139,7 +141,7 @@ export class InterviewsService {
       throw error;
     }
     await this.audit.record({ action: 'scores.saved', targetType: 'interview', targetId: interviewId, candidateId: row.candidateId, actorRole: role });
-    void this.draftWhenReady(interviewId);
+    void this.afterBoth(interviewId);
     return { interviewId, scores, savedAt: savedAt.toISOString() };
   }
 
@@ -176,7 +178,7 @@ export class InterviewsService {
         data: { transcriptStatus: 'ready', transcript: transcript as unknown as Prisma.InputJsonValue },
       });
       await this.audit.record({ action: 'transcript.ready', targetType: 'interview', targetId: interviewId, candidateId });
-      await this.draftWhenReady(interviewId);
+      await this.afterBoth(interviewId);
     } catch (error) {
       this.logger.error(`Interview ${interviewId} was not transcribed: ${error instanceof Error ? error.message : String(error)}`);
       await this.prisma.interview.update({ where: { id: interviewId }, data: { transcriptStatus: 'failed' } }).catch(() => undefined);
@@ -184,6 +186,15 @@ export class InterviewsService {
       // Only the text is kept.
       await this.audio.delete(audioRef).catch(() => undefined);
     }
+  }
+
+  /**
+   * Once the transcript and the scores both exist, whichever came second,
+   * the draft and the after-interview consistency follow by themselves.
+   * Neither throws.
+   */
+  private async afterBoth(interviewId: string): Promise<void> {
+    await Promise.all([this.draftWhenReady(interviewId), this.consistency.startAfter(interviewId)]);
   }
 
   /**

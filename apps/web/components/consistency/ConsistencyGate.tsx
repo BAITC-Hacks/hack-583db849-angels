@@ -3,19 +3,18 @@
 import { LockClosedIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { useWorld } from '../../lib/demo/world';
 import { useCopy } from '../../lib/i18n/StaffLocaleProvider';
 
 const copy = {
   en: {
     title: 'The interviewer has not scored yet',
     body: 'What the interview showed is held back until the interviewer has saved their own scores — the same rule as the AI draft. An interviewer who has already read "the interview confirmed a gap" is no longer scoring blind.',
-    action: 'Open the interview',
+    action: 'Back to the candidates',
   },
   ru: {
     title: 'Интервьюер ещё не выставил баллы',
     body: 'Итог сверки закрыт, пока интервьюер не сохранил свои баллы, — то же правило, что и у черновика ИИ. Интервьюер, который уже прочитал «интервью подтвердило разрыв», оценивает не вслепую.',
-    action: 'Открыть интервью',
+    action: 'К кандидатам',
   },
 };
 
@@ -24,11 +23,10 @@ const copy = {
  * saved, exactly as the API locks it with `409 DRAFT_LOCKED`. The screen says
  * why, because a lock without a reason reads as a bug.
  */
-export function ConsistencyGate({ children }: { children: ReactNode }) {
-  const { candidates } = useWorld();
+export function ConsistencyGate({ locked, children }: { locked: boolean; children: ReactNode }) {
   const text = useCopy(copy);
 
-  if (candidates.A.scoresSaved) return <>{children}</>;
+  if (!locked) return <>{children}</>;
 
   return (
     <main className="mx-auto flex max-w-3xl flex-col items-center gap-3 px-5 py-16 text-center">
@@ -36,7 +34,7 @@ export function ConsistencyGate({ children }: { children: ReactNode }) {
       <h1 className="text-xl font-bold text-text-primary">{text.title}</h1>
       <p className="max-w-xl text-sm text-text-secondary">{text.body}</p>
       <Link
-        href="/interviewer/interview"
+        href="/commission"
         className="mt-2 rounded-control border border-border-strong px-4 py-2.5 text-sm font-semibold text-text-primary transition-colors hover:bg-bg-elevated"
       >
         {text.action}
