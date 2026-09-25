@@ -40,6 +40,16 @@ def _inputs(candidate: str) -> tuple[ConsistencyRequest, ConsistencyRequest]:
     )
 
 
+@pytest.mark.parametrize("candidate", ["b", "c"])
+def test_after_uses_the_committed_seed_interview(candidate: str) -> None:
+    _, after = _inputs(candidate)
+    expected = json.loads((SEED / candidate / "interview-transcript.json").read_text(
+        encoding="utf-8"
+    ))
+
+    assert [turn.model_dump(mode="json") for turn in after.interviewTranscript] == expected
+
+
 @pytest.mark.parametrize("candidate", list("abc"))
 def test_before_and_after_replay_without_network(
     candidate: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
