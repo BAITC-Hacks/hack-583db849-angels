@@ -1352,6 +1352,46 @@
           "demo"
         ]
       }
+    },
+    "/v1/candidates/{candidateId}/decision-date": {
+      "put": {
+        "operationId": "RetentionController_decisionDate",
+        "parameters": [
+          {
+            "name": "candidateId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecisionDateInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DecisionDateDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "candidates"
+        ]
+      }
     }
   },
   "info": {
@@ -3694,6 +3734,7 @@
               "surprise.started",
               "surprise.answered",
               "surprise.video.viewed",
+              "surprise.video.deleted",
               "demo.reset"
             ]
           },
@@ -3745,6 +3786,42 @@
         },
         "required": [
           "candidateId"
+        ]
+      },
+      "DecisionDateInputDto": {
+        "type": "object",
+        "properties": {
+          "decidedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the commission decided. The date only — this API never stores a decision."
+          }
+        },
+        "required": [
+          "decidedAt"
+        ]
+      },
+      "DecisionDateDto": {
+        "type": "object",
+        "properties": {
+          "candidateId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "decidedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "videosDeletedAfter": {
+            "type": "string",
+            "format": "date-time",
+            "description": "decidedAt plus VIDEO_RETENTION_DAYS: the candidate’s videos are deleted from then on."
+          }
+        },
+        "required": [
+          "candidateId",
+          "decidedAt",
+          "videosDeletedAfter"
         ]
       }
     }

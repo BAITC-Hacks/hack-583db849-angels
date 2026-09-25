@@ -37,6 +37,8 @@ model Candidate {
   application        Json
   test               Json
   englishCertificate Json?
+  /// When the commission decided, as inVision reports it — never the decision itself. Videos go 30 days later.
+  decidedAt          DateTime?
   createdAt          DateTime     @default(now())
   updatedAt          DateTime     @updatedAt
   simulations        Simulation[]
