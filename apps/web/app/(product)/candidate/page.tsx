@@ -62,6 +62,8 @@ export default function CandidateHome() {
       ? errorText(openSurprise.error)
       : null;
 
+  const presentation = progress?.presentation ?? null;
+
   const status = simulation === null ? 'Not started yet' : simulation.status === 'completed' ? 'Finished — thank you' : 'In progress';
   const startError =
     start.isError && !(start.error instanceof ApiError && start.error.code === 'SIMULATION_EXISTS') ? errorText(start.error) : null;
@@ -83,7 +85,7 @@ export default function CandidateHome() {
         </p>
       ) : null}
 
-      <section className="grid gap-4 md:grid-cols-3">
+      <section className="grid gap-4 md:grid-cols-2">
         <article className="flex flex-col gap-3 rounded-panel border border-border-subtle bg-bg-surface p-5">
           <p className="font-mono text-[0.6rem] tracking-[0.14em] text-text-muted uppercase">Step 1 · the simulation</p>
           <p className="flex items-center gap-2 text-sm font-semibold text-text-primary">
@@ -181,6 +183,28 @@ export default function CandidateHome() {
               {surpriseError}
             </p>
           ) : null}
+        </article>
+        <article className="flex flex-col gap-3 rounded-panel border border-border-subtle bg-bg-surface p-5">
+          <p className="font-mono text-[0.6rem] tracking-[0.14em] text-text-muted uppercase">Step 4 · your presentation</p>
+          <p className="flex items-center gap-2 text-sm font-semibold text-text-primary">
+            <ClockIcon aria-hidden="true" className="h-4 w-4 text-text-muted" />
+            One to three minutes, sent once
+          </p>
+          <p className="text-[0.82rem] text-text-secondary">
+            A short video in English: why inVision U, and one time you led other people. Record it here or upload your
+            own.
+          </p>
+          {presentation ? (
+            <p className="mt-auto flex items-center gap-1.5 text-sm font-semibold text-text-primary">
+              <CheckCircleIcon aria-hidden="true" className="h-4 w-4 text-brand-ink" />
+              Your presentation is in
+            </p>
+          ) : (
+            <Link href="/candidate/presentation" className={`group ${stepAction}`}>
+              Record your presentation
+              <ArrowRightIcon aria-hidden="true" className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
+            </Link>
+          )}
         </article>
       </section>
 

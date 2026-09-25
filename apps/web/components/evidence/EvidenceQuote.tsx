@@ -10,7 +10,8 @@ export type EvidenceSourceKind =
   | 'test_item'
   | 'interview_turn'
   | 'interview_note'
-  | 'surprise_answer';
+  | 'surprise_answer'
+  | 'presentation';
 
 export interface EvidenceSource {
   kind: EvidenceSourceKind;
@@ -27,6 +28,7 @@ const sourceWords: Record<StaffLocale, Record<EvidenceSourceKind, string>> = {
     interview_turn: 'Interview',
     interview_note: 'Interview note',
     surprise_answer: 'Surprise answer',
+    presentation: 'Presentation',
   },
   ru: {
     simulation_turn: 'Ход',
@@ -35,6 +37,7 @@ const sourceWords: Record<StaffLocale, Record<EvidenceSourceKind, string>> = {
     interview_turn: 'Интервью',
     interview_note: 'Заметка интервью',
     surprise_answer: 'Сюрпризный ответ',
+    presentation: 'Презентация',
   },
 };
 

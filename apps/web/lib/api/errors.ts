@@ -99,6 +99,8 @@ const texts: Record<string, Copy<string>> = {
   ALREADY_ANSWERED: { en: 'The answer is already recorded.', ru: 'Ответ уже записан.' },
   DEADLINE_PASSED: { en: 'The time for the answer is over.', ru: 'Время на ответ вышло.' },
   PAYLOAD_TOO_LARGE: { en: 'The file is too large.', ru: 'Файл слишком большой.' },
+  VIDEO_TOO_SHORT: { en: 'The presentation is shorter than one minute. Record at least one minute.', ru: 'Презентация короче минуты. Запишите хотя бы одну минуту.' },
+  PRESENTATION_EXISTS: { en: 'The presentation has already been sent.', ru: 'Презентация уже отправлена.' },
   NO_SCENARIO_READY: {
     en: 'No scenario is ready yet. Staff are told.',
     ru: 'Ни один сценарий пока не готов. Сотрудники предупреждены.',
