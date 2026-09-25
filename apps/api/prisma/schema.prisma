@@ -49,6 +49,7 @@ model Candidate {
   briefs             Brief[]
   surprise           SurpriseQuestion?
   presentation       Presentation?
+  interviewSlots     InterviewSlot[]
   consistencyReports ConsistencyReport[]
 }
 
@@ -127,6 +128,7 @@ model Interview {
   drafts           InterviewDraft[]
   consistency      ConsistencyReport[]
   qualityChecks    QualityCheck[]
+  slot             InterviewSlot?
 
   @@index([candidateId, createdAt])
 }
@@ -253,4 +255,26 @@ model Presentation {
   segments    Json?
   createdAt   DateTime  @default(now())
   candidate   Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+}
+
+/// V: a time an interviewer offers for the video interview. A candidate books it and both join a LiveKit
+/// room. The status is worked out from the times (`slot-status.ts`), so nothing has to flip it when a
+/// slot is missed.
+model InterviewSlot {
+  id                  String     @id @default(uuid()) @db.Uuid
+  interviewerRef      String
+  startsAt            DateTime
+  durationMin         Int        @default(30)
+  candidateId         String?    @db.Uuid
+  bookedAt            DateTime?
+  candidateJoinedAt   DateTime?
+  interviewerJoinedAt DateTime?
+  consentRecording    Boolean    @default(false)
+  interviewId         String?    @unique @db.Uuid
+  createdAt           DateTime   @default(now())
+  candidate           Candidate? @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  interview           Interview? @relation(fields: [interviewId], references: [id], onDelete: SetNull)
+
+  @@index([startsAt])
+  @@index([candidateId, startsAt])
 }

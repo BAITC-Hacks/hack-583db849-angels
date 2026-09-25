@@ -32,6 +32,9 @@ const actions: Record<StaffLocale, Record<AuditEvent['action'], string>> = {
     'presentation.submitted': 'Candidate sent the video presentation',
     'presentation.video.viewed': 'Staff watched the video presentation',
     'presentation.video.deleted': 'Presentation video deleted, 30 days after the decision',
+    'slot.created': 'Interviewer added an interview slot',
+    'slot.booked': 'Candidate booked an interview slot',
+    'call.joined': 'Joined the video interview',
     'demo.reset': 'Demo reset',
   },
   ru: {
@@ -53,6 +56,9 @@ const actions: Record<StaffLocale, Record<AuditEvent['action'], string>> = {
     'presentation.submitted': 'Кандидат отправил видеопрезентацию',
     'presentation.video.viewed': 'Сотрудник посмотрел видеопрезентацию',
     'presentation.video.deleted': 'Видео презентации удалено через 30 дней после решения',
+    'slot.created': 'Интервьюер добавил слот для интервью',
+    'slot.booked': 'Кандидат забронировал слот интервью',
+    'call.joined': 'Вход в видеоинтервью',
     'demo.reset': 'Демо сброшено',
   },
 };

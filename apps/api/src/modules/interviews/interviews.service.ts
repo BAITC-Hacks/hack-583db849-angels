@@ -247,6 +247,22 @@ export class InterviewsService {
     return Object.fromEntries(competencies.map((competency) => [competency, scores[competency]])) as Scores;
   }
 
+  /**
+   * The interviewer's notes, taken during the call. They feed the draft, so
+   * they close with the scores: after those are saved they are fixed.
+   */
+  async saveNotes(interviewId: string, notes: string[]): Promise<InterviewDto> {
+    const row = await this.find(interviewId);
+    if (row.interviewerScore) throw new ConflictException({ code: 'SCORES_ALREADY_SAVED', message: 'The scores are saved, so the notes are fixed.' });
+    const kept = notes.map((text) => text.trim()).filter(Boolean);
+    const updated = await this.prisma.interview.update({
+      where: { id: interviewId },
+      data: { notes: kept.map((text, index) => ({ id: `note_${index + 1}`, text })) },
+      select: interviewSelect,
+    });
+    return this.toDto(updated);
+  }
+
   private withIds(turns: { speaker: 'interviewer' | 'candidate'; text: string; startSec: number; endSec: number }[]): InterviewTurnDto[] {
     return turns.map((turn, index) => ({
       turnId: `iturn_${String(index + 1).padStart(2, '0')}`, speaker: turn.speaker, text: turn.text.trim(), startSec: turn.startSec, endSec: turn.endSec,

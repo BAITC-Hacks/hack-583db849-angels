@@ -22,6 +22,7 @@ import { ConsistencyService } from '../src/modules/consistency/consistency.servi
 import { AdminService } from '../src/modules/admin/admin.service';
 import { RetentionService } from '../src/modules/retention/retention.service';
 import { PresentationsService } from '../src/modules/presentations/presentations.service';
+import { InterviewSlotsService } from '../src/modules/interview-slots/interview-slots.service';
 
 const briefs = {
   startFor: jest.fn().mockResolvedValue(undefined),
@@ -60,6 +61,7 @@ const interviews = {
   saveScores: jest.fn().mockImplementation(() => contractExample('interviewer-scores.json')),
   createDraft: jest.fn().mockImplementation(() => contractExample('assessment-draft.json')),
   getDraft: jest.fn().mockImplementation(() => contractExample('assessment-draft.json')),
+  saveNotes: jest.fn().mockImplementation(() => contractExample('interview.json')),
 };
 
 const consistency = {
@@ -88,6 +90,15 @@ const presentations = {
   video: jest.fn().mockImplementation(() => videoFile),
 };
 
+const slots = {
+  create: jest.fn().mockImplementation(() => contractExample('interview-slot.json')),
+  list: jest.fn().mockImplementation(() => ({ items: [contractExample('interview-slot.json')] })),
+  get: jest.fn().mockImplementation(() => contractExample('interview-slot.json')),
+  remove: jest.fn().mockResolvedValue(undefined),
+  book: jest.fn().mockImplementation(() => contractExample('interview-slot.json')),
+  join: jest.fn().mockImplementation(() => contractExample('call-access.json')),
+};
+
 describe('PR 1 contract routes', () => {
   let app: INestApplication;
   const candidateId = '00000000-0000-4000-8000-00000000000a';
@@ -99,6 +110,7 @@ describe('PR 1 contract routes', () => {
     assessments: [],
     briefs: [],
     interviews: [],
+    interviewSlots: [],
     consistencyReports: [],
   };
   const previousKeys = process.env.API_KEYS;
@@ -140,6 +152,8 @@ describe('PR 1 contract routes', () => {
       .useValue(retention)
       .overrideProvider(PresentationsService)
       .useValue(presentations)
+      .overrideProvider(InterviewSlotsService)
+      .useValue(slots)
       .overrideProvider(PrismaService)
       .useValue({
         candidate: {
@@ -197,7 +211,7 @@ describe('PR 1 contract routes', () => {
     expect(found.body).toEqual(created.body);
     expect(listed.body.items[0]).toEqual({ ...created.body, progress: {
       candidateId, label: 'Candidate A', brief: null, simulation: null, assessment: null,
-      interview: null, surprise: null, presentation: null, consistency: { before: null, after: null }, accommodation: null,
+      interview: null, surprise: null, presentation: null, interviewSlot: null, consistency: { before: null, after: null }, accommodation: null,
     } });
     expect(progress.body.assessment).toBeNull();
     expect(JSON.stringify([created.body, listed.body, found.body, progress.body])).not.toContain('Synthetic Person');
@@ -335,6 +349,39 @@ describe('PR 1 contract routes', () => {
     const outside = await request(server).get(url).set('X-API-Key', 'commission-key').set('Range', 'bytes=999-').expect(416);
     expect(outside.headers['content-range']).toBe(`bytes */${videoFile.size}`);
     expect(outside.body.error.code).toBe('RANGE_NOT_SATISFIABLE');
+  });
+
+  it('lets interviewers offer slots, the candidate channel book one, and both sides join', async () => {
+    const server = app.getHttpServer();
+    const slotId = '3b7f2c9e-5a41-4d0b-8e6f-1c2d3e4f5a61';
+    const body = { startsAt: '2026-09-29T05:00:00Z', interviewerRef: 'synthetic-interviewer-a' };
+    await request(server).post('/v1/interview-slots').set('X-API-Key', 'interviewer-key').send(body).expect(201);
+    await request(server).post('/v1/interview-slots').set('X-API-Key', 'platform-key').send(body).expect(403);
+    await request(server).post('/v1/interview-slots').set('X-API-Key', 'interviewer-key').send({ ...body, durationMin: 5 }).expect(400);
+    await request(server).post('/v1/interview-slots').set('X-API-Key', 'interviewer-key').send({ startsAt: body.startsAt }).expect(400);
+
+    await request(server).get('/v1/interview-slots?open=true').set('X-API-Key', 'platform-key').expect(200);
+    expect(slots.list).toHaveBeenLastCalledWith({ open: true }, 'platform');
+    await request(server).get(`/v1/interview-slots/${slotId}`).set('X-API-Key', 'commission-key').expect(200);
+    await request(server).delete(`/v1/interview-slots/${slotId}`).set('X-API-Key', 'interviewer-key').expect(204);
+    await request(server).delete(`/v1/interview-slots/${slotId}`).set('X-API-Key', 'platform-key').expect(403);
+
+    await request(server).post(`/v1/interview-slots/${slotId}/booking`).set('X-API-Key', 'platform-key').send({ candidateId }).expect(200);
+    await request(server).post(`/v1/interview-slots/${slotId}/booking`).set('X-API-Key', 'interviewer-key').send({ candidateId }).expect(403);
+
+    await request(server).post(`/v1/interview-slots/${slotId}/join`).set('X-API-Key', 'platform-key').send({ consentRecording: true }).expect(200);
+    expect(slots.join).toHaveBeenLastCalledWith(slotId, { consentRecording: true }, 'platform');
+    await request(server).post(`/v1/interview-slots/${slotId}/join`).set('X-API-Key', 'interviewer-key').send({}).expect(200);
+    await request(server).post(`/v1/interview-slots/${slotId}/join`).set('X-API-Key', 'commission-key').send({}).expect(403);
+  });
+
+  it('keeps the notes to the interviewer and the admin', async () => {
+    const server = app.getHttpServer();
+    const interviewId = '6f1c2a0e-0000-4000-8000-00000000a010';
+    await request(server).put(`/v1/interviews/${interviewId}/notes`).set('X-API-Key', 'interviewer-key').send({ notes: ['Asked about the robotics team.'] }).expect(200);
+    expect(interviews.saveNotes).toHaveBeenLastCalledWith(interviewId, ['Asked about the robotics team.']);
+    await request(server).put(`/v1/interviews/${interviewId}/notes`).set('X-API-Key', 'commission-key').send({ notes: [] }).expect(403);
+    await request(server).put(`/v1/interviews/${interviewId}/notes`).set('X-API-Key', 'interviewer-key').send({ notes: 'one string' }).expect(400);
   });
 
   it('answers 404, not 500, for an id that is not a UUID', async () => {

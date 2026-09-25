@@ -45,6 +45,10 @@ services:
       ML_INTERNAL_TOKEN: local-internal-token
       DEMO_MODE: "true"
       UPLOADS_DIR: /data/uploads
+      LIVEKIT_URL: ${LIVEKIT_URL:-}
+      LIVEKIT_API_KEY: ${LIVEKIT_API_KEY:-}
+      LIVEKIT_API_SECRET: ${LIVEKIT_API_SECRET:-}
+      INTERVIEW_TIME_ZONE: ${INTERVIEW_TIME_ZONE:-Asia/Almaty}
     volumes:
       - uploads-data:/data/uploads
     ports:

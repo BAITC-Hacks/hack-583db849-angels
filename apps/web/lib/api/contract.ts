@@ -147,6 +147,7 @@ export interface WireCandidateProgress {
   interview: { interviewId: string | null; transcriptStatus: WireInterview['transcriptStatus']; scoresSaved: boolean; draftReady: boolean } | null;
   surprise: { surpriseId: string | null; status: string } | null;
   presentation?: { presentationId: string; status: 'transcribing' | 'ready' | 'failed' } | null;
+  interviewSlot?: { slotId: string; startsAt: string; status: 'open' | 'closed' | 'booked' | 'waiting' | 'live' | 'done' | 'missed' } | null;
   consistency: { before: string | null; after: string | null } | null;
   /** Typing instead of speaking, set by staff before the simulation; `null` until set, and always for `platform`. */
   accommodation?: { textMode: boolean; reason: string } | null;

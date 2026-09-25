@@ -1,0 +1,16 @@
+{
+  "slotId": "3b7f2c9e-5a41-4d0b-8e6f-1c2d3e4f5a61",
+  "interviewerRef": "synthetic-interviewer-a",
+  "startsAt": "2026-09-29T05:00:00Z",
+  "endsAt": "2026-09-29T05:30:00Z",
+  "durationMin": 30,
+  "waitUntil": "2026-09-29T05:05:00Z",
+  "status": "booked",
+  "candidateId": "00000000-0000-4000-8000-00000000000a",
+  "candidateLabel": "Candidate A",
+  "candidateJoinedAt": null,
+  "interviewerJoinedAt": null,
+  "missedBy": null,
+  "consentRecording": false,
+  "interviewId": null
+}

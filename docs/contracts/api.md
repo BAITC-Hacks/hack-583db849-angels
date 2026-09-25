@@ -63,6 +63,10 @@ The browser never holds an API key. The web calls a Next.js route on its own ser
 | S surprise answer — transcript and video | — | yes | yes | yes |
 | P video presentation — submit, status | yes ³ | read | read | yes |
 | P video presentation — transcript and video | — | yes | yes | yes |
+| V interview slots — add, remove | — | yes | — | yes |
+| V interview slots — list, read | yes ⁴ | yes | yes | yes |
+| V interview slots — book | yes | — | — | yes |
+| V video call — join | yes ⁵ | yes | — | yes |
 | Admin overview, audit events | — | — | — | yes |
 | Demo: recorded session | — | — | yes | yes |
 | Demo: reset | — | — | — | yes |
@@ -70,6 +74,8 @@ The browser never holds an API key. The web calls a Next.js route on its own ser
 ¹ `progress` is filtered by role: `platform` gets no `brief` and no `interview` and never a score; `interviewer` gets no `assessment` — they score blind.
 ² `platform` sees the question only after `start`, and never the competency it targets, the transcript or the video.
 ³ `platform` sends the presentation and sees its status, and never the transcript or the video.
+⁴ `platform` sees open slots, and the slots booked by the candidate it asks about (`?candidateId=`).
+⁵ `platform` joins as the candidate; `interviewer` and `admin` join as the interviewer.
 
 `API_KEYS` gets a fourth pair, for example `change-me-platform:platform`.
 
@@ -211,6 +217,29 @@ The remote stage of inVision's selection opens with a video presentation (the br
 - **Once transcribed,** you make a new brief. Its `sources.presentation` carries the transcript for staff to read beside it; a brief quotes it as `source: "presentation"` once `BriefRequest.presentation` is in the ML service (`ml.md`, rule 6d).
 - **Deleted** on demo reset and `VIDEO_RETENTION_DAYS` after the decision date, like the surprise video; the transcript stays.
 
+### V — the scheduled video interview
+
+The live interview, held as a video call. An interviewer adds empty slots; the candidate books one; both join the call from the browser. The call itself runs on LiveKit: this API only issues the room tokens and keeps the rules.
+
+| Method | Path | Idem. | Success | Errors |
+| --- | --- | --- | --- | --- |
+| `POST` | `/v1/interview-slots` | ✱ | `201 InterviewSlot`; body `{ startsAt, interviewerRef, durationMin? }` — `durationMin` 15–90, default 30 | `400 SLOT_IN_PAST`, `409 SLOT_OVERLAPS` |
+| `GET` | `/v1/interview-slots` | | `200 { items: InterviewSlot[] }`, by `startsAt`; `?open=true` only open slots, `?candidateId=` one candidate's | |
+| `GET` | `/v1/interview-slots/:slotId` | | `200 InterviewSlot` | `404` |
+| `DELETE` | `/v1/interview-slots/:slotId` | | `204` | `404`, `409 SLOT_BOOKED` |
+| `POST` | `/v1/interview-slots/:slotId/booking` | ✱ | `200 InterviewSlot`; body `{ candidateId }` | `404`, `409 SLOT_TAKEN`, `409 SLOT_PASSED`, `409 ALREADY_BOOKED`, `409 ALREADY_INTERVIEWED`, `409 SAME_DAY_AS_MISSED` |
+| `POST` | `/v1/interview-slots/:slotId/join` | | `200 CallAccess`; body `{ consentRecording? }` — the candidate's answer | `404`, `409 SLOT_NOT_BOOKED`, `409 TOO_EARLY`, `409 SLOT_MISSED`, `409 SLOT_OVER`, `503 VIDEO_UNAVAILABLE` |
+| `PUT` | `/v1/interviews/:interviewId/notes` | | `200 Interview`; body `{ notes: string[] }` — replaces the notes | `404`, `409 SCORES_ALREADY_SAVED` |
+
+- **The door opens 10 minutes before the start.** An earlier join answers `409 TOO_EARLY` with `details.opensAt`.
+- **Each side waits at most 5 minutes.** If both have not joined by `startsAt + 5 min` (`waitUntil`), the slot is `missed`, and `missedBy` says who did not come. A late join answers `409 SLOT_MISSED`.
+- **After a missed slot the candidate books another day.** A slot on the same calendar day as a missed one answers `409 SAME_DAY_AS_MISSED` with `details.day`. Days are counted in `INTERVIEW_TIME_ZONE`, `Asia/Almaty` by default.
+- **One booking at a time.** A candidate with a slot that is `booked` or `waiting` gets `409 ALREADY_BOOKED` with `details.slotId`. Once both sides have joined one (`live` or `done`), it is `409 ALREADY_INTERVIEWED`.
+- **The interview is made when the interviewer joins.** It is an ordinary M4 interview with `heldAt = startsAt` and the slot's `interviewerRef`. Its id comes back in the interviewer's `CallAccess` and in `InterviewSlot.interviewId`. Notes, scores, recording, draft, consistency and the quality check work as for any interview.
+- **The call is recorded only with the candidate's consent, and only as audio.** The candidate answers `consentRecording` when joining. With `true`, the interviewer's screen records both voices and sends them to `POST /v1/interviews/:id/recording`. The video of the call is never recorded or stored.
+- **No personal data goes to LiveKit.** The room is `slot-<slotId>`; the participants are `candidate` and `interviewer`.
+- **Without `LIVEKIT_URL`, `LIVEKIT_API_KEY` and `LIVEKIT_API_SECRET`,** join answers `503 VIDEO_UNAVAILABLE`. Everything else, including the slots, keeps working.
+
 ### Admin and demo
 
 | Method | Path | Idem. | Success | Errors |
@@ -282,6 +311,7 @@ interface CandidateProgress {                     // filtered by role, see the R
   } | null;
   surprise: { surpriseId: string; status: SurpriseStatus } | null;
   presentation: { presentationId: string; status: 'transcribing' | 'ready' | 'failed' } | null;
+  interviewSlot: { slotId: string; startsAt: string; status: SlotStatus } | null;   // the latest slot the candidate booked
   consistency: { before: StepStatus | null; after: StepStatus | 'locked' | null };
   accommodation: { textMode: boolean; reason: string } | null;  // staff only; null until set, and always for platform
 }
@@ -501,7 +531,8 @@ type AuditAction =
   | 'candidate.created' | 'brief.ready' | 'simulation.started' | 'simulation.completed' | 'simulation.stopped'
   | 'assessment.ready' | 'interview.created' | 'recording.uploaded' | 'transcript.ready' | 'scores.saved'
   | 'draft.created' | 'surprise.started' | 'surprise.answered' | 'surprise.video.viewed' | 'surprise.video.deleted'
-  | 'presentation.submitted' | 'presentation.video.viewed' | 'presentation.video.deleted' | 'demo.reset';
+  | 'presentation.submitted' | 'presentation.video.viewed' | 'presentation.video.deleted'
+  | 'slot.created' | 'slot.booked' | 'call.joined' | 'demo.reset';
 
 interface AuditEvent {
   eventId: string;
@@ -511,6 +542,42 @@ interface AuditEvent {
   candidateId: string | null;
   candidateLabel: string | null;
   subjectId: string | null;
+}
+
+type SlotStatus =
+  | 'open'          // no candidate yet, before the start
+  | 'closed'        // no candidate, and the start has passed
+  | 'booked'        // a candidate, before the start
+  | 'waiting'       // the start has passed, not both have joined, less than 5 minutes in
+  | 'live'          // both have joined, before the end
+  | 'done'          // both joined, and the end has passed
+  | 'missed';       // not both joined within 5 minutes of the start
+
+interface InterviewSlot {
+  slotId: string;
+  interviewerRef: string;                         // a pseudonym, never a name
+  startsAt: string;
+  endsAt: string;
+  durationMin: number;
+  waitUntil: string;                              // startsAt + 5 minutes
+  status: SlotStatus;
+  candidateId: string | null;
+  candidateLabel: string | null;
+  candidateJoinedAt: string | null;
+  interviewerJoinedAt: string | null;
+  missedBy: 'candidate' | 'interviewer' | 'both' | null;   // set when missed
+  consentRecording: boolean;                      // the candidate's answer when joining; false until then
+  interviewId: string | null;                     // made when the interviewer joins; staff only
+}
+
+interface CallAccess {
+  slotId: string;
+  side: 'candidate' | 'interviewer';
+  url: string;                                    // LIVEKIT_URL, wss://
+  token: string;                                  // a LiveKit room token, valid until 30 minutes after the end
+  room: string;                                   // slot-<slotId>
+  waitUntil: string;
+  interviewId: string | null;                     // the interviewer's side only
 }
 
 interface QualityCheck {
@@ -570,6 +637,19 @@ interface QualitySignal {
 | `VIDEO_TOO_SHORT` | 400 | a presentation under 60 seconds |
 | `PRESENTATION_EXISTS` | 409 | a second presentation for the same candidate |
 | `RANGE_NOT_SATISFIABLE` | 416 | a video `Range` that starts past the end of the file |
+| `SLOT_IN_PAST` | 400 | a slot that starts before now |
+| `SLOT_OVERLAPS` | 409 | a slot that overlaps another of the same interviewer |
+| `SLOT_BOOKED` | 409 | removing a slot a candidate has booked |
+| `SLOT_TAKEN` | 409 | booking a slot another candidate has |
+| `SLOT_PASSED` | 409 | booking a slot whose start has passed |
+| `ALREADY_BOOKED` | 409 | the candidate has a slot `booked` or `waiting`; `details.slotId` |
+| `ALREADY_INTERVIEWED` | 409 | the candidate's interview has taken place |
+| `SAME_DAY_AS_MISSED` | 409 | a new slot on the day of a missed one; `details.day` |
+| `SLOT_NOT_BOOKED` | 409 | joining a slot without a candidate |
+| `TOO_EARLY` | 409 | joining more than 10 minutes before the start; `details.opensAt` |
+| `SLOT_MISSED` | 409 | joining after `waitUntil` when not both had come; `details.missedBy` |
+| `SLOT_OVER` | 409 | joining more than 30 minutes after the end of a call that took place |
+| `VIDEO_UNAVAILABLE` | 503 | LiveKit is not configured on this server |
 | `AI_INVALID_OUTPUT` | 502 | the ML service failed schema or evidence checks after its one retry |
 | `AI_UNAVAILABLE` | 503 | the ML service is down |
 | `AI_BUDGET_EXCEEDED` | 503 | the gateway refused: `BUDGET_USD_CAP` reached |

@@ -21,10 +21,11 @@ import { AdminModule } from './modules/admin/admin.module';
 import { DemoModule } from './modules/demo/demo.module';
 import { RetentionModule } from './modules/retention/retention.module';
 import { PresentationsModule } from './modules/presentations/presentations.module';
+import { InterviewSlotsModule } from './modules/interview-slots/interview-slots.module';
 import { ApiExceptionFilter } from './api-exception.filter';
 
 @Module({
-  imports: [AuthModule, DatabaseModule, IdempotencyModule, PrivacyModule, AiClientModule, AuditModule, CandidatesModule, ScenariosModule, BriefsModule, SimulationsModule, SimulationAssessmentsModule, InterviewsModule, QualityGuardModule, SurpriseModule, ConsistencyModule, AdminModule, DemoModule, RetentionModule, PresentationsModule],
+  imports: [AuthModule, DatabaseModule, IdempotencyModule, PrivacyModule, AiClientModule, AuditModule, CandidatesModule, ScenariosModule, BriefsModule, SimulationsModule, SimulationAssessmentsModule, InterviewsModule, QualityGuardModule, SurpriseModule, ConsistencyModule, AdminModule, DemoModule, RetentionModule, PresentationsModule, InterviewSlotsModule],
   controllers: [HealthController],
   providers: [{ provide: APP_FILTER, useClass: ApiExceptionFilter }],
 })
