@@ -63,12 +63,18 @@ function BriefPill({ brief, viewed, text }: { brief: CandidateProgress['brief'];
   return <StatusPill tone="muted">{text.none}</StatusPill>;
 }
 
+/** The interview itself once it exists; before that, the list where it is started. */
+function interviewHref(c: CandidateProgress): string {
+  return c.interviewId ? `/interviewer/interview/${c.interviewId}` : '/interviewer/interview';
+}
+
 function nextFor(a: CandidateProgress) {
   if (!a.briefViewed) return { key: a.brief === 'pending' ? ('briefPending' as const) : ('brief' as const), href: `/interviewer/brief/${a.id}` };
-  if (a.transcript === 'none') return { key: 'record' as const, href: '/interviewer/interview/preview' };
-  if (!a.scoresSaved) return { key: 'score' as const, href: '/interviewer/interview/preview' };
-  if (!a.draftReady) return { key: 'waiting' as const, href: '/interviewer/interview/preview' };
-  return { key: 'compare' as const, href: '/interviewer/interview/preview#draft-title' };
+  const open = interviewHref(a);
+  if (a.transcript === 'none') return { key: 'record' as const, href: open };
+  if (!a.scoresSaved) return { key: 'score' as const, href: open };
+  if (!a.draftReady) return { key: 'waiting' as const, href: open };
+  return { key: 'compare' as const, href: `${open}#draft-title` };
 }
 
 /** The interviewer's home: what to do next, and where each interview stands. */
@@ -130,7 +136,7 @@ export default function InterviewerHome() {
                         </StatusPill>
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <Link href="/interviewer/interview/preview" className="text-sm font-semibold text-brand-ink hover:underline">
+                        <Link href={interviewHref(c)} className="text-sm font-semibold text-brand-ink hover:underline">
                           {text.open}
                         </Link>
                       </td>
