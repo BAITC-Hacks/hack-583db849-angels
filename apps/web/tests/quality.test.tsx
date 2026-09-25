@@ -1,13 +1,26 @@
-import { render, screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import type { components } from '@invision/api-client';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import CommissionHome from '../app/(product)/commission/page';
+import { QualityGuardScreen } from '../components/quality/QualityGuardScreen';
 import { QualityCheckPanel } from '../components/quality/QualityPanel';
-import { previewCalibrationCheck, previewInterviewCheck } from '../lib/quality/preview';
-import { previewTranscript } from '../lib/interview/preview';
+import type { WireCandidate } from '../lib/api/contract';
+import { toQualityCheck } from '../lib/api/mappers/quality';
 import { navItems } from '../lib/navigation';
+import { apiError, example, json, mockApi, withQuery } from './apiHarness';
 
-vi.mock('next/navigation', () => ({ useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }), usePathname: () => '/' }));
+type WireCheck = components['schemas']['QualityCheckDto'];
+const wireInterview = example<WireCheck>('quality-check-interview.json');
+const wireCalibration = example<WireCheck>('quality-check-calibration.json');
+const previewInterviewCheck = toQualityCheck(wireInterview);
+const previewCalibrationCheck = toQualityCheck(wireCalibration);
+const previewTranscript = example<{ transcript: { speaker: string; text: string }[] }>('interview.json').transcript;
 
-describe('the quality guard panel', () => {
+afterEach(() => vi.unstubAllGlobals());
+
+vi.mock('next/navigation', () => ({ useRouter: () => ({ refresh: vi.fn(), push: vi.fn(), replace: vi.fn() }), usePathname: () => '/' }));
+
+describe('the quality guard panel, on the contract examples', () => {
   it('shows what the interview check found, with the question it is about', () => {
     render(<QualityCheckPanel check={previewInterviewCheck} />);
 
@@ -69,5 +82,57 @@ describe('the sidebar', () => {
     const quality = navItems.find((item) => item.id === 'quality');
     expect(quality?.href).toBe('/commission/quality-guard');
     expect(quality?.roles).toEqual(['commission', 'admin']);
+  });
+});
+
+describe('the panel on the API', () => {
+  it('shows the newest check of each kind', async () => {
+    mockApi({ 'GET /api/v1/quality-checks': () => json({ items: [wireCalibration, wireInterview] }) });
+    withQuery(<QualityGuardScreen />);
+    expect(await screen.findByText('Leading question')).toBeTruthy();
+    expect(screen.getByText('Scale drift')).toBeTruthy();
+    expect(screen.getByText(/interviewer-2 · 2026-09-01 – 2026-09-30 · 15 interviews/)).toBeTruthy();
+    expect(screen.queryByText(/Preview/)).toBeNull();
+  });
+
+  it('checks an interviewer’s scale over this month, and says when there is too little history', async () => {
+    let refuse = true;
+    const calls = mockApi({
+      'GET /api/v1/quality-checks': () => json({ items: [] }),
+      'POST /api/v1/quality-checks/calibration': () => (refuse ? apiError(409, 'NOT_ENOUGH_HISTORY') : json(wireCalibration, 201)),
+    });
+    withQuery(<QualityGuardScreen />);
+    expect(await screen.findByText(/No interview has been checked yet/)).toBeTruthy();
+
+    fireEvent.change(screen.getByLabelText('Interviewer'), { target: { value: 'synthetic-interviewer-a' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Check the scale' }));
+    expect(await screen.findByText(/Fewer than three scored interviews/)).toBeTruthy();
+
+    refuse = false;
+    fireEvent.click(screen.getByRole('button', { name: 'Check the scale' }));
+    expect(await screen.findByText('Scale drift')).toBeTruthy();
+
+    const posts = calls.filter((call) => call.method === 'POST');
+    const now = new Date();
+    const from = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString().slice(0, 10);
+    expect(JSON.parse(posts[0].body as string)).toMatchObject({ interviewerRef: 'synthetic-interviewer-a', from });
+    expect(posts[1].headers.get('Idempotency-Key')).toBe(posts[0].headers.get('Idempotency-Key'));
+  });
+
+  it('tells a role that may not see the checks so', async () => {
+    mockApi({ 'GET /api/v1/quality-checks': () => apiError(403, 'FORBIDDEN') });
+    withQuery(<QualityGuardScreen />);
+    expect(await screen.findByText('This role does not see the quality checks.')).toBeTruthy();
+  });
+
+  it('counts the signals of the newest checks on the commission’s home', async () => {
+    const list = example<{ items: WireCandidate[] }>('candidates.json');
+    mockApi({
+      'GET /api/v1/candidates': () => json(list),
+      'GET /api/v1/quality-checks': () => json({ items: [wireInterview, wireCalibration] }),
+    });
+    withQuery(<CommissionHome />);
+    const total = String(wireInterview.signals.length + wireCalibration.signals.length);
+    await waitFor(() => expect(screen.getByText('Quality signals').closest('a')?.textContent).toContain(total));
   });
 });

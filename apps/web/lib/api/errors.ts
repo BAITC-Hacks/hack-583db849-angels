@@ -88,6 +88,10 @@ const texts: Record<string, Copy<string>> = {
     ru: 'Сначала сохраните свои баллы — именно это не даёт черновику на них повлиять.',
   },
   TRANSCRIPT_MISSING: { en: 'The transcript is not ready yet.', ru: 'Расшифровка ещё не готова.' },
+  NOT_ENOUGH_HISTORY: {
+    en: 'Fewer than three scored interviews by this interviewer in the period — too few to compare.',
+    ru: 'У этого интервьюера меньше трёх оценённых интервью за период — слишком мало для сравнения.',
+  },
   TRANSCRIPT_EXISTS: { en: 'This interview already has a transcript.', ru: 'У этого интервью уже есть расшифровка.' },
   CONSENT_REQUIRED: { en: 'Consent is required before uploading.', ru: 'Перед загрузкой нужно согласие.' },
   SURPRISE_EXISTS: { en: 'This candidate already has the question.', ru: 'У этого кандидата уже есть вопрос.' },
