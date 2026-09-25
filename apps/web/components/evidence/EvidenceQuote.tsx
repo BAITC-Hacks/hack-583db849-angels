@@ -4,7 +4,13 @@ import { ArrowUturnLeftIcon } from '@heroicons/react/24/outline';
 import { useStaffLocale } from '../../lib/i18n/StaffLocaleProvider';
 import type { StaffLocale } from '../../lib/i18n/staffLocale';
 
-export type EvidenceSourceKind = 'simulation_turn' | 'application_field' | 'test_item' | 'interview_turn' | 'interview_note';
+export type EvidenceSourceKind =
+  | 'simulation_turn'
+  | 'application_field'
+  | 'test_item'
+  | 'interview_turn'
+  | 'interview_note'
+  | 'surprise_answer';
 
 export interface EvidenceSource {
   kind: EvidenceSourceKind;
@@ -20,6 +26,7 @@ const sourceWords: Record<StaffLocale, Record<EvidenceSourceKind, string>> = {
     test_item: 'Test',
     interview_turn: 'Interview',
     interview_note: 'Interview note',
+    surprise_answer: 'Surprise answer',
   },
   ru: {
     simulation_turn: 'Ход',
@@ -27,6 +34,7 @@ const sourceWords: Record<StaffLocale, Record<EvidenceSourceKind, string>> = {
     test_item: 'Тест',
     interview_turn: 'Интервью',
     interview_note: 'Заметка интервью',
+    surprise_answer: 'Сюрпризный ответ',
   },
 };
 

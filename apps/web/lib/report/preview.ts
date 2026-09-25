@@ -30,8 +30,8 @@ export const previewReport: SimulationReport = {
   assessmentId: 'preview',
   candidate: { id: '00000000-0000-4000-8000-00000000000a', code: 'A' },
   scenarioTitle: previewScenario.title,
-  mode: 'text',
-  completedAt: '2026-09-25T10:12:00Z',
+  mode: 'voice',
+  completedAt: '2026-09-25T10:11:50Z',
   durationMinutes: 7,
   turns,
   scores: [
@@ -95,9 +95,10 @@ export const previewReport: SimulationReport = {
   ],
   english: {
     cefrEstimate: 'B2',
-    // Typed, not spoken: speech measures do not exist for this session.
-    wordsPerMinute: null,
-    fillerRate: null,
+    // Spoken, so every measure exists. Only an accommodated text simulation
+    // leaves the speech ones null.
+    wordsPerMinute: 112,
+    fillerRate: 0.03,
     meanTurnLength: candidateWords.reduce((sum, count) => sum + count, 0) / candidateWords.length,
     lexicalDiversity: 0.71,
     grammarErrorsPer100Words: 0.8,

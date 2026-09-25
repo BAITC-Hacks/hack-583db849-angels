@@ -1,0 +1,26 @@
+{
+  "name": "@invision/api-client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "generate": "openapi-typescript ../../apps/api/openapi.json -o src/generated/schema.d.ts",
+    "prelint": "pnpm generate",
+    "lint": "eslint .",
+    "pretypecheck": "pnpm generate",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "openapi-fetch": "0.17.0"
+  },
+  "devDependencies": {
+    "@types/node": "24.13.5",
+    "eslint": "9.39.5",
+    "openapi-typescript": "7.13.0",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.70.0"
+  }
+}
