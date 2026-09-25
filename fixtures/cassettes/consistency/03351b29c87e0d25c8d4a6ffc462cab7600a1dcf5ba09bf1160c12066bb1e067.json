@@ -1,0 +1,12 @@
+{
+  "input_tokens": 150,
+  "model": "gpt-6-luna",
+  "output_tokens": 280,
+  "provider": "openai",
+  "recorded_at": "2026-09-26T00:00:00Z",
+  "request_hash": "03351b29c87e0d25c8d4a6ffc462cab7600a1dcf5ba09bf1160c12066bb1e067",
+  "request_id": "synthetic-consistency-fixture",
+  "response": "{\"items\":[{\"itemId\":\"c_01\",\"topic\":\"english\",\"claim\":{\"text\":\"Rates their English as C2.\",\"evidence\":[{\"source\":\"application_field\",\"sourceId\":\"english_self\",\"quote\":\"C2.\"}]},\"observation\":{\"text\":\"The simulation measured B2, and nothing in the interview points higher; the C2 self-rating is not supported.\",\"evidence\":[],\"metric\":{\"name\":\"cefrEstimate\",\"value\":\"B2\",\"source\":\"simulation\"}},\"status\":\"confirmed\",\"whatToDo\":\"Treat the English level as B2 against the English requirement, separately from leadership.\",\"askInInterview\":null},{\"itemId\":\"c_02\",\"topic\":\"other\",\"claim\":{\"text\":\"Says they ask everyone before deciding.\",\"evidence\":[{\"source\":\"application_field\",\"sourceId\":\"motivation\",\"quote\":\"I always ask everyone's opinion before I decide anything.\"}]},\"observation\":{\"text\":\"In the interview they again made the plan alone and at once.\",\"evidence\":[{\"source\":\"interview_turn\",\"sourceId\":\"iturn_02\",\"quote\":\"I made a plan straight away: owners, a deadline and a full run on Thursday.\"}],\"metric\":null},\"status\":\"confirmed\",\"whatToDo\":\"The “asks everyone first” claim is not supported; weigh it under Values-Driven Leadership.\",\"askInInterview\":null},{\"itemId\":\"c_03\",\"topic\":\"invision_knowledge\",\"claim\":{\"text\":\"Wants to study at inVision U.\",\"evidence\":[{\"source\":\"application_field\",\"sourceId\":\"motivation\",\"quote\":\"inVision U is where I can learn to do this at a bigger scale.\"}]},\"observation\":{\"text\":\"Nothing in the application or the simulation shows what they know about inVision U.\",\"evidence\":[],\"metric\":null},\"status\":\"unverified\",\"whatToDo\":\"Not asked in the interview — ask in a follow-up before the decision.\",\"askInInterview\":null}]}",
+  "task": "consistency",
+  "version": 1
+}
