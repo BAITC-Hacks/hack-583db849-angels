@@ -28,6 +28,8 @@ export interface CandidateProgress {
   assessmentReady: boolean;
   /** Where the assessment is, from the API: shown so a failed one is not mistaken for one not started. */
   assessment?: 'pending' | 'ready' | 'failed' | null;
+  /** The latest interview, from the API; `null` until the interviewer starts one. */
+  interviewId?: string | null;
   transcript: TranscriptStatus;
   scoresSaved: boolean;
   draftReady: boolean;

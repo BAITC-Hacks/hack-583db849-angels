@@ -49,3 +49,21 @@ export function useRunCalibration() {
     },
   });
 }
+
+/** Checks how one interview was run, from its transcript. Re-runnable: each run is a new check. */
+export function useRunInterviewCheck() {
+  const client = useQueryClient();
+  const key = useRef<string | null>(null);
+  return useMutation({
+    mutationFn: async (interviewId: string) => {
+      key.current ??= crypto.randomUUID();
+      const result = await api.POST('/v1/quality-checks/interview', { body: { interviewId }, headers: { 'Idempotency-Key': key.current } });
+      return toQualityCheck(unwrap(result));
+    },
+    onSuccess: (check) => {
+      key.current = null;
+      client.setQueryData<QualityCheck[]>(qualityChecksKey, (checks) => [check, ...(checks ?? [])]);
+    },
+  });
+}
+

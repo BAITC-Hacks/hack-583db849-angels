@@ -90,9 +90,8 @@ export const navItems: NavItem[] = [
     icon: ClipboardDocumentCheckIcon,
     label: { en: 'Interviews', ru: 'Интервью' },
     roles: ['interviewer', 'admin'],
-    href: '/interviewer/interview/preview',
+    href: '/interviewer/interview',
     match: '/interviewer/interview',
-    preview: true,
     module: 'M4',
   },
   {

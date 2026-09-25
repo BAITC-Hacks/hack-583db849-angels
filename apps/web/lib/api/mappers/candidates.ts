@@ -29,6 +29,7 @@ export function toScreenProgress(progress: WireCandidateProgress): ScreenProgres
     briefViewed: briefReady,
     simulation: simulationStage[simulation],
     assessmentReady: progress.assessment?.status === 'ready',
+    interviewId: interview?.interviewId ?? null,
     transcript: interview?.transcriptStatus === 'ready' ? 'ready' : interview?.transcriptStatus === 'transcribing' ? 'transcribing' : 'none',
     scoresSaved: interview?.scoresSaved ?? false,
     draftReady: interview?.draftReady ?? false,

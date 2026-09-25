@@ -44,7 +44,7 @@ const modules: { code: string; href?: string; state: ModuleState; en: string; ru
   { code: 'M1', href: '/interviewer/brief', state: 'live', en: 'Interviewer brief', ru: 'Бриф интервьюера' },
   { code: 'M2', href: '/simulation', state: 'live', en: 'Leadership simulation', ru: 'Симуляция лидерства' },
   { code: 'M3', href: '/commission/simulation-report', state: 'live', en: 'Report and candidate feedback', ru: 'Отчёт и отзыв кандидату' },
-  { code: 'M4', href: '/interviewer/interview/preview', state: 'preview', en: 'Interview transcript and draft', ru: 'Расшифровка интервью и черновик' },
+  { code: 'M4', href: '/interviewer/interview', state: 'live', en: 'Interview transcript and draft', ru: 'Расшифровка интервью и черновик' },
   { code: 'M5', href: '/commission/quality-guard', state: 'live', en: 'Quality guard', ru: 'Контроль качества' },
 ];
 

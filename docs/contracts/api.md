@@ -136,7 +136,7 @@ The brief's questions cover the five competencies **and** three topics the inter
 
 | Method | Path | Idem. | Success | Errors |
 | --- | --- | --- | --- | --- |
-| `POST` | `/v1/interviews` | ✱ | `201 Interview`; body `{ candidateId, heldAt, transcript?, transcriptSource?, notes? }` | `404` candidate |
+| `POST` | `/v1/interviews` | ✱ | `201 Interview`; body `{ candidateId, heldAt, interviewerRef?, transcript?, transcriptSource?, notes? }` | `404` candidate |
 | `POST` | `/v1/interviews/:interviewId/recording` | ✱ | `202 Interview` with `transcriptStatus: "transcribing"`; multipart `audio` (webm, ogg or wav, up to 60 minutes) and `consent=true` | `400 CONSENT_REQUIRED`, `409 TRANSCRIPT_EXISTS`, `413` |
 | `GET` | `/v1/interviews/:interviewId` | | `200 Interview`, including `transcriptStatus` and `transcript` | `404` |
 | `POST` | `/v1/interviews/:interviewId/interviewer-scores` | ✱ | `201 InterviewerScoresSaved`; body `{ scores }` with **all five** keys | `400` a key missing, `409 SCORES_ALREADY_SAVED` |
@@ -150,9 +150,11 @@ The brief's questions cover the five competencies **and** three topics the inter
   Either way you assign the turn ids `iturn_01`, `iturn_02`, …
 - **The recording path.** The recording is sent to the ML service for transcription, and **you delete the audio as soon as the transcript is stored**. Only text is ever kept, and only text reaches a model. Without `consent=true` the upload is refused. `transcriptStatus` goes `none → transcribing → ready` (or `failed`); the web polls `GET /v1/interviews/:id`.
 - **The draft needs a transcript.** Without one it answers `409 TRANSCRIPT_MISSING`. The scores may be saved before the transcript exists; the draft follows once it does.
+- **You make the draft yourself** as soon as the transcript exists and the scores are saved, whichever comes second; `progress.interview.draftReady` turns `true`. `POST …/assessment-draft` is a re-run.
 - **The scores are fixed once saved.** A repeat with the same `Idempotency-Key` returns the saved scores. A different body answers `409 SCORES_ALREADY_SAVED`.
 - **The ML service never sees the interviewer's scores** when it writes the draft (see `ml.md`). The web compares the two itself.
 - **Notes stay optional:** a list of strings, stored with ids `note_1`, `note_2`, … and sent to the draft as extra context.
+- **`interviewerRef` is optional** and a pseudonym (`interviewer-2`), never a name. A calibration check (M5) reads the saved scores of the interviews that carry one.
 
 ### C — consistency: what was claimed against what was measured
 
@@ -399,6 +401,7 @@ interface Interview {
   interviewId: string;
   candidateId: string;
   candidateLabel: string;
+  interviewerRef: string | null;                  // a pseudonym such as `interviewer-2`; M5 calibrates by it
   heldAt: string;
   transcriptStatus: 'none' | 'transcribing' | 'ready' | 'failed';
   transcriptSource: 'platform' | 'recording' | null;

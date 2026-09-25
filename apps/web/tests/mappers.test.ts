@@ -13,9 +13,8 @@ import type {
 } from '../lib/api/contract';
 import { toCandidateFeedback, toSimulationReport } from '../lib/api/mappers/assessment';
 import { toScreenProgress, toScreenProgressList } from '../lib/api/mappers/candidates';
-import { toAssessmentDraft, toInterviewTranscript, toInterviewView } from '../lib/api/mappers/interview';
+import { toAssessmentDraft, toInterviewRecord } from '../lib/api/mappers/interview';
 import { appendTurn, toScenarioBrief, toSimulationState } from '../lib/api/mappers/simulation';
-import { previewDraft, previewInterview, previewTranscript } from '../lib/interview/preview';
 import { previewScenario } from '../lib/simulation/previewScenario';
 
 /**
@@ -101,13 +100,17 @@ describe("the candidate's feedback", () => {
 describe('the interview', () => {
   const interview = example<WireInterview>('interview.json');
 
-  it('is exactly what the interview screen renders', () => {
-    expect(toInterviewView(interview)).toEqual({ ...previewInterview, interviewId: interview.interviewId });
-    expect(toInterviewTranscript(interview)).toEqual(previewTranscript);
+  it('is what the interview screen renders', () => {
+    const record = toInterviewRecord(interview as never);
+    expect(record.view).toEqual({ interviewId: interview.interviewId, candidate: { id: interview.candidateId, code: 'A' }, heldAt: interview.heldAt });
+    expect(record.transcript.map((turn) => turn.turnId)).toEqual(interview.transcript.map((turn) => turn.turnId));
+    expect(record).toMatchObject({ transcriptStatus: 'ready', savedScores: null });
   });
 
   it('maps the draft the way the comparison expects it', () => {
-    expect(toAssessmentDraft(example<WireAssessmentDraft>('assessment-draft.json'))).toEqual(previewDraft);
+    const draft = toAssessmentDraft(example<WireAssessmentDraft>('assessment-draft.json') as never);
+    expect(draft.scores.map((score) => score.competency)).toEqual(['D', 'R', 'I', 'V', 'E']);
+    expect(draft.scores.flatMap((score) => score.evidence).every((item) => item.source.kind === 'interview_turn')).toBe(true);
   });
 });
 
@@ -152,6 +155,7 @@ describe('a candidate on a home screen', () => {
       briefViewed: true,
       simulation: 'completed',
       assessmentReady: true,
+      interviewId: '6f1c2a0e-0000-4000-8000-00000000a004',
       transcript: 'ready',
       scoresSaved: true,
       draftReady: true,

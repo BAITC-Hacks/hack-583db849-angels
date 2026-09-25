@@ -1,47 +1,79 @@
 'use client';
 
-import { useState, useSyncExternalStore } from 'react';
-import { competencyOrder, type Competency } from '../drive';
+import { useState } from 'react';
 import type { Score } from '../../components/evidence/ScoreMeter';
-import { subscribeWorld } from '../demo/world';
-import { previewInterview } from './preview';
-import type { PreviewInterviewServer } from './previewServer';
-import { createInterviewStore, getSharedInterviewStore, type InterviewState } from './store';
-import type { InterviewView, InterviewerScores } from './types';
+import { errorText } from '../api/errors';
+import { competencyOrder, type Competency } from '../drive';
+import { useStaffLocale } from '../i18n/StaffLocaleProvider';
+import { useInterviewDraft, useRedoDraft, useSaveScores, useUploadRecording } from './queries';
+import type { AssessmentDraft, InterviewRecord, InterviewTurn, InterviewView, InterviewerScores, TranscriptStatus } from './types';
 
-export type { InterviewPhase, TranscriptState } from './store';
+export type InterviewPhase = 'scoring' | 'saving' | 'saved';
 
-export interface Interview extends InterviewState {
+export interface Interview {
   interview: InterviewView;
+  phase: InterviewPhase;
+  scores: InterviewerScores;
   complete: boolean;
-  preview: boolean;
+  transcript: InterviewTurn[] | null;
+  transcriptState: TranscriptStatus;
+  draft: AssessmentDraft | null;
+  waitingForTranscript: boolean;
+  /** The draft has been missing for a while after both halves were there: offer to make it again. */
+  draftSlow: boolean;
+  error: string | null;
+  uploading: boolean;
+  uploadError: string | null;
   setScore: (competency: Competency, score: Score) => void;
-  fill: (scores: InterviewerScores) => void;
   save: () => Promise<void>;
-  /** The recording is finished (or the sample chosen): send it for transcription. */
-  transcribe: () => Promise<void>;
+  /** The recording, sent with the candidate's consent for transcription. */
+  upload: (audio: Blob) => void;
+  redoDraft: () => void;
 }
 
+const empty: InterviewerScores = { D: undefined, R: undefined, I: undefined, V: undefined, E: undefined };
+
 /**
- * The M4 screen's only door to the interview. Normally the demo's shared
- * interview with candidate A; a test passes its own server for a fresh one.
- * Part 2 swaps the preview server for the generated client; the rules stay.
+ * The M4 screen's one door to an interview on the API. The interviewer's
+ * scores live in the page until the server has them; after that they come
+ * back from the server, fixed. The draft is asked for only then.
  */
-export function useInterview(interviewId: string, server?: PreviewInterviewServer): Interview {
-  const [local] = useState(() => (server ? createInterviewStore(server) : null));
-  const sharedStore = useSyncExternalStore(subscribeWorld, getSharedInterviewStore, getSharedInterviewStore);
-  const store = local ?? sharedStore;
-  const state = useSyncExternalStore(store.subscribe, store.getState, store.getState);
-  void interviewId;
+export function useInterviewSession(record: InterviewRecord): Interview {
+  const { locale } = useStaffLocale();
+  const interviewId = record.view.interviewId;
+  const [local, setLocal] = useState<InterviewerScores>(empty);
+  const saving = useSaveScores(interviewId);
+  const uploading = useUploadRecording(interviewId);
+  const redo = useRedoDraft(interviewId);
+  const saved = record.savedScores;
+  const transcriptReady = record.transcriptStatus === 'ready';
+  const draft = useInterviewDraft(interviewId, { scoresSaved: saved !== null, transcriptReady });
+
+  const scores: InterviewerScores = saved ?? local;
+  const complete = competencyOrder.every((competency) => scores[competency] !== undefined);
+  const failure = saving.error ?? redo.error;
 
   return {
-    ...state,
-    interview: previewInterview,
-    complete: competencyOrder.every((competency) => state.scores[competency] !== undefined),
-    preview: true,
-    setScore: store.setScore,
-    fill: store.fill,
-    save: store.save,
-    transcribe: store.transcribe,
+    interview: record.view,
+    phase: saved ? 'saved' : saving.isPending ? 'saving' : 'scoring',
+    scores,
+    complete,
+    transcript: transcriptReady ? record.transcript : null,
+    transcriptState: record.transcriptStatus,
+    draft: redo.data ?? draft.data ?? null,
+    waitingForTranscript: saved !== null && !transcriptReady,
+    draftSlow: transcriptReady && !draft.data && !redo.data && draft.errorUpdateCount >= 5,
+    error: failure ? errorText(failure, locale) : null,
+    uploading: uploading.isPending,
+    uploadError: uploading.error ? errorText(uploading.error, locale) : null,
+    setScore: (competency, score) => {
+      if (!saved) setLocal((current) => ({ ...current, [competency]: score }));
+    },
+    save: async () => {
+      if (saved || !complete || saving.isPending) return;
+      await saving.mutateAsync(scores as Record<Competency, Score>).catch(() => undefined);
+    },
+    upload: (audio) => uploading.mutate({ audio, consent: true }),
+    redoDraft: () => redo.mutate(),
   };
 }

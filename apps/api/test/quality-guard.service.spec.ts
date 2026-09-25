@@ -6,12 +6,15 @@ const interviewId = '6f1c2a0e-0000-4000-8000-00000000a004';
 const interviewResult = contractExample<Record<string, unknown>>('ml/quality-check-interview.response.json');
 const calibrationResult = contractExample<Record<string, unknown>>('ml/quality-check-calibration.response.json');
 
-function harness({ transcript = null as unknown, demo = true } = {}) {
+function harness({ transcript = null as unknown, demo = true, stored = [] as unknown[] } = {}) {
   const rows: Record<string, unknown>[] = [];
   const prisma = {
     interview: {
       findUnique: jest.fn().mockImplementation(({ where }: { where: { id: string } }) =>
-        Promise.resolve(where.id === interviewId ? { id: interviewId, transcript, candidate: { profile: { fullName: 'Ada Example' } } } : null)),
+        Promise.resolve(where.id === interviewId
+          ? { id: interviewId, interviewerRef: 'interviewer-2', transcript, candidate: { profile: { fullName: 'Ada Example' } } }
+          : null)),
+      findMany: jest.fn().mockResolvedValue(stored),
     },
     qualityCheck: {
       create: jest.fn().mockImplementation(({ data }: { data: Record<string, unknown> }) => {
@@ -45,7 +48,7 @@ describe('QualityGuardService', () => {
     expect(sent).toMatchObject({ kind: 'interview', history: [] });
     expect(sent.transcript).toHaveLength(2);
     expect(JSON.stringify(sent)).not.toContain('Ada Example');
-    expect(check).toMatchObject({ kind: 'interview', interviewId, interviewerRef: null, from: null, to: null, drift: [] });
+    expect(check).toMatchObject({ kind: 'interview', interviewId, interviewerRef: 'interviewer-2', from: null, to: null, drift: [] });
     expect(check.signals.length).toBeGreaterThan(0);
     expect(rows).toEqual([expect.objectContaining({ id: check.qualityCheckId, kind: 'interview', interviewId, result: check })]);
   });
@@ -73,6 +76,23 @@ describe('QualityGuardService', () => {
     // The seed history is 10–15 September: ending the period on the 12th leaves two of a's three interviews.
     await expect(service.calibration({ interviewerRef: 'synthetic-interviewer-a', from: '2026-09-01', to: '2026-09-12' }))
       .rejects.toMatchObject({ status: 409, response: { code: 'NOT_ENOUGH_HISTORY', details: { interviews: 2 } } });
+  });
+
+  it('reads the saved scores of interviews that name their interviewer, as pseudonymous history', async () => {
+    const stored = [1, 2, 3].map((day) => ({
+      id: `interview-${day}`, interviewerRef: 'interviewer-2', heldAt: new Date(`2026-09-2${day}T09:00:00Z`),
+      interviewerScore: { scores: { D: 3, R: 2, I: 2, V: null, E: 3 } },
+    }));
+    const { service, gateway } = harness({ demo: false, stored });
+    const check = await service.calibration({ interviewerRef: 'interviewer-2', from: '2026-09-01', to: '2026-10-01' });
+
+    const sent = gateway.qualityCheck.mock.calls[0][0];
+    expect(sent.history).toHaveLength(3);
+    expect(sent.history[0]).toEqual({
+      interviewRef: 'interview-1', interviewerRef: 'interviewer-2', heldAt: '2026-09-21T09:00:00.000Z',
+      scores: [{ competency: 'D', score: 3 }, { competency: 'R', score: 2 }, { competency: 'I', score: 2 }, { competency: 'V', score: null }, { competency: 'E', score: 3 }],
+    });
+    expect(check.interviews).toBe(3);
   });
 
   it('refuses an unknown interviewer, a bad date and an empty period', async () => {

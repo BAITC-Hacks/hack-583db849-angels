@@ -3,6 +3,7 @@
 import { MicrophoneIcon, StopIcon } from '@heroicons/react/24/outline';
 import { useEffect, useRef, useState } from 'react';
 import { useCopy } from '../../lib/i18n/StaffLocaleProvider';
+import { silentWav } from '../../lib/media/silentWav';
 
 const copy = {
   en: {
@@ -10,9 +11,8 @@ const copy = {
     record: 'Record the interview',
     stop: 'Stop and transcribe',
     recording: 'Recording',
-    sample: 'Use the sample recording',
-    noMic: 'The microphone is not available here. Use the sample recording instead.',
-    preview: 'Preview: the audio stays in this browser and is discarded; a scripted transcript comes back.',
+    sample: 'Use the demo recording',
+    noMic: 'The microphone is not available here. Use the demo recording instead.',
     privacy: 'Only the text reaches the model. The recording is deleted once it is transcribed.',
   },
   ru: {
@@ -20,19 +20,25 @@ const copy = {
     record: 'Записать интервью',
     stop: 'Остановить и расшифровать',
     recording: 'Идёт запись',
-    sample: 'Взять пример записи',
-    noMic: 'Микрофон здесь недоступен. Возьмите пример записи.',
-    preview: 'Превью: звук остаётся в этом браузере и удаляется; возвращается заготовленная расшифровка.',
+    sample: 'Взять демо-запись',
+    noMic: 'Микрофон здесь недоступен. Возьмите демо-запись.',
     privacy: 'В модель уходит только текст. Запись удаляется сразу после расшифровки.',
   },
 };
 
+/** webm where the browser has it, ogg elsewhere; the API takes both, and wav. */
+function audioType(): string | undefined {
+  if (typeof MediaRecorder === 'undefined') return undefined;
+  return ['audio/webm', 'audio/ogg'].find((type) => MediaRecorder.isTypeSupported?.(type));
+}
+
 /**
- * Records the live interview on the interviewer's device, with the candidate's
- * consent, and hands it over for transcription. Nothing is recorded before the
- * consent box is ticked. In the preview the audio never leaves the browser.
+ * Records the live interview on the interviewer's device, with the
+ * candidate's consent, and hands the audio over for transcription. Nothing is
+ * recorded before the consent box is ticked; the demo recording needs it too,
+ * because it goes through the same upload.
  */
-export function InterviewRecorder({ onRecorded, preview }: { onRecorded: () => void; preview: boolean }) {
+export function InterviewRecorder({ onRecorded, disabled = false }: { onRecorded: (audio: Blob) => void; disabled?: boolean }) {
   const text = useCopy(copy);
   const [consent, setConsent] = useState(false);
   const [recording, setRecording] = useState(false);
@@ -41,6 +47,8 @@ export function InterviewRecorder({ onRecorded, preview }: { onRecorded: () => v
   const [micError, setMicError] = useState(false);
   const stream = useRef<MediaStream | null>(null);
   const audio = useRef<AudioContext | null>(null);
+  const recorder = useRef<MediaRecorder | null>(null);
+  const chunks = useRef<Blob[]>([]);
   const frame = useRef<number | null>(null);
 
   function release() {
@@ -63,12 +71,24 @@ export function InterviewRecorder({ onRecorded, preview }: { onRecorded: () => v
 
   async function start() {
     setMicError(false);
-    if (!navigator.mediaDevices?.getUserMedia) {
+    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') {
       setMicError(true);
       return;
     }
     try {
       stream.current = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const type = audioType();
+      recorder.current = new MediaRecorder(stream.current, type ? { mimeType: type } : undefined);
+      chunks.current = [];
+      recorder.current.ondataavailable = (event) => {
+        if (event.data.size > 0) chunks.current.push(event.data);
+      };
+      recorder.current.onstop = () => {
+        const media = recorder.current;
+        onRecorded(new Blob(chunks.current, { type: media?.mimeType || type || 'audio/webm' }));
+        release();
+      };
+
       audio.current = new AudioContext();
       const analyser = audio.current.createAnalyser();
       analyser.fftSize = 512;
@@ -82,6 +102,7 @@ export function InterviewRecorder({ onRecorded, preview }: { onRecorded: () => v
         frame.current = requestAnimationFrame(tick);
       };
       tick();
+      recorder.current.start(1000);
       setSeconds(0);
       setRecording(true);
     } catch {
@@ -91,10 +112,8 @@ export function InterviewRecorder({ onRecorded, preview }: { onRecorded: () => v
   }
 
   function stop() {
-    // In the preview the audio is dropped here; part 2 uploads it for transcription instead.
-    release();
     setRecording(false);
-    onRecorded();
+    recorder.current?.stop();
   }
 
   const mm = String(Math.floor(seconds / 60)).padStart(2, '0');
@@ -139,7 +158,7 @@ export function InterviewRecorder({ onRecorded, preview }: { onRecorded: () => v
           <button
             type="button"
             onClick={() => void start()}
-            disabled={!consent}
+            disabled={!consent || disabled}
             className="inline-flex items-center justify-center gap-2 rounded-control bg-brand-green px-4 py-2.5 text-sm font-semibold text-on-brand transition-colors hover:bg-brand-dim disabled:cursor-not-allowed disabled:opacity-50"
           >
             <MicrophoneIcon aria-hidden="true" className="h-4 w-4" />
@@ -148,14 +167,15 @@ export function InterviewRecorder({ onRecorded, preview }: { onRecorded: () => v
           {micError ? <p className="text-[0.8rem] text-status-low">{text.noMic}</p> : null}
           <button
             type="button"
-            onClick={onRecorded}
-            className="self-start text-[0.8rem] font-medium text-brand-ink underline-offset-2 hover:underline"
+            onClick={() => onRecorded(silentWav())}
+            disabled={!consent || disabled}
+            className="self-start text-[0.8rem] font-medium text-brand-ink underline-offset-2 hover:underline disabled:cursor-not-allowed disabled:opacity-50"
           >
             {text.sample}
           </button>
         </>
       )}
-      <p className="text-[0.72rem] text-text-muted">{preview ? text.preview : text.privacy}</p>
+      <p className="text-[0.72rem] text-text-muted">{text.privacy}</p>
     </div>
   );
 }

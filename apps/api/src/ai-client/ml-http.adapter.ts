@@ -44,6 +44,16 @@ export class MlHttpAdapter implements AiGateway {
     return this.invoke('surprise-question', () => this.client().POST('/internal/v1/surprise-question', { body: request }));
   }
 
+  transcribeInterview(audioRef: string): Promise<components['schemas']['TranscribeResult']> {
+    return this.invoke('transcribe', () => this.client().POST('/internal/v1/transcribe', {
+      body: { purpose: 'interview', audioRef, language: 'en', speakers: 2 },
+    }));
+  }
+
+  interviewDraft(request: components['schemas']['DraftRequest']): Promise<components['schemas']['DraftResult']> {
+    return this.invoke('interview/draft', () => this.client().POST('/internal/v1/interview/draft', { body: request }));
+  }
+
   qualityCheck(request: components['schemas']['QualityCheckRequest']): Promise<components['schemas']['QualityCheckResult']> {
     return this.invoke('quality-check', () => this.client().POST('/internal/v1/quality-check', { body: request }));
   }

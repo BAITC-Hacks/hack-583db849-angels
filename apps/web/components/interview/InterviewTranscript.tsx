@@ -1,8 +1,7 @@
 'use client';
 
 import { useCopy } from '../../lib/i18n/StaffLocaleProvider';
-import type { InterviewTurn } from '../../lib/interview/types';
-import type { TranscriptState } from '../../lib/interview/useInterview';
+import type { InterviewTurn, TranscriptStatus } from '../../lib/interview/types';
 import { InterviewRecorder } from './InterviewRecorder';
 
 const copy = {
@@ -10,6 +9,8 @@ const copy = {
     title: 'Interview transcript',
     hint: 'By speaker, with timecodes. The draft quotes the candidate’s turns word for word.',
     transcribing: 'Transcribing the recording…',
+    uploading: 'Sending the recording…',
+    failed: 'The recording could not be transcribed. Record it again.',
     interviewer: 'Interviewer',
     candidate: 'Candidate',
   },
@@ -17,6 +18,8 @@ const copy = {
     title: 'Расшифровка интервью',
     hint: 'По говорящим, с таймкодами. Черновик дословно цитирует реплики кандидата.',
     transcribing: 'Расшифровываем запись…',
+    uploading: 'Отправляем запись…',
+    failed: 'Запись не удалось расшифровать. Запишите ещё раз.',
     interviewer: 'Интервьюер',
     candidate: 'Кандидат',
   },
@@ -33,12 +36,14 @@ export function InterviewTranscript({
   transcript,
   state,
   onRecorded,
-  preview,
+  uploading = false,
+  uploadError = null,
 }: {
   transcript: InterviewTurn[] | null;
-  state: TranscriptState;
-  onRecorded: () => void;
-  preview: boolean;
+  state: TranscriptStatus;
+  onRecorded: (audio: Blob) => void;
+  uploading?: boolean;
+  uploadError?: string | null;
 }) {
   const text = useCopy(copy);
 
@@ -51,7 +56,22 @@ export function InterviewTranscript({
         <p className="text-[0.75rem] text-text-muted">{text.hint}</p>
       </header>
 
-      {state === 'none' ? <InterviewRecorder onRecorded={onRecorded} preview={preview} /> : null}
+      {state === 'failed' ? (
+        <p role="alert" className="px-5 pt-4 text-sm text-status-low">
+          {text.failed}
+        </p>
+      ) : null}
+      {state === 'none' || state === 'failed' ? <InterviewRecorder onRecorded={onRecorded} disabled={uploading} /> : null}
+      {uploading ? (
+        <p className="px-5 pb-4 text-sm text-text-secondary" aria-live="polite">
+          {text.uploading}
+        </p>
+      ) : null}
+      {uploadError ? (
+        <p role="alert" className="px-5 pb-4 text-sm text-status-low">
+          {uploadError}
+        </p>
+      ) : null}
 
       {state === 'transcribing' ? (
         <p className="flex items-center gap-2 p-5 text-sm text-text-secondary" aria-live="polite">
