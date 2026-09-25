@@ -53,6 +53,19 @@ describe('MlHttpAdapter', () => {
     });
   });
 
+  it('posts a quality check to ML as it is', async () => {
+    const result = { signals: [], talkShare: null, drift: [], interviews: 3 };
+    const fetchImplementation = jest.fn().mockResolvedValue(new Response(JSON.stringify(result), {
+      status: 200, headers: { 'Content-Type': 'application/json' },
+    }));
+    const adapter = new MlHttpAdapter(config, fetchImplementation);
+    const body = { kind: 'calibration' as const, transcript: [], history: [], interviewerRef: 'interviewer-2', periodFrom: '2026-09-01', periodTo: '2026-10-01' };
+    await expect(adapter.qualityCheck(body)).resolves.toEqual(result);
+    const [request] = fetchImplementation.mock.calls[0] as [Request];
+    expect(new URL(request.url).pathname).toBe('/internal/v1/quality-check');
+    await expect(request.clone().json()).resolves.toEqual(body);
+  });
+
   it('asks for a one-speaker surprise transcription of the audio only', async () => {
     const fetchImplementation = jest.fn().mockResolvedValue(new Response(JSON.stringify({ turns: [], durationSec: 0 }), {
       status: 200, headers: { 'Content-Type': 'application/json' },

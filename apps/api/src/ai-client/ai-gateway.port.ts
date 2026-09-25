@@ -11,5 +11,6 @@ export interface AiGateway {
   surpriseQuestion(request: components['schemas']['SurpriseRequest']): Promise<components['schemas']['SurpriseResult']>;
   /** The audio track of a surprise answer, one speaker. Never the video. */
   transcribeSurprise(audioRef: string): Promise<components['schemas']['TranscribeResult']>;
+  qualityCheck(request: components['schemas']['QualityCheckRequest']): Promise<components['schemas']['QualityCheckResult']>;
   speech(text: string, scenarioId: string): Promise<Buffer>;
 }
