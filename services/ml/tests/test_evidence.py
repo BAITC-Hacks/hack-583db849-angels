@@ -2,11 +2,13 @@ import logging
 
 from services.ml.app.evidence import (
     candidate_turn_sources,
+    candidate_view_sources,
     normalize_quote,
     verify_evidence,
     verify_scores,
 )
-from services.ml.app.schemas.contracts import DriveScore, Evidence, Turn
+from services.ml.app.schemas.contracts import CandidateView, DriveScore, Evidence, Turn
+import pytest
 
 
 def score(*quotes: Evidence) -> DriveScore:
@@ -81,3 +83,42 @@ def test_exactly_half_is_not_a_majority() -> None:
     )
     assert verified.scores[0].score == 3
     assert [piece.quote for piece in verified.scores[0].evidence] == ["I asked the team"]
+
+
+def test_candidate_view_sources_only_exposes_application_and_test() -> None:
+    candidate = CandidateView.model_validate({
+        "candidateId": "synthetic-a",
+        "application": {"answers": [
+            {"fieldId": "english_self", "question": "English?", "answer": "C2. I speak fluently."},
+        ]},
+        "test": {"answers": [
+            {"itemId": "block_03", "response": "I decide quickly."},
+        ]},
+    })
+    sources = candidate_view_sources(candidate)
+    assert sources == {
+        ("application_field", "english_self"): "C2. I speak fluently.",
+        ("test_item", "block_03"): "I decide quickly.",
+    }
+    valid = Evidence(source="application_field", sourceId="english_self", quote="C2.")
+    fabricated = Evidence(source="simulation_turn", sourceId="turn_02", quote="C2.")
+    assert verify_evidence([valid, fabricated], sources) == ([valid], 2, 1)
+
+
+@pytest.mark.parametrize("kind", ["application", "test"])
+def test_candidate_view_sources_rejects_duplicate_ids(kind: str) -> None:
+    candidate = CandidateView.model_validate({
+        "candidateId": "synthetic-a",
+        "application": {"answers": [
+            {"fieldId": "same", "question": "First", "answer": "First answer"},
+            *([{"fieldId": "same", "question": "Second", "answer": "Second answer"}]
+              if kind == "application" else []),
+        ]},
+        "test": {"answers": [
+            {"itemId": "same", "response": "First response"},
+            *([{"itemId": "same", "response": "Second response"}]
+              if kind == "test" else []),
+        ]},
+    })
+    with pytest.raises(ValueError, match="duplicate"):
+        candidate_view_sources(candidate)

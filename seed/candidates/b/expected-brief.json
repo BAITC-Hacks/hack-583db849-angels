@@ -1,10 +1,10 @@
 {
-  "summary": "Synthetic preparation brief for candidate B.",
+  "summary": "Interview preparation based on the supplied application and test responses.",
   "questions": [
     {
       "focus": "D",
-      "question": "Candidate B: give a specific recent example for D.",
-      "why": "The written answer needs a concrete, verifiable example.",
+      "question": "Your application response says, \"Our first mentoring plan was rejected because it needed too many volunteers. I was disappointed and stopped working on it until another student restarted the discussion several weeks later.\" Describe a time you helped someone through a setback. What did you do?",
+      "why": "The cited response is worth exploring in the interview.",
       "evidence": [
         {
           "source": "application_field",
@@ -15,8 +15,8 @@
     },
     {
       "focus": "R",
-      "question": "Candidate B: give a specific recent example for R.",
-      "why": "The written answer needs a concrete, verifiable example.",
+      "question": "Your application response says, \"I helped our debate club redesign its mentoring programme. I interviewed new members, found that beginners left after the first month, and proposed smaller groups with one experienced mentor each.\" Describe a decision with a real risk. What alternatives did you weigh?",
+      "why": "The cited response is worth exploring in the interview.",
       "evidence": [
         {
           "source": "application_field",
@@ -27,8 +27,8 @@
     },
     {
       "focus": "I",
-      "question": "Candidate B: give a specific recent example for I.",
-      "why": "The written answer needs a concrete, verifiable example.",
+      "question": "Your application response says, \"Students can find individual courses, but they struggle to see a path from one skill to a real project. I would build a map that connects learning goals, mentors and local projects.\" What need did your idea address, and how did you test it?",
+      "why": "The cited response is worth exploring in the interview.",
       "evidence": [
         {
           "source": "application_field",
@@ -39,8 +39,8 @@
     },
     {
       "focus": "V",
-      "question": "Candidate B: give a specific recent example for V.",
-      "why": "The written answer needs a concrete, verifiable example.",
+      "question": "Your application response says, \"I helped our debate club redesign its mentoring programme. I interviewed new members, found that beginners left after the first month, and proposed smaller groups with one experienced mentor each.\" Describe a time fairness changed your plan. What did you choose?",
+      "why": "The cited response is worth exploring in the interview.",
       "evidence": [
         {
           "source": "application_field",
@@ -51,8 +51,8 @@
     },
     {
       "focus": "E",
-      "question": "Candidate B: give a specific recent example for E.",
-      "why": "The written answer needs a concrete, verifiable example.",
+      "question": "Your application response says, \"I helped our debate club redesign its mentoring programme. I interviewed new members, found that beginners left after the first month, and proposed smaller groups with one experienced mentor each.\" Describe a plan you carried out. Who owned each step?",
+      "why": "The cited response is worth exploring in the interview.",
       "evidence": [
         {
           "source": "application_field",
@@ -63,8 +63,8 @@
     },
     {
       "focus": "invision_knowledge",
-      "question": "Candidate B: give a specific recent example for invision_knowledge.",
-      "why": "The written answer needs a concrete, verifiable example.",
+      "question": "Your application response says, \"I want to learn how to turn a long-term idea into a service that improves access to learning. inVision U interests me because I want to test that idea with people from different disciplines.\" What do you know about how inVision U teaches?",
+      "why": "The cited response is worth exploring in the interview.",
       "evidence": [
         {
           "source": "application_field",
@@ -75,8 +75,8 @@
     },
     {
       "focus": "english",
-      "question": "Candidate B: give a specific recent example for english.",
-      "why": "The written answer needs a concrete, verifiable example.",
+      "question": "Your application response says, \"B2. I can discuss school projects and read articles, but I still pause when explaining unfamiliar topics.\" In English, describe a recent project without preparing.",
+      "why": "The cited response is worth exploring in the interview.",
       "evidence": [
         {
           "source": "application_field",
@@ -87,8 +87,8 @@
     },
     {
       "focus": "motivation",
-      "question": "Candidate B: give a specific recent example for motivation.",
-      "why": "The written answer needs a concrete, verifiable example.",
+      "question": "Your application response says, \"I want to learn how to turn a long-term idea into a service that improves access to learning. inVision U interests me because I want to test that idea with people from different disciplines.\" What in the programme supports your goals, and how did its free tuition factor into your decision to apply?",
+      "why": "Explore programme fit and the role of cost without assuming either is the candidate's only reason.",
       "evidence": [
         {
           "source": "application_field",
@@ -98,11 +98,34 @@
       ]
     }
   ],
-  "consistency": [],
+  "consistency": [
+    {
+      "itemId": "c_01",
+      "topic": "english",
+      "claim": {
+        "text": "Self-rated English as B2.",
+        "evidence": [
+          {
+            "source": "application_field",
+            "sourceId": "english_self",
+            "quote": "B2"
+          }
+        ]
+      },
+      "observation": {
+        "text": "No simulation English estimate is available yet.",
+        "evidence": [],
+        "metric": null
+      },
+      "status": "unverified",
+      "whatToDo": "Ask an unprepared English question and review the evidence together.",
+      "askInInterview": "In English, describe a recent project and an unexpected problem you solved."
+    }
+  ],
   "clarify": [],
   "english": {
     "certificate": null,
-    "writtenCefr": "B2",
-    "basis": "Estimated from synthetic written answers only; leadership scoring is separate."
+    "writtenCefr": "not assessed",
+    "basis": "Written English is not independently measured; verify live."
   }
 }
