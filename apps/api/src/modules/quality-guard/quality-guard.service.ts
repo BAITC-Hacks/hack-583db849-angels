@@ -37,7 +37,7 @@ export class QualityGuardService {
   async interview(interviewId: string): Promise<QualityCheckDto> {
     const interview = await this.prisma.interview.findUnique({
       where: { id: interviewId },
-      select: { id: true, transcript: true, candidate: { select: { profile: true } } },
+      select: { id: true, interviewerRef: true, transcript: true, candidate: { select: { profile: true } } },
     });
     if (!interview) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Interview was not found.' });
     const turns = Array.isArray(interview.transcript) ? (interview.transcript as unknown as InterviewTurn[]) : [];
@@ -50,8 +50,7 @@ export class QualityGuardService {
       turnId: turn.turnId, speaker: turn.speaker, text: this.privacy.redactText(profile, turn.text), startSec: turn.startSec, endSec: turn.endSec,
     }));
     const result = await this.gateway.qualityCheck({ kind: 'interview', transcript, history: [] });
-    // An interview does not name its interviewer yet, so an interview check carries no interviewerRef.
-    return this.store({ kind: 'interview', interviewId, interviewerRef: null, from: null, to: null }, result);
+    return this.store({ kind: 'interview', interviewId, interviewerRef: interview.interviewerRef, from: null, to: null }, result);
   }
 
   /**
@@ -133,15 +132,26 @@ export class QualityGuardService {
   }
 
   /**
-   * The scored interviews a calibration reads. An interview does not name its
-   * interviewer yet (`api.md`, Interview), so saved scores cannot be told
-   * apart by interviewer; in `DEMO_MODE` the synthetic panel history in
-   * `seed/quality-history.json` is what a calibration reads.
+   * The scored interviews a calibration reads: every saved set of scores
+   * whose interview names its interviewer, pseudonymous — no candidate, no
+   * name. In `DEMO_MODE` the synthetic panel in `seed/quality-history.json`
+   * joins them, so there is a panel to compare against.
    */
   private async history(): Promise<ScoredInterview[]> {
-    if (this.config.get<string>('DEMO_MODE') !== 'true') return [];
+    const stored = await this.prisma.interview.findMany({
+      where: { interviewerRef: { not: null }, interviewerScore: { isNot: null } },
+      select: { id: true, interviewerRef: true, heldAt: true, interviewerScore: { select: { scores: true } } },
+    });
+    const saved: ScoredInterview[] = stored.map((interview) => ({
+      interviewRef: interview.id,
+      interviewerRef: interview.interviewerRef as string,
+      heldAt: interview.heldAt.toISOString(),
+      scores: Object.entries(interview.interviewerScore?.scores as Record<string, ScoredInterview['scores'][number]['score']>)
+        .map(([competency, score]) => ({ competency: competency as ScoredInterview['scores'][number]['competency'], score })),
+    }));
+    if (this.config.get<string>('DEMO_MODE') !== 'true') return saved;
     const filename = resolve(process.cwd(), '../../seed/quality-history.json');
-    return JSON.parse(await readFile(filename, 'utf8')) as ScoredInterview[];
+    return [...(JSON.parse(await readFile(filename, 'utf8')) as ScoredInterview[]), ...saved];
   }
 
   private day(value: string, field: 'from' | 'to'): Date {
