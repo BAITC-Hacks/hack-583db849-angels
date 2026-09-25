@@ -1,15 +1,15 @@
-import { Body, Controller, Get, Headers, Post } from '@nestjs/common';
+import { Body, Controller, Get, Headers, Param, Post } from '@nestjs/common';
 import { ApiCreatedResponse, ApiHeader, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
 
 import { Roles } from '../../auth/roles.decorator';
-import { contractExample } from '../../contract-example';
 import { IdempotencyService } from '../../idempotency/idempotency.service';
 import { CandidateFeedbackDto, CreateSimulationAssessmentDto, SimulationAssessmentDto } from './dto/simulation-assessment.dto';
+import { SimulationAssessmentsService } from './simulation-assessments.service';
 
 @ApiTags('simulation-assessments')
 @Controller('simulation-assessments')
 export class SimulationAssessmentsController {
-  constructor(private readonly idempotency: IdempotencyService) {}
+  constructor(private readonly idempotency: IdempotencyService, private readonly assessments: SimulationAssessmentsService) {}
 
   @Post()
   @Roles('admin')
@@ -17,22 +17,22 @@ export class SimulationAssessmentsController {
   @ApiCreatedResponse({ type: SimulationAssessmentDto })
   create(@Body() input: CreateSimulationAssessmentDto, @Headers('idempotency-key') key: string | undefined): Promise<SimulationAssessmentDto> {
     return this.idempotency.execute(key, { operation: 'simulation-assessment.create', simulationId: input.simulationId },
-      async () => contractExample<SimulationAssessmentDto>('assessment.json'));
+      () => this.assessments.rerun(input.simulationId));
   }
 
   @Get(':assessmentId')
   @Roles('commission', 'admin')
   @ApiParam({ name: 'assessmentId', type: String })
   @ApiOkResponse({ type: SimulationAssessmentDto })
-  get(): SimulationAssessmentDto {
-    return contractExample<SimulationAssessmentDto>('assessment.json');
+  get(@Param('assessmentId') assessmentId: string): Promise<SimulationAssessmentDto> {
+    return this.assessments.get(assessmentId);
   }
 
   @Get(':assessmentId/candidate-feedback')
   @Roles('platform', 'interviewer', 'commission', 'admin')
   @ApiParam({ name: 'assessmentId', type: String })
   @ApiOkResponse({ type: CandidateFeedbackDto })
-  feedback(): CandidateFeedbackDto {
-    return contractExample<CandidateFeedbackDto>('candidate-feedback.json');
+  feedback(@Param('assessmentId') assessmentId: string): Promise<CandidateFeedbackDto> {
+    return this.assessments.feedback(assessmentId);
   }
 }

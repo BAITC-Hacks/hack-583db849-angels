@@ -9,6 +9,7 @@ import { RolesGuard } from '../src/auth/roles.guard';
 import { contractExample } from '../src/contract-example';
 import { PrismaService } from '../src/database/prisma.service';
 import { SimulationsService } from '../src/modules/simulations/simulations.service';
+import { SimulationAssessmentsService } from '../src/modules/simulation-assessments/simulation-assessments.service';
 
 describe('PR 1 contract routes', () => {
   let app: INestApplication;
@@ -18,6 +19,7 @@ describe('PR 1 contract routes', () => {
     createdAt: new Date('2026-09-23T08:00:00Z'),
     profile: { fullName: 'Synthetic Person', email: 'synthetic@example.test' },
     simulations: [],
+    assessments: [],
   };
   const previousKeys = process.env.API_KEYS;
   const previousDemoMode = process.env.DEMO_MODE;
@@ -35,6 +37,12 @@ describe('PR 1 contract routes', () => {
         characterAudio: jest.fn().mockReturnValue(Buffer.from('synthetic audio')),
         accommodation: jest.fn().mockImplementation(() => contractExample('accommodation.json')),
         idempotencyBody: jest.fn().mockReturnValue({ operation: 'simulation.turn' }),
+      })
+      .overrideProvider(SimulationAssessmentsService)
+      .useValue({
+        rerun: jest.fn().mockImplementation(() => contractExample('assessment.json')),
+        get: jest.fn().mockImplementation(() => contractExample('assessment.json')),
+        feedback: jest.fn().mockImplementation(() => contractExample('candidate-feedback.json')),
       })
       .overrideProvider(PrismaService)
       .useValue({
