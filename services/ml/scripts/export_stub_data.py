@@ -61,6 +61,10 @@ def export_stub_data() -> None:
         SOURCE_PROMPTS / "simulation-actor.md",
         OUTPUT_PROMPTS / "simulation-actor.md",
     )
+    shutil.copyfile(
+        SOURCE_PROMPTS / "c-consistency.md",
+        OUTPUT_PROMPTS / "c-consistency.md",
+    )
     OUTPUT_SCENARIOS.mkdir(parents=True, exist_ok=True)
     for destination in OUTPUT_SCENARIOS.glob("*.json"):
         destination.unlink()
