@@ -101,11 +101,28 @@ describe('PR 1 contract routes', () => {
     expect(found.body).toEqual(created.body);
     expect(listed.body.items[0]).toEqual({ ...created.body, progress: {
       candidateId, label: 'Candidate A', brief: null, simulation: null, assessment: null,
-      interview: null, surprise: null, consistency: { before: null, after: null },
+      interview: null, surprise: null, consistency: { before: null, after: null }, accommodation: null,
     } });
     expect(progress.body.assessment).toBeNull();
     expect(JSON.stringify([created.body, listed.body, found.body, progress.body])).not.toContain('Synthetic Person');
     expect(JSON.stringify([created.body, listed.body, found.body, progress.body])).not.toContain('profile');
+  });
+
+  it('answers 404, not 500, for an id that is not a UUID', async () => {
+    const server = app.getHttpServer();
+    const checks = [
+      () => request(server).get('/v1/candidates/not-a-uuid').set('X-API-Key', 'commission-key'),
+      () => request(server).get('/v1/candidates/not-a-uuid/progress').set('X-API-Key', 'commission-key'),
+      () => request(server).put('/v1/candidates/not-a-uuid/accommodations').set('X-API-Key', 'commission-key')
+        .send({ textMode: true, reason: 'No microphone' }),
+      () => request(server).get('/v1/simulations/preview').set('X-API-Key', 'platform-key'),
+      () => request(server).get('/v1/simulation-assessments/preview').set('X-API-Key', 'commission-key'),
+    ];
+    for (const check of checks) {
+      const response = await check();
+      expect(response.status).toBe(404);
+      expect(response.body.error.code).toBe('NOT_FOUND');
+    }
   });
 
   it('serves simulation contract examples without creating a simulation', async () => {
@@ -136,7 +153,7 @@ describe('PR 1 contract routes', () => {
       code: 'VALIDATION_ERROR', message: expect.any(String),
       details: { fields: ['candidateId'] }, traceId: expect.any(String),
     });
-    const multipartText = await request(app.getHttpServer()).post('/v1/simulations/synthetic-id/turns')
+    const multipartText = await request(app.getHttpServer()).post('/v1/simulations/6f1c2a0e-0000-4000-8000-00000000a002/turns')
       .set('X-API-Key', 'platform-key').field('text', 'Text belongs in JSON').expect(400);
     expect(multipartText.body.error.code).toBe('VALIDATION_ERROR');
   });

@@ -27,5 +27,6 @@
   "consistency": {
     "before": "ready",
     "after": "ready"
-  }
+  },
+  "accommodation": null
 }

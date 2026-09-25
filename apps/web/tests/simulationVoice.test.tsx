@@ -4,7 +4,7 @@ import { Composer } from '../components/simulation/Composer';
 import { VoiceComposer } from '../components/simulation/VoiceComposer';
 import { AccommodationControl } from '../components/home/AccommodationControl';
 import type { WireCandidate } from '../lib/api/contract';
-import { getWorld, resetWorld } from '../lib/demo/world';
+import { resetWorld } from '../lib/demo/world';
 import { apiError, example, json, mockApi, withQuery } from './apiHarness';
 
 /**
@@ -104,9 +104,18 @@ describe('the accommodation, on the API', () => {
     json({ candidateId: list.items[0].candidateId, textMode, reason, setByRole: 'commission', setAt: '2026-09-25T09:00:00Z' });
 
   it('switches a candidate to typing, with the reason, and keeps what the server answered', async () => {
+    // Like the server: after the PUT, the list carries the new accommodation.
+    let current = notStarted;
     const calls = mockApi({
-      'GET /api/v1/candidates': () => json(notStarted),
-      'PUT /api/v1/candidates/[^/]+/accommodations': () => saved(true, 'No microphone available'),
+      'GET /api/v1/candidates': () => json(current),
+      'PUT /api/v1/candidates/[^/]+/accommodations': () => {
+        current = {
+          items: notStarted.items.map((item, index) =>
+            index === 0 ? { ...item, progress: { ...item.progress, accommodation: { textMode: true, reason: 'No microphone available' } } } : item,
+          ),
+        };
+        return saved(true, 'No microphone available');
+      },
     });
     withQuery(<AccommodationControl />);
     const [field] = await screen.findAllByPlaceholderText('No microphone available');
@@ -114,10 +123,22 @@ describe('the accommodation, on the API', () => {
     fireEvent.change(field, { target: { value: 'No microphone available' } });
     fireEvent.click(screen.getAllByRole('button', { name: 'Switch typing on' })[0]);
 
-    await waitFor(() => expect(getWorld().accommodations.A).toEqual({ textMode: true, reason: 'No microphone available' }));
+    expect(await screen.findByText('Reason: No microphone available')).toBeTruthy();
     const put = calls.find((call) => call.method === 'PUT')!;
     expect(put.path).toBe(`/api/v1/candidates/${list.items[0].candidateId}/accommodations`);
     expect(JSON.parse(put.body as string)).toEqual({ textMode: true, reason: 'No microphone available' });
+  });
+
+  it('shows what the API holds, so a reload keeps it', async () => {
+    const accommodated = {
+      items: notStarted.items.map((item, index) =>
+        index === 0 ? { ...item, progress: { ...item.progress!, accommodation: { textMode: true, reason: 'Speech difficulty' } } } : item,
+      ),
+    };
+    mockApi({ 'GET /api/v1/candidates': () => json(accommodated) });
+    withQuery(<AccommodationControl />);
+    expect(await screen.findByText('Reason: Speech difficulty')).toBeTruthy();
+    expect(screen.getAllByText('Types')).toHaveLength(1);
   });
 
   it('cannot be changed once the simulation has started', async () => {
@@ -138,6 +159,6 @@ describe('the accommodation, on the API', () => {
     fireEvent.change(field, { target: { value: 'Too late' } });
     fireEvent.click(screen.getAllByRole('button', { name: 'Switch typing on' })[0]);
     expect(await screen.findByRole('alert')).toBeTruthy();
-    expect(getWorld().accommodations.A.textMode).toBe(false);
+    expect(screen.queryByText(/Reason: Too late/)).toBeNull();
   });
 });

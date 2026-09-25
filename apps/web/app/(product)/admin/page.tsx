@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { StatusPill, type Tone } from '../../../components/home/StatusPill';
-import { completeWithRecordedSession, resetWorld, useWorld, type DemoEventCode } from '../../../lib/demo/world';
+import { resetWorld, useWorld, type DemoEventCode } from '../../../lib/demo/world';
 import { useStaffLocale } from '../../../lib/i18n/StaffLocaleProvider';
 import type { StaffLocale } from '../../../lib/i18n/staffLocale';
 import { navFor } from '../../../lib/navigation';
@@ -65,7 +65,6 @@ const copy = {
     logTitle: 'Activity',
     logEmpty: 'Nothing yet. Actions on any screen, in any role, appear here.',
     controlsTitle: 'Demo controls',
-    recorded: 'Use candidate A’s recorded session',
     reset: 'Reset the demo',
     confirm: 'Reset everything?',
     yes: 'Reset',
@@ -89,7 +88,6 @@ const copy = {
     logTitle: 'Журнал',
     logEmpty: 'Пока пусто. Действия на любом экране в любой роли появятся здесь.',
     controlsTitle: 'Управление демо',
-    recorded: 'Взять записанную сессию кандидата A',
     reset: 'Сбросить демо',
     confirm: 'Сбросить всё?',
     yes: 'Сбросить',
@@ -182,13 +180,6 @@ export default function AdminHome() {
           <section className="rounded-panel border border-border-subtle bg-bg-surface p-5">
             <h2 className="text-sm font-semibold text-text-primary">{text.controlsTitle}</h2>
             <div className="mt-3 flex flex-col gap-2">
-              <button
-                type="button"
-                onClick={() => completeWithRecordedSession('A')}
-                className="rounded-control border border-border-strong px-3 py-2 text-left text-sm font-medium text-text-primary transition-colors hover:bg-bg-elevated"
-              >
-                {text.recorded}
-              </button>
               {confirming ? (
                 <div className="flex items-center gap-2">
                   <span className="text-[0.8rem] text-text-secondary">{text.confirm}</span>

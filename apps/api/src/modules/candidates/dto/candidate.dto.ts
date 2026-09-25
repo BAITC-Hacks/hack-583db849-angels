@@ -5,6 +5,12 @@ class BriefProgressDto {
   @ApiProperty({ enum: ['pending', 'ready', 'failed'] }) status!: 'pending' | 'ready' | 'failed';
 }
 
+/** Typing instead of speaking, switched on by staff before the simulation. `null` until someone sets it; staff only. */
+class AccommodationProgressDto {
+  @ApiProperty() textMode!: boolean;
+  @ApiProperty() reason!: string;
+}
+
 class SimulationProgressDto {
   @ApiProperty() simulationId!: string;
   @ApiProperty({ enum: ['active', 'completed'] }) status!: 'active' | 'completed';
@@ -42,6 +48,7 @@ export class CandidateProgressDto {
   @ApiProperty({ type: () => InterviewProgressDto, nullable: true }) interview!: InterviewProgressDto | null;
   @ApiProperty({ type: () => SurpriseProgressDto, nullable: true }) surprise!: SurpriseProgressDto | null;
   @ApiProperty({ type: () => ConsistencyProgressDto }) consistency!: ConsistencyProgressDto;
+  @ApiProperty({ type: () => AccommodationProgressDto, nullable: true }) accommodation!: AccommodationProgressDto | null;
 }
 
 export class CandidateDto {
