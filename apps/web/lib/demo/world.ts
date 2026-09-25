@@ -1,8 +1,6 @@
 'use client';
 
 import { useSyncExternalStore } from 'react';
-import { previewLines, previewScenario } from '../simulation/previewScenario';
-import { PreviewSimulation } from '../simulation/previewDriver';
 
 /**
  * The demo's shared state, held in this browser tab for as long as it is open.
@@ -133,14 +131,13 @@ export function record(code: DemoEventCode, candidate: CandidateCode | null, pat
 }
 
 /**
- * Staff switch typing on or off for a candidate. The server refuses this once
- * the simulation has started (`409 SIMULATION_STARTED`), and so does this.
+ * Keeps what the API answered to `PUT /v1/candidates/:id/accommodations`, so
+ * the control shows it: the API has no call that reads it back before the
+ * simulation starts. The server decides; this only remembers.
  */
-export function setTextMode(candidate: CandidateCode, textMode: boolean, reason: string): boolean {
-  if (world.candidates[candidate].simulation !== 'not-started') return false;
-  world = { ...world, accommodations: { ...world.accommodations, [candidate]: { textMode, reason } } };
+export function storeAccommodation(candidate: CandidateCode, accommodation: Accommodation): void {
+  world = { ...world, accommodations: { ...world.accommodations, [candidate]: accommodation } };
   record('accommodation-changed', candidate);
-  return true;
 }
 
 /** Screens that keep their own session state (the simulation, the interview) drop it on reset. */
@@ -151,31 +148,8 @@ export function onReset(listener: () => void): () => void {
 
 export function resetWorld(): void {
   world = initial();
-  simulation = null;
   resetListeners.forEach((listener) => listener());
   record('demo-reset', null);
-}
-
-// ---- The candidate's simulation lives here, so leaving the page does not lose it.
-
-let simulation: PreviewSimulation | null = null;
-
-export function getSimulation(): PreviewSimulation {
-  if (!simulation) {
-    const driver = new PreviewSimulation(previewScenario, previewLines);
-    driver.subscribe(() => {
-      const state = driver.getSnapshot();
-      if (state.candidateTurns === 1 && state.stage !== 'finished') {
-        record('simulation-started', 'A', { simulation: 'in-progress' });
-      }
-      if (state.stage === 'finished') {
-        record(state.ending === 'stopped' ? 'simulation-stopped' : 'simulation-completed', 'A', { simulation: 'completed' });
-        record('assessment-ready', 'A', { assessmentReady: true });
-      }
-    });
-    simulation = driver;
-  }
-  return simulation;
 }
 
 /** For the presenter: skip playing the simulation and use candidate A's recorded session. */

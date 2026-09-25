@@ -98,7 +98,7 @@ export const demoSteps: DemoStep[] = [
   },
   {
     module: 'M2',
-    preview: '/simulation/preview',
+    preview: '/simulation',
     copy: {
       en: { title: 'Simulation', note: 'The candidate leads a work situation in English' },
       ru: { title: 'Симуляция', note: 'Кандидат ведёт рабочую ситуацию на английском' },

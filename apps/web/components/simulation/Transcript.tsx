@@ -1,20 +1,26 @@
 'use client';
 
+import { SpeakerWaveIcon } from '@heroicons/react/24/outline';
 import { useEffect, useRef } from 'react';
 import type { SimulationTurn } from '../../lib/simulation/types';
 
 /**
  * The conversation as it happens. Each turn carries its id in the DOM so the
  * commission report can link a quote straight back to it later.
+ *
+ * The character's lines play out loud as they arrive; a browser may block that,
+ * so each one can be played again. The captions are always there.
  */
 export function Transcript({
   turns,
   characterName,
   replying,
+  onListen,
 }: {
   turns: SimulationTurn[];
   characterName: string;
   replying: boolean;
+  onListen?: (turnId: string) => void;
 }) {
   const end = useRef<HTMLDivElement>(null);
   const mounted = useRef(false);
@@ -35,8 +41,18 @@ export function Transcript({
         const mine = turn.speaker === 'candidate';
         return (
           <div key={turn.turnId} id={turn.turnId} className={`flex flex-col gap-1 ${mine ? 'items-end' : 'items-start'}`}>
-            <span className="font-mono text-[0.58rem] tracking-[0.12em] text-text-muted uppercase">
+            <span className="flex items-center gap-2 font-mono text-[0.58rem] tracking-[0.12em] text-text-muted uppercase">
               {mine ? 'You' : characterName}
+              {!mine && onListen ? (
+                <button
+                  type="button"
+                  onClick={() => onListen(turn.turnId)}
+                  aria-label={`Listen to ${characterName} again`}
+                  className="rounded-control p-0.5 text-text-muted hover:text-text-primary"
+                >
+                  <SpeakerWaveIcon aria-hidden="true" className="h-3.5 w-3.5" />
+                </button>
+              ) : null}
             </span>
             <p
               className={`max-w-[34rem] rounded-panel px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${

@@ -2,11 +2,17 @@ import { createApiClient } from '@invision/api-client';
 import { ApiError, toApiError } from './errors';
 
 /**
- * The one way a screen reaches the API. The base URL is this app's own
- * `/api/v1`, so the browser sends no key and needs no CORS: the route handler
- * adds the key of the demo role in the cookie.
+ * The one way a screen reaches the API. The base URL is this app's own `/api`
+ * (the contract's paths start with `/v1`), so the browser sends no key and
+ * needs no CORS: the route handler adds the key of the demo role in the cookie.
+ *
+ * `fetch` is looked up on each call rather than kept from when this module
+ * loaded, and the origin is spelled out, so the same client runs in tests.
  */
-export const api = createApiClient();
+export const api = createApiClient({
+  baseUrl: typeof window === 'undefined' ? '/api' : `${window.location.origin}/api`,
+  fetch: (input) => globalThis.fetch(input),
+});
 
 interface Result<T> {
   data?: T;

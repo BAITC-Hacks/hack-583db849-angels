@@ -9,7 +9,7 @@ import { ApiError, unwrap } from '../lib/api/client';
  */
 function clientAnswering(answer: Response) {
   const fetch = vi.fn(async () => answer) as unknown as typeof globalThis.fetch;
-  return { fetch, client: createApiClient({ baseUrl: 'http://web/api/v1', fetch }) };
+  return { fetch, client: createApiClient({ baseUrl: 'http://web/api', fetch }) };
 }
 
 describe('the generated client', () => {
@@ -20,7 +20,9 @@ describe('the generated client', () => {
 
     const result = await client.GET('/v1/health');
     expect(unwrap(result)).toEqual({ status: 'ok' });
-    expect(vi.mocked(fetch).mock.calls[0][0]).toBeDefined();
+    // The proxy maps /api/v1/* to the API's /v1/*: one /v1, not two.
+    const sent = vi.mocked(fetch).mock.calls[0][0] as unknown as Request;
+    expect(sent.url).toBe('http://web/api/v1/health');
   });
 
   it('turns an error answer into an ApiError with its code', async () => {

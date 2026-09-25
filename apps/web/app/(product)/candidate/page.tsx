@@ -1,22 +1,55 @@
 'use client';
 
 import { ArrowRightIcon, CheckCircleIcon, ClockIcon } from '@heroicons/react/24/outline';
+import { useMutation } from '@tanstack/react-query';
 import Link from 'next/link';
-import { useWorld } from '../../../lib/demo/world';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import { candidateByCode, useCandidates } from '../../../lib/api/candidates';
+import { api, ApiError, unwrap } from '../../../lib/api/client';
+import { errorText } from '../../../lib/api/errors';
+import { record } from '../../../lib/demo/world';
 
 /**
  * The candidate's home: the simulation to play and, afterwards, the feedback.
  * English only, and never a score — not here, not anywhere a candidate can go.
+ *
+ * Where the candidate is comes from the API (`GET /v1/candidates?include=progress`
+ * through inVision's platform key), polled while a step is pending.
  */
 export default function CandidateHome() {
-  const { candidates } = useWorld();
-  const me = candidates.A;
+  const router = useRouter();
+  const candidates = useCandidates({ poll: true });
+  const me = candidateByCode(candidates.data, 'A');
+  const progress = me?.progress;
+  const simulation = progress?.simulation ?? null;
+  const assessment = progress?.assessment ?? null;
+  const feedbackReady = assessment?.status === 'ready' && Boolean(assessment.assessmentId);
 
-  const simulation = {
-    'not-started': { status: 'Not started yet', action: 'Start the simulation' },
-    'in-progress': { status: 'In progress', action: 'Continue' },
-    completed: { status: 'Finished — thank you', action: null },
-  }[me.simulation];
+  // The other roles' homes still read the demo world until they move to the API (#23).
+  useEffect(() => {
+    if (feedbackReady) record('assessment-ready', 'A', { assessmentReady: true });
+  }, [feedbackReady]);
+
+  const start = useMutation({
+    mutationFn: async (candidateId: string) =>
+      unwrap(
+        await api.POST('/v1/simulations', {
+          body: { candidateId },
+          headers: { 'Idempotency-Key': crypto.randomUUID() },
+        }),
+      ) as unknown as { simulationId: string },
+    onSuccess: ({ simulationId }) => router.push(`/simulation/${simulationId}`),
+    onError: (error) => {
+      // One simulation per candidate: if it already exists, that is the one to open.
+      const existing = error instanceof ApiError && error.code === 'SIMULATION_EXISTS' ? error.details?.simulationId : null;
+      if (typeof existing === 'string') router.push(`/simulation/${existing}`);
+    },
+  });
+
+  const status = simulation === null ? 'Not started yet' : simulation.status === 'completed' ? 'Finished — thank you' : 'In progress';
+  const startError =
+    start.isError && !(start.error instanceof ApiError && start.error.code === 'SIMULATION_EXISTS') ? errorText(start.error) : null;
 
   return (
     <main lang="en" className="mx-auto flex max-w-4xl flex-col gap-6 px-5 py-10">
@@ -29,43 +62,65 @@ export default function CandidateHome() {
         </p>
       </header>
 
+      {candidates.isError ? (
+        <p role="alert" className="text-sm text-text-primary">
+          {errorText(candidates.error)}
+        </p>
+      ) : null}
+
       <section className="grid gap-4 md:grid-cols-3">
         <article className="flex flex-col gap-3 rounded-panel border border-border-subtle bg-bg-surface p-5">
           <p className="font-mono text-[0.6rem] tracking-[0.14em] text-text-muted uppercase">Step 1 · the simulation</p>
           <p className="flex items-center gap-2 text-sm font-semibold text-text-primary">
-            {me.simulation === 'completed' ? (
+            {simulation?.status === 'completed' ? (
               <CheckCircleIcon aria-hidden="true" className="h-4 w-4 text-brand-ink" />
             ) : (
               <ClockIcon aria-hidden="true" className="h-4 w-4 text-text-muted" />
             )}
-            {simulation.status}
+            {candidates.isPending ? 'Loading…' : status}
           </p>
-          <p className="text-[0.82rem] text-text-secondary">About 8 minutes, five of your turns, spoken in English.</p>
-          {simulation.action ? (
+          <p className="text-[0.82rem] text-text-secondary">About 8 minutes, spoken in English. You can stop at any moment.</p>
+          {simulation === null && me ? (
+            <button
+              type="button"
+              disabled={start.isPending}
+              onClick={() => start.mutate(me.candidateId)}
+              className="group mt-auto inline-flex w-fit items-center gap-1.5 rounded-control bg-brand-green px-4 py-2.5 text-sm font-semibold text-on-brand transition-colors hover:bg-brand-dim disabled:opacity-50"
+            >
+              Start the simulation
+              <ArrowRightIcon aria-hidden="true" className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
+            </button>
+          ) : null}
+          {simulation?.status === 'active' && simulation.simulationId ? (
             <Link
-              href="/simulation/preview"
+              href={`/simulation/${simulation.simulationId}`}
               className="group mt-auto inline-flex w-fit items-center gap-1.5 rounded-control bg-brand-green px-4 py-2.5 text-sm font-semibold text-on-brand transition-colors hover:bg-brand-dim"
             >
-              {simulation.action}
+              Continue
               <ArrowRightIcon aria-hidden="true" className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
             </Link>
+          ) : null}
+          {startError ? (
+            <p role="alert" className="text-[0.8rem] text-text-primary">
+              {startError}
+            </p>
           ) : null}
         </article>
 
         <article className="flex flex-col gap-3 rounded-panel border border-border-subtle bg-bg-surface p-5">
           <p className="font-mono text-[0.6rem] tracking-[0.14em] text-text-muted uppercase">Step 2 · your feedback</p>
           <p className="flex items-center gap-2 text-sm font-semibold text-text-primary">
-            {me.assessmentReady ? (
+            {feedbackReady ? (
               <CheckCircleIcon aria-hidden="true" className="h-4 w-4 text-brand-ink" />
             ) : (
               <ClockIcon aria-hidden="true" className="h-4 w-4 text-text-muted" />
             )}
-            {me.assessmentReady ? 'Ready to read' : 'Ready after the review'}
+            {feedbackReady ? 'Ready to read' : 'Ready after the review'}
           </p>
           <p className="text-[0.82rem] text-text-secondary">Written notes on what went well and what to work on. No scores.</p>
-          {me.assessmentReady ? (
+          {feedbackReady ? (
             <Link
-              href="/feedback/preview"
+              href={`/feedback/${assessment?.assessmentId}`}
               className="group mt-auto inline-flex w-fit items-center gap-1.5 rounded-control border border-border-strong px-4 py-2.5 text-sm font-semibold text-text-primary transition-colors hover:bg-bg-elevated"
             >
               Read your feedback

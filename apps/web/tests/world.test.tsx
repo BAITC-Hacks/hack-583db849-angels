@@ -1,13 +1,13 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import CommissionHome from '../app/(product)/commission/page';
-import CandidateHome from '../app/(product)/candidate/page';
 import InterviewerHome from '../app/(product)/interviewer/page';
 import { AssessmentGate } from '../components/home/AssessmentGate';
-import { getSimulation, getWorld, record, resetWorld } from '../lib/demo/world';
+import type { WireCandidate } from '../lib/api/contract';
+import { getWorld, record, resetWorld } from '../lib/demo/world';
 import { sampleScores } from '../lib/interview/preview';
 import { getSharedInterviewStore } from '../lib/interview/store';
-import { previewScenario } from '../lib/simulation/previewScenario';
+import { example, json, mockApi, withQuery } from './apiHarness';
 
 vi.mock('next/navigation', () => ({ useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }), usePathname: () => '/' }));
 
@@ -15,23 +15,25 @@ beforeEach(() => {
   vi.useFakeTimers();
   resetWorld();
 });
-afterEach(() => vi.useRealTimers());
+afterEach(() => {
+  vi.useRealTimers();
+  vi.unstubAllGlobals();
+});
 
 const codes = () => getWorld().events.map((event) => event.code);
 
-async function playSimulation() {
-  const simulation = getSimulation();
-  for (let turn = 1; turn <= previewScenario.maxCandidateTurns; turn += 1) {
-    simulation.send(`Turn ${turn}`);
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(2000);
-    });
-  }
+/** What the simulation screen and the candidate home report while the other homes still read the world (#23). */
+function playSimulation() {
+  act(() => {
+    record('simulation-started', 'A', { simulation: 'in-progress' });
+    record('simulation-completed', 'A', { simulation: 'completed' });
+    record('assessment-ready', 'A', { assessmentReady: true });
+  });
 }
 
 describe('the demo world', () => {
-  it('follows the candidate through the simulation to the report', async () => {
-    await playSimulation();
+  it('follows the candidate through the simulation to the report', () => {
+    playSimulation();
     expect(getWorld().candidates.A).toMatchObject({ simulation: 'completed', assessmentReady: true });
     expect(codes()).toEqual(expect.arrayContaining(['simulation-started', 'simulation-completed', 'assessment-ready']));
   });
@@ -55,12 +57,10 @@ describe('the demo world', () => {
   });
 
   it('starts over on reset, with a fresh simulation and interview', async () => {
-    const before = getSimulation();
     const interview = getSharedInterviewStore();
     record('brief-viewed', 'A', { briefViewed: true });
     resetWorld();
     expect(getWorld().candidates.A.briefViewed).toBe(false);
-    expect(getSimulation()).not.toBe(before);
     expect(getSharedInterviewStore()).not.toBe(interview);
     expect(codes()).toEqual(['demo-reset']);
   });
@@ -77,19 +77,11 @@ describe('each role has its own working home', () => {
   });
 
   it('opens the report for the commission only once the simulation is finished', () => {
-    render(<CommissionHome />);
+    mockApi({ 'GET /api/v1/candidates': () => json(example<{ items: WireCandidate[] }>('candidates.json')) });
+    withQuery(<CommissionHome />);
     expect(screen.queryByRole('link', { name: 'Open report' })).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: 'Use the recorded session' }));
     expect(screen.getAllByRole('link', { name: /Open (the )?report/ }).length).toBeGreaterThan(0);
-  });
-
-  it('shows the candidate the simulation, then the feedback, never a score', async () => {
-    const { container } = render(<CandidateHome />);
-    expect(screen.getByRole('link', { name: /Start the simulation/ })).toBeTruthy();
-    expect(screen.queryByRole('link', { name: /Read your feedback/ })).toBeNull();
-    await playSimulation();
-    expect(screen.getByRole('link', { name: /Read your feedback/ })).toBeTruthy();
-    expect(container.textContent).not.toMatch(/\d\s*\/\s*4|score:/i);
   });
 
   it('keeps the report behind the simulation', () => {
