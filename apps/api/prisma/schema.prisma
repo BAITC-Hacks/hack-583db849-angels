@@ -46,6 +46,7 @@ model Candidate {
   auditEvents        AuditEvent[]
   briefs             Brief[]
   surprise           SurpriseQuestion?
+  consistencyReports ConsistencyReport[]
 }
 
 model Simulation {
@@ -121,6 +122,7 @@ model Interview {
   candidate        Candidate          @relation(fields: [candidateId], references: [id], onDelete: Cascade)
   interviewerScore InterviewerScore?
   drafts           InterviewDraft[]
+  consistency      ConsistencyReport[]
   qualityChecks    QualityCheck[]
 
   @@index([candidateId, createdAt])
@@ -218,4 +220,21 @@ model SurpriseQuestion {
   segments       Json?
   createdAt      DateTime  @default(now())
   candidate      Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+}
+
+/// C, after the interview: what the candidate claimed against what was measured and what the interview
+/// showed. Made by the API itself once the transcript exists and the interviewer's scores are saved —
+/// it reads the interview, so it waits for the blind scores like the draft. The before stage is the
+/// brief's own `consistency` block. `result` is ML's ConsistencyResult, stored as returned.
+model ConsistencyReport {
+  id          String     @id @default(uuid()) @db.Uuid
+  candidateId String     @db.Uuid
+  interviewId String?    @db.Uuid
+  status      String     @default("pending") // pending | ready | failed
+  result      Json?
+  createdAt   DateTime   @default(now())
+  candidate   Candidate  @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  interview   Interview? @relation(fields: [interviewId], references: [id], onDelete: SetNull)
+
+  @@index([candidateId, createdAt])
 }

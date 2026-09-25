@@ -69,6 +69,18 @@ describe('MlHttpAdapter', () => {
     await expect(drafted.clone().json()).resolves.toEqual(draft);
   });
 
+  it('posts a consistency request to ML as it is', async () => {
+    const fetchImplementation = jest.fn().mockResolvedValue(new Response(JSON.stringify({ items: [] }), {
+      status: 200, headers: { 'Content-Type': 'application/json' },
+    }));
+    const adapter = new MlHttpAdapter(config, fetchImplementation);
+    const body = { stage: 'after' as const, candidate: { candidateId: 'c', application: { answers: [] }, test: { answers: [] } }, simulationEnglish: null, simulationTurns: [], interviewTranscript: [] };
+    await adapter.consistency(body);
+    const [request] = fetchImplementation.mock.calls[0] as [Request];
+    expect(new URL(request.url).pathname).toBe('/internal/v1/consistency');
+    await expect(request.clone().json()).resolves.toEqual(body);
+  });
+
   it('posts a quality check to ML as it is', async () => {
     const result = { signals: [], talkShare: null, drift: [], interviews: 3 };
     const fetchImplementation = jest.fn().mockResolvedValue(new Response(JSON.stringify(result), {

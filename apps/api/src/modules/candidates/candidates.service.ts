@@ -33,6 +33,7 @@ const candidateWithSimulationSelect = {
       drafts: { where: { status: 'ready' }, take: 1, select: { id: true } },
     },
   },
+  consistencyReports: { orderBy: { createdAt: 'desc' }, take: 1, select: { status: true } },
 } as const satisfies Prisma.CandidateSelect;
 
 type SafeCandidate = Prisma.CandidateGetPayload<{ select: typeof candidateSelect }>;
@@ -117,7 +118,12 @@ export class CandidatesService {
         draftReady: interview.drafts.length > 0,
       } : null,
       surprise: candidate.surprise ? { surpriseId: candidate.surprise.id, status: surpriseStatus(candidate.surprise) } : null,
-      consistency: { before: null, after: null },
+      consistency: {
+        before: brief ? (brief.status as 'pending' | 'ready' | 'failed') : null,
+        // The after stage reads the interview, so it stays locked until the interviewer has scored blind.
+        after: !interview ? null : !interview.interviewerScore ? 'locked'
+          : (candidate.consistencyReports[0]?.status as 'pending' | 'ready' | 'failed' | undefined) ?? null,
+      },
       accommodation: candidate.accommodation
         ? { textMode: candidate.accommodation.textMode, reason: candidate.accommodation.reason }
         : null,
