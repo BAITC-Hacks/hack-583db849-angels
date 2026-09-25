@@ -97,7 +97,7 @@ class DeepgramProvider:
     def _speech(self, request: MediaProviderRequest) -> MediaProviderResponse:
         text = request.content.decode("utf-8")
         http_request = Request(
-            f"{DEEPGRAM_API}/speak?{urlencode({'model': request.model, 'encoding': 'mp3'})}",
+            f"{DEEPGRAM_API}/speak?{urlencode({'model': _speaking_voice(request), 'encoding': 'mp3'})}",
             data=json.dumps({"text": text}, ensure_ascii=False).encode("utf-8"),
             headers={
                 "Authorization": f"Token {self._api_key}",
@@ -117,3 +117,22 @@ class DeepgramProvider:
             billed_units=Decimal(len(text)) / Decimal(1000),
             request_id=request_id,
         )
+
+
+def _aura_generation(name: str) -> str | None:
+    if name.startswith("aura-2-"):
+        return "aura-2"
+    return "aura" if name.startswith("aura-") else None
+
+
+def _speaking_voice(request: MediaProviderRequest) -> str:
+    """The character's own voice when it belongs to the routed model's generation.
+
+    The routed model is the task's model or, after a failure, its fallback. A
+    voice from the other Aura generation would fail the same way again, so the
+    routed model speaks instead.
+    """
+    voice = request.parameters.get("voice")
+    if isinstance(voice, str) and _aura_generation(voice) is not None and _aura_generation(voice) == _aura_generation(request.model):
+        return voice
+    return request.model

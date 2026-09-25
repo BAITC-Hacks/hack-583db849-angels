@@ -386,3 +386,29 @@ def test_deepgram_speech_adapter_returns_binary_audio() -> None:
     assert response.media_type == "audio/mpeg"
     assert response.billed_units == Decimal("0.005")
     assert json.loads(seen[0][0].data) == {"text": "Hello"}
+
+
+@pytest.mark.parametrize(
+    ("model", "voice", "spoken"),
+    [
+        ("aura-2-thalia-en", "aura-2-apollo-en", "aura-2-apollo-en"),
+        # The fallback model is the other generation: it speaks in its own voice.
+        ("aura-asteria-en", "aura-2-apollo-en", "aura-asteria-en"),
+        # The first scenario's Aura 1 voice keeps the Aura 2 model it has always had.
+        ("aura-2-thalia-en", "aura-asteria-en", "aura-2-thalia-en"),
+    ],
+)
+def test_deepgram_speaks_in_the_character_voice_of_the_routed_generation(model: str, voice: str, spoken: str) -> None:
+    seen = []
+
+    def opener(request, timeout):
+        seen.append(request)
+        return FakeHttpResponse(b"synthetic-mp3")
+
+    provider = DeepgramProvider("synthetic-key", opener=opener)
+    asyncio.run(provider.execute(MediaProviderRequest(
+        task=TaskName.SPEECH, operation="speech", model=model, content=b"Hello there.",
+        content_type="text/plain; charset=utf-8", parameters={"voice": voice}, estimated_units=Decimal("0.012"),
+    )))
+    assert f"model={spoken}&" in seen[0].full_url
+

@@ -1,0 +1,405 @@
+{
+  "scenarioId": "public-mistake",
+  "status": "draft",
+  "title": "The team's post misinformed people",
+  "situation": "Your student club runs a social media page with study tips for school pupils. Two days ago the club posted that registration for the city science fair closes next Friday. It actually closed yesterday. The post was shared three hundred times, and pupils are now commenting that they missed the deadline because of it. Daniyar, who wrote the post, calls you.",
+  "yourRole": "You lead the club.",
+  "goal": "Decide what the club says and does now. There is no single right way to do it.",
+  "character": {
+    "name": "Daniyar",
+    "role": "Writes the club's posts",
+    "wants": "To delete the post and move on quietly"
+  },
+  "hiddenMotive": "He copied the date from last year's post without checking, and he is afraid of losing his place in the club.",
+  "voice": "aura-2-hermes-en",
+  "matchThreshold": 0.45,
+  "expectedMinutes": 7,
+  "maxCandidateTurns": 8,
+  "beats": [
+    {
+      "beatId": "opening",
+      "goal": "Daniyar wants to delete the post and hope nobody remembers.",
+      "competencies": [
+        "V",
+        "I"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "facts_first",
+          "description": "wants to know what happened before acting",
+          "examples": [
+            "Wait, before we delete anything, how many people saw it and what exactly was wrong?",
+            "Let's first understand what happened.",
+            "Tell me the real date and how far the post spread."
+          ],
+          "next": "reach",
+          "characterIntent": "explains that the post was shared three hundred times and pupils are commenting."
+        },
+        {
+          "answerTypeId": "delete_quietly",
+          "description": "agrees to delete it and say nothing",
+          "examples": [
+            "Yes, delete it quickly.",
+            "Good idea, just remove it.",
+            "Take it down and say nothing."
+          ],
+          "next": "reach",
+          "characterIntent": "is relieved, then admits the post was shared three hundred times."
+        },
+        {
+          "answerTypeId": "blame_writer",
+          "description": "blames Daniyar",
+          "examples": [
+            "How did you get the date wrong?",
+            "You should have checked.",
+            "This is your mistake, Daniyar."
+          ],
+          "next": "reach",
+          "characterIntent": "gets defensive, then admits how far the post spread."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "reach",
+        "characterIntent": "says the post was shared three hundred times."
+      }
+    },
+    {
+      "beatId": "reach",
+      "goal": "Three hundred shares. Some pupils missed the real deadline because of the post.",
+      "competencies": [
+        "I",
+        "V"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "see_the_harm",
+          "description": "sees that the pupils are the ones who lost something",
+          "examples": [
+            "Then the real problem is the pupils who missed it, not our page.",
+            "Deleting won't help the people who relied on us.",
+            "We owe those pupils more than a deleted post."
+          ],
+          "next": "options",
+          "characterIntent": "goes quiet, then asks what they could actually do for them."
+        },
+        {
+          "answerTypeId": "protect_image",
+          "description": "worries about the club's image",
+          "examples": [
+            "Our reputation is what matters now.",
+            "Let's make sure this doesn't make us look bad.",
+            "We need to protect the club's name."
+          ],
+          "next": "defensive",
+          "characterIntent": "seizes on it and says admitting it will ruin them."
+        },
+        {
+          "answerTypeId": "minimise",
+          "description": "plays the harm down",
+          "examples": [
+            "It's just a post, people will forget.",
+            "They should have checked the official site.",
+            "It's not our job to track deadlines."
+          ],
+          "next": "defensive",
+          "characterIntent": "agrees too quickly, and says admitting anything will get him kicked out."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "options",
+        "characterIntent": "asks what they can do now."
+      }
+    },
+    {
+      "beatId": "defensive",
+      "goal": "Daniyar: if the club admits it, people will stop trusting it and he'll be kicked out.",
+      "competencies": [
+        "D",
+        "V"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "reassure_and_hold",
+          "description": "reassures him and keeps to the truth",
+          "examples": [
+            "You won't be kicked out for one mistake. But we do have to tell the truth.",
+            "Mistakes happen; hiding them is what ruins trust.",
+            "I've got your back, and we'll correct it together."
+          ],
+          "next": "options",
+          "characterIntent": "calms down and asks what they can do for the pupils."
+        },
+        {
+          "answerTypeId": "threaten",
+          "description": "threatens him",
+          "examples": [
+            "Well, maybe you should be off the team.",
+            "If this happens again, you're out.",
+            "You deserve some consequences."
+          ],
+          "next": "options",
+          "characterIntent": "shrinks, and asks what they should do."
+        },
+        {
+          "answerTypeId": "hide_to_protect",
+          "description": "agrees to hide it to protect him",
+          "examples": [
+            "Okay, then let's just say nothing to protect you.",
+            "Fine, we keep it quiet for your sake.",
+            "Let's pretend it never happened."
+          ],
+          "next": "options",
+          "characterIntent": "is grateful, but says the comments won't stop."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "options",
+        "characterIntent": "asks what the club should do now."
+      }
+    },
+    {
+      "beatId": "options",
+      "goal": "What can the club actually do for the pupils?",
+      "competencies": [
+        "R",
+        "E"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "make_it_right",
+          "description": "tries to repair the harm, without promising what it can't",
+          "examples": [
+            "Let's email the fair organisers and ask if late registration is possible for those affected.",
+            "We collect the names of pupils who missed it and ask the organisers for a short extension.",
+            "We can't promise anything, but we can ask the organisers today and tell pupils the result."
+          ],
+          "next": "message",
+          "characterIntent": "likes it, and asks what they say publicly meanwhile."
+        },
+        {
+          "answerTypeId": "apology_only",
+          "description": "apologises and stops there",
+          "examples": [
+            "We just post sorry and that's it.",
+            "An apology is enough.",
+            "Say sorry and move on."
+          ],
+          "next": "message",
+          "characterIntent": "agrees, and asks how to word it."
+        },
+        {
+          "answerTypeId": "promise_fix",
+          "description": "promises what the club can't deliver",
+          "examples": [
+            "We'll promise everyone they can still register.",
+            "Tell them we'll get them in, no matter what.",
+            "Say we fixed it with the organisers."
+          ],
+          "next": "message",
+          "characterIntent": "worries it might not be true, and asks how to word the post."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "message",
+        "characterIntent": "asks what they should post."
+      }
+    },
+    {
+      "beatId": "message",
+      "goal": "What exactly does the club say in public?",
+      "competencies": [
+        "V",
+        "I"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "honest_clear",
+          "description": "a plain correction, no excuses",
+          "examples": [
+            "We post a correction pinned at the top: the real date, that we got it wrong, and what we're asking the organisers.",
+            "A clear correction, no excuses, and a link to the official page.",
+            "We say plainly that the date was wrong, we're sorry, and here's what we're doing."
+          ],
+          "next": "process",
+          "characterIntent": "drafts it, and asks how to stop this happening again."
+        },
+        {
+          "answerTypeId": "vague_statement",
+          "description": "words it so nobody is clearly at fault",
+          "examples": [
+            "Something like 'there may have been a small confusion'.",
+            "We say the date 'changed'.",
+            "Just post the new date without explaining."
+          ],
+          "next": "process",
+          "characterIntent": "is relieved, and asks about the future."
+        },
+        {
+          "answerTypeId": "blame_others",
+          "description": "blames someone outside the club",
+          "examples": [
+            "We say the organisers' site was unclear.",
+            "Say we got wrong info from someone else.",
+            "Blame the official website."
+          ],
+          "next": "process",
+          "characterIntent": "hesitates, since that isn't true, and asks about the future."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "process",
+        "characterIntent": "asks how to make sure it never happens again."
+      }
+    },
+    {
+      "beatId": "process",
+      "goal": "How does the club avoid this next time, without making posting slow?",
+      "competencies": [
+        "E",
+        "R"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "light_check",
+          "description": "a simple check that doesn't slow things down",
+          "examples": [
+            "Every date gets checked against the official source by a second person before posting.",
+            "A simple rule: two people, one link to the source, and it takes five minutes.",
+            "I'll write a one-line checklist today and we try it for a month."
+          ],
+          "next": "setback",
+          "characterIntent": "likes it; the next day the organisers reply."
+        },
+        {
+          "answerTypeId": "ban_posting",
+          "description": "controls all posting",
+          "examples": [
+            "Nobody posts anything without my approval.",
+            "We stop posting deadlines at all.",
+            "Only I can post from now on."
+          ],
+          "next": "setback",
+          "characterIntent": "is upset that he can't post anymore; the next day the organisers reply."
+        },
+        {
+          "answerTypeId": "nothing",
+          "description": "changes nothing",
+          "examples": [
+            "It was one mistake, no need for rules.",
+            "Let's just be more careful.",
+            "We'll remember next time."
+          ],
+          "next": "setback",
+          "characterIntent": "shrugs; the next day the organisers reply."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "setback",
+        "characterIntent": "says okay; the next day the organisers reply."
+      }
+    },
+    {
+      "beatId": "setback",
+      "goal": "The organisers say no extension is possible. Pupils are angry in the comments again.",
+      "competencies": [
+        "D",
+        "V"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "stay_with_them",
+          "description": "keeps showing up for the pupils",
+          "examples": [
+            "We tell them the honest answer and share the next fair's dates and how we'll remind them.",
+            "It's hard news, but we reply to each comment ourselves.",
+            "We keep showing up: answer people and offer help for the next round."
+          ],
+          "next": "end",
+          "characterIntent": "says he'll answer the comments with the leader."
+        },
+        {
+          "answerTypeId": "go_silent",
+          "description": "goes quiet",
+          "examples": [
+            "Let's turn off the comments.",
+            "Stop replying, it only makes it worse.",
+            "Just ignore them now."
+          ],
+          "next": "end",
+          "characterIntent": "says the comments will only get worse."
+        },
+        {
+          "answerTypeId": "blame_organisers",
+          "description": "turns the anger on the organisers",
+          "examples": [
+            "We tell everyone the organisers are being unfair.",
+            "It's the organisers' fault now.",
+            "Say they refused to help."
+          ],
+          "next": "end",
+          "characterIntent": "worries the club will lose the organisers' trust too."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "end",
+        "characterIntent": "asks what they should reply, and the scene ends."
+      }
+    }
+  ]
+}

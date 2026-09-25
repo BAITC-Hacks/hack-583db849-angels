@@ -1,0 +1,405 @@
+{
+  "scenarioId": "project-failure",
+  "status": "draft",
+  "title": "The launch flopped and the team wants to quit",
+  "situation": "Your team of five spent two months building a free app that helps students swap textbooks on campus. Launch week is over: forty downloads, three swaps, and one review calling it \"confusing\". At tonight's team meeting Madina, the designer, says it is time to shut it down.",
+  "yourRole": "You started the project and you lead it.",
+  "goal": "Decide with the team what happens next. There is no single right way to do it.",
+  "character": {
+    "name": "Madina",
+    "role": "Designer on your team",
+    "wants": "To stop spending evenings on something nobody uses"
+  },
+  "hiddenMotive": "She thinks the confusing screens are her fault and would rather quit than hear it said.",
+  "voice": "aura-2-helena-en",
+  "matchThreshold": 0.45,
+  "expectedMinutes": 7,
+  "maxCandidateTurns": 8,
+  "beats": [
+    {
+      "beatId": "opening",
+      "goal": "Madina proposes shutting the app down.",
+      "competencies": [
+        "D",
+        "V"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "hear_her",
+          "description": "listens before arguing",
+          "examples": [
+            "That's a fair point. What makes you think we should stop?",
+            "I hear you. Tell me what's been hardest this week.",
+            "Okay, before anyone decides, I want to hear how you see it."
+          ],
+          "next": "facts",
+          "characterIntent": "says the week has been exhausting and she doesn't see the point anymore."
+        },
+        {
+          "answerTypeId": "refuse_quit",
+          "description": "rejects quitting outright",
+          "examples": [
+            "No way, we're not quitting.",
+            "We didn't work two months to give up now.",
+            "Quitting is not an option."
+          ],
+          "next": "facts",
+          "characterIntent": "shrugs and asks what the numbers are supposed to mean then."
+        },
+        {
+          "answerTypeId": "agree_quit",
+          "description": "agrees to stop at once",
+          "examples": [
+            "You're right, let's shut it down.",
+            "Fine, it failed, let's stop.",
+            "Honestly, I agree, it's over."
+          ],
+          "next": "facts",
+          "characterIntent": "is surprised it's so easy, and says the others will want to see the numbers first."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "facts",
+        "characterIntent": "says she just wants to know whether anyone thinks it can work."
+      }
+    },
+    {
+      "beatId": "facts",
+      "goal": "What do the numbers actually say?",
+      "competencies": [
+        "I",
+        "R"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "learn_from_data",
+          "description": "wants to learn why before deciding",
+          "examples": [
+            "Let's look at where people dropped off before we decide.",
+            "Three swaps is small, but let's ask those three people why it worked.",
+            "We should talk to ten students who downloaded it and never used it."
+          ],
+          "next": "direction",
+          "characterIntent": "admits she'd like to know where people got stuck."
+        },
+        {
+          "answerTypeId": "blame_someone",
+          "description": "says whose fault it is",
+          "examples": [
+            "The design is confusing, that's the problem.",
+            "Marketing did nothing, that's why.",
+            "Whoever built the first screens messed up."
+          ],
+          "next": "blame",
+          "characterIntent": "goes quiet at the word \"design\"."
+        },
+        {
+          "answerTypeId": "ignore_numbers",
+          "description": "waves the numbers away",
+          "examples": [
+            "Numbers don't matter this early.",
+            "Forty downloads is fine, let's keep going.",
+            "Let's not overthink the stats."
+          ],
+          "next": "direction",
+          "characterIntent": "doubts it and asks what the next month would look like."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "direction",
+        "characterIntent": "asks what the team should do next month."
+      }
+    },
+    {
+      "beatId": "blame",
+      "goal": "Madina hears the design being blamed and says maybe she should leave the team.",
+      "competencies": [
+        "V",
+        "D"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "repair_respect",
+          "description": "takes it back and makes it the team's result",
+          "examples": [
+            "I'm sorry, that came out wrong. It's the team's result, not yours.",
+            "We built the app together; nobody failed alone.",
+            "Your design got us this far. Let's fix the confusing part together."
+          ],
+          "next": "direction",
+          "characterIntent": "softens and asks what they would change first."
+        },
+        {
+          "answerTypeId": "double_down",
+          "description": "repeats the blame",
+          "examples": [
+            "Well, the design is the reason, that's just true.",
+            "Facts are facts, the screens are confusing.",
+            "Someone has to say it."
+          ],
+          "next": "direction",
+          "characterIntent": "goes cold and says they can find another designer."
+        },
+        {
+          "answerTypeId": "move_on",
+          "description": "skips past it",
+          "examples": [
+            "Let's not get emotional, let's move on.",
+            "Okay, whatever, next topic.",
+            "We don't have time for this."
+          ],
+          "next": "direction",
+          "characterIntent": "says nothing, and the meeting moves on awkwardly."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "direction",
+        "characterIntent": "asks flatly what the plan is, then."
+      }
+    },
+    {
+      "beatId": "direction",
+      "goal": "What should the next month look like?",
+      "competencies": [
+        "I",
+        "R"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "focused_experiment",
+          "description": "one small test with a clear goal and a stop rule",
+          "examples": [
+            "Let's pick one thing, fix the swap flow, and test it with twenty students in two weeks.",
+            "One small experiment: a simpler first screen, and we count the swaps.",
+            "We give it one month with a clear goal, and we stop if we don't hit it."
+          ],
+          "next": "team_energy",
+          "characterIntent": "likes that there is an end point, and raises the problem of time."
+        },
+        {
+          "answerTypeId": "big_relaunch",
+          "description": "adds features and relaunches",
+          "examples": [
+            "Let's add chat, ratings and a web version.",
+            "We rebuild it bigger and relaunch.",
+            "More features will bring more users."
+          ],
+          "next": "team_energy",
+          "characterIntent": "sighs that this means more evenings, and raises the problem of time."
+        },
+        {
+          "answerTypeId": "drift",
+          "description": "keeps it running and waits",
+          "examples": [
+            "Let's just keep it running and see.",
+            "Maybe it grows by itself.",
+            "No need to change anything yet."
+          ],
+          "next": "team_energy",
+          "characterIntent": "asks how anyone will know if it's working, and raises the problem of time."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "team_energy",
+        "characterIntent": "says that whatever they do, two people have exams this month."
+      }
+    },
+    {
+      "beatId": "team_energy",
+      "goal": "Two members have exams and want to step back.",
+      "competencies": [
+        "V",
+        "E"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "honest_ask",
+          "description": "plans around the time people really have",
+          "examples": [
+            "Let's ask everyone how much time they really have this month.",
+            "It's okay to step back; let's plan around who's available.",
+            "Nobody should feel guilty. Let's split the work by the time people have."
+          ],
+          "next": "plan",
+          "characterIntent": "relaxes and says she can give a few evenings."
+        },
+        {
+          "answerTypeId": "pressure_all",
+          "description": "insists everyone stays in",
+          "examples": [
+            "Everyone has to stay, we're a team.",
+            "Exams are no excuse.",
+            "If you step back now, you're letting us down."
+          ],
+          "next": "plan",
+          "characterIntent": "bristles and says that's exactly why people burn out."
+        },
+        {
+          "answerTypeId": "carry_alone",
+          "description": "takes the load alone",
+          "examples": [
+            "Fine, I'll do the work myself.",
+            "I'll cover whatever they don't do.",
+            "Don't worry, I'll handle it."
+          ],
+          "next": "plan",
+          "characterIntent": "doubts one person can do it, and asks what happens this week."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "plan",
+        "characterIntent": "asks what exactly happens this week."
+      }
+    },
+    {
+      "beatId": "plan",
+      "goal": "What exactly happens this week?",
+      "competencies": [
+        "E",
+        "R"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "owners_and_goal",
+          "description": "sets a goal, owners and a decision date",
+          "examples": [
+            "Madina redraws the first screen by Wednesday, I recruit twenty testers, Ali tracks the swaps. We decide on the thirtieth.",
+            "Goal: ten swaps in two weeks. Three tasks, three owners.",
+            "By Friday we have a new screen, twenty testers, and one number we watch."
+          ],
+          "next": "setback",
+          "characterIntent": "takes the first screen; two weeks later the result comes in."
+        },
+        {
+          "answerTypeId": "vague",
+          "description": "no owners, no goal",
+          "examples": [
+            "Let's all do what we can.",
+            "We'll work on it when we have time.",
+            "Everyone pitch in a bit."
+          ],
+          "next": "setback",
+          "characterIntent": "asks what \"a bit\" means; two weeks later the result comes in."
+        },
+        {
+          "answerTypeId": "hope_harder",
+          "description": "effort without anything to measure",
+          "examples": [
+            "We'll redesign everything and see if people like it.",
+            "Let's work hard and hope it takes off.",
+            "We just need to try harder this time."
+          ],
+          "next": "setback",
+          "characterIntent": "asks how they'll know it worked; two weeks later the result comes in."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "setback",
+        "characterIntent": "says she'll start on something; two weeks later the result comes in."
+      }
+    },
+    {
+      "beatId": "setback",
+      "goal": "Two weeks later the new screen brought only four swaps.",
+      "competencies": [
+        "D",
+        "I"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "learn_and_decide",
+          "description": "takes the lesson and decides together",
+          "examples": [
+            "It's not nothing. We learned people want it for exam season. Let's decide together whether to pause or change direction.",
+            "Four swaps tell us something. Let's talk to those four and then decide.",
+            "We set a stop rule; let's keep to it and keep what we learned."
+          ],
+          "next": "end",
+          "characterIntent": "says she's glad they tried it properly, and agrees to decide together."
+        },
+        {
+          "answerTypeId": "quit_bitter",
+          "description": "ends it bitterly",
+          "examples": [
+            "Yes, it was a waste of time.",
+            "I'm done, let's kill it.",
+            "We should never have started."
+          ],
+          "next": "end",
+          "characterIntent": "agrees, but says she wishes it had ended better."
+        },
+        {
+          "answerTypeId": "deny",
+          "description": "refuses to see the result",
+          "examples": [
+            "It's just bad luck, keep going.",
+            "Four swaps is actually great.",
+            "Let's ignore it and continue."
+          ],
+          "next": "end",
+          "characterIntent": "says she can't keep going on hope."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "end",
+        "characterIntent": "says they need an answer by the next meeting, and the scene ends."
+      }
+    }
+  ]
+}
