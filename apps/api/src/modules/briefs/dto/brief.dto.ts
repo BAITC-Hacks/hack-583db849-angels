@@ -91,10 +91,17 @@ class SurpriseSourceDto {
   @ApiProperty({ type: () => [SurpriseSegmentDto] }) segments!: SurpriseSegmentDto[];
 }
 
+class PresentationSourceDto {
+  @ApiProperty() presentationId!: string;
+  @ApiProperty() prompt!: string;
+  @ApiProperty({ type: () => [SurpriseSegmentDto] }) segments!: SurpriseSegmentDto[];
+}
+
 class BriefSourcesDto {
   @ApiProperty({ type: () => [ApplicationSourceDto] }) application!: ApplicationSourceDto[];
   @ApiProperty({ type: () => [TestSourceDto] }) test!: TestSourceDto[];
   @ApiProperty({ type: () => SurpriseSourceDto, nullable: true }) surpriseAnswer!: SurpriseSourceDto | null;
+  @ApiProperty({ type: () => PresentationSourceDto, nullable: true }) presentation!: PresentationSourceDto | null;
 }
 
 /** M1: questions for the interviewer, each traced to its source, and the before-interview consistency. */

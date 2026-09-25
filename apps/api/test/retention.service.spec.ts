@@ -3,7 +3,7 @@ import { RetentionService } from '../src/modules/retention/retention.service';
 const DAY = 24 * 60 * 60 * 1000;
 const now = new Date('2026-11-01T12:00:00Z');
 
-function harness(days?: string) {
+function harness(days?: string, presentations: { id: string; candidateId: string; videoRef: string | null; decidedAt: Date | null }[] = []) {
   const questions = [
     { id: 'old', candidateId: 'c-old', videoRef: 'surprise/old/answer.webm', decidedAt: new Date(now.getTime() - 31 * DAY) },
     { id: 'recent', candidateId: 'c-recent', videoRef: 'surprise/recent/answer.webm', decidedAt: new Date(now.getTime() - 10 * DAY) },
@@ -23,11 +23,20 @@ function harness(days?: string) {
         return Promise.resolve(question);
       }),
     },
+    presentation: {
+      findMany: jest.fn(({ where }: { where: { candidate: { decidedAt: { lte: Date } } } }) =>
+        Promise.resolve(presentations.filter((item) => item.videoRef && item.decidedAt && item.decidedAt <= where.candidate.decidedAt.lte))),
+      update: jest.fn(({ where }: { where: { id: string } }) => {
+        const item = presentations.find((presentation) => presentation.id === where.id)!;
+        item.videoRef = null;
+        return Promise.resolve(item);
+      }),
+    },
   };
   const media = { delete: jest.fn().mockResolvedValue(undefined) };
   const audit = { record: jest.fn().mockResolvedValue(undefined) };
   const config = { get: (name: string) => (name === 'VIDEO_RETENTION_DAYS' ? days : undefined) };
-  return { service: new RetentionService(prisma as never, config as never, media as never, audit as never), prisma, media, audit, questions };
+  return { service: new RetentionService(prisma as never, config as never, media as never, audit as never), prisma, media, audit, questions, presentations };
 }
 
 describe('RetentionService', () => {
@@ -40,6 +49,17 @@ describe('RetentionService', () => {
     expect(audit.record).toHaveBeenCalledWith(expect.objectContaining({ action: 'surprise.video.deleted', targetId: 'old', candidateId: 'c-old' }));
     // A second sweep finds nothing left to delete.
     await expect(service.sweep(now)).resolves.toBe(0);
+  });
+
+  it('deletes the video presentations on the same rule, and keeps their transcripts', async () => {
+    const { service, media, audit, presentations } = harness(undefined, [
+      { id: 'p-old', candidateId: 'c-old', videoRef: 'presentations/c-old/video.webm', decidedAt: new Date(now.getTime() - 40 * DAY) },
+      { id: 'p-new', candidateId: 'c-recent', videoRef: 'presentations/c-recent/video.webm', decidedAt: new Date(now.getTime() - 5 * DAY) },
+    ]);
+    await expect(service.sweep(now)).resolves.toBe(2);
+    expect(media.delete).toHaveBeenCalledWith('presentations/c-old/video.webm');
+    expect(presentations.map((item) => item.videoRef)).toEqual([null, 'presentations/c-recent/video.webm']);
+    expect(audit.record).toHaveBeenCalledWith(expect.objectContaining({ action: 'presentation.video.deleted', targetId: 'p-old' }));
   });
 
   it('takes the period from VIDEO_RETENTION_DAYS', async () => {
