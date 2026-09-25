@@ -49,6 +49,7 @@ The browser never holds an API key. The web calls a Next.js route on its own ser
 | Candidates — create, list, progress | yes ¹ | yes ¹ | yes | yes |
 | Scenarios — the pool | — | yes | yes | yes |
 | Accommodations — text mode | — | — | yes | yes |
+| Decision date — for deleting videos | yes | — | yes | yes |
 | C consistency — before the interview | — | yes | yes | yes |
 | C consistency — after the interview | — | — | yes | yes |
 | M1 briefs | — | yes | yes | yes |
@@ -84,6 +85,7 @@ The browser never holds an API key. The web calls a Next.js route on its own ser
 | `GET` | `/v1/candidates/:candidateId/progress` | | `200 CandidateProgress` — filtered by role | `404` |
 | `GET` | `/v1/scenarios` | | `200 ScenarioSummary[]` — the pool, staff only | |
 | `PUT` | `/v1/candidates/:candidateId/accommodations` | | `200 Accommodation`; body `{ textMode, reason }` | `404`, `409 SIMULATION_STARTED` |
+| `PUT` | `/v1/candidates/:candidateId/decision-date` | | `200 DecisionDate`; body `{ decidedAt }` — only the date of the commission's decision, never the decision | `400` a date in the future, `404` |
 
 `CandidateProgress` is what every role's home reads: one call, every step's state and id. The homes poll it every 5 seconds while a step is `pending`.
 
@@ -187,6 +189,7 @@ One question about the candidate's own application, one attempt, 90 seconds, on 
 - **One attempt, held by the server:** a second `start` answers `409 ALREADY_STARTED`, and an answer after `answerDeadline` + 15 s answers `409 DEADLINE_PASSED`.
 - **The video never reaches a model.** You extract the audio (`ffmpeg`), send it to `POST /internal/v1/transcribe` with one speaker, store the transcript as segments `sseg_01`, `sseg_02`, …, and delete the audio. The video file stays for staff playback only.
 - **Every video view is an audit event.** The video is deleted on demo reset and 30 days after the decision.
+- **The decision date comes from inVision.** The commission decides in inVision's own system; the platform sends only its date with `PUT /v1/candidates/:id/decision-date`. An hourly sweep deletes every video whose candidate was decided 30 days ago or more (`VIDEO_RETENTION_DAYS`) and writes `surprise.video.deleted`. The transcript stays, and `videoAvailable` turns `false`.
 - **Once the answer is transcribed,** you create a new brief and send the question and the segments in `BriefRequest.surpriseAnswer` (`ml.md`, rule 6c), so its quotes can cite `surprise_answer`.
 
 ### Admin and demo
@@ -432,6 +435,12 @@ interface SurpriseSegment {
   endSec: number;
 }
 
+interface DecisionDate {
+  candidateId: string;
+  decidedAt: string;                              // when the commission decided — the date only, never the outcome
+  videosDeletedAfter: string;                     // decidedAt + VIDEO_RETENTION_DAYS (30)
+}
+
 interface SurpriseQuestion {
   surpriseId: string;
   candidateId: string;
@@ -459,7 +468,7 @@ interface AdminOverview {
 type AuditAction =
   | 'candidate.created' | 'brief.ready' | 'simulation.started' | 'simulation.completed' | 'simulation.stopped'
   | 'assessment.ready' | 'interview.created' | 'recording.uploaded' | 'transcript.ready' | 'scores.saved'
-  | 'draft.created' | 'surprise.started' | 'surprise.answered' | 'surprise.video.viewed' | 'demo.reset';
+  | 'draft.created' | 'surprise.started' | 'surprise.answered' | 'surprise.video.viewed' | 'surprise.video.deleted' | 'demo.reset';
 
 interface AuditEvent {
   eventId: string;
