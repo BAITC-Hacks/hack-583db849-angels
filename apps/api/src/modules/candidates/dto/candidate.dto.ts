@@ -34,6 +34,11 @@ class SurpriseProgressDto {
   @ApiProperty({ enum: ['ready', 'started', 'transcribing', 'answered', 'expired', 'failed'] }) status!: 'ready' | 'started' | 'transcribing' | 'answered' | 'expired' | 'failed';
 }
 
+class PresentationProgressDto {
+  @ApiProperty() presentationId!: string;
+  @ApiProperty({ enum: ['transcribing', 'ready', 'failed'] }) status!: 'transcribing' | 'ready' | 'failed';
+}
+
 class ConsistencyProgressDto {
   @ApiProperty({ enum: ['pending', 'ready', 'failed'], nullable: true }) before!: 'pending' | 'ready' | 'failed' | null;
   @ApiProperty({ enum: ['pending', 'ready', 'failed', 'locked'], nullable: true }) after!: 'pending' | 'ready' | 'failed' | 'locked' | null;
@@ -47,6 +52,7 @@ export class CandidateProgressDto {
   @ApiProperty({ type: () => AssessmentProgressDto, nullable: true }) assessment!: AssessmentProgressDto | null;
   @ApiProperty({ type: () => InterviewProgressDto, nullable: true }) interview!: InterviewProgressDto | null;
   @ApiProperty({ type: () => SurpriseProgressDto, nullable: true }) surprise!: SurpriseProgressDto | null;
+  @ApiProperty({ type: () => PresentationProgressDto, nullable: true }) presentation!: PresentationProgressDto | null;
   @ApiProperty({ type: () => ConsistencyProgressDto }) consistency!: ConsistencyProgressDto;
   @ApiProperty({ type: () => AccommodationProgressDto, nullable: true }) accommodation!: AccommodationProgressDto | null;
 }

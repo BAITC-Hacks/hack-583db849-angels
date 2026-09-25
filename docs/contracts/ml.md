@@ -116,6 +116,7 @@ Each of these is visible on a screen, and a mistake here shows up in the demo.
    - A quote from it is `source: "surprise_answer"` with the segment id as `sourceId`, checked verbatim against that segment's `text` like any other quote (rule 2).
    - It is evidence like the application and the test: it can back a question, a claim or an observation in `consistency`, or something to clarify. Without `surpriseAnswer` in the request the brief never cites `surprise_answer`.
    - The field is optional, so a request without it is exactly today's request.
+6d. **The brief can quote the video presentation**, the same way: `BriefRequest.presentation` carries the prompt and the segments `pseg_01`, …, and a quote from it is `source: "presentation"` with the segment id, checked verbatim. Its audio comes to `transcribe` with `purpose: "presentation"` and one speaker.
 7. **English is separate.**
    - `EnglishMetrics` is computed by code;
    - grammar never moves a D.R.I.V.E. score;
@@ -151,7 +152,7 @@ class Strict(BaseModel):
 Competency = Literal["D", "R", "I", "V", "E"]
 Score = Annotated[int, Field(ge=0, le=4)] | None
 Confidence = Literal["low", "medium", "high"]
-SourceKind = Literal["application_field", "test_item", "simulation_turn", "interview_turn", "interview_note", "surprise_answer"]
+SourceKind = Literal["application_field", "test_item", "simulation_turn", "interview_turn", "interview_note", "surprise_answer", "presentation"]
 TurnId = Annotated[str, Field(pattern=r"^turn_\d{2,}$")]
 
 
@@ -398,10 +399,25 @@ class SurpriseAnswer(Strict):
     segments: list[SurpriseSegment]
 
 
+class PresentationSegment(Strict):
+    segmentId: Annotated[str, Field(pattern=r"^pseg_\d{2,}$")]
+    text: str                                   # verbatim, as transcribed; never translated
+    startSec: float
+    endSec: float
+
+
+class Presentation(Strict):
+    """The transcribed video presentation: the prompt and what was said. Never the video, never the audio."""
+
+    prompt: str
+    segments: list[PresentationSegment]
+
+
 class BriefRequest(Strict):
     candidate: CandidateView
     simulationEnglish: EnglishMetrics | None = None     # once the simulation is assessed
     surpriseAnswer: SurpriseAnswer | None = None        # once the surprise answer is transcribed (rule 6c)
+    presentation: Presentation | None = None            # once the video presentation is transcribed (rule 6d)
 
 
 BriefFocus = Literal["D", "R", "I", "V", "E", "invision_knowledge", "english", "motivation"]
@@ -503,7 +519,7 @@ class TranscribedTurn(Strict):
 # ---- POST /internal/v1/transcribe
 
 class TranscribeRequest(Strict):
-    purpose: Literal["interview", "surprise", "turn"]
+    purpose: Literal["interview", "surprise", "turn", "presentation"]
     audioRef: str                          # where api put the file; api deletes it afterwards
     language: Literal["en"] = "en"
     speakers: Literal[1, 2] = 2

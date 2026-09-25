@@ -61,7 +61,7 @@ export class RetentionService implements OnModuleInit, OnModuleDestroy {
     };
   }
 
-  /** Deletes every surprise video whose candidate was decided at least VIDEO_RETENTION_DAYS ago. The transcript stays. */
+  /** Deletes every surprise and presentation video whose candidate was decided at least VIDEO_RETENTION_DAYS ago. The transcript stays. */
   async sweep(now = new Date()): Promise<number> {
     const before = new Date(now.getTime() - this.retentionDays() * DAY);
     const due = await this.prisma.surpriseQuestion.findMany({
@@ -77,6 +77,20 @@ export class RetentionService implements OnModuleInit, OnModuleDestroy {
         deleted += 1;
       } catch (error) {
         this.logger.error(`Video of surprise question ${question.id} was not deleted: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    }
+    const presentations = await this.prisma.presentation.findMany({
+      where: { videoRef: { not: null }, candidate: { decidedAt: { lte: before } } },
+      select: { id: true, candidateId: true, videoRef: true },
+    });
+    for (const presentation of presentations) {
+      try {
+        await this.media.delete(presentation.videoRef as string);
+        await this.prisma.presentation.update({ where: { id: presentation.id }, data: { videoRef: null } });
+        await this.audit.record({ action: 'presentation.video.deleted', targetType: 'presentation', targetId: presentation.id, candidateId: presentation.candidateId });
+        deleted += 1;
+      } catch (error) {
+        this.logger.error(`Video of presentation ${presentation.id} was not deleted: ${error instanceof Error ? error.message : String(error)}`);
       }
     }
     if (deleted) this.logger.log(`Deleted ${deleted} video(s) past the retention period.`);

@@ -1,4 +1,8 @@
-import { ForbiddenException, INestApplication, NotFoundException, StreamableFile, ValidationPipe } from '@nestjs/common';
+import { mkdtempSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+
+import { ForbiddenException, INestApplication, NotFoundException, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
 
@@ -17,6 +21,7 @@ import { InterviewsService } from '../src/modules/interviews/interviews.service'
 import { ConsistencyService } from '../src/modules/consistency/consistency.service';
 import { AdminService } from '../src/modules/admin/admin.service';
 import { RetentionService } from '../src/modules/retention/retention.service';
+import { PresentationsService } from '../src/modules/presentations/presentations.service';
 
 const briefs = {
   startFor: jest.fn().mockResolvedValue(undefined),
@@ -25,6 +30,11 @@ const briefs = {
   rerun: jest.fn(),
 };
 
+/** A synthetic video on disk, as the services hand it to the controllers. */
+const videoPath = join(mkdtempSync(join(tmpdir(), 'contract-video-')), 'video.webm');
+writeFileSync(videoPath, 'synthetic video');
+const videoFile = { path: videoPath, type: 'video/webm', size: 'synthetic video'.length };
+
 const surprise = {
   create: jest.fn().mockImplementation(() => contractExample('surprise-question.created.json')),
   start: jest.fn().mockImplementation(() => contractExample('surprise-question.started.json')),
@@ -32,7 +42,7 @@ const surprise = {
   get: jest.fn().mockImplementation(() => contractExample('surprise-question.staff.json')),
   video: jest.fn().mockImplementation((_id: string, role: string) => {
     if (role === 'platform') throw new ForbiddenException({ code: 'FORBIDDEN', message: 'This role does not see the video.' });
-    return new StreamableFile(Buffer.from('synthetic video'), { type: 'video/webm' });
+    return videoFile;
   }),
 };
 
@@ -70,6 +80,12 @@ const retention = {
   setDecisionDate: jest.fn().mockImplementation((candidateId: string, decidedAt: string) =>
     ({ candidateId, decidedAt, videosDeletedAfter: decidedAt })),
   sweep: jest.fn(),
+};
+
+const presentations = {
+  submit: jest.fn().mockResolvedValue({ presentationId: 'p', status: 'transcribing' }),
+  get: jest.fn().mockResolvedValue({ presentationId: 'p', status: 'ready' }),
+  video: jest.fn().mockImplementation(() => videoFile),
 };
 
 describe('PR 1 contract routes', () => {
@@ -122,6 +138,8 @@ describe('PR 1 contract routes', () => {
       .useValue(admin)
       .overrideProvider(RetentionService)
       .useValue(retention)
+      .overrideProvider(PresentationsService)
+      .useValue(presentations)
       .overrideProvider(PrismaService)
       .useValue({
         candidate: {
@@ -179,7 +197,7 @@ describe('PR 1 contract routes', () => {
     expect(found.body).toEqual(created.body);
     expect(listed.body.items[0]).toEqual({ ...created.body, progress: {
       candidateId, label: 'Candidate A', brief: null, simulation: null, assessment: null,
-      interview: null, surprise: null, consistency: { before: null, after: null }, accommodation: null,
+      interview: null, surprise: null, presentation: null, consistency: { before: null, after: null }, accommodation: null,
     } });
     expect(progress.body.assessment).toBeNull();
     expect(JSON.stringify([created.body, listed.body, found.body, progress.body])).not.toContain('Synthetic Person');
@@ -214,7 +232,8 @@ describe('PR 1 contract routes', () => {
     await request(server).get(`/v1/surprise-questions/${surpriseId}/video`).set('X-API-Key', 'platform-key').expect(403);
     const video = await request(server).get(`/v1/surprise-questions/${surpriseId}/video`).set('X-API-Key', 'interviewer-key').expect(200);
     expect(video.headers['content-type']).toBe('video/webm');
-    expect(surprise.video).toHaveBeenCalledWith(surpriseId, 'interviewer');
+    expect(video.headers['accept-ranges']).toBe('bytes');
+    expect(surprise.video).toHaveBeenCalledWith(surpriseId, 'interviewer', undefined);
   });
 
   it('keeps quality checks to the commission and the admin, and validates the period', async () => {
@@ -291,6 +310,31 @@ describe('PR 1 contract routes', () => {
     await request(server).put(path).set('X-API-Key', 'platform-key').send({ decidedAt: 'soon' }).expect(400);
     // The outcome has no field to travel in.
     await request(server).put(path).set('X-API-Key', 'platform-key').send({ decidedAt: '2026-09-01T09:00:00Z', decision: 'admit' }).expect(400);
+  });
+
+  it('lets the candidate channel send the presentation, and keeps its video for staff', async () => {
+    const server = app.getHttpServer();
+    const presentationId = '6f1c2a0e-0000-4000-8000-00000000a009';
+    await request(server).post('/v1/presentations').set('X-API-Key', 'platform-key')
+      .field('candidateId', candidateId).field('consentVideo', 'true').field('consentProcessing', 'true')
+      .attach('video', Buffer.from('synthetic'), 'presentation.webm').expect(202);
+    await request(server).post('/v1/presentations').set('X-API-Key', 'interviewer-key').field('candidateId', candidateId).expect(403);
+    await request(server).get(`/v1/presentations/${presentationId}`).set('X-API-Key', 'platform-key').expect(200);
+    await request(server).get(`/v1/presentations/${presentationId}/video`).set('X-API-Key', 'platform-key').expect(403);
+    await request(server).get(`/v1/presentations/${presentationId}/video`).set('X-API-Key', 'commission-key').expect(200);
+  });
+
+  it('serves a video in the byte ranges a player asks for, so Safari plays it and anyone can seek', async () => {
+    const server = app.getHttpServer();
+    const url = '/v1/presentations/6f1c2a0e-0000-4000-8000-00000000a009/video';
+    const part = await request(server).get(url).set('X-API-Key', 'commission-key').set('Range', 'bytes=0-8').expect(206);
+    expect(part.headers['content-range']).toBe(`bytes 0-8/${videoFile.size}`);
+    expect(part.headers['content-length']).toBe('9');
+    expect(Buffer.from(part.body).toString()).toBe('synthetic');
+    expect(presentations.video).toHaveBeenLastCalledWith(expect.any(String), 'commission', 'bytes=0-8');
+    const outside = await request(server).get(url).set('X-API-Key', 'commission-key').set('Range', 'bytes=999-').expect(416);
+    expect(outside.headers['content-range']).toBe(`bytes */${videoFile.size}`);
+    expect(outside.body.error.code).toBe('RANGE_NOT_SATISFIABLE');
   });
 
   it('answers 404, not 500, for an id that is not a UUID', async () => {

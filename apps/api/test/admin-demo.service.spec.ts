@@ -49,7 +49,7 @@ describe('DemoService', () => {
       $transaction: jest.fn((operations: unknown[]) => Promise.resolve(operations)),
       qualityCheck: table('qualityCheck'), consistencyReport: table('consistencyReport'), interviewDraft: table('interviewDraft'),
       interviewerScore: table('interviewerScore'), interview: table('interview'), surpriseQuestion: table('surpriseQuestion'),
-      assessment: table('assessment'), simulationTurn: table('simulationTurn'), accommodation: table('accommodation'),
+      assessment: table('assessment'), simulationTurn: table('simulationTurn'), accommodation: table('accommodation'), presentation: table('presentation'),
       candidate: { findUnique: jest.fn().mockResolvedValue({ id: candidateId, externalId }) },
       simulation: { ...table('simulation'), findUnique: jest.fn().mockResolvedValue(existing), create: jest.fn().mockResolvedValue({ id: 'simulation-1' }) },
     };
@@ -71,7 +71,7 @@ describe('DemoService', () => {
   it('drops everything the demo made, keeps the audit log, and seeds A, B and C again', async () => {
     const { service, deleted, audit, seed } = harness();
     await service.reset('admin');
-    expect(deleted).toEqual(expect.arrayContaining(['simulation', 'assessment', 'interview', 'surpriseQuestion', 'qualityCheck', 'consistencyReport']));
+    expect(deleted).toEqual(expect.arrayContaining(['simulation', 'assessment', 'interview', 'surpriseQuestion', 'presentation', 'qualityCheck', 'consistencyReport']));
     expect(deleted).not.toContain('auditEvent');
     expect(audit.record).toHaveBeenCalledWith(expect.objectContaining({ action: 'demo.reset', actorRole: 'admin' }));
     expect(seed.seed).toHaveBeenCalled();

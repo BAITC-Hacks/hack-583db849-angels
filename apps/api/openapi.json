@@ -1392,6 +1392,113 @@
           "candidates"
         ]
       }
+    },
+    "/v1/presentations": {
+      "post": {
+        "operationId": "PresentationsController_submit",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitPresentationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PresentationDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "presentations"
+        ]
+      }
+    },
+    "/v1/presentations/{presentationId}": {
+      "get": {
+        "operationId": "PresentationsController_get",
+        "parameters": [
+          {
+            "name": "presentationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PresentationDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "presentations"
+        ]
+      }
+    },
+    "/v1/presentations/{presentationId}/video": {
+      "get": {
+        "operationId": "PresentationsController_video",
+        "parameters": [
+          {
+            "name": "presentationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "video/webm": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "video/mp4": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "presentations"
+        ]
+      }
     }
   },
   "info": {
@@ -1629,6 +1736,26 @@
           "status"
         ]
       },
+      "PresentationProgressDto": {
+        "type": "object",
+        "properties": {
+          "presentationId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "transcribing",
+              "ready",
+              "failed"
+            ]
+          }
+        },
+        "required": [
+          "presentationId",
+          "status"
+        ]
+      },
       "ConsistencyProgressDto": {
         "type": "object",
         "properties": {
@@ -1721,6 +1848,14 @@
               }
             ]
           },
+          "presentation": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PresentationProgressDto"
+              }
+            ]
+          },
           "consistency": {
             "$ref": "#/components/schemas/ConsistencyProgressDto"
           },
@@ -1741,6 +1876,7 @@
           "assessment",
           "interview",
           "surprise",
+          "presentation",
           "consistency",
           "accommodation"
         ]
@@ -2486,6 +2622,28 @@
           "segments"
         ]
       },
+      "PresentationSourceDto": {
+        "type": "object",
+        "properties": {
+          "presentationId": {
+            "type": "string"
+          },
+          "prompt": {
+            "type": "string"
+          },
+          "segments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SurpriseSegmentDto"
+            }
+          }
+        },
+        "required": [
+          "presentationId",
+          "prompt",
+          "segments"
+        ]
+      },
       "BriefSourcesDto": {
         "type": "object",
         "properties": {
@@ -2508,12 +2666,21 @@
                 "$ref": "#/components/schemas/SurpriseSourceDto"
               }
             ]
+          },
+          "presentation": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PresentationSourceDto"
+              }
+            ]
           }
         },
         "required": [
           "application",
           "test",
-          "surpriseAnswer"
+          "surpriseAnswer",
+          "presentation"
         ]
       },
       "BriefDto": {
@@ -3735,6 +3902,9 @@
               "surprise.answered",
               "surprise.video.viewed",
               "surprise.video.deleted",
+              "presentation.submitted",
+              "presentation.video.viewed",
+              "presentation.video.deleted",
               "demo.reset"
             ]
           },
@@ -3822,6 +3992,110 @@
           "candidateId",
           "decidedAt",
           "videosDeletedAfter"
+        ]
+      },
+      "SubmitPresentationDto": {
+        "type": "object",
+        "properties": {
+          "video": {
+            "type": "string",
+            "format": "binary",
+            "description": "webm or mp4, 60–180 seconds, up to 100 MB"
+          },
+          "candidateId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "consentVideo": {
+            "type": "string",
+            "enum": [
+              "true"
+            ]
+          },
+          "consentProcessing": {
+            "type": "string",
+            "enum": [
+              "true"
+            ]
+          }
+        },
+        "required": [
+          "video",
+          "candidateId",
+          "consentVideo",
+          "consentProcessing"
+        ]
+      },
+      "PresentationSegmentDto": {
+        "type": "object",
+        "properties": {
+          "segmentId": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "startSec": {
+            "type": "number"
+          },
+          "endSec": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "segmentId",
+          "text",
+          "startSec",
+          "endSec"
+        ]
+      },
+      "PresentationDto": {
+        "type": "object",
+        "properties": {
+          "presentationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "candidateId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "transcribing",
+              "ready",
+              "failed"
+            ]
+          },
+          "prompt": {
+            "type": "string"
+          },
+          "durationSec": {
+            "type": "number"
+          },
+          "submittedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "segments": {
+            "nullable": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PresentationSegmentDto"
+            }
+          },
+          "videoAvailable": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "presentationId",
+          "candidateId",
+          "status",
+          "prompt",
+          "durationSec",
+          "submittedAt"
         ]
       }
     }

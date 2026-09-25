@@ -1,15 +1,16 @@
-import { BadRequestException, ConflictException, ForbiddenException, Inject, Injectable, Logger, NotFoundException, StreamableFile } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Prisma, SurpriseQuestion } from '@prisma/client';
 
 import { AI_GATEWAY, AiGateway } from '../../ai-client/ai-gateway.port';
 import { CandidateAiService } from '../../ai-client/candidate-ai.service';
 import { ApiRole } from '../../auth/roles';
+import { countsAsView, type VideoFile } from '../../media/video-range';
 import { PrismaService } from '../../database/prisma.service';
 import { candidateSnapshot, snapshotSelect } from '../../privacy/candidate-snapshot';
 import { AuditService } from '../audit/audit.service';
 import { BriefsService } from '../briefs/briefs.service';
 import { SurpriseQuestionDto, SurpriseSegmentDto } from './dto/surprise.dto';
-import { SurpriseMediaService, type VideoExtension } from './surprise-media.service';
+import { SurpriseMediaService, videoContainer, type VideoExtension } from './surprise-media.service';
 import { READING_SECONDS, surpriseStatus } from './surprise-status';
 
 export interface UploadedVideo {
@@ -112,16 +113,18 @@ export class SurpriseService {
     return this.toDto(await this.find(surpriseId), role);
   }
 
-  /** Staff only, and every view is written to the audit log. */
-  async video(surpriseId: string, role: ApiRole): Promise<StreamableFile> {
+  /** Staff only, and every view is written to the audit log; `range` is the player's `Range` header. */
+  async video(surpriseId: string, role: ApiRole, range?: string): Promise<VideoFile> {
     if (role === 'platform') throw new ForbiddenException({ code: 'FORBIDDEN', message: 'This role does not see the video.' });
     const row = await this.find(surpriseId);
     if (!row.videoRef) throw new NotFoundException({ code: 'NOT_FOUND', message: 'There is no video for this question.' });
     const file = await this.media.open(row.videoRef);
-    await this.audit.record({
-      action: 'surprise.video.viewed', targetType: 'surprise_question', targetId: surpriseId, candidateId: row.candidateId, actorRole: role,
-    });
-    return new StreamableFile(file.stream, { type: file.type, length: file.length });
+    if (countsAsView(range, file.size)) {
+      await this.audit.record({
+        action: 'surprise.video.viewed', targetType: 'surprise_question', targetId: surpriseId, candidateId: row.candidateId, actorRole: role,
+      });
+    }
+    return file;
   }
 
   private async transcribe(surpriseId: string, candidateId: string, videoRef: string): Promise<void> {
@@ -150,21 +153,8 @@ export class SurpriseService {
     }
   }
 
-  /**
-   * The container, read from the file's first bytes rather than its declared
-   * type: a browser labels a recording `video/webm;codecs=vp8,opus`, and the
-   * comma in it is not a valid header value, so the declared type cannot be
-   * relied on.
-   */
   private extension(video: UploadedVideo | undefined): VideoExtension {
-    const head = video?.buffer.subarray(0, 12);
-    const found: VideoExtension | undefined = !head || head.length < 12
-      ? undefined
-      : head.readUInt32BE(0) === 0x1a45dfa3
-        ? 'webm'
-        : head.toString('latin1', 4, 8) === 'ftyp'
-          ? 'mp4'
-          : undefined;
+    const found = videoContainer(video?.buffer);
     if (!found) throw new BadRequestException({ code: 'VALIDATION_ERROR', message: 'A webm or mp4 video is required.', details: { fields: ['video'] } });
     return found;
   }

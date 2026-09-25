@@ -1,6 +1,5 @@
 import { randomUUID } from 'node:crypto';
 import { execFile } from 'node:child_process';
-import { createReadStream, type ReadStream } from 'node:fs';
 import { mkdir, stat, unlink, writeFile } from 'node:fs/promises';
 import { dirname, extname, join, resolve } from 'node:path';
 import { promisify } from 'node:util';
@@ -8,10 +7,27 @@ import { promisify } from 'node:util';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
+import { audioDurationSeconds } from '../../media/audio-duration';
+import type { VideoFile } from '../../media/video-range';
+
 const execFileAsync = promisify(execFile);
 
 export const videoTypes = { webm: 'video/webm', mp4: 'video/mp4' } as const;
 export type VideoExtension = keyof typeof videoTypes;
+
+/**
+ * The container, read from the file's first bytes rather than its declared
+ * type: a browser labels a recording `video/webm;codecs=vp8,opus`, and the
+ * comma in it is not a valid header value, so the declared type cannot be
+ * relied on. mp4 and a phone's mov both start with `ftyp`.
+ */
+export function videoContainer(video: Buffer | undefined): VideoExtension | null {
+  const head = video?.subarray(0, 12);
+  if (!head || head.length < 12) return null;
+  if (head.readUInt32BE(0) === 0x1a45dfa3) return 'webm';
+  if (head.toString('latin1', 4, 8) === 'ftyp') return 'mp4';
+  return null;
+}
 
 /**
  * The surprise answer on disk, under `UPLOADS_DIR/surprise/<id>/`. The video
@@ -26,8 +42,9 @@ export class SurpriseMediaService {
     this.root = resolve(config.get<string>('UPLOADS_DIR', '/data/uploads'));
   }
 
-  async saveVideo(surpriseId: string, extension: VideoExtension, video: Buffer): Promise<string> {
-    const videoRef = join('surprise', surpriseId, `${randomUUID()}.${extension}`);
+  /** Under `UPLOADS_DIR/<folder>/<id>/`: `surprise` for the surprise answer, `presentations` for the presentation. */
+  async saveVideo(id: string, extension: VideoExtension, video: Buffer, folder: 'surprise' | 'presentations' = 'surprise'): Promise<string> {
+    const videoRef = join(folder, id, `${randomUUID()}.${extension}`);
     const file = this.absolute(videoRef);
     await mkdir(dirname(file), { recursive: true });
     await writeFile(file, video, { flag: 'wx' });
@@ -43,12 +60,17 @@ export class SurpriseMediaService {
     return audioRef;
   }
 
-  async open(videoRef: string): Promise<{ stream: ReadStream; type: string; length: number }> {
+  /** How long the recording is, or null when it cannot be read as one. */
+  durationSeconds(videoRef: string): Promise<number | null> {
+    return audioDurationSeconds(this.absolute(videoRef));
+  }
+
+  async open(videoRef: string): Promise<VideoFile> {
     const file = this.absolute(videoRef);
     try {
       const { size } = await stat(file);
       const extension = extname(file).slice(1) as VideoExtension;
-      return { stream: createReadStream(file), type: videoTypes[extension] ?? 'application/octet-stream', length: size };
+      return { path: file, type: videoTypes[extension] ?? 'application/octet-stream', size };
     } catch {
       throw new NotFoundException({ code: 'NOT_FOUND', message: 'The video was not found.' });
     }

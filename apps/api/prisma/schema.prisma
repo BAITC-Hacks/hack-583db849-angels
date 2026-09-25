@@ -48,6 +48,7 @@ model Candidate {
   auditEvents        AuditEvent[]
   briefs             Brief[]
   surprise           SurpriseQuestion?
+  presentation       Presentation?
   consistencyReports ConsistencyReport[]
 }
 
@@ -239,4 +240,17 @@ model ConsistencyReport {
   interview   Interview? @relation(fields: [interviewId], references: [id], onDelete: SetNull)
 
   @@index([candidateId, createdAt])
+}
+
+/// P: the candidate's video presentation, sent once. The video stays on disk for staff only (`videoRef`);
+/// only the transcript of its audio ever reaches a model.
+model Presentation {
+  id          String    @id @default(uuid()) @db.Uuid
+  candidateId String    @unique @db.Uuid
+  status      String    @default("transcribing") // transcribing | ready | failed
+  durationSec Float
+  videoRef    String?
+  segments    Json?
+  createdAt   DateTime  @default(now())
+  candidate   Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
 }
