@@ -113,3 +113,29 @@ def test_impossible_duration_and_invalid_json_fail_closed(tmp_path: Path) -> Non
         transcribe(tmp_path, FakeMediaGateway(b"not-json"))
     with pytest.raises(GatewayOutputError):
         transcribe(tmp_path, FakeMediaGateway(provider_payload(), "audio/ogg"))
+
+
+def test_a_live_deepgram_interview_maps_to_both_voices_despite_boundary_noise(tmp_path: Path) -> None:
+    """A real Deepgram Nova-3 response (25.09.2026) on the seed interview voiced by two synthetic Aura voices.
+
+    One word at a turn boundary ("Right?") carries the other speaker; the
+    interview must still map, with every role where the script puts it.
+    """
+    live = (Path(__file__).parent / "fixtures" / "deepgram-interview-two-voices.json").read_bytes()
+    result = transcribe(tmp_path, FakeMediaGateway(live))
+    script = json.loads((Path(__file__).resolve().parents[3] / "seed/candidates/a/interview-transcript.json").read_text(encoding="utf-8"))
+
+    assert result.turns[0].speaker == "interviewer"
+    # Deepgram splits "Yes. Finishing on time…" in two; joined back, the turns follow the script's speakers.
+    joined = [turn.speaker for index, turn in enumerate(result.turns) if index == 0 or turn.speaker != result.turns[index - 1].speaker]
+    assert joined == [turn["speaker"] for turn in script]
+    assert all(turn.endSec > turn.startSec for turn in result.turns)
+
+
+def test_an_utterance_mostly_in_another_voice_still_fails_closed(tmp_path: Path) -> None:
+    words = [{"speaker": 1, "confidence": 0.9}] * 3 + [{"speaker": 0, "confidence": 0.9}] * 2
+    with pytest.raises(GatewayOutputError):
+        transcribe(tmp_path, FakeMediaGateway(provider_payload([
+            {"speaker": 0, "transcript": "What happened next?", "start": 0, "end": 2, "words": words},
+            {"speaker": 1, "transcript": "We regrouped.", "start": 3, "end": 5},
+        ])))
