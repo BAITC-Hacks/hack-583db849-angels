@@ -29,6 +29,9 @@ const actions: Record<StaffLocale, Record<AuditEvent['action'], string>> = {
     'surprise.answered': 'Surprise answer transcribed',
     'surprise.video.viewed': 'Staff watched the surprise answer',
     'surprise.video.deleted': 'Surprise video deleted, 30 days after the decision',
+    'presentation.submitted': 'Candidate sent the video presentation',
+    'presentation.video.viewed': 'Staff watched the video presentation',
+    'presentation.video.deleted': 'Presentation video deleted, 30 days after the decision',
     'demo.reset': 'Demo reset',
   },
   ru: {
@@ -47,6 +50,9 @@ const actions: Record<StaffLocale, Record<AuditEvent['action'], string>> = {
     'surprise.answered': 'Сюрпризный ответ расшифрован',
     'surprise.video.viewed': 'Сотрудник посмотрел сюрпризный ответ',
     'surprise.video.deleted': 'Видео сюрпризного ответа удалено через 30 дней после решения',
+    'presentation.submitted': 'Кандидат отправил видеопрезентацию',
+    'presentation.video.viewed': 'Сотрудник посмотрел видеопрезентацию',
+    'presentation.video.deleted': 'Видео презентации удалено через 30 дней после решения',
     'demo.reset': 'Демо сброшено',
   },
 };

@@ -10,6 +10,7 @@ import { useDemoRole } from '../../lib/DemoRoleProvider';
 import { useCopy, useStaffLocale } from '../../lib/i18n/StaffLocaleProvider';
 import { homeFor } from '../../lib/roles';
 import { MarkBriefViewed } from '../home/MarkBriefViewed';
+import { CandidatePresentation } from '../presentation/CandidatePresentation';
 import { CandidateSurprise } from '../surprise/CandidateSurprise';
 import { BriefClarify, BriefConsistency, BriefEnglish, BriefQuestions } from './BriefSections';
 import { SourcesPanel } from './SourcesPanel';
@@ -166,6 +167,7 @@ function BriefView({ brief, label, newer }: { brief: InterviewerBrief; label: st
             <BriefQuestions questions={brief.questions} />
             <BriefConsistency items={brief.consistency} />
             <CandidateSurprise candidateId={brief.candidateId} />
+            <CandidatePresentation candidateId={brief.candidateId} />
             <div className="grid items-start gap-4 md:grid-cols-2">
               <BriefClarify items={brief.clarify} />
               <BriefEnglish english={brief.english} />
