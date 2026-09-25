@@ -17,11 +17,8 @@ from ..schemas.contracts import (
     BriefResult,
     BriefTopic,
     CertificateLevel,
-    Claim,
-    ConsistencyItem,
-    Observation,
 )
-from .consistency import before_consistency
+from .consistency import assemble_before_consistency
 from .model_view import model_brief_request
 
 
@@ -139,37 +136,7 @@ def _ground(
                 evidence=evidence,
             ))
 
-    consistency = before_consistency(request)
-    for item in proposed.consistency:
-        claim_evidence = checked(item.claim.evidence)
-        observation_evidence = checked(item.observation.evidence)
-        if item.topic == "english" or not claim_evidence:
-            continue  # English is measured deterministically above.
-        if item.observation.metric is not None:
-            # Only the deterministic English comparison may interpret a metric.
-            continue
-        observation_text = (
-            f"The cited test or application response is: {observation_evidence[0].quote}"
-            if observation_evidence else "No comparable observation was supplied."
-        )
-        consistency.append(ConsistencyItem(
-            itemId=f"c_{len(consistency) + 1:02d}",
-            topic=item.topic,
-            claim=Claim(
-                text=f"The cited response says: {claim_evidence[0].quote}",
-                evidence=claim_evidence,
-            ),
-            observation=Observation(
-                text=observation_text,
-                evidence=observation_evidence,
-                metric=None,
-            ),
-            # Verified quotes establish the two source texts, not their semantic
-            # agreement. Keep the comparison open for the interviewer.
-            status="unverified",
-            whatToDo="Ask the candidate to clarify these points with a concrete example.",
-            askInInterview="How do these two points fit together in a recent example?",
-        ))
+    consistency = assemble_before_consistency(request, proposed.consistency, checked)
 
     certificate = None
     supplied_certificate = request.candidate.englishCertificate
