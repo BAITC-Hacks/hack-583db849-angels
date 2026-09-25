@@ -151,6 +151,8 @@ In `ml`, the Pydantic model has no `profile` field and sets `extra="forbid"`: a 
 
 `speaker` is `candidate` or `character`. `turnId` is `turn_` plus a two-digit position, unique within one simulation; with the simulation id it is unique everywhere.
 
+In `api` responses a candidate turn also carries `recognitionConfidence`: the recogniser's lowest confidence (0–1) for a spoken turn, `null` for a typed one. It is a flag for the people reading the transcript, never a penalty, and it is never sent to the ML service — the models there refuse fields they do not know.
+
 ### `Evidence` and `Claim`
 
 ```json

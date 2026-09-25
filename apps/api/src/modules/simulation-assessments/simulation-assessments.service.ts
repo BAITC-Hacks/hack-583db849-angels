@@ -36,6 +36,8 @@ export class SimulationAssessmentsService {
   async startAutomatically(simulationId: string): Promise<void> {
     const simulation = await this.loadSimulation(simulationId);
     if (simulation.status !== 'completed' || !simulation.completedAt) return;
+    // Stopped before saying anything: nothing to judge, and ML refuses such a transcript.
+    if (!this.hasCandidateTurn(simulation)) return;
 
     let assessmentId: string;
     try {
@@ -61,6 +63,9 @@ export class SimulationAssessmentsService {
     const simulation = await this.loadSimulation(simulationId);
     if (simulation.status !== 'completed' || !simulation.completedAt) {
       throw new ConflictException({ code: 'SIMULATION_NOT_FINISHED', message: 'The simulation has not finished.' });
+    }
+    if (!this.hasCandidateTurn(simulation)) {
+      throw new ConflictException({ code: 'NOTHING_TO_ASSESS', message: 'The candidate stopped before saying anything.' });
     }
 
     const existing = await this.prisma.assessment.findUnique({
@@ -124,6 +129,7 @@ export class SimulationAssessmentsService {
           text: turn.text,
           startedAt: (turn.startedAt ?? turn.createdAt).toISOString(),
           endedAt: (turn.endedAt ?? turn.createdAt).toISOString(),
+          ...(turn.speaker === 'candidate' ? { recognitionConfidence: turn.recognitionConfidence ?? null } : {}),
         })),
       },
       scores: result.scores,
@@ -217,6 +223,10 @@ export class SimulationAssessmentsService {
   }
 
   private turnId(sequence: number): string { return `turn_${String(sequence).padStart(2, '0')}`; }
+
+  private hasCandidateTurn(simulation: SimulationForAssessment): boolean {
+    return simulation.turns.some((turn) => turn.speaker === 'candidate');
+  }
 
   private isUniqueViolation(error: unknown): boolean {
     return error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002';

@@ -55,6 +55,31 @@ function harness(status: 'active' | 'completed' = 'completed') {
 }
 
 describe('SimulationAssessmentsService', () => {
+  it('shows the recognition confidence on the report, and never sends it to ML', async () => {
+    const fixture = harness();
+    Object.assign(fixture.simulation.turns[0], { recognitionConfidence: 0.42 });
+    await fixture.service.startAutomatically(simulationId);
+    const sent = fixture.gateway.simulationAssessment.mock.calls[0][0] as { turns: Record<string, unknown>[] };
+    expect(sent.turns[0]).not.toHaveProperty('recognitionConfidence');
+    const report = await fixture.service.get(assessmentId);
+    expect(report.simulation.turns[0].recognitionConfidence).toBe(0.42);
+  });
+
+  it('does not assess a simulation the candidate stopped before saying anything', async () => {
+    const fixture = harness();
+    fixture.simulation.turns = [
+      { sequence: 1, speaker: 'character' as never, text: 'Honestly, I am done.',
+        startedAt: new Date('2026-09-25T10:05:00Z'), endedAt: new Date('2026-09-25T10:05:05Z'),
+        createdAt: new Date('2026-09-25T10:05:00Z') },
+    ];
+    await fixture.service.startAutomatically(simulationId);
+    expect(fixture.gateway.simulationAssessment).not.toHaveBeenCalled();
+    expect(fixture.prisma.assessment.create).not.toHaveBeenCalled();
+    await expect(fixture.service.rerun(simulationId)).rejects.toMatchObject({
+      status: 409, response: { code: 'NOTHING_TO_ASSESS' },
+    });
+  });
+
   it('does not assess before completion and rejects an early manual re-run', async () => {
     const fixture = harness('active');
     await fixture.service.startAutomatically(simulationId);
