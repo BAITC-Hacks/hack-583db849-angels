@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
 import { contractExample } from '../src/contract-example';
 import { InterviewsService } from '../src/modules/interviews/interviews.service';
 import { ToLlmViewService } from '../src/privacy/to-llm-view.service';
@@ -13,14 +16,17 @@ const scores = { D: 3, R: 2, I: 2, V: null, E: 3 };
 
 type Row = Record<string, unknown> & { id: string; transcriptStatus: string };
 
-function harness({ duration = 900, transcribeFails = false, silent = false } = {}) {
+function harness({ duration = 900, transcribeFails = false, silent = false, demo = false } = {}) {
   let interview: Row | null = null;
   let saved: { scores: unknown; savedAt: Date } | null = null;
   const drafts: { id: string; status: string; result: unknown; createdAt: Date }[] = [];
-  const candidate = { label: 'Candidate A', profile: { fullName: 'Ada Example' } };
+  const candidate = { label: 'Candidate A', profile: { fullName: 'Ada Example' }, externalId: 'inv-2026-demo-a' };
   const row = () => (interview ? { ...interview, candidate, interviewerScore: saved } : null);
   const prisma = {
-    candidate: { findUnique: jest.fn(({ where }: { where: { id: string } }) => Promise.resolve(where.id === candidateId ? { id: candidateId } : null)) },
+    candidate: {
+      findUnique: jest.fn(({ where }: { where: { id: string } }) =>
+        Promise.resolve(where.id === candidateId ? { id: candidateId, externalId: candidate.externalId } : null)),
+    },
     interview: {
       create: jest.fn(({ data }: { data: Record<string, unknown> }) => {
         interview = { id: 'interview-1', ...data, transcript: Array.isArray(data.transcript) ? data.transcript : null } as unknown as Row;
@@ -74,11 +80,16 @@ function harness({ duration = 900, transcribeFails = false, silent = false } = {
   };
   const audit = { record: jest.fn().mockResolvedValue(undefined) };
   const consistency = { startAfter: jest.fn().mockResolvedValue(undefined) };
-  const service = new InterviewsService(prisma as never, gateway as never, audio as never, new ToLlmViewService(), audit as never, consistency as never);
+  const config = { get: (key: string) => (key === 'DEMO_MODE' ? String(demo) : undefined) };
+  const service = new InterviewsService(prisma as never, gateway as never, audio as never, new ToLlmViewService(), audit as never, consistency as never, config as never);
   return { service, gateway, audio, audit, consistency, drafts, current: () => interview as Row };
 }
 
 const settle = () => new Promise((resolve) => setTimeout(resolve, 0));
+/** Waits until the background work has got somewhere, however long a file read takes under load. */
+async function until(condition: () => boolean | Promise<boolean>) {
+  for (let tries = 0; tries < 200 && !(await condition()); tries += 1) await new Promise((resolve) => setTimeout(resolve, 5));
+}
 const upload = { buffer: webm, size: webm.length };
 
 describe('InterviewsService', () => {
@@ -193,5 +204,32 @@ describe('InterviewsService', () => {
     expect(sent.notes).toEqual([{ id: 'note_1', text: '[redacted] paused before answering.' }]);
     const draft = await service.getDraft('interview-1');
     expect(draft.scores).toHaveLength(5);
+  });
+
+  it('in DEMO_MODE gives a seed candidate the seed interview and the seed draft, with no model call', async () => {
+    const seed = (name: string) => JSON.parse(readFileSync(resolve(__dirname, '../../../seed/candidates/a', name), 'utf8'));
+    const { service, gateway, audio, current } = harness({ demo: true });
+    await service.create({ candidateId, heldAt: '2026-09-26T09:30:00Z', notes: ['Asked about the Thursday run.'] }, 'interviewer');
+    await service.recording('interview-1', upload, 'true', 'interviewer');
+    await until(() => current().transcriptStatus === 'ready');
+
+    expect(gateway.transcribeInterview).not.toHaveBeenCalled();
+    expect(current()).toMatchObject({ transcriptStatus: 'ready', transcript: seed('interview-transcript.json') });
+    // Only the text is kept, as ever.
+    expect(audio.delete).toHaveBeenCalled();
+
+    await service.saveScores('interview-1', scores, 'interviewer');
+    await until(() => service.getDraft('interview-1').then(() => true, () => false));
+    expect(gateway.interviewDraft).not.toHaveBeenCalled();
+    const draft = await service.getDraft('interview-1');
+    expect(draft.scores).toEqual(seed('expected-interview-draft.json').scores);
+  });
+
+  it('outside DEMO_MODE asks ML, even for a seed candidate', async () => {
+    const { service, gateway } = harness({ demo: false });
+    await service.create({ candidateId, heldAt: '2026-09-26T09:30:00Z' }, 'interviewer');
+    await service.recording('interview-1', upload, 'true', 'interviewer');
+    await settle();
+    expect(gateway.transcribeInterview).toHaveBeenCalledTimes(1);
   });
 });

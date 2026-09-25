@@ -1,12 +1,14 @@
 import {
   BadRequestException, ConflictException, HttpException, HttpStatus, Inject, Injectable, Logger, NotFoundException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Prisma } from '@prisma/client';
 
 import { AI_GATEWAY, AiGateway } from '../../ai-client/ai-gateway.port';
 import type { components } from '../../ai-client/schema';
 import { ApiRole } from '../../auth/roles';
 import { PrismaService } from '../../database/prisma.service';
+import { readSeed, seedLetter } from '../../seed-files';
 import { ToLlmViewService } from '../../privacy/to-llm-view.service';
 import { AuditService } from '../audit/audit.service';
 import { ConsistencyService } from '../consistency/consistency.service';
@@ -26,7 +28,7 @@ const MAX_RECORDING_SECONDS = 60 * 60 + 5;
 
 const interviewSelect = {
   id: true, candidateId: true, interviewerRef: true, heldAt: true, transcriptStatus: true, transcript: true, transcriptSource: true,
-  notes: true, candidate: { select: { label: true, profile: true } }, interviewerScore: { select: { scores: true, savedAt: true } },
+  notes: true, candidate: { select: { label: true, profile: true, externalId: true } }, interviewerScore: { select: { scores: true, savedAt: true } },
 } as const satisfies Prisma.InterviewSelect;
 type InterviewRow = Prisma.InterviewGetPayload<{ select: typeof interviewSelect }>;
 
@@ -46,6 +48,7 @@ export class InterviewsService {
     private readonly privacy: ToLlmViewService,
     private readonly audit: AuditService,
     private readonly consistency: ConsistencyService,
+    private readonly config: ConfigService,
   ) {}
 
   /** An interview, with inVision's own transcript or without one yet — then a recording brings it. */
@@ -169,8 +172,8 @@ export class InterviewsService {
 
   private async transcribe(interviewId: string, candidateId: string, audioRef: string): Promise<void> {
     try {
-      const result = await this.gateway.transcribeInterview(audioRef);
-      const transcript = this.withIds(result.turns.filter((turn) => turn.text.trim()));
+      const transcript = await this.seededTranscript(candidateId) ??
+        this.withIds((await this.gateway.transcribeInterview(audioRef)).turns.filter((turn) => turn.text.trim()));
       // Nothing recognised is nothing to read: the recording failed, and a new one may be sent.
       if (transcript.length === 0) throw new Error('No speech was recognised in the recording');
       await this.prisma.interview.update({
@@ -221,7 +224,7 @@ export class InterviewsService {
     const notes = ((row.notes ?? []) as unknown as { id: string; text: string }[]).map((note) => ({ ...note, text: this.privacy.redactText(profile, note.text) }));
     const pending = await this.prisma.interviewDraft.create({ data: { interviewId: row.id, status: 'pending' }, select: { id: true } });
     try {
-      const result = await this.gateway.interviewDraft({ candidateId: row.candidateId, transcript, notes });
+      const result = await this.recordedDraft(row) ?? await this.gateway.interviewDraft({ candidateId: row.candidateId, transcript, notes });
       await this.prisma.interviewDraft.update({ where: { id: pending.id }, data: { status: 'ready', result: result as unknown as Prisma.InputJsonValue } });
       await this.audit.record({ action: 'draft.created', targetType: 'interview', targetId: row.id, candidateId: row.candidateId });
     } catch (error) {
@@ -230,6 +233,33 @@ export class InterviewsService {
       this.logger.error(`Draft ${pending.id} failed: ${error instanceof Error ? error.message : String(error)}`);
     }
     return pending.id;
+  }
+
+  /**
+   * In `DEMO_MODE`, A, B and C's interview is the seed's, whatever was
+   * recorded: the pitch does not depend on a microphone or on a recorded
+   * answer for that audio. Anyone else is transcribed by ML as usual.
+   */
+  private async seededTranscript(candidateId: string): Promise<InterviewTurnDto[] | null> {
+    if (this.config.get<string>('DEMO_MODE') !== 'true') return null;
+    const candidate = await this.prisma.candidate.findUnique({ where: { id: candidateId }, select: { externalId: true } });
+    const letter = candidate ? seedLetter(candidate.externalId) : null;
+    return letter ? readSeed<InterviewTurnDto[]>('candidates', letter, 'interview-transcript.json').catch(() => null) : null;
+  }
+
+  /**
+   * In `DEMO_MODE`, the seed's own interview gets the seed's draft, with no
+   * model call: its quotes are that transcript's. The notes do not change
+   * it — the seed draft cites the candidate's turns only.
+   */
+  private async recordedDraft(row: InterviewRow): Promise<DraftResult | null> {
+    const letter = seedLetter(row.candidate.externalId);
+    if (!letter || this.config.get<string>('DEMO_MODE') !== 'true') return null;
+    const seeded = await readSeed<InterviewTurnDto[]>('candidates', letter, 'interview-transcript.json').catch(() => null);
+    const held = (row.transcript ?? []) as unknown as InterviewTurnDto[];
+    const same = seeded !== null && seeded.length === held.length &&
+      seeded.every((turn, index) => turn.speaker === held[index].speaker && turn.text === held[index].text);
+    return same ? readSeed<DraftResult>('candidates', letter, 'expected-interview-draft.json') : null;
   }
 
   private validScores(input: unknown): Scores {
