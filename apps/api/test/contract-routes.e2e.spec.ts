@@ -12,6 +12,7 @@ import { BriefsService } from '../src/modules/briefs/briefs.service';
 import { SimulationsService } from '../src/modules/simulations/simulations.service';
 import { SimulationAssessmentsService } from '../src/modules/simulation-assessments/simulation-assessments.service';
 import { SurpriseService } from '../src/modules/surprise/surprise.service';
+import { QualityGuardService } from '../src/modules/quality-guard/quality-guard.service';
 
 const briefs = {
   startFor: jest.fn().mockResolvedValue(undefined),
@@ -29,6 +30,13 @@ const surprise = {
     if (role === 'platform') throw new ForbiddenException({ code: 'FORBIDDEN', message: 'This role does not see the video.' });
     return new StreamableFile(Buffer.from('synthetic video'), { type: 'video/webm' });
   }),
+};
+
+const quality = {
+  interview: jest.fn().mockImplementation(() => contractExample('quality-check-interview.json')),
+  calibration: jest.fn().mockImplementation(() => contractExample('quality-check-calibration.json')),
+  list: jest.fn().mockResolvedValue({ items: [] }),
+  get: jest.fn().mockImplementation(() => contractExample('quality-check-interview.json')),
 };
 
 describe('PR 1 contract routes', () => {
@@ -69,6 +77,8 @@ describe('PR 1 contract routes', () => {
       .useValue(briefs)
       .overrideProvider(SurpriseService)
       .useValue(surprise)
+      .overrideProvider(QualityGuardService)
+      .useValue(quality)
       .overrideProvider(PrismaService)
       .useValue({
         candidate: {
@@ -164,6 +174,24 @@ describe('PR 1 contract routes', () => {
     expect(surprise.video).toHaveBeenCalledWith(surpriseId, 'interviewer');
   });
 
+  it('keeps quality checks to the commission and the admin, and validates the period', async () => {
+    const server = app.getHttpServer();
+    const interviewId = '6f1c2a0e-0000-4000-8000-00000000a004';
+    const period = { interviewerRef: 'interviewer-2', from: '2026-09-01', to: '2026-10-01' };
+    for (const role of ['platform-key', 'interviewer-key']) {
+      await request(server).post('/v1/quality-checks/interview').set('X-API-Key', role).send({ interviewId }).expect(403);
+      await request(server).post('/v1/quality-checks/calibration').set('X-API-Key', role).send(period).expect(403);
+      await request(server).get('/v1/quality-checks').set('X-API-Key', role).expect(403);
+    }
+    await request(server).post('/v1/quality-checks/interview').set('X-API-Key', 'commission-key').send({ interviewId }).expect(201);
+    await request(server).post('/v1/quality-checks/calibration').set('X-API-Key', 'admin-key').send(period).expect(201);
+    await request(server).get('/v1/quality-checks?kind=calibration&limit=5').set('X-API-Key', 'commission-key').expect(200);
+    expect(quality.list).toHaveBeenLastCalledWith(expect.objectContaining({ kind: 'calibration', limit: 5 }));
+    const invalid = await request(server).post('/v1/quality-checks/calibration').set('X-API-Key', 'admin-key')
+      .send({ ...period, from: '1 September' }).expect(400);
+    expect(invalid.body.error.fields ?? invalid.body.error.details.fields).toContain('from');
+  });
+
   it('answers 404, not 500, for an id that is not a UUID', async () => {
     const server = app.getHttpServer();
     const checks = [
@@ -175,6 +203,7 @@ describe('PR 1 contract routes', () => {
       () => request(server).get('/v1/simulation-assessments/preview').set('X-API-Key', 'commission-key'),
       () => request(server).get('/v1/surprise-questions/preview').set('X-API-Key', 'platform-key'),
       () => request(server).get('/v1/surprise-questions/preview/video').set('X-API-Key', 'commission-key'),
+      () => request(server).get('/v1/quality-checks/preview').set('X-API-Key', 'commission-key'),
     ];
     for (const check of checks) {
       const response = await check();

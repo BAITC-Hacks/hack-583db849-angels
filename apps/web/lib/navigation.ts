@@ -121,7 +121,6 @@ export const navItems: NavItem[] = [
     label: { en: 'Quality guard', ru: 'Контроль качества' },
     roles: ['commission', 'admin'],
     href: '/commission/quality-guard',
-    preview: true,
     module: 'M5',
   },
   {

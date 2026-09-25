@@ -619,6 +619,167 @@
         ]
       }
     },
+    "/v1/quality-checks/interview": {
+      "post": {
+        "operationId": "QualityGuardController_interview",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InterviewCheckDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QualityCheckDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "quality-checks"
+        ]
+      }
+    },
+    "/v1/quality-checks/calibration": {
+      "post": {
+        "operationId": "QualityGuardController_calibration",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CalibrationCheckDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QualityCheckDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "quality-checks"
+        ]
+      }
+    },
+    "/v1/quality-checks": {
+      "get": {
+        "operationId": "QualityGuardController_list",
+        "parameters": [
+          {
+            "name": "kind",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "interview",
+                "calibration"
+              ]
+            }
+          },
+          {
+            "name": "interviewerRef",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QualityCheckListDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "quality-checks"
+        ]
+      }
+    },
+    "/v1/quality-checks/{qualityCheckId}": {
+      "get": {
+        "operationId": "QualityGuardController_get",
+        "parameters": [
+          {
+            "name": "qualityCheckId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QualityCheckDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "quality-checks"
+        ]
+      }
+    },
     "/v1/surprise-questions": {
       "post": {
         "operationId": "SurpriseController_create",
@@ -2275,6 +2436,248 @@
           "strengths",
           "growth",
           "nextTime"
+        ]
+      },
+      "InterviewCheckDto": {
+        "type": "object",
+        "properties": {
+          "interviewId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "interviewId"
+        ]
+      },
+      "TalkShareDto": {
+        "type": "object",
+        "properties": {
+          "interviewer": {
+            "type": "number"
+          },
+          "candidate": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "interviewer",
+          "candidate"
+        ]
+      },
+      "DriftDto": {
+        "type": "object",
+        "properties": {
+          "competency": {
+            "type": "string",
+            "enum": [
+              "D",
+              "R",
+              "I",
+              "V",
+              "E"
+            ]
+          },
+          "interviewerMean": {
+            "type": "number"
+          },
+          "panelMean": {
+            "type": "number"
+          },
+          "delta": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "competency",
+          "interviewerMean",
+          "panelMean",
+          "delta"
+        ]
+      },
+      "QualityEvidenceDto": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string",
+            "enum": [
+              "application_field",
+              "test_item",
+              "simulation_turn",
+              "interview_turn",
+              "interview_note",
+              "surprise_answer"
+            ]
+          },
+          "sourceId": {
+            "type": "string"
+          },
+          "quote": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "source",
+          "sourceId",
+          "quote"
+        ]
+      },
+      "QualitySignalDto": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "leading_question",
+              "off_limits_question",
+              "coverage_gap",
+              "scale_drift"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "recommendation": {
+            "type": "string"
+          },
+          "competencies": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "D",
+                "R",
+                "I",
+                "V",
+                "E"
+              ]
+            }
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QualityEvidenceDto"
+            }
+          }
+        },
+        "required": [
+          "kind",
+          "message",
+          "recommendation",
+          "competencies",
+          "evidence"
+        ]
+      },
+      "QualityCheckDto": {
+        "type": "object",
+        "properties": {
+          "qualityCheckId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "interview",
+              "calibration"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "interviewId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "interviewerRef": {
+            "type": "string",
+            "nullable": true
+          },
+          "from": {
+            "type": "string",
+            "nullable": true
+          },
+          "to": {
+            "type": "string",
+            "nullable": true
+          },
+          "interviews": {
+            "type": "number",
+            "nullable": true
+          },
+          "talkShare": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TalkShareDto"
+              }
+            ]
+          },
+          "drift": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DriftDto"
+            }
+          },
+          "signals": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QualitySignalDto"
+            }
+          }
+        },
+        "required": [
+          "qualityCheckId",
+          "kind",
+          "createdAt",
+          "interviewId",
+          "interviewerRef",
+          "from",
+          "to",
+          "interviews",
+          "talkShare",
+          "drift",
+          "signals"
+        ]
+      },
+      "CalibrationCheckDto": {
+        "type": "object",
+        "properties": {
+          "interviewerRef": {
+            "type": "string",
+            "example": "interviewer-2"
+          },
+          "from": {
+            "type": "string",
+            "example": "2026-09-01",
+            "description": "YYYY-MM-DD, included"
+          },
+          "to": {
+            "type": "string",
+            "example": "2026-10-01",
+            "description": "YYYY-MM-DD, excluded"
+          }
+        },
+        "required": [
+          "interviewerRef",
+          "from",
+          "to"
+        ]
+      },
+      "QualityCheckListDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QualityCheckDto"
+            }
+          }
+        },
+        "required": [
+          "items"
         ]
       },
       "CreateSurpriseDto": {
