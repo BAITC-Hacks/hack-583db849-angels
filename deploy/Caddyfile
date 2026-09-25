@@ -1,0 +1,20 @@
+# HTTPS for the demo. Caddy gets and renews the certificate for $DOMAIN by
+# itself; only the web is behind it — the API, ML and Postgres stay inside
+# the compose network.
+{$DOMAIN} {
+	encode zstd gzip
+
+	# A surprise answer is up to 50 MB and an interview recording can be long.
+	request_body {
+		max_size 250MB
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+
+	reverse_proxy web:3000
+}
