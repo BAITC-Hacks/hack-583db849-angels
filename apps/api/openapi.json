@@ -419,6 +419,106 @@
         ]
       }
     },
+    "/v1/briefs": {
+      "post": {
+        "operationId": "BriefsController_create",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBriefDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BriefDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "briefs"
+        ]
+      }
+    },
+    "/v1/briefs/{briefId}": {
+      "get": {
+        "operationId": "BriefsController_get",
+        "parameters": [
+          {
+            "name": "briefId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BriefDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "briefs"
+        ]
+      }
+    },
+    "/v1/candidates/{candidateId}/brief": {
+      "get": {
+        "operationId": "BriefsController_latest",
+        "parameters": [
+          {
+            "name": "candidateId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BriefDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "briefs"
+        ]
+      }
+    },
     "/v1/simulation-assessments": {
       "post": {
         "operationId": "SimulationAssessmentsController_create",
@@ -1268,6 +1368,433 @@
           "status",
           "competencies",
           "assignedCount"
+        ]
+      },
+      "CreateBriefDto": {
+        "type": "object",
+        "properties": {
+          "candidateId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "candidateId"
+        ]
+      },
+      "BriefEvidenceDto": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string",
+            "enum": [
+              "application_field",
+              "test_item",
+              "simulation_turn",
+              "interview_turn",
+              "interview_note",
+              "surprise_answer"
+            ]
+          },
+          "sourceId": {
+            "type": "string"
+          },
+          "quote": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "source",
+          "sourceId",
+          "quote"
+        ]
+      },
+      "BriefQuestionDto": {
+        "type": "object",
+        "properties": {
+          "focus": {
+            "type": "string",
+            "enum": [
+              "D",
+              "R",
+              "I",
+              "V",
+              "E",
+              "invision_knowledge",
+              "english",
+              "motivation"
+            ]
+          },
+          "question": {
+            "type": "string"
+          },
+          "why": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BriefEvidenceDto"
+            }
+          }
+        },
+        "required": [
+          "focus",
+          "question",
+          "why",
+          "evidence"
+        ]
+      },
+      "ConsistencyClaimDto": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BriefEvidenceDto"
+            }
+          }
+        },
+        "required": [
+          "text",
+          "evidence"
+        ]
+      },
+      "ConsistencyMetricDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "value": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "simulation",
+              "surprise",
+              "interview"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "value",
+          "source"
+        ]
+      },
+      "ConsistencyObservationDto": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BriefEvidenceDto"
+            }
+          },
+          "metric": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ConsistencyMetricDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "text",
+          "evidence",
+          "metric"
+        ]
+      },
+      "ConsistencyItemDto": {
+        "type": "object",
+        "properties": {
+          "itemId": {
+            "type": "string"
+          },
+          "topic": {
+            "type": "string",
+            "enum": [
+              "english",
+              "invision_knowledge",
+              "motivation",
+              "experience",
+              "achievements",
+              "other"
+            ]
+          },
+          "claim": {
+            "$ref": "#/components/schemas/ConsistencyClaimDto"
+          },
+          "observation": {
+            "$ref": "#/components/schemas/ConsistencyObservationDto"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "consistent",
+              "discrepancy",
+              "unverified",
+              "confirmed",
+              "resolved"
+            ]
+          },
+          "whatToDo": {
+            "type": "string"
+          },
+          "askInInterview": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "itemId",
+          "topic",
+          "claim",
+          "observation",
+          "status",
+          "whatToDo",
+          "askInInterview"
+        ]
+      },
+      "BriefTopicDto": {
+        "type": "object",
+        "properties": {
+          "topic": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BriefEvidenceDto"
+            }
+          }
+        },
+        "required": [
+          "topic",
+          "evidence"
+        ]
+      },
+      "EnglishCertificateDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "score": {
+            "type": "string"
+          },
+          "cefr": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "score",
+          "cefr"
+        ]
+      },
+      "BriefEnglishDto": {
+        "type": "object",
+        "properties": {
+          "certificate": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EnglishCertificateDto"
+              }
+            ]
+          },
+          "writtenCefr": {
+            "type": "string"
+          },
+          "basis": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "certificate",
+          "writtenCefr",
+          "basis"
+        ]
+      },
+      "ApplicationSourceDto": {
+        "type": "object",
+        "properties": {
+          "fieldId": {
+            "type": "string"
+          },
+          "question": {
+            "type": "string"
+          },
+          "answer": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "fieldId",
+          "question",
+          "answer"
+        ]
+      },
+      "TestSourceDto": {
+        "type": "object",
+        "properties": {
+          "itemId": {
+            "type": "string"
+          },
+          "response": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "itemId",
+          "response"
+        ]
+      },
+      "SurpriseSegmentDto": {
+        "type": "object",
+        "properties": {
+          "segmentId": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "startSec": {
+            "type": "number"
+          },
+          "endSec": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "segmentId",
+          "text",
+          "startSec",
+          "endSec"
+        ]
+      },
+      "SurpriseSourceDto": {
+        "type": "object",
+        "properties": {
+          "surpriseId": {
+            "type": "string"
+          },
+          "question": {
+            "type": "string"
+          },
+          "segments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SurpriseSegmentDto"
+            }
+          }
+        },
+        "required": [
+          "surpriseId",
+          "question",
+          "segments"
+        ]
+      },
+      "BriefSourcesDto": {
+        "type": "object",
+        "properties": {
+          "application": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApplicationSourceDto"
+            }
+          },
+          "test": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TestSourceDto"
+            }
+          },
+          "surpriseAnswer": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SurpriseSourceDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "application",
+          "test",
+          "surpriseAnswer"
+        ]
+      },
+      "BriefDto": {
+        "type": "object",
+        "properties": {
+          "briefId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "candidateId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BriefQuestionDto"
+            }
+          },
+          "consistency": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConsistencyItemDto"
+            }
+          },
+          "clarify": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BriefTopicDto"
+            }
+          },
+          "english": {
+            "$ref": "#/components/schemas/BriefEnglishDto"
+          },
+          "sources": {
+            "$ref": "#/components/schemas/BriefSourcesDto"
+          }
+        },
+        "required": [
+          "briefId",
+          "candidateId",
+          "createdAt",
+          "summary",
+          "questions",
+          "consistency",
+          "clarify",
+          "english",
+          "sources"
         ]
       },
       "CreateSimulationAssessmentDto": {

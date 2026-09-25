@@ -4,7 +4,6 @@ import createClient from 'openapi-fetch';
 
 import { AiGateway } from './ai-gateway.port';
 import type { components, paths } from './schema';
-import { LlmView } from '../privacy/to-llm-view.service';
 
 export const ML_FETCH = Symbol('ML_FETCH');
 
@@ -19,8 +18,8 @@ export class MlHttpAdapter implements AiGateway {
     @Inject(ML_FETCH) private readonly fetchImplementation: typeof globalThis.fetch,
   ) {}
 
-  async sendCandidateContext(view: LlmView): Promise<void> {
-    await this.invoke('brief', () => this.client().POST('/internal/v1/brief', { body: { candidate: view } }));
+  brief(request: components['schemas']['BriefRequest']): Promise<components['schemas']['BriefResult']> {
+    return this.invoke('brief', () => this.client().POST('/internal/v1/brief', { body: request }));
   }
 
   scenarios(): Promise<components['schemas']['ScenarioBrief'][]> {
