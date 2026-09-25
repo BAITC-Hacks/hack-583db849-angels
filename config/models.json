@@ -26,11 +26,11 @@
         "usd": 0.0043
       }
     },
-    "whisper-large": {
+    "nova-2": {
       "provider": "deepgram",
       "pricing": {
         "unit": "audio_minute",
-        "usd": 0.0048
+        "usd": 0.0043
       }
     },
     "aura-2-thalia-en": {
@@ -115,7 +115,7 @@
     "transcription": {
       "provider": "deepgram",
       "model": "nova-3",
-      "fallback_model": "whisper-large",
+      "fallback_model": "nova-2",
       "max_tokens": 4000,
       "request_cost_limit_usd": 0.30,
       "cache_ttl_seconds": 604800,

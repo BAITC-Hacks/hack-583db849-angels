@@ -10,6 +10,7 @@ from services.ml.app.audio import resolve_audio_ref
 from services.ml.app.config import Settings
 from services.ml.app.errors import ServiceError
 from services.ml.app.gateway.config import Provider
+from services.ml.app.gateway.errors import GatewayProviderError
 from services.ml.app.gateway.media import MediaGatewayResult, MediaRequest
 from services.ml.app.main import create_app
 
@@ -104,6 +105,12 @@ class InterviewExampleGateway:
             media_type="application/json", billed_units=Decimal("0.1"),
             provider=Provider.DEEPGRAM, model="nova-3", replayed=True, cached=False,
         )
+
+
+class UnavailableInterviewGateway:
+    async def execute(self, request: MediaRequest) -> MediaGatewayResult:
+        assert request.parameters["purpose"] == "interview"
+        raise GatewayProviderError("both synthetic Deepgram models failed")
 
 
 def test_audio_ref_resolves_a_file_inside_uploads(tmp_path: Path) -> None:
@@ -249,6 +256,25 @@ def test_interview_transcription_uses_upload_and_returns_two_roles(tmp_path: Pat
     assert response.json()["turns"][1]["text"] == "I heard both sides."
     assert response.json()["durationSec"] == 5
     assert gateway.requests[0].content == b"synthetic-interview-audio"
+
+
+def test_interview_provider_outage_returns_safe_503(tmp_path: Path) -> None:
+    audio = tmp_path / "synthetic.ogg"
+    audio.write_bytes(b"synthetic")
+    settings = Settings(
+        ml_internal_token="test-internal-token", uploads_dir=tmp_path,
+        gateway_mode="replay", budget_usd_cap=Decimal("20"), demo_mode=False,
+    )
+    response = TestClient(
+        create_app(settings, media_gateway=UnavailableInterviewGateway()),
+        raise_server_exceptions=False,
+    ).post("/internal/v1/transcribe", json={
+        "purpose": "interview", "audioRef": "synthetic.ogg", "speakers": 2,
+    }, headers=TOKEN)
+
+    assert response.status_code == 503
+    assert response.json()["error"]["code"] == "AI_UNAVAILABLE"
+    assert "synthetic Deepgram models" not in response.text
 
 
 @pytest.mark.parametrize("purpose,speakers", [
