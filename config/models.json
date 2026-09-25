@@ -117,7 +117,7 @@
       "model": "nova-3",
       "fallback_model": "whisper-large",
       "max_tokens": 4000,
-      "request_cost_limit_usd": 0.05,
+      "request_cost_limit_usd": 0.30,
       "cache_ttl_seconds": 604800,
       "demo_seed_available": true
     },
