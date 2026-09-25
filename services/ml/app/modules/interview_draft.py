@@ -5,10 +5,13 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Protocol
 
+from ..evidence import interview_sources, verify_scores
+from ..errors import ServiceError
 from ..gateway.config import TaskName
+from ..gateway.errors import GatewayOutputError
 from ..gateway.types import GatewayRequest, GatewayResult
 from ..rubric import DriveRubric, load_drive_rubric
-from ..schemas.contracts import DraftRequest, DraftResult
+from ..schemas.contracts import DraftRequest, DraftResult, DriveScore
 
 
 ROOT_PROMPT = Path(__file__).resolve().parents[4] / "config/prompts/m4-interview-draft.md"
@@ -66,3 +69,45 @@ class InterviewDraftGenerator:
             )
         )
         return result.output
+
+
+class InterviewDraftService:
+    def __init__(self, generator: InterviewDraftGenerator) -> None:
+        self._generator = generator
+
+    async def prepare(self, request: DraftRequest) -> DraftResult:
+        try:
+            sources = interview_sources(request.transcript, request.notes)
+        except ValueError as error:
+            raise ServiceError(
+                status_code=422,
+                code="VALIDATION_ERROR",
+                message="Interview source identifiers are ambiguous.",
+            ) from error
+
+        if not sources:
+            return DraftResult(scores=[_null_score(code) for code in "DRIVE"])
+
+        for attempt in (1, 2):
+            proposed = await self._generator.generate(request, attempt=attempt)
+            verified = verify_scores(proposed.scores, sources)
+            if verified.majority_dropped:
+                continue
+            return DraftResult(scores=[_safe_score(score) for score in verified.scores])
+        raise GatewayOutputError("draft evidence did not match interview sources")
+
+
+def _null_score(code: str) -> DriveScore:
+    return DriveScore(
+        competency=code, score=None, confidence=None, rationale=None, evidence=[],
+    )
+
+
+def _safe_score(score: DriveScore) -> DriveScore:
+    if score.score is None or not score.evidence:
+        return _null_score(score.competency)
+    first = score.evidence[0]
+    source = "candidate response" if first.source == "interview_turn" else "interview note"
+    return score.model_copy(update={
+        "rationale": f'The cited {source} says: "{first.quote}"',
+    })
