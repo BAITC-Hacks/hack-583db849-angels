@@ -56,7 +56,12 @@ class DeepgramProvider:
             diarize_model = request.parameters.get("diarize_model")
             if diarize_model not in {"latest", "v1", "v2"}:
                 raise GatewayConfigurationError("interview diarization model is missing")
-            parameters["diarize_model"] = diarize_model
+            if request.model == "nova-2":
+                # The approved fallback uses legacy diarization, never both
+                # diarize and diarize_model in the same Deepgram request.
+                parameters["diarize"] = "true"
+            else:
+                parameters["diarize_model"] = diarize_model
             parameters["utterances"] = "true"
         elif speakers == 1:
             parameters["diarize"] = "false"

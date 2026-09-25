@@ -214,9 +214,19 @@ def test_interview_budget_covers_sixty_minutes_and_fallback(tmp_path: Path) -> N
 
     result = asyncio.run(service.execute(interview_request()))
 
-    assert result.model == "whisper-large"
-    assert [call.model for call in provider.calls] == ["nova-3", "whisper-large"]
-    assert asyncio.run(usage.records())[0].actual_usd == Decimal("0.2880")
+    assert result.model == "nova-2"
+    assert [call.model for call in provider.calls] == ["nova-3", "nova-2"]
+    assert asyncio.run(usage.records())[0].actual_usd == Decimal("0.2580")
+
+
+def test_interview_both_models_failing_is_provider_unavailable(tmp_path: Path) -> None:
+    provider = FakeProvider(fail_models={"nova-3", "nova-2"})
+    service, _, _ = gateway(tmp_path, provider)
+
+    with pytest.raises(GatewayProviderError, match="Deepgram provider failed"):
+        asyncio.run(service.execute(interview_request()))
+
+    assert [call.model for call in provider.calls] == ["nova-3", "nova-2"]
 
 
 def test_interview_global_cap_blocks_provider_before_call(tmp_path: Path) -> None:
@@ -313,6 +323,29 @@ def test_deepgram_interview_adapter_requests_diarized_utterances() -> None:
     assert "utterances=true" in seen[0].full_url
     assert "diarize=true" not in seen[0].full_url
     assert seen[0].data == request.content
+
+
+def test_deepgram_nova_2_fallback_uses_legacy_diarization_only() -> None:
+    seen = []
+    body = json.dumps({"metadata": {"duration": 186}, "results": {}}).encode()
+
+    def opener(request, timeout):
+        seen.append(request)
+        return FakeHttpResponse(body)
+
+    provider = DeepgramProvider("synthetic-key", opener=opener)
+    request = interview_request()
+    asyncio.run(provider.execute(MediaProviderRequest(
+        task=request.task, operation=request.operation, model="nova-2",
+        content=request.content, content_type=request.content_type,
+        parameters=request.parameters, estimated_units=request.estimated_units,
+    )))
+
+    assert len(seen) == 1
+    assert "model=nova-2" in seen[0].full_url
+    assert "diarize=true" in seen[0].full_url
+    assert "diarize_model=" not in seen[0].full_url
+    assert "utterances=true" in seen[0].full_url
 
 
 def test_deepgram_rejects_interview_without_keyed_diarizer() -> None:
