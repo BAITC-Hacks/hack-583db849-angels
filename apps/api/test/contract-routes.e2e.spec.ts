@@ -16,6 +16,7 @@ import { QualityGuardService } from '../src/modules/quality-guard/quality-guard.
 import { InterviewsService } from '../src/modules/interviews/interviews.service';
 import { ConsistencyService } from '../src/modules/consistency/consistency.service';
 import { AdminService } from '../src/modules/admin/admin.service';
+import { RetentionService } from '../src/modules/retention/retention.service';
 
 const briefs = {
   startFor: jest.fn().mockResolvedValue(undefined),
@@ -65,6 +66,12 @@ const admin = {
 // Each test here walks many routes over HTTP; under a full parallel run 5 s is too tight.
 jest.setTimeout(20_000);
 
+const retention = {
+  setDecisionDate: jest.fn().mockImplementation((candidateId: string, decidedAt: string) =>
+    ({ candidateId, decidedAt, videosDeletedAfter: decidedAt })),
+  sweep: jest.fn(),
+};
+
 describe('PR 1 contract routes', () => {
   let app: INestApplication;
   const candidateId = '00000000-0000-4000-8000-00000000000a';
@@ -113,6 +120,8 @@ describe('PR 1 contract routes', () => {
       .useValue(consistency)
       .overrideProvider(AdminService)
       .useValue(admin)
+      .overrideProvider(RetentionService)
+      .useValue(retention)
       .overrideProvider(PrismaService)
       .useValue({
         candidate: {
@@ -271,6 +280,17 @@ describe('PR 1 contract routes', () => {
     await request(server).post('/v1/demo/recorded-session').set('X-API-Key', 'commission-key').send({ candidateId }).expect(404);
     await request(server).post('/v1/demo/reset').set('X-API-Key', 'commission-key').expect(403);
     await request(server).post('/v1/demo/recorded-session').set('X-API-Key', 'interviewer-key').send({ candidateId }).expect(403);
+  });
+
+  it('takes the decision date from the platform and the commission, never from the interviewer', async () => {
+    const server = app.getHttpServer();
+    const path = `/v1/candidates/${candidateId}/decision-date`;
+    await request(server).put(path).set('X-API-Key', 'platform-key').send({ decidedAt: '2026-09-01T09:00:00Z' }).expect(200);
+    await request(server).put(path).set('X-API-Key', 'commission-key').send({ decidedAt: '2026-09-01T09:00:00Z' }).expect(200);
+    await request(server).put(path).set('X-API-Key', 'interviewer-key').send({ decidedAt: '2026-09-01T09:00:00Z' }).expect(403);
+    await request(server).put(path).set('X-API-Key', 'platform-key').send({ decidedAt: 'soon' }).expect(400);
+    // The outcome has no field to travel in.
+    await request(server).put(path).set('X-API-Key', 'platform-key').send({ decidedAt: '2026-09-01T09:00:00Z', decision: 'admit' }).expect(400);
   });
 
   it('answers 404, not 500, for an id that is not a UUID', async () => {
