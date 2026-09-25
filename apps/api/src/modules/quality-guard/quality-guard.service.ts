@@ -83,7 +83,8 @@ export class QualityGuardService {
     }
 
     const result = await this.gateway.qualityCheck({ kind: 'calibration', transcript: [], history, interviewerRef, periodFrom: from, periodTo: to });
-    return this.store({ kind: 'calibration', interviewId: null, interviewerRef, from, to }, result);
+    // How many interviews the check read is what was sent, whatever the answer says.
+    return this.store({ kind: 'calibration', interviewId: null, interviewerRef, from, to }, { ...result, interviews: history.length });
   }
 
   async list({ kind, interviewerRef, limit = 20 }: QualityCheckQueryDto): Promise<{ items: QualityCheckDto[] }> {
