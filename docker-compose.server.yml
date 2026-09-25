@@ -1,0 +1,64 @@
+# The server: the same four services, with every secret from .env, nothing
+# published but Caddy, and HTTPS in front of the web — the camera and the
+# microphone only work over HTTPS. See docs/DEPLOY.md.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.server.yml up -d --build
+#
+# `!reset` needs Docker Compose 2.24 or newer.
+
+services:
+  postgres:
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    ports: !reset []
+
+  ml:
+    restart: unless-stopped
+    environment:
+      ML_INTERNAL_TOKEN: ${ML_INTERNAL_TOKEN:?set ML_INTERNAL_TOKEN in .env}
+      GATEWAY_MODE: ${GATEWAY_MODE:-replay}
+      BUDGET_USD_CAP: ${BUDGET_USD_CAP:-20}
+      DEMO_MODE: ${DEMO_MODE:-true}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      DEEPGRAM_API_KEY: ${DEEPGRAM_API_KEY:-}
+
+  api:
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://invision:${POSTGRES_PASSWORD}@postgres:5432/invision
+      API_KEYS: ${API_KEYS:?set API_KEYS in .env}
+      ML_INTERNAL_TOKEN: ${ML_INTERNAL_TOKEN}
+      DEMO_MODE: ${DEMO_MODE:-true}
+      VIDEO_RETENTION_DAYS: ${VIDEO_RETENTION_DAYS:-30}
+    ports: !reset []
+
+  web:
+    restart: unless-stopped
+    environment:
+      WEB_API_KEY_PLATFORM: ${WEB_API_KEY_PLATFORM:?set the WEB_API_KEY_* values in .env}
+      WEB_API_KEY_INTERVIEWER: ${WEB_API_KEY_INTERVIEWER:?set the WEB_API_KEY_* values in .env}
+      WEB_API_KEY_COMMISSION: ${WEB_API_KEY_COMMISSION:?set the WEB_API_KEY_* values in .env}
+      WEB_API_KEY_ADMIN: ${WEB_API_KEY_ADMIN:?set the WEB_API_KEY_* values in .env}
+    ports: !reset []
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    environment:
+      DOMAIN: ${DOMAIN:?set DOMAIN in .env}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      web:
+        condition: service_healthy
+
+volumes:
+  caddy-data:
+  caddy-config:
