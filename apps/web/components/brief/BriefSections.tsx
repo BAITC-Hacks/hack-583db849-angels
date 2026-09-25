@@ -64,7 +64,7 @@ const focusIcon = {
   motivation: SparklesIcon,
 } as const;
 
-function focusName(focus: BriefFocus, locale: StaffLocale): { letter: string | null; Icon: typeof AcademicCapIcon | null; name: string } {
+export function focusName(focus: BriefFocus, locale: StaffLocale): { letter: string | null; Icon: typeof AcademicCapIcon | null; name: string } {
   if (focus === 'invision_knowledge' || focus === 'english' || focus === 'motivation') {
     return { letter: null, Icon: focusIcon[focus], name: copy[locale].focus[focus] };
   }
