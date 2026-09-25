@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { NextStep } from '../../../components/home/NextStep';
 import { SeedPending } from '../../../components/home/SeedPending';
 import { StatusPill } from '../../../components/home/StatusPill';
-import type { CandidateProgress } from '../../../lib/demo/world';
+import type { CandidateProgress } from '../../../lib/home/types';
 import { useHomeProgress } from '../../../lib/home/useHomeProgress';
 import { ApiUnavailable } from '../../../components/home/ApiUnavailable';
 import { useStaffLocale } from '../../../lib/i18n/StaffLocaleProvider';

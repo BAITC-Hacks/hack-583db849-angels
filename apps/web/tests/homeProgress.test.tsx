@@ -2,14 +2,14 @@ import { act, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { somethingPending } from '../lib/api/candidates';
 import type { WireCandidate } from '../lib/api/contract';
-import { record, resetWorld } from '../lib/demo/world';
+import { forgetViewedBriefs, markBriefViewed } from '../lib/brief/viewed';
 import { useHomeProgress } from '../lib/home/useHomeProgress';
 import CommissionHome from '../app/(product)/commission/page';
 import { example, hookWithQuery, json, mockApi, withQuery } from './apiHarness';
 
 const list = example<{ items: WireCandidate[] }>('candidates.json');
 
-beforeEach(() => resetWorld());
+beforeEach(() => forgetViewedBriefs());
 afterEach(() => vi.unstubAllGlobals());
 
 describe('where each candidate is, for the staff homes', () => {
@@ -21,7 +21,7 @@ describe('where each candidate is, for the staff homes', () => {
     expect(result.current.candidates.A).toMatchObject({ id: 'api-Candidate A', brief: 'ready', assessmentReady: true, assessment: 'ready' });
     // Whether the brief was opened is known to this tab only (G13).
     expect(result.current.candidates.A.briefViewed).toBe(false);
-    act(() => record('brief-viewed', 'A', { briefViewed: true }));
+    act(() => markBriefViewed('api-Candidate A'));
     expect(result.current.candidates.A).toMatchObject({ briefViewed: true, brief: 'ready' });
   });
 
