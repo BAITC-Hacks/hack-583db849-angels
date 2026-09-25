@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "source": "https://ielts.org/organisations/ielts-for-organisations/compare-ielts/ielts-and-the-cefr",
+  "note": "Indicative alignment of IELTS overall bands, not certificate verification or an admissions threshold. Borderline 5.0 and 8.0 are intentionally unmapped.",
+  "certificates": {
+    "IELTS": {
+      "4": "B1",
+      "4.5": "B1",
+      "5.5": "B2",
+      "6": "B2",
+      "6.5": "B2",
+      "7": "C1",
+      "7.5": "C1",
+      "8.5": "C2",
+      "9": "C2"
+    }
+  }
+}

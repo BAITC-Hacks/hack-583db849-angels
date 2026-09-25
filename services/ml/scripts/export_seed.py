@@ -5,9 +5,15 @@ from __future__ import annotations
 import json
 from pathlib import Path
 import shutil
+import sys
 
 
 ROOT = Path(__file__).resolve().parents[3]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from services.ml.app.metrics.certificate import mapped_certificate_cefr  # noqa: E402
+
 SEED = ROOT / "seed" / "candidates"
 EXAMPLES = ROOT / "docs" / "contracts" / "examples" / "candidate-a" / "ml"
 CANDIDATE_IDS = {
@@ -88,6 +94,20 @@ def brief(candidate: str, snapshot: dict) -> dict:
             ["simulationEnglish"] if candidate == "a" else None
         )
         measured = simulation_english["cefrEstimate"] if simulation_english else None
+        supplied_certificate = snapshot.get("englishCertificate")
+        mapped = (
+            mapped_certificate_cefr(supplied_certificate["type"], supplied_certificate["score"])
+            if supplied_certificate else None
+        )
+        observation_text = (
+            f"Simulation English was estimated at {measured}." if measured
+            else "No simulation English estimate is available yet."
+        )
+        if mapped is not None:
+            observation_text += (
+                f" The supplied IELTS overall band indicatively maps to {mapped}; "
+                "the certificate has not been verified."
+            )
         consistency.append({
             "itemId": "c_01",
             "topic": "english",
@@ -98,10 +118,7 @@ def brief(candidate: str, snapshot: dict) -> dict:
                 }],
             },
             "observation": {
-                "text": (
-                    f"Simulation English was estimated at {measured}." if measured
-                    else "No simulation English estimate is available yet."
-                ),
+                "text": observation_text,
                 "evidence": [],
                 "metric": (
                     {"name": "cefrEstimate", "value": measured, "source": "simulation"}

@@ -113,7 +113,7 @@
         ]
       },
       "observation": {
-        "text": "Simulation English was estimated at B2.",
+        "text": "Simulation English was estimated at B2. The supplied IELTS overall band indicatively maps to B2; the certificate has not been verified.",
         "evidence": [],
         "metric": {
           "name": "cefrEstimate",
