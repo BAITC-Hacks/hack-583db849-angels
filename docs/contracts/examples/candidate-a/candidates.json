@@ -31,6 +31,7 @@
           "surpriseId": "6f1c2a0e-0000-4000-8000-00000000a007",
           "status": "answered"
         },
+        "presentation": null,
         "consistency": {
           "before": "ready",
           "after": "ready"
@@ -54,6 +55,7 @@
         "assessment": null,
         "interview": null,
         "surprise": null,
+        "presentation": null,
         "consistency": {
           "before": "ready",
           "after": null
@@ -77,6 +79,7 @@
         "assessment": null,
         "interview": null,
         "surprise": null,
+        "presentation": null,
         "consistency": {
           "before": "ready",
           "after": null
