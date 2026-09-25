@@ -1204,6 +1204,48 @@
           "surprise-questions"
         ]
       }
+    },
+    "/v1/candidates/{candidateId}/consistency": {
+      "get": {
+        "operationId": "ConsistencyController_get",
+        "parameters": [
+          {
+            "name": "candidateId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "stage",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "before",
+                "after"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsistencyReportDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "consistency"
+        ]
+      }
     }
   },
   "info": {
@@ -3358,6 +3400,38 @@
           "video",
           "consentVideo",
           "consentProcessing"
+        ]
+      },
+      "ConsistencyReportDto": {
+        "type": "object",
+        "properties": {
+          "candidateId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "stage": {
+            "type": "string",
+            "enum": [
+              "before",
+              "after"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConsistencyItemDto"
+            }
+          }
+        },
+        "required": [
+          "candidateId",
+          "stage",
+          "createdAt",
+          "items"
         ]
       }
     }

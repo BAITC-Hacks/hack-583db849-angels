@@ -15,6 +15,7 @@ describe('CandidatesService', () => {
     assessments: [],
     briefs: [],
     interviews: [],
+    consistencyReports: [],
   };
   const briefs = { startFor: jest.fn().mockResolvedValue(undefined) };
 
@@ -119,6 +120,18 @@ describe('CandidatesService', () => {
       interviewId: 'interview-id', transcriptStatus: 'ready', scoresSaved: true, draftReady: false,
     });
     expect((await service.progress(row.id, 'platform'))?.interview).toBeNull();
+  });
+
+  it('keeps the after-interview consistency locked until the scores, then shows where it is', async () => {
+    const interview = { id: 'interview-id', transcriptStatus: 'ready', drafts: [] };
+    const unscored = { ...row, briefs: [{ id: 'brief-id', status: 'ready' }], interviews: [{ ...interview, interviewerScore: null }] };
+    const scored = { ...unscored, interviews: [{ ...interview, interviewerScore: { id: 'scores-id' } }], consistencyReports: [{ status: 'pending' }] };
+    const prisma = { candidate: { findUnique: jest.fn().mockResolvedValueOnce(unscored).mockResolvedValueOnce(scored).mockResolvedValueOnce(scored) } };
+    const service = new CandidatesService(prisma as never, briefs as never);
+    expect((await service.progress(row.id, 'commission'))?.consistency).toEqual({ before: 'ready', after: 'locked' });
+    expect((await service.progress(row.id, 'commission'))?.consistency).toEqual({ before: 'ready', after: 'pending' });
+    // The interviewer reads the brief, not the after stage.
+    expect((await service.progress(row.id, 'interviewer'))?.consistency).toEqual({ before: 'ready', after: null });
   });
 
   it('shows every role where the surprise question is, and an unanswered one as expired after its deadline', async () => {
