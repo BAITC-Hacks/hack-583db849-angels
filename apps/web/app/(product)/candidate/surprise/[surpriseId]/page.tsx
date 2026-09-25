@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
-import { SurpriseFlow } from '../../../../../components/surprise/SurpriseFlow';
-import { previewSurpriseStarted } from '../../../../../lib/surprise/preview';
+import { SurpriseScreen } from '../../../../../components/surprise/SurpriseScreen';
 
 export const metadata: Metadata = { title: 'A short question — AI Leader ID' };
 
@@ -11,19 +10,12 @@ export const metadata: Metadata = { title: 'A short question — AI Leader ID' }
  * Published questions can be rehearsed; this one cannot, which is the whole
  * reason it exists. The candidate screen is English only and shows no score,
  * no ranking and nothing about a decision — as everywhere they can see.
- *
- * Scripted until the surprise endpoints land (#55).
  */
 export default async function SurprisePage({ params }: { params: Promise<{ surpriseId: string }> }) {
   const { surpriseId } = await params;
-  void surpriseId;
 
   return (
     <div lang="en">
-      <p className="border-b border-border-subtle bg-bg-elevated px-5 py-1.5 text-center font-mono text-[0.6rem] tracking-[0.12em] text-text-muted uppercase">
-        Preview · a scripted question — the real one arrives with S
-      </p>
-
       <main className="mx-auto flex max-w-3xl flex-col gap-6 px-5 py-8">
         <header className="flex flex-col gap-2">
           <p className="font-mono text-[0.62rem] tracking-[0.14em] text-text-muted uppercase">A short question</p>
@@ -34,7 +26,7 @@ export default async function SurprisePage({ params }: { params: Promise<{ surpr
           </p>
         </header>
 
-        <SurpriseFlow surprise={previewSurpriseStarted} />
+        <SurpriseScreen surpriseId={surpriseId} />
       </main>
     </div>
   );

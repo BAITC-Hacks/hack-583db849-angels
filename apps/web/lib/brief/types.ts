@@ -1,7 +1,6 @@
 import type { EvidenceSource } from '../../components/evidence/EvidenceQuote';
 import type { ConsistencyItem, ConsistencyTopic } from '../consistency/types';
 import type { Competency } from '../drive';
-import type { SurpriseAnswerView } from '../surprise/types';
 
 export interface BriefEvidence {
   quote: string;
@@ -42,6 +41,4 @@ export interface InterviewerBrief {
   consistency: BriefConsistencyItem[];
   clarify: { topic: string; evidence: BriefEvidence[] }[];
   english: { certificate: { type: string; score: string; cefr: string } | null; writtenCefr: string; basis: string };
-  /** The transcribed surprise answer, once there is one (#55). */
-  surpriseAnswer: SurpriseAnswerView | null;
 }
