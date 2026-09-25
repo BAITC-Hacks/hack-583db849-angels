@@ -58,7 +58,7 @@ describe('CandidatesService', () => {
       candidateId: row.id, label: 'Candidate A', brief: null,
       simulation: { simulationId: 'simulation-id', status: 'active', ending: null },
       assessment: null, interview: null, surprise: null,
-      consistency: { before: null, after: null },
+      consistency: { before: null, after: null }, accommodation: null,
     });
     expect(listed.items[0].progress).toEqual(progress);
   });
@@ -93,6 +93,16 @@ describe('CandidatesService', () => {
       assessmentId: 'assessment-id', status: 'pending',
     });
     expect((await service.progress(row.id, 'interviewer'))?.assessment).toBeNull();
+  });
+
+  it('shows staff the text-mode accommodation and keeps it from the candidate channel', async () => {
+    const accommodated = { ...row, accommodation: { textMode: true, reason: 'No microphone at home' } };
+    const prisma = { candidate: { findUnique: jest.fn().mockResolvedValue(accommodated) } };
+    const service = new CandidatesService(prisma as never);
+    for (const role of ['commission', 'admin', 'interviewer'] as const) {
+      expect((await service.progress(row.id, role))?.accommodation).toEqual({ textMode: true, reason: 'No microphone at home' });
+    }
+    expect((await service.progress(row.id, 'platform'))?.accommodation).toBeNull();
   });
 
 });

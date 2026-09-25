@@ -2,6 +2,7 @@ import { Body, Controller, Get, Headers, NotFoundException, Param, Post, Put, Qu
 import { Request } from 'express';
 import { ApiCreatedResponse, ApiHeader, ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Roles } from '../../auth/roles.decorator';
+import { EntityId } from '../../entity-id.pipe';
 import { CreateCandidateDto } from './create-candidate.dto';
 import { CandidatesService } from './candidates.service';
 import { IdempotencyService } from '../../idempotency/idempotency.service';
@@ -37,7 +38,7 @@ export class CandidatesController {
 
   @Get(':candidateId/progress')
   @ApiOkResponse({ type: CandidateProgressDto })
-  async progress(@Param('candidateId') candidateId: string, @Req() request: Request & { apiRole: ApiRole }): Promise<CandidateProgressDto> {
+  async progress(@Param('candidateId', EntityId) candidateId: string, @Req() request: Request & { apiRole: ApiRole }): Promise<CandidateProgressDto> {
     const progress = await this.candidates.progress(candidateId, request.apiRole);
     if (!progress) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Candidate was not found.' });
     return progress;
@@ -46,14 +47,14 @@ export class CandidatesController {
   @Put(':candidateId/accommodations')
   @Roles('commission', 'admin')
   @ApiOkResponse({ type: AccommodationDto })
-  accommodation(@Param('candidateId') candidateId: string, @Body() input: UpdateAccommodationDto,
+  accommodation(@Param('candidateId', EntityId) candidateId: string, @Body() input: UpdateAccommodationDto,
     @Req() request: Request & { apiRole: 'commission' | 'admin' }): Promise<AccommodationDto> {
     return this.simulations.accommodation(candidateId, input, request.apiRole);
   }
 
   @Get(':candidateId')
   @ApiOkResponse({ type: CandidateDto })
-  async get(@Param('candidateId') candidateId: string): Promise<CandidateDto> {
+  async get(@Param('candidateId', EntityId) candidateId: string): Promise<CandidateDto> {
     const candidate = await this.candidates.find(candidateId);
     if (!candidate) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Candidate was not found.' });
     return candidate;

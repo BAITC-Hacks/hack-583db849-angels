@@ -48,19 +48,8 @@ export interface DemoEvent {
   candidate: CandidateCode | null;
 }
 
-/**
- * Typing instead of speaking, switched on by staff for one candidate — no
- * microphone, or a speech difficulty. It is recorded with a reason, shows up
- * in the report, and changes nothing about how the conversation is read.
- */
-export interface Accommodation {
-  textMode: boolean;
-  reason: string;
-}
-
 export interface World {
   candidates: Record<CandidateCode, CandidateProgress>;
-  accommodations: Record<CandidateCode, Accommodation>;
   events: DemoEvent[];
 }
 
@@ -84,12 +73,9 @@ function fresh(code: CandidateCode): CandidateProgress {
   };
 }
 
-const noAccommodation: Accommodation = { textMode: false, reason: '' };
-
 function initial(): World {
   return {
     candidates: { A: fresh('A'), B: fresh('B'), C: fresh('C') },
-    accommodations: { A: noAccommodation, B: noAccommodation, C: noAccommodation },
     events: [],
   };
 }
@@ -130,16 +116,6 @@ export function record(code: DemoEventCode, candidate: CandidateCode | null, pat
   emit();
 }
 
-/**
- * Keeps what the API answered to `PUT /v1/candidates/:id/accommodations`, so
- * the control shows it: the API has no call that reads it back before the
- * simulation starts. The server decides; this only remembers.
- */
-export function storeAccommodation(candidate: CandidateCode, accommodation: Accommodation): void {
-  world = { ...world, accommodations: { ...world.accommodations, [candidate]: accommodation } };
-  record('accommodation-changed', candidate);
-}
-
 /** Screens that keep their own session state (the simulation, the interview) drop it on reset. */
 export function onReset(listener: () => void): () => void {
   resetListeners.add(listener);
@@ -150,12 +126,6 @@ export function resetWorld(): void {
   world = initial();
   resetListeners.forEach((listener) => listener());
   record('demo-reset', null);
-}
-
-/** For the presenter: skip playing the simulation and use candidate A's recorded session. */
-export function completeWithRecordedSession(candidate: CandidateCode): void {
-  record('simulation-completed', candidate, { simulation: 'completed' });
-  record('assessment-ready', candidate, { assessmentReady: true });
 }
 
 export const homeFor: Record<'interviewer' | 'commission' | 'admin' | 'candidate', string> = {

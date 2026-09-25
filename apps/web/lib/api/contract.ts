@@ -147,6 +147,8 @@ export interface WireCandidateProgress {
   interview: { interviewId: string | null; transcriptStatus: WireInterview['transcriptStatus']; scoresSaved: boolean; draftReady: boolean } | null;
   surprise: { surpriseId: string | null; status: string } | null;
   consistency: { before: string | null; after: string | null } | null;
+  /** Typing instead of speaking, set by staff before the simulation; `null` until set, and always for `platform`. */
+  accommodation?: { textMode: boolean; reason: string } | null;
 }
 
 export interface WireCandidate {

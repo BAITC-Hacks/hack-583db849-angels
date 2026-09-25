@@ -20,6 +20,7 @@ const candidateWithSimulationSelect = {
     take: 1,
     select: { id: true, status: true },
   },
+  accommodation: { select: { textMode: true, reason: true } },
 } as const satisfies Prisma.CandidateSelect;
 
 type SafeCandidate = Prisma.CandidateGetPayload<{ select: typeof candidateSelect }>;
@@ -96,6 +97,9 @@ export class CandidatesService {
       interview: null,
       surprise: null,
       consistency: { before: null, after: null },
+      accommodation: candidate.accommodation
+        ? { textMode: candidate.accommodation.textMode, reason: candidate.accommodation.reason }
+        : null,
     };
     return filterProgressForRole(progress, role);
   }

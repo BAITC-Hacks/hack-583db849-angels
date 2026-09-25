@@ -1,8 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 import { MotionProvider } from '../components/motion/MotionProvider';
-import { AuthProvider } from '../lib/auth/AuthContext';
-import { MswProvider } from '../mocks/MswProvider';
 import { jetbrainsMono, onest } from './fonts';
 import './style.css';
 
@@ -35,11 +33,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <Script id="theme" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body>
-        <MotionProvider>
-          <MswProvider>
-            <AuthProvider>{children}</AuthProvider>
-          </MswProvider>
-        </MotionProvider>
+        <MotionProvider>{children}</MotionProvider>
       </body>
     </html>
   );
