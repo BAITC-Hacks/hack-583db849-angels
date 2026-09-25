@@ -1,13 +1,11 @@
 import { randomUUID } from 'node:crypto';
-import { execFile } from 'node:child_process';
 import { mkdir, unlink, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
-import { promisify } from 'node:util';
 
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-const execFileAsync = promisify(execFile);
+import { audioDurationSeconds } from '../../media/audio-duration';
 
 export type AudioExtension = 'webm' | 'ogg' | 'wav';
 
@@ -44,16 +42,11 @@ export class InterviewAudioService {
   }
 
   async durationSeconds(audioRef: string): Promise<number> {
-    try {
-      const { stdout } = await execFileAsync('ffprobe', [
-        '-v', 'error', '-show_entries', 'format=duration', '-of', 'default=noprint_wrappers=1:nokey=1', this.absolute(audioRef),
-      ], { timeout: 20_000, maxBuffer: 1024 });
-      const duration = Number(stdout.trim());
-      if (!Number.isFinite(duration) || duration <= 0) throw new Error('Invalid audio duration');
-      return duration;
-    } catch {
+    const duration = await audioDurationSeconds(this.absolute(audioRef));
+    if (duration === null) {
       throw new BadRequestException({ code: 'VALIDATION_ERROR', message: 'A readable webm, ogg or wav recording is required.', details: { fields: ['audio'] } });
     }
+    return duration;
   }
 
   async delete(audioRef: string): Promise<void> {
