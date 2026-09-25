@@ -569,6 +569,7 @@ interface QualitySignal {
 | `PAYLOAD_TOO_LARGE` | 413 | audio over 60 minutes, a surprise video over 50 MB, a presentation over 3 minutes or 100 MB |
 | `VIDEO_TOO_SHORT` | 400 | a presentation under 60 seconds |
 | `PRESENTATION_EXISTS` | 409 | a second presentation for the same candidate |
+| `RANGE_NOT_SATISFIABLE` | 416 | a video `Range` that starts past the end of the file |
 | `AI_INVALID_OUTPUT` | 502 | the ML service failed schema or evidence checks after its one retry |
 | `AI_UNAVAILABLE` | 503 | the ML service is down |
 | `AI_BUDGET_EXCEEDED` | 503 | the gateway refused: `BUDGET_USD_CAP` reached |
