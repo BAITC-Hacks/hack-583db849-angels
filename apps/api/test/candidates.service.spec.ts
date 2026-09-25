@@ -110,4 +110,12 @@ describe('CandidatesService', () => {
     expect((await service.progress(row.id, 'platform'))?.accommodation).toBeNull();
   });
 
+  it('shows every role where the surprise question is, and an unanswered one as expired after its deadline', async () => {
+    const opened = { ...row, surprise: { id: 'surprise-id', status: 'started', answerDeadline: new Date(Date.now() + 60_000) } };
+    const late = { ...row, surprise: { ...opened.surprise, answerDeadline: new Date(Date.now() - 16_000) } };
+    const prisma = { candidate: { findUnique: jest.fn().mockResolvedValueOnce(opened).mockResolvedValueOnce(late) } };
+    const service = new CandidatesService(prisma as never, briefs as never);
+    expect((await service.progress(row.id, 'platform'))?.surprise).toEqual({ surpriseId: 'surprise-id', status: 'started' });
+    expect((await service.progress(row.id, 'platform'))?.surprise).toEqual({ surpriseId: 'surprise-id', status: 'expired' });
+  });
 });

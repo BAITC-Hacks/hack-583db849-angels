@@ -1,10 +1,21 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
-import { SurpriseAnswer } from '../components/surprise/SurpriseAnswer';
-import { SurpriseFlow } from '../components/surprise/SurpriseFlow';
-import { previewSurpriseAnswered, previewSurpriseReady, previewSurpriseStarted } from '../lib/surprise/preview';
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import CandidateHome from '../app/(product)/candidate/page';
+import { CandidateSurprise } from '../components/surprise/CandidateSurprise';
+import { SurpriseScreen } from '../components/surprise/SurpriseScreen';
+import type { WireCandidate } from '../lib/api/contract';
+import type { SurpriseQuestion } from '../lib/surprise/types';
+import { apiError, example, json, mockApi, withQuery } from './apiHarness';
 
-vi.mock('next/navigation', () => ({ useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }), usePathname: () => '/' }));
+const push = vi.fn();
+vi.mock('next/navigation', () => ({ useRouter: () => ({ refresh: vi.fn(), push, replace: vi.fn() }), usePathname: () => '/' }));
+
+const created = example<SurpriseQuestion>('surprise-question.created.json');
+const started = example<SurpriseQuestion>('surprise-question.started.json');
+const staff = example<SurpriseQuestion>('surprise-question.staff.json');
+const list = example<{ items: WireCandidate[] }>('candidates.json');
+const id = created.surpriseId;
+const path = `/api/v1/surprise-questions/${id}`;
 
 class FakeRecorder {
   static isTypeSupported = () => true;
@@ -34,72 +45,175 @@ function withCamera() {
   window.URL.revokeObjectURL = vi.fn();
 }
 
-afterEach(() => vi.unstubAllGlobals());
+/** The candidate's channel is sent no staff field at all. */
+const inFuture = (seconds: number) => new Date(Date.now() + seconds * 1000).toISOString();
 
-describe('the candidate answering', () => {
-  it('keeps the question shut until both consents are given', async () => {
+async function readyToOpen() {
+  fireEvent.click(await screen.findByRole('button', { name: 'Check camera and microphone' }));
+  await waitFor(() => expect(screen.getByText(/Nothing is being recorded yet/)).toBeTruthy());
+  fireEvent.click(screen.getByLabelText(/I agree to being recorded on video/));
+  fireEvent.click(screen.getByLabelText(/I agree to my answer being transcribed/));
+}
+
+beforeEach(() => push.mockReset());
+afterEach(() => {
+  vi.useRealTimers();
+  vi.unstubAllGlobals();
+});
+
+describe('the candidate answering, on the API', () => {
+  it('keeps the question shut until the camera is checked and both consents are given', async () => {
     withCamera();
-    render(<SurpriseFlow surprise={previewSurpriseStarted} />);
+    mockApi({ [`GET ${path}`]: () => json(created) });
+    withQuery(<SurpriseScreen surpriseId={id} />);
 
-    const show = screen.getByRole('button', { name: 'Show the question' }) as HTMLButtonElement;
+    const show = (await screen.findByRole('button', { name: 'Show the question' })) as HTMLButtonElement;
     expect(show.disabled).toBe(true);
-    expect(screen.queryByText(previewSurpriseStarted.question as string)).toBeNull();
-
     fireEvent.click(screen.getByRole('button', { name: 'Check camera and microphone' }));
     await waitFor(() => expect(screen.getByText(/Nothing is being recorded yet/)).toBeTruthy());
-
     fireEvent.click(screen.getByLabelText(/I agree to being recorded on video/));
-    expect((screen.getByRole('button', { name: 'Show the question' }) as HTMLButtonElement).disabled).toBe(true);
-
+    expect(show.disabled).toBe(true);
     fireEvent.click(screen.getByLabelText(/I agree to my answer being transcribed/));
-    expect((screen.getByRole('button', { name: 'Show the question' }) as HTMLButtonElement).disabled).toBe(false);
+    expect(show.disabled).toBe(false);
   });
 
-  it('says there is one attempt, and offers no second one after sending', async () => {
+  it('opens the question once, records after the reading time, and sends the video with both consents', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
     withCamera();
-    render(<SurpriseFlow surprise={previewSurpriseStarted} />);
-    expect(screen.getByText(/One attempt/)).toBeTruthy();
-
-    fireEvent.click(screen.getByRole('button', { name: 'Check camera and microphone' }));
-    await waitFor(() => expect(screen.getByText(/Nothing is being recorded yet/)).toBeTruthy());
-    fireEvent.click(screen.getByLabelText(/I agree to being recorded on video/));
-    fireEvent.click(screen.getByLabelText(/I agree to my answer being transcribed/));
+    const calls = mockApi({
+      [`GET ${path}`]: () => json(created),
+      [`POST ${path}/start`]: () => json({ ...started, answerDeadline: inFuture(100) }),
+      [`POST ${path}/answer`]: () => json({ ...started, status: 'transcribing' }, 202),
+    });
+    withQuery(<SurpriseScreen surpriseId={id} />);
+    await readyToOpen();
     fireEvent.click(screen.getByRole('button', { name: 'Show the question' }));
 
-    // The question is out, so the attempt has begun.
-    expect(screen.getByText(previewSurpriseStarted.question as string)).toBeTruthy();
+    expect(await screen.findByText(started.question as string)).toBeTruthy();
     expect(screen.getByText(/Recording starts in/)).toBeTruthy();
+    // Ten seconds to read, one tick at a time, then the camera starts by itself.
+    for (let second = 0; second < 10; second += 1) await act(() => vi.advanceTimersByTimeAsync(1_000));
+    fireEvent.click(await screen.findByRole('button', { name: 'Done' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Send my answer' }));
+
+    expect(await screen.findByText('Your answer is in')).toBeTruthy();
+    expect(screen.queryByRole('button')).toBeNull();
+    const startCall = calls.find((call) => call.method === 'POST' && call.path.endsWith('/start'))!;
+    expect(startCall.headers.get('Idempotency-Key')).toBeTruthy();
+    const answer = calls.find((call) => call.method === 'POST' && call.path.endsWith('/answer'))!;
+    const form = answer.body as FormData;
+    expect(form.get('video')).toBeInstanceOf(Blob);
+    expect(form.get('consentVideo')).toBe('true');
+    expect(form.get('consentProcessing')).toBe('true');
+    expect(answer.headers.get('Idempotency-Key')).toBeTruthy();
   });
 
-  it('shows the candidate no score and nothing about a decision', () => {
+  it('says so when the server refuses: opened elsewhere, or sent after the deadline', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
     withCamera();
-    const { container } = render(<SurpriseFlow surprise={previewSurpriseStarted} />);
+    mockApi({
+      [`GET ${path}`]: () => json(created),
+      [`POST ${path}/start`]: () => apiError(409, 'ALREADY_STARTED'),
+    });
+    const first = withQuery(<SurpriseScreen surpriseId={id} />);
+    await readyToOpen();
+    fireEvent.click(screen.getByRole('button', { name: 'Show the question' }));
+    expect(await screen.findByText('The question was already opened. There is one attempt.')).toBeTruthy();
+    first.unmount();
+
+    mockApi({
+      [`GET ${path}`]: () => json({ ...started, answerDeadline: inFuture(60) }),
+      [`POST ${path}/answer`]: () => apiError(409, 'DEADLINE_PASSED'),
+    });
+    withQuery(<SurpriseScreen surpriseId={id} />);
+    await readyToOpen();
+    fireEvent.click(screen.getByRole('button', { name: 'Start recording' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Done' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Send my answer' }));
+    expect(await screen.findByText('The time for this question is over')).toBeTruthy();
+  });
+
+  it('picks an opened question up after a reload with the time that is left, never a fresh attempt', async () => {
+    withCamera();
+    mockApi({ [`GET ${path}`]: () => json({ ...started, answerDeadline: inFuture(42) }) });
+    const resumed = withQuery(<SurpriseScreen surpriseId={id} />);
+    expect(await screen.findByText(started.question as string)).toBeTruthy();
+    expect(screen.getByText(/You opened this question earlier/).textContent).toMatch(/4[12]s are left/);
+    expect(screen.queryByRole('button', { name: 'Show the question' })).toBeNull();
+    resumed.unmount();
+
+    mockApi({ [`GET ${path}`]: () => json({ ...started, status: 'expired' }) });
+    withQuery(<SurpriseScreen surpriseId={id} />);
+    expect(await screen.findByText('The time for this question is over')).toBeTruthy();
+  });
+
+  it('shows the candidate no score, nothing about a decision and nothing staff see', async () => {
+    withCamera();
+    mockApi({ [`GET ${path}`]: () => json({ ...started, answerDeadline: inFuture(60) }) });
+    const { container } = withQuery(<SurpriseScreen surpriseId={id} />);
+    await screen.findByText(started.question as string);
     expect(container.textContent).not.toMatch(/\b(score|rank|admit|reject|accept|pass|fail)\w*/i);
-  });
-
-  it('never leaks the staff side of the question to the candidate', () => {
-    withCamera();
-    const { container } = render(<SurpriseFlow surprise={previewSurpriseStarted} />);
-    // competency and why are staff-only fields; the started example has neither.
-    expect(previewSurpriseStarted.competency).toBeUndefined();
-    expect(previewSurpriseReady.question).toBeNull();
     expect(container.textContent).not.toContain('Disciplined Resilience');
   });
 });
 
-describe('what staff read afterwards', () => {
-  it('shows the question, why it was asked and the transcript with timecodes', () => {
-    render(<SurpriseAnswer surprise={previewSurpriseAnswered} />);
+describe('the candidate home, step 3', () => {
+  const withSurprise = (surprise: unknown) => ({
+    items: list.items.map((item, index) => (index === 0 ? { ...item, progress: { ...item.progress!, surprise } } : item)),
+  });
 
-    expect(screen.getByText(previewSurpriseAnswered.question as string)).toBeTruthy();
+  it('writes the question on the first open, and opens the existing one after that', async () => {
+    const calls = mockApi({
+      'GET /api/v1/candidates': () => json(withSurprise(null)),
+      'POST /api/v1/surprise-questions': () => json(created, 201),
+    });
+    const first = withQuery(<CandidateHome />);
+    const open = (await screen.findByRole('button', { name: 'Open the question' })) as HTMLButtonElement;
+    await waitFor(() => expect(open.disabled).toBe(false));
+    fireEvent.click(open);
+    await waitFor(() => expect(push).toHaveBeenCalledWith(`/candidate/surprise/${id}`));
+    const post = calls.find((call) => call.method === 'POST')!;
+    expect(JSON.parse(post.body as string)).toEqual({ candidateId: list.items[0].candidateId });
+    first.unmount();
+
+    mockApi({ 'GET /api/v1/candidates': () => json(withSurprise({ surpriseId: id, status: 'started' })) });
+    const opened = withQuery(<CandidateHome />);
+    expect((await screen.findByRole('link', { name: 'Continue your answer' })).getAttribute('href')).toBe(`/candidate/surprise/${id}`);
+    opened.unmount();
+
+    mockApi({ 'GET /api/v1/candidates': () => json(withSurprise({ surpriseId: id, status: 'answered' })) });
+    withQuery(<CandidateHome />);
+    expect(await screen.findByText('Your answer is in')).toBeTruthy();
+    expect(screen.queryByRole('link', { name: /question|answer/i })).toBeNull();
+  });
+});
+
+describe('what staff read afterwards', () => {
+  it('shows the question, why it was asked and the transcript, with a source anchor for every segment', async () => {
+    mockApi({ 'GET /api/v1/candidates': () => json(list), [`GET ${path}`]: () => json(staff) });
+    const { container } = withQuery(<CandidateSurprise candidateId={list.items[0].candidateId} />);
+
+    expect(await screen.findByText(staff.question as string)).toBeTruthy();
     expect(screen.getByText(/D · Disciplined Resilience/)).toBeTruthy();
     expect(screen.getByText('0:03')).toBeTruthy();
     expect(screen.getByText(/two people were exhausted/)).toBeTruthy();
+    expect(container.querySelector('#source-sseg_01')).not.toBeNull();
+    expect(screen.getByText(/audit log/)).toBeTruthy();
   });
 
-  it('says a viewing is audited and that the video never reaches a model', () => {
-    render(<SurpriseAnswer surprise={previewSurpriseAnswered} />);
-    expect(screen.getByText(/audit log/)).toBeTruthy();
-    expect(screen.getByText(/never reaches a model/)).toBeTruthy();
+  it('fetches the video only when someone presses play', async () => {
+    mockApi({ 'GET /api/v1/candidates': () => json(list), [`GET ${path}`]: () => json({ ...staff, videoAvailable: true }) });
+    const { container } = withQuery(<CandidateSurprise candidateId={list.items[0].candidateId} />);
+    const play = await screen.findByRole('button', { name: 'Play the recording' });
+    expect(container.querySelector('video')).toBeNull();
+    fireEvent.click(play);
+    const video = within(container).getByLabelText('Play the recording') as HTMLVideoElement;
+    expect(video.getAttribute('src')).toBe(`${path}/video`);
+  });
+
+  it('shows nothing for a candidate who has no question', async () => {
+    mockApi({ 'GET /api/v1/candidates': () => json(list) });
+    const { container } = withQuery(<CandidateSurprise candidateId={list.items[1].candidateId} />);
+    await waitFor(() => expect(container.textContent).toBe(''));
   });
 });

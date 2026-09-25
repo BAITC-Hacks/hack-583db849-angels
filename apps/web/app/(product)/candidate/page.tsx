@@ -7,6 +7,10 @@ import { useRouter } from 'next/navigation';
 import { candidateByCode, useCandidates } from '../../../lib/api/candidates';
 import { api, ApiError, unwrap } from '../../../lib/api/client';
 import { errorText } from '../../../lib/api/errors';
+import { useCreateSurprise } from '../../../lib/surprise/queries';
+
+const stepAction =
+  'mt-auto inline-flex w-fit items-center gap-1.5 rounded-control border border-border-strong px-4 py-2.5 text-sm font-semibold text-text-primary transition-colors hover:bg-bg-elevated';
 
 /**
  * The candidate's home: the simulation to play and, afterwards, the feedback.
@@ -39,6 +43,24 @@ export default function CandidateHome() {
       if (typeof existing === 'string') router.push(`/simulation/${existing}`);
     },
   });
+
+  // The surprise question is written when the candidate first opens the step, and there is one per candidate.
+  const surprise = progress?.surprise ?? null;
+  const surpriseDone = surprise?.status === 'transcribing' || surprise?.status === 'answered' || surprise?.status === 'failed';
+  const openSurprise = useCreateSurprise();
+  const openQuestion = (candidateId: string) =>
+    openSurprise.mutate(candidateId, {
+      onSuccess: ({ surpriseId }) => router.push(`/candidate/surprise/${surpriseId}`),
+      onError: (error) => {
+        // One question per candidate: if it already exists, that is the one to open.
+        const existing = error instanceof ApiError && error.code === 'SURPRISE_EXISTS' ? error.details?.surpriseId : null;
+        if (typeof existing === 'string') router.push(`/candidate/surprise/${existing}`);
+      },
+    });
+  const surpriseError =
+    openSurprise.isError && !(openSurprise.error instanceof ApiError && openSurprise.error.code === 'SURPRISE_EXISTS')
+      ? errorText(openSurprise.error)
+      : null;
 
   const status = simulation === null ? 'Not started yet' : simulation.status === 'completed' ? 'Finished — thank you' : 'In progress';
   const startError =
@@ -131,13 +153,34 @@ export default function CandidateHome() {
             One question about your own application, answered on camera. You have not seen it before — that is the
             point.
           </p>
-          <Link
-            href="/candidate/surprise/preview"
-            className="group mt-auto inline-flex w-fit items-center gap-1.5 rounded-control border border-border-strong px-4 py-2.5 text-sm font-semibold text-text-primary transition-colors hover:bg-bg-elevated"
-          >
-            Open the question
-            <ArrowRightIcon aria-hidden="true" className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
-          </Link>
+          {surpriseDone ? (
+            <p className="mt-auto flex items-center gap-1.5 text-sm font-semibold text-text-primary">
+              <CheckCircleIcon aria-hidden="true" className="h-4 w-4 text-brand-ink" />
+              Your answer is in
+            </p>
+          ) : surprise?.status === 'expired' ? (
+            <p className="mt-auto text-sm text-text-secondary">The time for this question is over.</p>
+          ) : surprise ? (
+            <Link href={`/candidate/surprise/${surprise.surpriseId}`} className={`group ${stepAction}`}>
+              {surprise.status === 'started' ? 'Continue your answer' : 'Open the question'}
+              <ArrowRightIcon aria-hidden="true" className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
+            </Link>
+          ) : (
+            <button
+              type="button"
+              disabled={!me || openSurprise.isPending}
+              onClick={() => me && openQuestion(me.candidateId)}
+              className={`group ${stepAction} disabled:opacity-50`}
+            >
+              Open the question
+              <ArrowRightIcon aria-hidden="true" className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
+            </button>
+          )}
+          {surpriseError ? (
+            <p role="alert" className="text-[0.82rem] text-text-primary">
+              {surpriseError}
+            </p>
+          ) : null}
         </article>
       </section>
 

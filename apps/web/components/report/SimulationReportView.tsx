@@ -52,7 +52,7 @@ const copy = {
  * transcript every quote links into, English measured apart, and questions
  * for the live interview.
  */
-export function SimulationReportView({ report }: { report: SimulationReport }) {
+export function SimulationReportView({ report, surprise }: { report: SimulationReport; surprise?: React.ReactNode }) {
   const { locale } = useStaffLocale();
   const text = copy[locale];
   const candidateTurns = report.turns.filter((turn) => turn.speaker === 'candidate').length;
@@ -97,6 +97,7 @@ export function SimulationReportView({ report }: { report: SimulationReport }) {
 
           <InterviewQuestions questions={report.interviewQuestions} />
           <EnglishMetricsPanel metrics={report.english} />
+          {surprise}
 
           <section className="flex flex-wrap items-center justify-between gap-3 rounded-panel border border-border-subtle bg-bg-elevated p-5">
             <div>

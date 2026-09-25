@@ -1,4 +1,4 @@
-import { INestApplication, NotFoundException, ValidationPipe } from '@nestjs/common';
+import { ForbiddenException, INestApplication, NotFoundException, StreamableFile, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
 
@@ -11,12 +11,24 @@ import { PrismaService } from '../src/database/prisma.service';
 import { BriefsService } from '../src/modules/briefs/briefs.service';
 import { SimulationsService } from '../src/modules/simulations/simulations.service';
 import { SimulationAssessmentsService } from '../src/modules/simulation-assessments/simulation-assessments.service';
+import { SurpriseService } from '../src/modules/surprise/surprise.service';
 
 const briefs = {
   startFor: jest.fn().mockResolvedValue(undefined),
   latestFor: jest.fn().mockRejectedValue(new NotFoundException({ code: 'BRIEF_NOT_FOUND', message: 'There is no brief for this candidate yet.' })),
   get: jest.fn(),
   rerun: jest.fn(),
+};
+
+const surprise = {
+  create: jest.fn().mockImplementation(() => contractExample('surprise-question.created.json')),
+  start: jest.fn().mockImplementation(() => contractExample('surprise-question.started.json')),
+  answer: jest.fn(),
+  get: jest.fn().mockImplementation(() => contractExample('surprise-question.staff.json')),
+  video: jest.fn().mockImplementation((_id: string, role: string) => {
+    if (role === 'platform') throw new ForbiddenException({ code: 'FORBIDDEN', message: 'This role does not see the video.' });
+    return new StreamableFile(Buffer.from('synthetic video'), { type: 'video/webm' });
+  }),
 };
 
 describe('PR 1 contract routes', () => {
@@ -55,6 +67,8 @@ describe('PR 1 contract routes', () => {
       })
       .overrideProvider(BriefsService)
       .useValue(briefs)
+      .overrideProvider(SurpriseService)
+      .useValue(surprise)
       .overrideProvider(PrismaService)
       .useValue({
         candidate: {
@@ -133,6 +147,23 @@ describe('PR 1 contract routes', () => {
     expect(missing.body.error.code).toBe('BRIEF_NOT_FOUND');
   });
 
+  it('lets the candidate channel run the surprise question, and keeps the video for staff', async () => {
+    const server = app.getHttpServer();
+    const surpriseId = '6f1c2a0e-0000-4000-8000-00000000a007';
+    await request(server).post('/v1/surprise-questions').set('X-API-Key', 'platform-key').send({ candidateId }).expect(201);
+    await request(server).post(`/v1/surprise-questions/${surpriseId}/start`).set('X-API-Key', 'platform-key').expect(200);
+    for (const role of ['interviewer-key', 'commission-key']) {
+      await request(server).post('/v1/surprise-questions').set('X-API-Key', role).send({ candidateId }).expect(403);
+      await request(server).post(`/v1/surprise-questions/${surpriseId}/start`).set('X-API-Key', role).expect(403);
+      await request(server).post(`/v1/surprise-questions/${surpriseId}/answer`).set('X-API-Key', role).expect(403);
+      await request(server).get(`/v1/surprise-questions/${surpriseId}`).set('X-API-Key', role).expect(200);
+    }
+    await request(server).get(`/v1/surprise-questions/${surpriseId}/video`).set('X-API-Key', 'platform-key').expect(403);
+    const video = await request(server).get(`/v1/surprise-questions/${surpriseId}/video`).set('X-API-Key', 'interviewer-key').expect(200);
+    expect(video.headers['content-type']).toBe('video/webm');
+    expect(surprise.video).toHaveBeenCalledWith(surpriseId, 'interviewer');
+  });
+
   it('answers 404, not 500, for an id that is not a UUID', async () => {
     const server = app.getHttpServer();
     const checks = [
@@ -142,6 +173,8 @@ describe('PR 1 contract routes', () => {
         .send({ textMode: true, reason: 'No microphone' }),
       () => request(server).get('/v1/simulations/preview').set('X-API-Key', 'platform-key'),
       () => request(server).get('/v1/simulation-assessments/preview').set('X-API-Key', 'commission-key'),
+      () => request(server).get('/v1/surprise-questions/preview').set('X-API-Key', 'platform-key'),
+      () => request(server).get('/v1/surprise-questions/preview/video').set('X-API-Key', 'commission-key'),
     ];
     for (const check of checks) {
       const response = await check();
