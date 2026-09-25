@@ -194,6 +194,42 @@ def test_after_service_grounds_candidate_quotes_and_simulation_metric() -> None:
     assert len(gateway.requests) == 1
 
 
+def test_after_resolves_saved_discrepancy_with_candidate_interview_account() -> None:
+    request, proposed = example()
+    account = (
+        "I asked Dana and Timur for their views before I decided what the team should do."
+    )
+    next(turn for turn in request.interviewTranscript if turn.turnId == "iturn_02").text = account
+    proposed.items[1].observation.evidence[0].quote = account
+    proposed.items[1].status = "resolved"
+    service, _ = _service(proposed)
+
+    result = asyncio.run(service.prepare(request))
+
+    assert request.beforeItems[1].status == "discrepancy"
+    assert result.items[1].status == "resolved"
+    assert result.items[1].claim == request.beforeItems[1].claim
+    assert result.items[1].observation.evidence[0].sourceId == "iturn_02"
+    assert result.items[1].observation.text.endswith(account)
+    assert result.items[1].askInInterview is None
+
+
+def test_after_keeps_discrepancy_when_interview_repeats_conflicting_account() -> None:
+    request, proposed = example()
+    account = proposed.items[1].observation.evidence[0].quote
+    proposed.items[1].status = "discrepancy"
+    service, _ = _service(proposed)
+
+    result = asyncio.run(service.prepare(request))
+
+    assert request.beforeItems[1].status == "discrepancy"
+    assert result.items[1].status == "discrepancy"
+    assert result.items[1].claim == request.beforeItems[1].claim
+    assert result.items[1].observation.evidence[0].sourceId == "iturn_02"
+    assert result.items[1].observation.text.endswith(account)
+    assert result.items[1].askInInterview is None
+
+
 def test_tampered_saved_quote_is_rejected_before_model_call() -> None:
     request, proposed = example()
     request.beforeItems[0].claim.evidence[0].quote = "Invented C2 quote"
