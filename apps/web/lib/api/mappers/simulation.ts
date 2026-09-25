@@ -39,3 +39,22 @@ export function appendTurn(state: SimulationState, result: WireTurnResult): Simu
     ending: result.status === 'completed' ? (state.ending ?? 'completed') : null,
   };
 }
+
+/**
+ * The same turn result, applied to the simulation the screen keeps in its
+ * query cache, so the transcript grows without a second round trip. Once the
+ * simulation ends here it has ended as `completed`: a stop comes back as a
+ * whole simulation from `/complete`, not as a turn.
+ */
+export function applyTurnResult(simulation: WireSimulation, result: WireTurnResult, now = new Date()): WireSimulation {
+  const added = [result.candidateTurn, result.characterTurn].filter((turn): turn is WireTurn => turn !== null);
+  const completed = result.status === 'completed';
+  return {
+    ...simulation,
+    stage: result.stage,
+    status: result.status,
+    ending: completed ? (simulation.ending ?? 'completed') : simulation.ending,
+    completedAt: completed ? (simulation.completedAt ?? now.toISOString()) : simulation.completedAt,
+    turns: [...simulation.turns, ...added],
+  };
+}

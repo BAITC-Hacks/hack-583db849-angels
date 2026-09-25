@@ -38,9 +38,11 @@ const events: Record<StaffLocale, Record<DemoEventCode, string>> = {
   },
 };
 
-const modules: { code: string; href?: string; state: 'preview' | 'locked'; en: string; ru: string }[] = [
+type ModuleState = 'live' | 'preview' | 'locked';
+
+const modules: { code: string; href?: string; state: ModuleState; en: string; ru: string }[] = [
   { code: 'M1', href: '/interviewer/brief/00000000-0000-4000-8000-00000000000a', state: 'preview', en: 'Interviewer brief', ru: 'Бриф интервьюера' },
-  { code: 'M2', href: '/simulation/preview', state: 'preview', en: 'Leadership simulation', ru: 'Симуляция лидерства' },
+  { code: 'M2', href: '/simulation', state: 'live', en: 'Leadership simulation', ru: 'Симуляция лидерства' },
   { code: 'M3', href: '/commission/simulation-report/preview', state: 'preview', en: 'Report and candidate feedback', ru: 'Отчёт и отзыв кандидату' },
   { code: 'M4', href: '/interviewer/interview/preview', state: 'preview', en: 'Interview transcript and draft', ru: 'Расшифровка интервью и черновик' },
   { code: 'M5', state: 'locked', en: 'Quality guard', ru: 'Контроль качества' },
@@ -56,7 +58,7 @@ const copy = {
     apiNote: 'the real API arrives with F0 (#3)',
     callsNote: 'replay only in the preview',
     modulesTitle: 'Modules',
-    state: { preview: 'Preview', locked: 'Not built' },
+    state: { live: 'On the API', preview: 'Preview', locked: 'Not built' },
     open: 'Open',
     rolesTitle: 'Roles and what they see',
     screens: (count: number) => `${count} screens`,
@@ -80,7 +82,7 @@ const copy = {
     apiNote: 'настоящий API появится с F0 (#3)',
     callsNote: 'в превью только replay',
     modulesTitle: 'Модули',
-    state: { preview: 'Превью', locked: 'Не готов' },
+    state: { live: 'На API', preview: 'Превью', locked: 'Не готов' },
     open: 'Открыть',
     rolesTitle: 'Роли и что они видят',
     screens: (count: number) => `экранов: ${count}`,
@@ -104,7 +106,7 @@ export default function AdminHome() {
   const world = useWorld();
   const [confirming, setConfirming] = useState(false);
   const time = new Intl.DateTimeFormat(locale, { timeStyle: 'medium' });
-  const stateTone: Record<'preview' | 'locked', Tone> = { preview: 'active', locked: 'locked' };
+  const stateTone: Record<ModuleState, Tone> = { live: 'done', preview: 'active', locked: 'locked' };
 
   const tiles = [
     { label: text.tiles.api, value: text.apiValue, note: text.apiNote },
