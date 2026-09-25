@@ -6,7 +6,9 @@ from dataclasses import dataclass
 import logging
 from typing import Iterable, Mapping
 
-from services.ml.app.schemas.contracts import CandidateView, DriveScore, Evidence, Turn
+from services.ml.app.schemas.contracts import (
+    CandidateView, DriveScore, Evidence, InterviewNote, InterviewTurn, Turn,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -49,6 +51,27 @@ def candidate_view_sources(candidate: CandidateView) -> dict[SourceKey, str]:
         if key in sources:
             raise ValueError("duplicate test source id")
         sources[key] = answer.response
+    return sources
+
+
+def interview_sources(
+    transcript: Iterable[InterviewTurn], notes: Iterable[InterviewNote],
+) -> dict[SourceKey, str]:
+    """Index candidate speech and supplied notes, never interviewer speech."""
+
+    sources: dict[SourceKey, str] = {}
+    seen_ids: set[str] = set()
+    for turn in transcript:
+        if turn.turnId in seen_ids:
+            raise ValueError("duplicate interview source id")
+        seen_ids.add(turn.turnId)
+        if turn.speaker == "candidate":
+            sources[("interview_turn", turn.turnId)] = turn.text
+    for note in notes:
+        if not note.id or note.id in seen_ids:
+            raise ValueError("duplicate or empty interview source id")
+        seen_ids.add(note.id)
+        sources[("interview_note", note.id)] = note.text
     return sources
 
 
