@@ -32,6 +32,7 @@
           "status": "answered"
         },
         "presentation": null,
+        "interviewSlot": null,
         "consistency": {
           "before": "ready",
           "after": "ready"
@@ -56,6 +57,7 @@
         "interview": null,
         "surprise": null,
         "presentation": null,
+        "interviewSlot": null,
         "consistency": {
           "before": "ready",
           "after": null
@@ -80,6 +82,7 @@
         "interview": null,
         "surprise": null,
         "presentation": null,
+        "interviewSlot": null,
         "consistency": {
           "before": "ready",
           "after": null

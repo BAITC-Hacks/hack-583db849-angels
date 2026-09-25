@@ -17,6 +17,7 @@
     "status": "answered"
   },
   "presentation": null,
+  "interviewSlot": null,
   "consistency": {
     "before": null,
     "after": null
