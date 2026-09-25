@@ -35,3 +35,6 @@ export interface SimulationState {
   /** Why the simulation ended, once it has. */
   ending: 'completed' | 'stopped' | null;
 }
+
+/** The API refuses a typed turn longer than this (`400`); the field stops first. */
+export const MAX_TURN_LENGTH = 1000;

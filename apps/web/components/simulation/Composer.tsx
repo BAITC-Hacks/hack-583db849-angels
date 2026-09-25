@@ -2,7 +2,7 @@
 
 import { PaperAirplaneIcon } from '@heroicons/react/24/outline';
 import { useState } from 'react';
-import { MAX_TURN_LENGTH } from '../../lib/simulation/previewDriver';
+import { MAX_TURN_LENGTH } from '../../lib/simulation/types';
 
 /**
  * Typing a turn, which happens only when staff switched it on for this

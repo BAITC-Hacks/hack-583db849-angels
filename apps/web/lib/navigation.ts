@@ -133,9 +133,8 @@ export const navItems: NavItem[] = [
     icon: ChatBubbleLeftRightIcon,
     label: { en: 'My simulation', ru: 'My simulation' },
     roles: ['candidate'],
-    href: '/simulation/preview',
+    href: '/simulation',
     match: '/simulation',
-    preview: true,
     module: 'M2',
   },
   {
