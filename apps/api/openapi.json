@@ -193,30 +193,6 @@
         ]
       }
     },
-    "/v1/scenarios": {
-      "get": {
-        "operationId": "ScenariosController_list",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ScenarioSummaryDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "scenarios"
-        ]
-      }
-    },
     "/v1/simulations": {
       "post": {
         "operationId": "SimulationsController_create",
@@ -262,17 +238,17 @@
         "operationId": "SimulationsController_turn",
         "parameters": [
           {
-            "name": "Idempotency-Key",
-            "in": "header",
-            "required": false,
+            "name": "simulationId",
+            "required": true,
+            "in": "path",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "simulationId",
-            "required": true,
-            "in": "path",
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
             "schema": {
               "type": "string"
             }
@@ -315,7 +291,7 @@
         "operationId": "SimulationsController_audio",
         "parameters": [
           {
-            "name": "turnId",
+            "name": "simulationId",
             "required": true,
             "in": "path",
             "schema": {
@@ -323,7 +299,7 @@
             }
           },
           {
-            "name": "simulationId",
+            "name": "turnId",
             "required": true,
             "in": "path",
             "schema": {
@@ -416,6 +392,130 @@
         },
         "tags": [
           "simulations"
+        ]
+      }
+    },
+    "/v1/scenarios": {
+      "get": {
+        "operationId": "ScenariosController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ScenarioSummaryDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "scenarios"
+        ]
+      }
+    },
+    "/v1/simulation-assessments": {
+      "post": {
+        "operationId": "SimulationAssessmentsController_create",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSimulationAssessmentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulationAssessmentDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "simulation-assessments"
+        ]
+      }
+    },
+    "/v1/simulation-assessments/{assessmentId}": {
+      "get": {
+        "operationId": "SimulationAssessmentsController_get",
+        "parameters": [
+          {
+            "name": "assessmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulationAssessmentDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "simulation-assessments"
+        ]
+      }
+    },
+    "/v1/simulation-assessments/{assessmentId}/candidate-feedback": {
+      "get": {
+        "operationId": "SimulationAssessmentsController_feedback",
+        "parameters": [
+          {
+            "name": "assessmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CandidateFeedbackDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "simulation-assessments"
         ]
       }
     }
@@ -835,47 +935,6 @@
           "setAt"
         ]
       },
-      "ScenarioSummaryDto": {
-        "type": "object",
-        "properties": {
-          "scenarioId": {
-            "type": "string"
-          },
-          "title": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "draft",
-              "ready"
-            ]
-          },
-          "competencies": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "enum": [
-                "D",
-                "R",
-                "I",
-                "V",
-                "E"
-              ]
-            }
-          },
-          "assignedCount": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "scenarioId",
-          "title",
-          "status",
-          "competencies",
-          "assignedCount"
-        ]
-      },
       "CreateSimulationDto": {
         "type": "object",
         "properties": {
@@ -1138,6 +1197,334 @@
         },
         "required": [
           "reason"
+        ]
+      },
+      "ScenarioSummaryDto": {
+        "type": "object",
+        "properties": {
+          "scenarioId": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "ready"
+            ]
+          },
+          "competencies": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "D",
+                "R",
+                "I",
+                "V",
+                "E"
+              ]
+            }
+          },
+          "assignedCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "scenarioId",
+          "title",
+          "status",
+          "competencies",
+          "assignedCount"
+        ]
+      },
+      "CreateSimulationAssessmentDto": {
+        "type": "object",
+        "properties": {
+          "simulationId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "simulationId"
+        ]
+      },
+      "AssessmentSimulationDto": {
+        "type": "object",
+        "properties": {
+          "scenarioTitle": {
+            "type": "string"
+          },
+          "characterName": {
+            "type": "string"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "voice",
+              "text"
+            ]
+          },
+          "accommodation": {
+            "type": "boolean"
+          },
+          "completedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "durationSeconds": {
+            "type": "number"
+          },
+          "turns": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TurnDto"
+            }
+          }
+        },
+        "required": [
+          "scenarioTitle",
+          "characterName",
+          "mode",
+          "accommodation",
+          "completedAt",
+          "durationSeconds",
+          "turns"
+        ]
+      },
+      "AssessmentEvidenceDto": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string",
+            "enum": [
+              "application_field",
+              "test_item",
+              "simulation_turn",
+              "interview_turn",
+              "interview_note",
+              "surprise_answer"
+            ]
+          },
+          "sourceId": {
+            "type": "string"
+          },
+          "quote": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "source",
+          "sourceId",
+          "quote"
+        ]
+      },
+      "AssessmentDriveScoreDto": {
+        "type": "object",
+        "properties": {
+          "competency": {
+            "type": "string",
+            "enum": [
+              "D",
+              "R",
+              "I",
+              "V",
+              "E"
+            ]
+          },
+          "score": {
+            "type": "number",
+            "enum": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ],
+            "nullable": true
+          },
+          "confidence": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ],
+            "nullable": true
+          },
+          "rationale": {
+            "type": "string",
+            "nullable": true
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssessmentEvidenceDto"
+            }
+          }
+        },
+        "required": [
+          "competency",
+          "score",
+          "confidence",
+          "rationale",
+          "evidence"
+        ]
+      },
+      "AssessmentEnglishMetricsDto": {
+        "type": "object",
+        "properties": {
+          "cefrEstimate": {
+            "type": "string",
+            "nullable": true
+          },
+          "wordsPerMinute": {
+            "type": "number",
+            "nullable": true
+          },
+          "fillerRate": {
+            "type": "number",
+            "nullable": true
+          },
+          "meanTurnLength": {
+            "type": "number",
+            "nullable": true
+          },
+          "lexicalDiversity": {
+            "type": "number",
+            "nullable": true
+          },
+          "grammarErrorsPer100Words": {
+            "type": "number",
+            "nullable": true
+          }
+        },
+        "required": [
+          "cefrEstimate",
+          "wordsPerMinute",
+          "fillerRate",
+          "meanTurnLength",
+          "lexicalDiversity",
+          "grammarErrorsPer100Words"
+        ]
+      },
+      "AssessmentInterviewQuestionDto": {
+        "type": "object",
+        "properties": {
+          "competency": {
+            "type": "string",
+            "enum": [
+              "D",
+              "R",
+              "I",
+              "V",
+              "E"
+            ]
+          },
+          "question": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "competency",
+          "question",
+          "reason"
+        ]
+      },
+      "SimulationAssessmentDto": {
+        "type": "object",
+        "properties": {
+          "assessmentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "simulationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "candidateId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "candidateLabel": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "simulation": {
+            "$ref": "#/components/schemas/AssessmentSimulationDto"
+          },
+          "scores": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssessmentDriveScoreDto"
+            }
+          },
+          "english": {
+            "$ref": "#/components/schemas/AssessmentEnglishMetricsDto"
+          },
+          "interviewQuestions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssessmentInterviewQuestionDto"
+            }
+          }
+        },
+        "required": [
+          "assessmentId",
+          "simulationId",
+          "candidateId",
+          "candidateLabel",
+          "createdAt",
+          "simulation",
+          "scores",
+          "english",
+          "interviewQuestions"
+        ]
+      },
+      "CandidateFeedbackDto": {
+        "type": "object",
+        "properties": {
+          "assessmentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "scenarioTitle": {
+            "type": "string"
+          },
+          "strengths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "growth": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "nextTime": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "assessmentId",
+          "scenarioTitle",
+          "strengths",
+          "growth",
+          "nextTime"
         ]
       }
     }
