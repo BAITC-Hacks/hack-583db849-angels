@@ -34,3 +34,6 @@ export interface SurpriseQuestion {
   segments?: SurpriseSegment[] | null;
   videoAvailable?: boolean;
 }
+
+/** What staff read of an answer: the question, why it was asked and what was said. */
+export type SurpriseAnswerView = Pick<SurpriseQuestion, 'question' | 'competency' | 'why' | 'segments' | 'videoAvailable'>;

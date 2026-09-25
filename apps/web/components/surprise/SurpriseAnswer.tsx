@@ -3,7 +3,7 @@
 import { PlayCircleIcon } from '@heroicons/react/24/outline';
 import { competencies } from '../../lib/drive';
 import { useStaffLocale } from '../../lib/i18n/StaffLocaleProvider';
-import type { SurpriseQuestion } from '../../lib/surprise/types';
+import type { SurpriseAnswerView } from '../../lib/surprise/types';
 
 const copy = {
   en: {
@@ -39,7 +39,7 @@ function timecode(seconds: number): string {
  * against the moment it came from. The recording itself sits behind a button
  * that writes an audit line.
  */
-export function SurpriseAnswer({ surprise }: { surprise: SurpriseQuestion }) {
+export function SurpriseAnswer({ surprise }: { surprise: SurpriseAnswerView }) {
   const { locale } = useStaffLocale();
   const text = copy[locale];
   const segments = surprise.segments ?? [];

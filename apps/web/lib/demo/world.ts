@@ -20,6 +20,9 @@ export interface CandidateProgress {
   id: string;
   /** Only candidate A has preview data today; B and C arrive with the seed. */
   hasData: boolean;
+  /** Where the brief is, from the API. */
+  brief?: 'pending' | 'ready' | 'failed' | null;
+  /** Opened in this tab. The server keeps no "read" mark (`docs/INTEGRATION.md`, G13). */
   briefViewed: boolean;
   simulation: SimulationStatus;
   assessmentReady: boolean;

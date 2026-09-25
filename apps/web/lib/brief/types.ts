@@ -1,6 +1,7 @@
 import type { EvidenceSource } from '../../components/evidence/EvidenceQuote';
 import type { ConsistencyItem, ConsistencyTopic } from '../consistency/types';
 import type { Competency } from '../drive';
+import type { SurpriseAnswerView } from '../surprise/types';
 
 export interface BriefEvidence {
   quote: string;
@@ -24,11 +25,14 @@ export type BriefConsistencyItem = ConsistencyItem;
 export type { ConsistencyTopic };
 
 /**
- * What the interviewer brief renders. The screen's own shape, not a wire type;
- * part 2 maps the generated client onto it once the briefs contract lands (#12).
+ * What the interviewer brief renders. The screen's own shape, not a wire type:
+ * `lib/api/mappers/brief.ts` makes it from `GET /v1/candidates/:id/brief`.
  */
 export interface InterviewerBrief {
-  candidate: { id: string; code: 'A' | 'B' | 'C' };
+  briefId: string;
+  candidateId: string;
+  createdAt: string;
+  /** Only the answers the quotes point into, from the same redacted view the model read — never the profile. */
   application: { fieldId: string; question: string; answer: string }[];
   test: { itemId: string; response: string }[];
   summary: string;
@@ -38,4 +42,6 @@ export interface InterviewerBrief {
   consistency: BriefConsistencyItem[];
   clarify: { topic: string; evidence: BriefEvidence[] }[];
   english: { certificate: { type: string; score: string; cefr: string } | null; writtenCefr: string; basis: string };
+  /** The transcribed surprise answer, once there is one (#55). */
+  surpriseAnswer: SurpriseAnswerView | null;
 }

@@ -17,13 +17,14 @@ const copy = {
     next: 'Next step',
     steps: {
       brief: { title: 'Read candidate A’s brief', body: 'Questions for each competency, what to clarify, and the English gap — each with its source.', action: 'Open the brief' },
+      briefPending: { title: 'Candidate A’s brief is being prepared', body: 'It is written from the application and the test. The brief page shows it as soon as it is ready.', action: 'Open the brief' },
       record: { title: 'Interview candidate A and record it', body: 'Tick the candidate’s consent and record, or take inVision’s recording. Only the text reaches the model.', action: 'Open the interview' },
       score: { title: 'Score candidate A blind', body: 'Five competencies, 0–4 or “not enough to judge”. No AI opinion is shown until you save.', action: 'Score now' },
       waiting: { title: 'The draft is waiting for the transcript', body: 'Your scores are saved. The draft is written as soon as the transcript is ready.', action: 'Open the interview' },
       compare: { title: 'Compare your scores with the draft', body: 'See where you and the draft differ, and what needs a second look. Nothing is merged.', action: 'Open the comparison' },
     },
     columns: ['Candidate', 'Brief', 'Recording', 'Your scores', 'AI draft', ''],
-    brief: { read: 'Read', unread: 'Not read' },
+    brief: { read: 'Read', ready: 'Ready', pending: 'Being prepared', failed: 'Failed', none: 'Not started' },
     recording: { none: 'Not recorded', transcribing: 'Transcribing', ready: 'Transcript ready' },
     scores: { saved: 'Saved', none: 'Not scored' },
     draft: { locked: 'Locked until you score', waiting: 'Waiting for the transcript', ready: 'Open' },
@@ -38,13 +39,14 @@ const copy = {
     next: 'Следующий шаг',
     steps: {
       brief: { title: 'Прочитайте бриф кандидата A', body: 'Вопросы по каждой компетенции, что уточнить и разрыв по английскому — у всего есть источник.', action: 'Открыть бриф' },
+      briefPending: { title: 'Бриф кандидата A готовится', body: 'Он пишется по анкете и тесту. Страница брифа покажет его, как только он будет готов.', action: 'Открыть бриф' },
       record: { title: 'Проведите и запишите интервью с кандидатом A', body: 'Отметьте согласие кандидата и запишите, или возьмите запись inVision. В модель уходит только текст.', action: 'Открыть интервью' },
       score: { title: 'Оцените кандидата A вслепую', body: 'Пять компетенций, 0–4 или «недостаточно данных». Мнения ИИ не видно, пока вы не сохраните.', action: 'Оценить' },
       waiting: { title: 'Черновик ждёт расшифровку', body: 'Баллы сохранены. Черновик появится, как только будет готова расшифровка.', action: 'Открыть интервью' },
       compare: { title: 'Сравните свои баллы с черновиком', body: 'Где вы с черновиком расходитесь и что стоит перепроверить. Ничего не объединяется.', action: 'Открыть сравнение' },
     },
     columns: ['Кандидат', 'Бриф', 'Запись', 'Ваши баллы', 'Черновик ИИ', ''],
-    brief: { read: 'Прочитан', unread: 'Не прочитан' },
+    brief: { read: 'Прочитан', ready: 'Готов', pending: 'Готовится', failed: 'Не удался', none: 'Не начат' },
     recording: { none: 'Не записано', transcribing: 'Расшифровывается', ready: 'Расшифровка готова' },
     scores: { saved: 'Сохранены', none: 'Не выставлены' },
     draft: { locked: 'Закрыт до ваших баллов', waiting: 'Ждёт расшифровку', ready: 'Открыт' },
@@ -54,8 +56,15 @@ const copy = {
   },
 };
 
+function BriefPill({ brief, viewed, text }: { brief: CandidateProgress['brief']; viewed: boolean; text: (typeof copy)['en']['brief'] }) {
+  if (brief === 'ready') return <StatusPill tone={viewed ? 'done' : 'waiting'}>{viewed ? text.read : text.ready}</StatusPill>;
+  if (brief === 'pending') return <StatusPill tone="active">{text.pending}</StatusPill>;
+  if (brief === 'failed') return <StatusPill tone="waiting">{text.failed}</StatusPill>;
+  return <StatusPill tone="muted">{text.none}</StatusPill>;
+}
+
 function nextFor(a: CandidateProgress) {
-  if (!a.briefViewed) return { key: 'brief' as const, href: `/interviewer/brief/${a.id}` };
+  if (!a.briefViewed) return { key: a.brief === 'pending' ? ('briefPending' as const) : ('brief' as const), href: `/interviewer/brief/${a.id}` };
   if (a.transcript === 'none') return { key: 'record' as const, href: '/interviewer/interview/preview' };
   if (!a.scoresSaved) return { key: 'score' as const, href: '/interviewer/interview/preview' };
   if (!a.draftReady) return { key: 'waiting' as const, href: '/interviewer/interview/preview' };
@@ -105,7 +114,7 @@ export default function InterviewerHome() {
                   {c.hasData ? (
                     <>
                       <td className="px-4 py-3">
-                        <StatusPill tone={c.briefViewed ? 'done' : 'waiting'}>{c.briefViewed ? text.brief.read : text.brief.unread}</StatusPill>
+                        <BriefPill brief={c.brief ?? null} viewed={c.briefViewed} text={text.brief} />
                       </td>
                       <td className="px-4 py-3">
                         <StatusPill tone={c.transcript === 'ready' ? 'done' : c.transcript === 'transcribing' ? 'active' : 'waiting'}>

@@ -13,7 +13,9 @@ describe('CandidatesService', () => {
     profile: { fullName: 'Synthetic Person', email: 'synthetic@example.test' },
     simulations: [{ id: 'simulation-id', status: 'active', ending: null }],
     assessments: [],
+    briefs: [],
   };
+  const briefs = { startFor: jest.fn().mockResolvedValue(undefined) };
 
   it('selects and returns only the public Candidate DTO for create, list, and GET', async () => {
     const storedRow = { ...row, externalId: 'candidate-John', label: 'Candidate 00000000' };
@@ -23,7 +25,8 @@ describe('CandidatesService', () => {
       findMany: jest.fn().mockResolvedValue([correctedRow]),
       findUnique: jest.fn().mockResolvedValue(correctedRow),
     } };
-    const service = new CandidatesService(prisma as never);
+    const service = new CandidatesService(prisma as never, briefs as never);
+    briefs.startFor.mockClear();
     const input = {
       externalId: 'candidate-John', profile: row.profile,
       application: { answers: [] }, test: { answers: [] },
@@ -43,6 +46,8 @@ describe('CandidatesService', () => {
     expect(found).toEqual(created);
     expect(JSON.stringify([created, listed, found])).not.toContain('Synthetic Person');
     expect(JSON.stringify([created, listed, found])).not.toContain('profile');
+    // The brief is made as soon as the candidate arrives (#12).
+    expect(briefs.startFor).toHaveBeenCalledWith(row.id);
   });
 
   it('includes only the current simulation in progress and omits unstarted steps', async () => {
@@ -50,7 +55,7 @@ describe('CandidatesService', () => {
       findMany: jest.fn().mockResolvedValue([row]),
       findUnique: jest.fn().mockResolvedValue(row),
     } };
-    const service = new CandidatesService(prisma as never);
+    const service = new CandidatesService(prisma as never, briefs as never);
     const progress = await service.progress(row.id, 'platform');
     const listed = await service.list(true, 'interviewer');
 
@@ -65,7 +70,7 @@ describe('CandidatesService', () => {
 
   it('stores the missing demo certificate as database null', async () => {
     const upsert = jest.fn().mockResolvedValue(row);
-    const service = new CandidatesService({ candidate: { upsert } } as never);
+    const service = new CandidatesService({ candidate: { upsert } } as never, briefs as never);
     await service.upsert({
       externalId: 'inv-2026-demo-b', profile: {}, application: { answers: [] }, test: { answers: [] },
       englishCertificate: null,
@@ -85,7 +90,7 @@ describe('CandidatesService', () => {
     const assessed = { ...row, simulations: [{ id: 'simulation-id', status: 'completed', ending: 'completed' }],
       assessments: [{ id: 'assessment-id', status: 'pending' }] };
     const prisma = { candidate: { findUnique: jest.fn().mockResolvedValue(assessed) } };
-    const service = new CandidatesService(prisma as never);
+    const service = new CandidatesService(prisma as never, briefs as never);
     expect((await service.progress(row.id, 'commission'))?.assessment).toEqual({
       assessmentId: 'assessment-id', status: 'pending',
     });
@@ -98,7 +103,7 @@ describe('CandidatesService', () => {
   it('shows staff the text-mode accommodation and keeps it from the candidate channel', async () => {
     const accommodated = { ...row, accommodation: { textMode: true, reason: 'No microphone at home' } };
     const prisma = { candidate: { findUnique: jest.fn().mockResolvedValue(accommodated) } };
-    const service = new CandidatesService(prisma as never);
+    const service = new CandidatesService(prisma as never, briefs as never);
     for (const role of ['commission', 'admin', 'interviewer'] as const) {
       expect((await service.progress(row.id, role))?.accommodation).toEqual({ textMode: true, reason: 'No microphone at home' });
     }

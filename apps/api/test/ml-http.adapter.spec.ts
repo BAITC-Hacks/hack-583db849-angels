@@ -17,11 +17,9 @@ describe('MlHttpAdapter', () => {
     );
     const adapter = new MlHttpAdapter(config, fetchImplementation);
 
-    await adapter.sendCandidateContext({
-      candidateId: 'candidate-id',
-      application: { answers: [] },
-      test: { answers: [] },
-    });
+    await expect(adapter.brief({
+      candidate: { candidateId: 'candidate-id', application: { answers: [] }, test: { answers: [] } },
+    })).resolves.toMatchObject({ summary: '' });
 
     expect(fetchImplementation).toHaveBeenCalledTimes(1);
     const [request] = fetchImplementation.mock.calls[0] as [Request];

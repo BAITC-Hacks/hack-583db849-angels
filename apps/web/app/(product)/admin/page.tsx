@@ -41,7 +41,7 @@ const events: Record<StaffLocale, Record<DemoEventCode, string>> = {
 type ModuleState = 'live' | 'preview' | 'locked';
 
 const modules: { code: string; href?: string; state: ModuleState; en: string; ru: string }[] = [
-  { code: 'M1', href: '/interviewer/brief/00000000-0000-4000-8000-00000000000a', state: 'preview', en: 'Interviewer brief', ru: 'Бриф интервьюера' },
+  { code: 'M1', href: '/interviewer/brief', state: 'live', en: 'Interviewer brief', ru: 'Бриф интервьюера' },
   { code: 'M2', href: '/simulation', state: 'live', en: 'Leadership simulation', ru: 'Симуляция лидерства' },
   { code: 'M3', href: '/commission/simulation-report', state: 'live', en: 'Report and candidate feedback', ru: 'Отчёт и отзыв кандидату' },
   { code: 'M4', href: '/interviewer/interview/preview', state: 'preview', en: 'Interview transcript and draft', ru: 'Расшифровка интервью и черновик' },

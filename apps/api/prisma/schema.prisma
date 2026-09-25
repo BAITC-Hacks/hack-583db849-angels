@@ -44,6 +44,7 @@ model Candidate {
   assessments        Assessment[]
   interviews         Interview[]
   auditEvents        AuditEvent[]
+  briefs             Brief[]
 }
 
 model Simulation {
@@ -159,4 +160,17 @@ model IdempotencyKey {
   createdAt   DateTime @default(now())
 
   @@index([expiresAt])
+}
+
+/// M1: the interviewer's brief. Made by the API itself — when the candidate arrives and again once the
+/// simulation is assessed — so every step has one. `result` is ML's BriefResult, stored as returned.
+model Brief {
+  id          String    @id @default(uuid()) @db.Uuid
+  candidateId String    @db.Uuid
+  status      String    @default("pending") // pending | ready | failed
+  result      Json?
+  createdAt   DateTime  @default(now())
+  candidate   Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+
+  @@index([candidateId, createdAt])
 }
