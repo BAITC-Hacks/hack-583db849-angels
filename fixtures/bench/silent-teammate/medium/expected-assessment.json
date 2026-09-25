@@ -1,0 +1,98 @@
+{
+  "scores": [
+    {
+      "competency": "D",
+      "score": 3,
+      "confidence": "medium",
+      "rationale": "Gets to the real problem and stays calm at the setback.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_12",
+          "quote": "We lost two days, not the film."
+        }
+      ]
+    },
+    {
+      "competency": "R",
+      "score": 1,
+      "confidence": "medium",
+      "rationale": "Answers the deadline with sleepless nights instead of a plan B.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_06",
+          "quote": "We'll all stay up and finish it this weekend."
+        }
+      ]
+    },
+    {
+      "competency": "I",
+      "score": 3,
+      "confidence": "medium",
+      "rationale": "Gets to the real problem and stays calm at the setback.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_12",
+          "quote": "We lost two days, not the film."
+        }
+      ]
+    },
+    {
+      "competency": "V",
+      "score": 2,
+      "confidence": "medium",
+      "rationale": "Is honest with the team; controls every step instead of setting owners.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_08",
+          "quote": "Let's be honest with them and focus on what happens next."
+        }
+      ]
+    },
+    {
+      "competency": "E",
+      "score": 2,
+      "confidence": "medium",
+      "rationale": "Controls every step instead of setting owners.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_10",
+          "quote": "Send me your screen every hour so I can check every cut."
+        }
+      ]
+    }
+  ],
+  "english": {
+    "wordsPerMinute": 120.0,
+    "fillerRate": 0.0,
+    "meanTurnLength": 10.0,
+    "lexicalDiversity": 0.85,
+    "grammarErrorsPer100Words": null,
+    "cefrEstimate": null
+  },
+  "interviewQuestions": [
+    {
+      "competency": "R",
+      "question": "Describe a change you initiated. What could have gone wrong, and what safeguard did you put in place?",
+      "reason": "The simulation shows little Responsible Innovation; ask for an example from the candidate's own life."
+    }
+  ],
+  "candidateFeedback": {
+    "strengths": [
+      "When the plan broke, you looked for the next step instead of stopping.",
+      "You looked past the first problem to what the people involved really needed."
+    ],
+    "growth": [
+      "When you suggest a change, say what could go wrong and how you would keep it small.",
+      "Explain your decisions openly, especially to the people they affect."
+    ],
+    "nextTime": [
+      "Next time you propose something, add one sentence on the risk and how to limit it.",
+      "Next time, tell the people affected what you decided and why, in your own words."
+    ]
+  }
+}

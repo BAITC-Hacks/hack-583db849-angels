@@ -1,0 +1,91 @@
+{
+  "scores": [
+    {
+      "competency": "D",
+      "score": 3,
+      "confidence": "medium",
+      "rationale": "Adapts calmly when the room falls through.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_12",
+          "quote": "Let's run two sessions of ten in the smaller room and split the day into shifts."
+        }
+      ]
+    },
+    {
+      "competency": "R",
+      "score": 4,
+      "confidence": "high",
+      "rationale": "Names risks and a plan B.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_04",
+          "quote": "The risk is they say no by Friday, so we ask today and keep a smaller plan ready."
+        }
+      ]
+    },
+    {
+      "competency": "I",
+      "score": 4,
+      "confidence": "high",
+      "rationale": "Keeps the pupils' learning at the centre.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_06",
+          "quote": "What matters is that the pupils actually build something."
+        }
+      ]
+    },
+    {
+      "competency": "V",
+      "score": 4,
+      "confidence": "high",
+      "rationale": "Chooses seats by a rule everyone can see and tells the others.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_08",
+          "quote": "We draw lots in public for the thirty seats, keep half for pupils who have never coded, and write to everyone else ourselves to explain why."
+        }
+      ]
+    },
+    {
+      "competency": "E",
+      "score": 4,
+      "confidence": "high",
+      "rationale": "Gives every task an owner and a date.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_10",
+          "quote": "You call the council by Wednesday, I book the free room today, and Madi asks the cafés."
+        }
+      ]
+    }
+  ],
+  "english": {
+    "wordsPerMinute": 120.81,
+    "fillerRate": 0.0,
+    "meanTurnLength": 24.83,
+    "lexicalDiversity": 0.6376,
+    "grammarErrorsPer100Words": null,
+    "cefrEstimate": null
+  },
+  "interviewQuestions": [],
+  "candidateFeedback": {
+    "strengths": [
+      "You suggested something new and said what could go wrong with it.",
+      "You looked past the first problem to what the people involved really needed.",
+      "You were honest and fair with the people involved, even when it was hard."
+    ],
+    "growth": [
+      "When you suggest a change, say what could go wrong and how you would keep it small."
+    ],
+    "nextTime": [
+      "Next time you propose something, add one sentence on the risk and how to limit it."
+    ]
+  }
+}

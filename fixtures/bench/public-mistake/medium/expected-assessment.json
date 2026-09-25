@@ -1,0 +1,104 @@
+{
+  "scores": [
+    {
+      "competency": "D",
+      "score": 3,
+      "confidence": "medium",
+      "rationale": "Stays with the pupils when the answer is no.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_04",
+          "quote": "We owe those pupils more than that."
+        }
+      ]
+    },
+    {
+      "competency": "R",
+      "score": 1,
+      "confidence": "medium",
+      "rationale": "Stops at an apology without trying to repair anything.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_10",
+          "quote": "Nobody posts anything without my approval."
+        }
+      ]
+    },
+    {
+      "competency": "I",
+      "score": 3,
+      "confidence": "medium",
+      "rationale": "Sees the harm and corrects the post honestly.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_08",
+          "quote": "We say plainly that the date was wrong, we're sorry, and link the official page."
+        }
+      ]
+    },
+    {
+      "competency": "V",
+      "score": 3,
+      "confidence": "medium",
+      "rationale": "Sees the harm and corrects the post honestly.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_08",
+          "quote": "We say plainly that the date was wrong, we're sorry, and link the official page."
+        }
+      ]
+    },
+    {
+      "competency": "E",
+      "score": 1,
+      "confidence": "medium",
+      "rationale": "Controls all posting instead of fixing the process.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_10",
+          "quote": "Nobody posts anything without my approval."
+        }
+      ]
+    }
+  ],
+  "english": {
+    "wordsPerMinute": 120.0,
+    "fillerRate": 0.0,
+    "meanTurnLength": 12.67,
+    "lexicalDiversity": 0.8158,
+    "grammarErrorsPer100Words": null,
+    "cefrEstimate": null
+  },
+  "interviewQuestions": [
+    {
+      "competency": "R",
+      "question": "Describe a change you initiated. What could have gone wrong, and what safeguard did you put in place?",
+      "reason": "The simulation shows little Responsible Innovation; ask for an example from the candidate's own life."
+    },
+    {
+      "competency": "E",
+      "question": "Choose an idea you actually delivered. How did you prioritize the work, assign ownership, and measure the result?",
+      "reason": "The simulation shows little Entrepreneurial Execution; ask for an example from the candidate's own life."
+    }
+  ],
+  "candidateFeedback": {
+    "strengths": [
+      "When the plan broke, you looked for the next step instead of stopping.",
+      "You looked past the first problem to what the people involved really needed.",
+      "You were honest and fair with the people involved, even when it was hard."
+    ],
+    "growth": [
+      "When you suggest a change, say what could go wrong and how you would keep it small.",
+      "End with a plan: what happens next, who owns it, and when you will check on it."
+    ],
+    "nextTime": [
+      "Next time you propose something, add one sentence on the risk and how to limit it.",
+      "Next time, close the conversation with owners and a date for every step."
+    ]
+  }
+}

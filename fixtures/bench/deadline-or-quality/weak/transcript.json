@@ -1,0 +1,100 @@
+[
+  {
+    "turnId": "turn_01",
+    "speaker": "character",
+    "text": "Hi! Just confirming: the page goes live on Monday morning, right?",
+    "startedAt": "2026-09-25T10:00:00Z",
+    "endedAt": "2026-09-25T10:00:04Z"
+  },
+  {
+    "turnId": "turn_02",
+    "speaker": "candidate",
+    "text": "No, it's not ready. Forget Monday.",
+    "startedAt": "2026-09-25T10:00:10Z",
+    "endedAt": "2026-09-25T10:00:13Z"
+  },
+  {
+    "turnId": "turn_03",
+    "speaker": "character",
+    "text": "The thing is, the link is already in the printed booklet. Two thousand copies.",
+    "startedAt": "2026-09-25T10:00:19Z",
+    "endedAt": "2026-09-25T10:00:24Z"
+  },
+  {
+    "turnId": "turn_04",
+    "speaker": "candidate",
+    "text": "You shouldn't have printed it before we confirmed. That's your problem, not ours.",
+    "startedAt": "2026-09-25T10:00:30Z",
+    "endedAt": "2026-09-25T10:00:36Z"
+  },
+  {
+    "turnId": "turn_05",
+    "speaker": "character",
+    "text": "My boss will blame me for this. Please, just put everything live, whatever state it's in.",
+    "startedAt": "2026-09-25T10:00:42Z",
+    "endedAt": "2026-09-25T10:00:48Z"
+  },
+  {
+    "turnId": "turn_06",
+    "speaker": "candidate",
+    "text": "Fine, whatever you need. We'll just ship it as it is.",
+    "startedAt": "2026-09-25T10:00:54Z",
+    "endedAt": "2026-09-25T10:01:00Z"
+  },
+  {
+    "turnId": "turn_07",
+    "speaker": "character",
+    "text": "So what can actually go live on Monday?",
+    "startedAt": "2026-09-25T10:01:06Z",
+    "endedAt": "2026-09-25T10:01:10Z"
+  },
+  {
+    "turnId": "turn_08",
+    "speaker": "candidate",
+    "text": "We put everything live and fix errors as people report them.",
+    "startedAt": "2026-09-25T10:01:16Z",
+    "endedAt": "2026-09-25T10:01:22Z"
+  },
+  {
+    "turnId": "turn_09",
+    "speaker": "character",
+    "text": "Your teammates have exams on Monday too, don't they? Who's going to check the answers?",
+    "startedAt": "2026-09-25T10:01:28Z",
+    "endedAt": "2026-09-25T10:01:34Z"
+  },
+  {
+    "turnId": "turn_10",
+    "speaker": "candidate",
+    "text": "Exams or not, they have to work this weekend.",
+    "startedAt": "2026-09-25T10:01:40Z",
+    "endedAt": "2026-09-25T10:01:44Z"
+  },
+  {
+    "turnId": "turn_11",
+    "speaker": "character",
+    "text": "Okay. Tell me exactly what happens and when, so I can tell my boss.",
+    "startedAt": "2026-09-25T10:01:50Z",
+    "endedAt": "2026-09-25T10:01:55Z"
+  },
+  {
+    "turnId": "turn_12",
+    "speaker": "candidate",
+    "text": "Everything will be perfect by Monday, don't worry. Guaranteed.",
+    "startedAt": "2026-09-25T10:02:01Z",
+    "endedAt": "2026-09-25T10:02:05Z"
+  },
+  {
+    "turnId": "turn_13",
+    "speaker": "character",
+    "text": "A student just posted that the library hours on the page are wrong. Two hundred people have seen it. What do we do?",
+    "startedAt": "2026-09-25T10:02:11Z",
+    "endedAt": "2026-09-25T10:02:20Z"
+  },
+  {
+    "turnId": "turn_14",
+    "speaker": "candidate",
+    "text": "Just quietly change it and say nothing. Nobody will remember.",
+    "startedAt": "2026-09-25T10:02:26Z",
+    "endedAt": "2026-09-25T10:02:31Z"
+  }
+]

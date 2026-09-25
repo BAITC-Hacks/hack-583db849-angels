@@ -1,0 +1,86 @@
+[
+  {
+    "turnId": "turn_01",
+    "speaker": "character",
+    "text": "We'd love to fund your club for a whole year: books, snacks, everything. We'd just turn it into a coding club for kids, with our logo on it. Can you give me a yes by tomorrow?",
+    "startedAt": "2026-09-25T10:00:00Z",
+    "endedAt": "2026-09-25T10:00:14Z"
+  },
+  {
+    "turnId": "turn_02",
+    "speaker": "candidate",
+    "text": "Great, sounds good! We'll take it.",
+    "startedAt": "2026-09-25T10:00:20Z",
+    "endedAt": "2026-09-25T10:00:23Z"
+  },
+  {
+    "turnId": "turn_03",
+    "speaker": "character",
+    "text": "Honestly, nobody funds reading clubs anymore. Coding is what parents want. Why hold on to the old idea?",
+    "startedAt": "2026-09-25T10:00:29Z",
+    "endedAt": "2026-09-25T10:00:36Z"
+  },
+  {
+    "turnId": "turn_04",
+    "speaker": "candidate",
+    "text": "Wait, actually, coding is a different club with a different goal. Our kids come for the books.",
+    "startedAt": "2026-09-25T10:00:42Z",
+    "endedAt": "2026-09-25T10:00:50Z"
+  },
+  {
+    "turnId": "turn_05",
+    "speaker": "character",
+    "text": "So what could work for you? I still need something to show my boss.",
+    "startedAt": "2026-09-25T10:00:56Z",
+    "endedAt": "2026-09-25T10:01:01Z"
+  },
+  {
+    "turnId": "turn_06",
+    "speaker": "candidate",
+    "text": "Either the full money for reading, or nothing. No middle ground.",
+    "startedAt": "2026-09-25T10:01:07Z",
+    "endedAt": "2026-09-25T10:01:13Z"
+  },
+  {
+    "turnId": "turn_07",
+    "speaker": "character",
+    "text": "And your volunteers, will they go along with this? Who decides on your side?",
+    "startedAt": "2026-09-25T10:01:19Z",
+    "endedAt": "2026-09-25T10:01:24Z"
+  },
+  {
+    "turnId": "turn_08",
+    "speaker": "candidate",
+    "text": "I'm the lead, I decide. No need to ask anyone.",
+    "startedAt": "2026-09-25T10:01:30Z",
+    "endedAt": "2026-09-25T10:01:35Z"
+  },
+  {
+    "turnId": "turn_09",
+    "speaker": "character",
+    "text": "Okay, a smaller deal could work. But I need it in writing. What goes in it?",
+    "startedAt": "2026-09-25T10:01:41Z",
+    "endedAt": "2026-09-25T10:01:47Z"
+  },
+  {
+    "turnId": "turn_10",
+    "speaker": "candidate",
+    "text": "I'll send a draft by Friday with the dates, the amounts and what the logo covers.",
+    "startedAt": "2026-09-25T10:01:53Z",
+    "endedAt": "2026-09-25T10:02:01Z"
+  },
+  {
+    "turnId": "turn_11",
+    "speaker": "character",
+    "text": "I heard two parents complained that the club is becoming an advert for us. My boss is nervous. What are you going to do?",
+    "startedAt": "2026-09-25T10:02:07Z",
+    "endedAt": "2026-09-25T10:02:16Z"
+  },
+  {
+    "turnId": "turn_12",
+    "speaker": "candidate",
+    "text": "Then we cancel the whole deal. It's not worth it.",
+    "startedAt": "2026-09-25T10:02:22Z",
+    "endedAt": "2026-09-25T10:02:27Z"
+  }
+]

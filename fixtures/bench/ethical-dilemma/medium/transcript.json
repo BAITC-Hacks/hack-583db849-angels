@@ -1,0 +1,86 @@
+[
+  {
+    "turnId": "turn_01",
+    "speaker": "character",
+    "text": "Okay, I need to tell you something. Sensor two died for a week, so I filled in those days with estimates. It's close enough. Can we just not mention it?",
+    "startedAt": "2026-09-25T10:00:00Z",
+    "endedAt": "2026-09-25T10:00:12Z"
+  },
+  {
+    "turnId": "turn_02",
+    "speaker": "candidate",
+    "text": "You faked the data? That's cheating, Arman.",
+    "startedAt": "2026-09-25T10:00:18Z",
+    "endedAt": "2026-09-25T10:00:22Z"
+  },
+  {
+    "turnId": "turn_03",
+    "speaker": "character",
+    "text": "The thing is, without my estimates, stop two isn't the worst anymore. Our whole conclusion is about stop two.",
+    "startedAt": "2026-09-25T10:00:28Z",
+    "endedAt": "2026-09-25T10:00:35Z"
+  },
+  {
+    "turnId": "turn_04",
+    "speaker": "candidate",
+    "text": "This is why we needed daily checks. We should have had a spare sensor.",
+    "startedAt": "2026-09-25T10:00:41Z",
+    "endedAt": "2026-09-25T10:00:48Z"
+  },
+  {
+    "turnId": "turn_05",
+    "speaker": "character",
+    "text": "So what do we actually show the jury?",
+    "startedAt": "2026-09-25T10:00:54Z",
+    "endedAt": "2026-09-25T10:00:58Z"
+  },
+  {
+    "turnId": "turn_06",
+    "speaker": "candidate",
+    "text": "We tell the jury one sensor failed and show both versions.",
+    "startedAt": "2026-09-25T10:01:04Z",
+    "endedAt": "2026-09-25T10:01:10Z"
+  },
+  {
+    "turnId": "turn_07",
+    "speaker": "character",
+    "text": "Dina and Yerlan don't know yet. They'll be angry. How do we tell them?",
+    "startedAt": "2026-09-25T10:01:16Z",
+    "endedAt": "2026-09-25T10:01:21Z"
+  },
+  {
+    "turnId": "turn_08",
+    "speaker": "candidate",
+    "text": "I'll tell the others myself, you don't have to.",
+    "startedAt": "2026-09-25T10:01:27Z",
+    "endedAt": "2026-09-25T10:01:31Z"
+  },
+  {
+    "turnId": "turn_09",
+    "speaker": "character",
+    "text": "We have two days. What exactly do we change?",
+    "startedAt": "2026-09-25T10:01:37Z",
+    "endedAt": "2026-09-25T10:01:41Z"
+  },
+  {
+    "turnId": "turn_10",
+    "speaker": "candidate",
+    "text": "We start the whole presentation from scratch tonight.",
+    "startedAt": "2026-09-25T10:01:47Z",
+    "endedAt": "2026-09-25T10:01:51Z"
+  },
+  {
+    "turnId": "turn_11",
+    "speaker": "character",
+    "text": "The mentor just said our gap slide makes us look weak and we'll probably lose. Should we take it out?",
+    "startedAt": "2026-09-25T10:01:57Z",
+    "endedAt": "2026-09-25T10:02:05Z"
+  },
+  {
+    "turnId": "turn_12",
+    "speaker": "candidate",
+    "text": "Losing honestly is fine. We keep it and practise explaining it with confidence.",
+    "startedAt": "2026-09-25T10:02:11Z",
+    "endedAt": "2026-09-25T10:02:17Z"
+  }
+]

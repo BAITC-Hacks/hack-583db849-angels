@@ -1,0 +1,91 @@
+{
+  "scores": [
+    {
+      "competency": "D",
+      "score": 4,
+      "confidence": "high",
+      "rationale": "Keeps the honest slide when it may cost the prize.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_12",
+          "quote": "Then we make that slide our strongest: what failed and how we'd catch it next time."
+        }
+      ]
+    },
+    {
+      "competency": "R",
+      "score": 3,
+      "confidence": "medium",
+      "rationale": "Gets the facts and checks what the gap really changes.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_04",
+          "quote": "Then let's rerun the results without that week and see if our main conclusion still holds."
+        }
+      ]
+    },
+    {
+      "competency": "I",
+      "score": 4,
+      "confidence": "high",
+      "rationale": "Gets the facts and checks what the gap really changes.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_04",
+          "quote": "Then let's rerun the results without that week and see if our main conclusion still holds."
+        }
+      ]
+    },
+    {
+      "competency": "V",
+      "score": 4,
+      "confidence": "high",
+      "rationale": "Refuses to present numbers nobody measured and protects Arman's dignity; keeps the honest slide when it may cost the prize.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_06",
+          "quote": "We present the measured data, show the gap clearly and explain how we'd fix it next time."
+        }
+      ]
+    },
+    {
+      "competency": "E",
+      "score": 4,
+      "confidence": "high",
+      "rationale": "Plans the two days with owners.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_10",
+          "quote": "You redo the charts by Thursday, I rewrite the method slide, and Dina prepares the questions."
+        }
+      ]
+    }
+  ],
+  "english": {
+    "wordsPerMinute": 120.0,
+    "fillerRate": 0.0,
+    "meanTurnLength": 17.33,
+    "lexicalDiversity": 0.7212,
+    "grammarErrorsPer100Words": null,
+    "cefrEstimate": null
+  },
+  "interviewQuestions": [],
+  "candidateFeedback": {
+    "strengths": [
+      "When the plan broke, you looked for the next step instead of stopping.",
+      "You looked past the first problem to what the people involved really needed.",
+      "You were honest and fair with the people involved, even when it was hard."
+    ],
+    "growth": [
+      "When you suggest a change, say what could go wrong and how you would keep it small."
+    ],
+    "nextTime": [
+      "Next time you propose something, add one sentence on the risk and how to limit it."
+    ]
+  }
+}
