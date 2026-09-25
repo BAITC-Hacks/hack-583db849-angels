@@ -25,9 +25,10 @@ function toConsistencyItem(item: WireConsistencyItem): InterviewerBrief['consist
  * The interviewer brief. `sources` carries only the answers the quotes point
  * into, so the side panel shows exactly what was cited and nothing of the
  * profile — the API builds them from the same redacted view the model read.
+ * The surprise answer is read on its own (`['surprise', id]`), with the
+ * fields only staff get, so the brief's copy of it is not needed here.
  */
 export function toInterviewerBrief(brief: WireBrief): InterviewerBrief {
-  const surprise = brief.sources.surpriseAnswer;
   return {
     briefId: brief.briefId,
     candidateId: brief.candidateId,
@@ -44,6 +45,5 @@ export function toInterviewerBrief(brief: WireBrief): InterviewerBrief {
     consistency: brief.consistency.map(toConsistencyItem),
     clarify: brief.clarify.map((topic) => ({ topic: topic.topic, evidence: topic.evidence.map(toEvidence) })),
     english: brief.english,
-    surpriseAnswer: surprise ? { question: surprise.question, segments: surprise.segments } : null,
   };
 }

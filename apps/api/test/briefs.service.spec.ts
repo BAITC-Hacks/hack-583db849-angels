@@ -6,7 +6,7 @@ import { ToLlmViewService } from '../src/privacy/to-llm-view.service';
 const candidateId = '00000000-0000-4000-8000-00000000000a';
 const briefResult = contractExample<Record<string, unknown>>('ml/brief.response.json');
 
-function harness({ externalId = 'inv-2026-new-0001', demo = false, mlFails = false } = {}) {
+function harness({ externalId = 'inv-2026-new-0001', demo = false, mlFails = false, surprise = null as unknown } = {}) {
   const candidate = {
     id: candidateId,
     externalId,
@@ -19,6 +19,7 @@ function harness({ externalId = 'inv-2026-new-0001', demo = false, mlFails = fal
     },
     test: { answers: [{ itemId: 't1', response: 'Ask the team first.' }] },
     englishCertificate: { type: 'IELTS', score: '6.5' },
+    surprise,
   };
   const rows: Record<string, { id: string; candidateId: string; status: string; result: unknown; createdAt: Date }> = {};
   let next = 0;
@@ -105,6 +106,19 @@ describe('BriefsService', () => {
     expect(brief.sources.application.map((answer) => answer.fieldId)).not.toContain('unused');
     expect(brief.sources.surpriseAnswer).toBeNull();
     expect(JSON.stringify(brief)).not.toMatch(/Ada Example|ada@example\.test|000000000000|"profile"/);
+  });
+
+  it('carries the transcribed surprise answer as a source once there is one, and not before', async () => {
+    const segments = [{ segmentId: 'sseg_01', text: 'I would talk to the team first.', startSec: 3, endSec: 14.5 }];
+    const answered = harness({ surprise: { id: 'surprise-1', status: 'answered', question: 'What would you change?', segments } });
+    await answered.service.startFor(candidateId);
+    await expect(answered.service.latestFor(candidateId)).resolves.toMatchObject({
+      sources: { surpriseAnswer: { surpriseId: 'surprise-1', question: 'What would you change?', segments } },
+    });
+
+    const transcribing = harness({ surprise: { id: 'surprise-1', status: 'transcribing', question: 'What would you change?', segments: null } });
+    await transcribing.service.startFor(candidateId);
+    expect((await transcribing.service.latestFor(candidateId)).sources.surpriseAnswer).toBeNull();
   });
 
   it('answers 404 BRIEF_NOT_FOUND before a brief is ready, and 404 for an unknown or unfinished one', async () => {

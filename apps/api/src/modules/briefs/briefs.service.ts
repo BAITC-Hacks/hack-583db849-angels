@@ -8,15 +8,18 @@ import { Prisma } from '@prisma/client';
 import { CandidateAiService } from '../../ai-client/candidate-ai.service';
 import type { components } from '../../ai-client/schema';
 import { PrismaService } from '../../database/prisma.service';
-import { CandidateSnapshot, LlmView, ToLlmViewService } from '../../privacy/to-llm-view.service';
+import { candidateSnapshot, snapshotSelect } from '../../privacy/candidate-snapshot';
+import { LlmView, ToLlmViewService } from '../../privacy/to-llm-view.service';
 import { BriefDto } from './dto/brief.dto';
 
 type BriefResult = components['schemas']['BriefResult'];
 type EnglishMetrics = components['schemas']['EnglishMetrics'];
 type Evidence = components['schemas']['Evidence'];
+type SurpriseSegment = NonNullable<BriefDto['sources']['surpriseAnswer']>['segments'][number];
 
 const candidateSelect = {
-  id: true, externalId: true, profile: true, application: true, test: true, englishCertificate: true,
+  id: true, ...snapshotSelect,
+  surprise: { select: { id: true, status: true, question: true, segments: true } },
 } as const satisfies Prisma.CandidateSelect;
 type BriefCandidate = Prisma.CandidateGetPayload<{ select: typeof candidateSelect }>;
 
@@ -36,12 +39,15 @@ export class BriefsService {
 
   /**
    * Makes a brief for the candidate without anyone asking: when they arrive,
-   * and again with the simulation's English once it is assessed. It never
-   * throws — a failure is kept as `failed`, and `progress.brief` shows it.
+   * again with the simulation's English once it is assessed, and again once
+   * the surprise answer is transcribed. Without English given, the latest
+   * assessment's is used. It never throws — a failure is kept as `failed`,
+   * and `progress.brief` shows it.
    */
   async startFor(candidateId: string, simulationEnglish?: EnglishMetrics | null): Promise<void> {
     try {
-      await this.generate(candidateId, simulationEnglish, { reuseSeed: true });
+      const english = simulationEnglish ?? await this.latestSimulationEnglish(candidateId);
+      await this.generate(candidateId, english, { reuseSeed: true });
     } catch (error) {
       this.logger.error(`Automatic brief failed for candidate ${candidateId}: ${error instanceof Error ? error.message : String(error)}`);
     }
@@ -89,7 +95,7 @@ export class BriefsService {
 
     const pending = await this.prisma.brief.create({ data: { candidateId, status: 'pending' }, select: { id: true } });
     try {
-      const result = seeded ?? await this.candidateAi.brief(candidateId, this.snapshot(candidate), simulationEnglish);
+      const result = seeded ?? await this.candidateAi.brief(candidateId, candidateSnapshot(candidate), simulationEnglish);
       await this.prisma.brief.update({
         where: { id: pending.id },
         data: { status: 'ready', result: result as unknown as Prisma.InputJsonValue },
@@ -119,14 +125,10 @@ export class BriefsService {
     return (assessment?.result as { english?: EnglishMetrics } | null)?.english ?? null;
   }
 
-  private snapshot(candidate: BriefCandidate): CandidateSnapshot {
-    return {
-      externalId: candidate.externalId,
-      profile: candidate.profile as Record<string, unknown>,
-      application: candidate.application as unknown as CandidateSnapshot['application'],
-      test: candidate.test as unknown as CandidateSnapshot['test'],
-      ...(candidate.englishCertificate ? { englishCertificate: candidate.englishCertificate as unknown as CandidateSnapshot['englishCertificate'] } : {}),
-    };
+  /** The transcribed surprise answer, for staff to read beside the brief, once there is one. */
+  private surpriseSource(surprise: BriefCandidate['surprise']): BriefDto['sources']['surpriseAnswer'] {
+    if (!surprise || surprise.status !== 'answered' || !Array.isArray(surprise.segments)) return null;
+    return { surpriseId: surprise.id, question: surprise.question, segments: surprise.segments as unknown as SurpriseSegment[] };
   }
 
   /**
@@ -135,7 +137,7 @@ export class BriefsService {
    * quote is found in them word for word — and no profile field is among them.
    */
   private toDto(briefId: string, createdAt: Date, result: BriefResult, candidate: BriefCandidate): BriefDto {
-    const view: LlmView = this.privacy.toLlmView(candidate.id, this.snapshot(candidate));
+    const view: LlmView = this.privacy.toLlmView(candidate.id, candidateSnapshot(candidate));
     const cited = [
       ...result.questions.flatMap((question) => question.evidence),
       ...result.consistency.flatMap((item) => [...item.claim.evidence, ...item.observation.evidence]),
@@ -157,8 +159,7 @@ export class BriefsService {
       sources: {
         application: view.application.answers.filter((answer) => fields.has(answer.fieldId)),
         test: view.test.answers.filter((answer) => items.has(answer.itemId)),
-        // The surprise answer joins the brief with #55.
-        surpriseAnswer: null,
+        surpriseAnswer: this.surpriseSource(candidate.surprise),
       },
     };
   }

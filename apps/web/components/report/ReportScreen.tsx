@@ -5,6 +5,7 @@ import { ApiError } from '../../lib/api/client';
 import { errorText } from '../../lib/api/errors';
 import { useCopy, useStaffLocale } from '../../lib/i18n/StaffLocaleProvider';
 import { useAssessment, useFeedback } from '../../lib/report/queries';
+import { CandidateSurprise } from '../surprise/CandidateSurprise';
 import { FeedbackView } from './FeedbackView';
 import { SimulationReportView } from './SimulationReportView';
 
@@ -46,7 +47,7 @@ export function ReportScreen({ assessmentId }: { assessmentId: string }) {
       </Notice>
     );
   }
-  return <SimulationReportView report={report.data} />;
+  return <SimulationReportView report={report.data} surprise={<CandidateSurprise candidateId={report.data.candidate.id} />} />;
 }
 
 /**
