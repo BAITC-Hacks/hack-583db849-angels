@@ -54,6 +54,10 @@ export class MlHttpAdapter implements AiGateway {
     return this.invoke('interview/draft', () => this.client().POST('/internal/v1/interview/draft', { body: request }));
   }
 
+  usage(): Promise<components['schemas']['Usage']> {
+    return this.invoke('usage', () => this.client().GET('/internal/v1/usage'));
+  }
+
   consistency(request: components['schemas']['ConsistencyRequest']): Promise<components['schemas']['ConsistencyResult']> {
     return this.invoke('consistency', () => this.client().POST('/internal/v1/consistency', { body: request }));
   }

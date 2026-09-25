@@ -20,7 +20,7 @@ describe('CandidatesController', () => {
     expect(JSON.stringify(response)).not.toContain('profile');
     expect(JSON.stringify(response)).not.toContain('private@example.test');
     expect(audit.record).toHaveBeenCalledWith({
-      action: 'candidate.upsert', targetType: 'candidate', targetId: 'candidate-id', candidateId: 'candidate-id', actorRole: 'platform',
+      action: 'candidate.created', targetType: 'candidate', targetId: 'candidate-id', candidateId: 'candidate-id', actorRole: 'platform',
     });
   });
 });

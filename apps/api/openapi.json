@@ -1246,6 +1246,112 @@
           "consistency"
         ]
       }
+    },
+    "/v1/admin/overview": {
+      "get": {
+        "operationId": "AdminController_overview",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminOverviewDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/audit-events": {
+      "get": {
+        "operationId": "AdminController_auditEvents",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 50,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditEventListDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/v1/demo/reset": {
+      "post": {
+        "operationId": "DemoController_reset",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "demo"
+        ]
+      }
+    },
+    "/v1/demo/recorded-session": {
+      "post": {
+        "operationId": "DemoController_recordedSession",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordedSessionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CandidateProgressDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "demo"
+        ]
+      }
     }
   },
   "info": {
@@ -3432,6 +3538,213 @@
           "stage",
           "createdAt",
           "items"
+        ]
+      },
+      "UsageDto": {
+        "type": "object",
+        "properties": {
+          "liveCalls": {
+            "type": "number"
+          },
+          "replayedCalls": {
+            "type": "number"
+          },
+          "spentUsd": {
+            "type": "number"
+          },
+          "capUsd": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "liveCalls",
+          "replayedCalls",
+          "spentUsd",
+          "capUsd"
+        ]
+      },
+      "ModuleStateDto": {
+        "type": "object",
+        "properties": {
+          "module": {
+            "type": "string",
+            "enum": [
+              "M1",
+              "M2",
+              "M3",
+              "M4",
+              "M5",
+              "S"
+            ]
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "on",
+              "off"
+            ]
+          }
+        },
+        "required": [
+          "module",
+          "state"
+        ]
+      },
+      "CountsDto": {
+        "type": "object",
+        "properties": {
+          "candidates": {
+            "type": "number"
+          },
+          "simulationsCompleted": {
+            "type": "number"
+          },
+          "assessmentsReady": {
+            "type": "number"
+          },
+          "interviewsScored": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "candidates",
+          "simulationsCompleted",
+          "assessmentsReady",
+          "interviewsScored"
+        ]
+      },
+      "AdminOverviewDto": {
+        "type": "object",
+        "properties": {
+          "demoMode": {
+            "type": "boolean"
+          },
+          "gatewayMode": {
+            "type": "string",
+            "enum": [
+              "live",
+              "record",
+              "replay"
+            ]
+          },
+          "ml": {
+            "type": "string",
+            "enum": [
+              "up",
+              "down"
+            ]
+          },
+          "usage": {
+            "$ref": "#/components/schemas/UsageDto"
+          },
+          "modules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModuleStateDto"
+            }
+          },
+          "counts": {
+            "$ref": "#/components/schemas/CountsDto"
+          }
+        },
+        "required": [
+          "demoMode",
+          "gatewayMode",
+          "ml",
+          "usage",
+          "modules",
+          "counts"
+        ]
+      },
+      "AuditEventDto": {
+        "type": "object",
+        "properties": {
+          "eventId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "actorRole": {
+            "type": "string",
+            "enum": [
+              "platform",
+              "interviewer",
+              "commission",
+              "admin",
+              "system"
+            ]
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "candidate.created",
+              "brief.ready",
+              "simulation.started",
+              "simulation.completed",
+              "simulation.stopped",
+              "assessment.ready",
+              "interview.created",
+              "recording.uploaded",
+              "transcript.ready",
+              "scores.saved",
+              "draft.created",
+              "surprise.started",
+              "surprise.answered",
+              "surprise.video.viewed",
+              "demo.reset"
+            ]
+          },
+          "candidateId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "candidateLabel": {
+            "type": "string",
+            "nullable": true
+          },
+          "subjectId": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "eventId",
+          "at",
+          "actorRole",
+          "action",
+          "candidateId",
+          "candidateLabel",
+          "subjectId"
+        ]
+      },
+      "AuditEventListDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AuditEventDto"
+            }
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "RecordedSessionDto": {
+        "type": "object",
+        "properties": {
+          "candidateId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "candidateId"
         ]
       }
     }

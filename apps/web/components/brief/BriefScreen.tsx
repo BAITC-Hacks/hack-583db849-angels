@@ -6,7 +6,6 @@ import { ApiError } from '../../lib/api/client';
 import { errorText } from '../../lib/api/errors';
 import { useBrief, useRerunBrief } from '../../lib/brief/queries';
 import type { InterviewerBrief } from '../../lib/brief/types';
-import type { CandidateCode } from '../../lib/demo/world';
 import { useDemoRole } from '../../lib/DemoRoleProvider';
 import { useCopy, useStaffLocale } from '../../lib/i18n/StaffLocaleProvider';
 import { homeFor } from '../../lib/roles';
@@ -135,19 +134,12 @@ export function BriefScreen({ candidateId }: { candidateId: string }) {
   );
 }
 
-/** The demo world knows A, B and C only; any other candidate's brief marks nothing there. */
-function demoCode(label: string): CandidateCode | null {
-  const letter = /^Candidate ([ABC])$/.exec(label)?.[1];
-  return letter ? (letter as CandidateCode) : null;
-}
-
 function BriefView({ brief, label, newer }: { brief: InterviewerBrief; label: string; newer: boolean }) {
   const text = useCopy(copy);
-  const code = demoCode(label);
 
   return (
     <>
-      {code ? <MarkBriefViewed code={code} /> : null}
+      <MarkBriefViewed candidateId={brief.candidateId} />
       {newer ? (
         <p
           aria-live="polite"

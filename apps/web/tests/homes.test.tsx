@@ -3,50 +3,18 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import CommissionHome from '../app/(product)/commission/page';
 import InterviewerHome from '../app/(product)/interviewer/page';
 import type { WireCandidate } from '../lib/api/contract';
-import { getWorld, record, resetWorld } from '../lib/demo/world';
+import { forgetViewedBriefs, markBriefViewed } from '../lib/brief/viewed';
 import { example, json, mockApi, withQuery } from './apiHarness';
 
 vi.mock('next/navigation', () => ({ useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }), usePathname: () => '/' }));
 
 beforeEach(() => {
   vi.useFakeTimers();
-  resetWorld();
+  forgetViewedBriefs();
 });
 afterEach(() => {
   vi.useRealTimers();
   vi.unstubAllGlobals();
-});
-
-const codes = () => getWorld().events.map((event) => event.code);
-
-/** What the simulation screen and the candidate home report while the other homes still read the world (#23). */
-function playSimulation() {
-  act(() => {
-    record('simulation-started', 'A', { simulation: 'in-progress' });
-    record('simulation-completed', 'A', { simulation: 'completed' });
-    record('assessment-ready', 'A', { assessmentReady: true });
-  });
-}
-
-describe('the demo world', () => {
-  it('follows the candidate through the simulation to the report', () => {
-    playSimulation();
-    expect(getWorld().candidates.A).toMatchObject({ simulation: 'completed', assessmentReady: true });
-    expect(codes()).toEqual(expect.arrayContaining(['simulation-started', 'simulation-completed', 'assessment-ready']));
-  });
-
-  it('records a step once, however often a screen reports it', () => {
-    record('brief-viewed', 'A', { briefViewed: true });
-    record('brief-viewed', 'A', { briefViewed: true });
-    expect(codes().filter((code) => code === 'brief-viewed')).toHaveLength(1);
-  });
-
-  it('starts over on reset', () => {
-    record('brief-viewed', 'A', { briefViewed: true });
-    resetWorld();
-    expect(getWorld().candidates.A.briefViewed).toBe(false);
-    expect(codes()).toEqual(['demo-reset']);
-  });
 });
 
 describe('each role has its own working home', () => {
@@ -63,7 +31,7 @@ describe('each role has its own working home', () => {
     mockApi({ 'GET /api/v1/candidates': () => json(at(null)) });
     const first = withQuery(<InterviewerHome />);
     expect(screen.getByText('Read candidate A’s brief')).toBeTruthy();
-    act(() => record('brief-viewed', 'A', { briefViewed: true }));
+    act(() => markBriefViewed(list.items[0].candidateId));
     expect(await screen.findByText('Interview candidate A and record it')).toBeTruthy();
     expect(screen.getByRole('link', { name: 'Open the interview' }).getAttribute('href')).toBe('/interviewer/interview');
     first.unmount();

@@ -1,10 +1,9 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Composer } from '../components/simulation/Composer';
 import { VoiceComposer } from '../components/simulation/VoiceComposer';
 import { AccommodationControl } from '../components/home/AccommodationControl';
 import type { WireCandidate } from '../lib/api/contract';
-import { resetWorld } from '../lib/demo/world';
 import { apiError, example, json, mockApi, withQuery } from './apiHarness';
 
 /**
@@ -45,7 +44,6 @@ function withMicrophone(granted: boolean) {
   window.URL.revokeObjectURL = vi.fn();
 }
 
-beforeEach(() => resetWorld());
 afterEach(() => vi.unstubAllGlobals());
 
 describe('taking a turn by voice', () => {

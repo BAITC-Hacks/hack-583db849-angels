@@ -81,6 +81,14 @@ describe('MlHttpAdapter', () => {
     await expect(request.clone().json()).resolves.toEqual(body);
   });
 
+  it('reads the gateway’s usage for the admin', async () => {
+    const usage = { gatewayMode: 'replay', liveCalls: 0, replayedCalls: 3, spentUsd: 0, capUsd: 20 };
+    const fetchImplementation = jest.fn().mockResolvedValue(new Response(JSON.stringify(usage), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+    await expect(new MlHttpAdapter(config, fetchImplementation).usage()).resolves.toEqual(usage);
+    const [request] = fetchImplementation.mock.calls[0] as [Request];
+    expect(new URL(request.url).pathname).toBe('/internal/v1/usage');
+  });
+
   it('posts a quality check to ML as it is', async () => {
     const result = { signals: [], talkShare: null, drift: [], interviews: 3 };
     const fetchImplementation = jest.fn().mockResolvedValue(new Response(JSON.stringify(result), {

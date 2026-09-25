@@ -6,7 +6,7 @@ import { ToLlmViewService } from '../src/privacy/to-llm-view.service';
 function gateway(overrides: Partial<Record<keyof AiGateway, jest.Mock>>): AiGateway {
   const methods: (keyof AiGateway)[] = [
     'brief', 'scenarios', 'simulationTurn', 'simulationAssessment', 'transcribeTurn', 'speech',
-    'surpriseQuestion', 'transcribeSurprise', 'qualityCheck', 'transcribeInterview', 'interviewDraft',
+    'surpriseQuestion', 'transcribeSurprise', 'qualityCheck', 'transcribeInterview', 'interviewDraft', 'consistency', 'usage',
   ];
   return { ...Object.fromEntries(methods.map((method) => [method, jest.fn()])), ...overrides } as unknown as AiGateway;
 }

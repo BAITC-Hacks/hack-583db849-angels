@@ -2,50 +2,60 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { StatusPill, type Tone } from '../../../components/home/StatusPill';
-import { resetWorld, useWorld, type DemoEventCode } from '../../../lib/demo/world';
+import { StatusPill } from '../../../components/home/StatusPill';
+import { useAdminOverview, useAuditEvents, useDemoReset, useRecordedSession, type AuditEvent } from '../../../lib/admin/queries';
+import { useCandidates } from '../../../lib/api/candidates';
+import { errorText } from '../../../lib/api/errors';
 import { useStaffLocale } from '../../../lib/i18n/StaffLocaleProvider';
 import type { StaffLocale } from '../../../lib/i18n/staffLocale';
 import { navFor } from '../../../lib/navigation';
 import { demoRoles, roleMeta } from '../../../lib/roles';
 
-const events: Record<StaffLocale, Record<DemoEventCode, string>> = {
+/** Every action the audit log can hold, as a sentence. */
+const actions: Record<StaffLocale, Record<AuditEvent['action'], string>> = {
   en: {
-    'brief-viewed': 'Interviewer read the brief',
-    'simulation-started': 'Candidate started the simulation',
-    'simulation-completed': 'Candidate finished the simulation',
-    'simulation-stopped': 'Candidate stopped the simulation early',
-    'assessment-ready': 'Report and candidate feedback are ready',
-    'recording-loaded': 'Interview recording sent for transcription',
-    'transcript-ready': 'Interview transcript is ready',
-    'scores-saved': 'Interviewer saved blind scores',
-    'draft-ready': 'AI draft opened for the interviewer',
-    'accommodation-changed': 'Staff changed how a candidate answers',
-    'demo-reset': 'Demo reset',
+    'candidate.created': 'Candidate arrived from the platform',
+    'brief.ready': 'Brief is ready',
+    'simulation.started': 'Candidate started the simulation',
+    'simulation.completed': 'Simulation finished',
+    'simulation.stopped': 'Candidate stopped the simulation early',
+    'assessment.ready': 'Report and candidate feedback are ready',
+    'interview.created': 'Interview started',
+    'recording.uploaded': 'Interview recording sent for transcription',
+    'transcript.ready': 'Interview transcript is ready',
+    'scores.saved': 'Interviewer saved blind scores',
+    'draft.created': 'AI draft written',
+    'surprise.started': 'Candidate opened the surprise question',
+    'surprise.answered': 'Surprise answer transcribed',
+    'surprise.video.viewed': 'Staff watched the surprise answer',
+    'demo.reset': 'Demo reset',
   },
   ru: {
-    'brief-viewed': 'Интервьюер прочитал бриф',
-    'simulation-started': 'Кандидат начал симуляцию',
-    'simulation-completed': 'Кандидат завершил симуляцию',
-    'simulation-stopped': 'Кандидат остановил симуляцию досрочно',
-    'assessment-ready': 'Отчёт и отзыв кандидату готовы',
-    'recording-loaded': 'Запись интервью отправлена на расшифровку',
-    'transcript-ready': 'Расшифровка интервью готова',
-    'scores-saved': 'Интервьюер сохранил баллы вслепую',
-    'draft-ready': 'Черновик ИИ открыт интервьюеру',
-    'accommodation-changed': 'Сотрудник изменил способ ответа кандидата',
-    'demo-reset': 'Демо сброшено',
+    'candidate.created': 'Кандидат пришёл с платформы',
+    'brief.ready': 'Бриф готов',
+    'simulation.started': 'Кандидат начал симуляцию',
+    'simulation.completed': 'Симуляция завершена',
+    'simulation.stopped': 'Кандидат остановил симуляцию досрочно',
+    'assessment.ready': 'Отчёт и отзыв кандидату готовы',
+    'interview.created': 'Интервью начато',
+    'recording.uploaded': 'Запись интервью отправлена на расшифровку',
+    'transcript.ready': 'Расшифровка интервью готова',
+    'scores.saved': 'Интервьюер сохранил баллы вслепую',
+    'draft.created': 'Черновик ИИ написан',
+    'surprise.started': 'Кандидат открыл сюрпризный вопрос',
+    'surprise.answered': 'Сюрпризный ответ расшифрован',
+    'surprise.video.viewed': 'Сотрудник посмотрел сюрпризный ответ',
+    'demo.reset': 'Демо сброшено',
   },
 };
 
-type ModuleState = 'live' | 'preview' | 'locked';
-
-const modules: { code: string; href?: string; state: ModuleState; en: string; ru: string }[] = [
-  { code: 'M1', href: '/interviewer/brief', state: 'live', en: 'Interviewer brief', ru: 'Бриф интервьюера' },
-  { code: 'M2', href: '/simulation', state: 'live', en: 'Leadership simulation', ru: 'Симуляция лидерства' },
-  { code: 'M3', href: '/commission/simulation-report', state: 'live', en: 'Report and candidate feedback', ru: 'Отчёт и отзыв кандидату' },
-  { code: 'M4', href: '/interviewer/interview', state: 'live', en: 'Interview transcript and draft', ru: 'Расшифровка интервью и черновик' },
-  { code: 'M5', href: '/commission/quality-guard', state: 'live', en: 'Quality guard', ru: 'Контроль качества' },
+const modules: { code: 'M1' | 'M2' | 'M3' | 'M4' | 'M5' | 'S'; href: string; en: string; ru: string }[] = [
+  { code: 'M1', href: '/interviewer/brief', en: 'Interviewer brief', ru: 'Бриф интервьюера' },
+  { code: 'M2', href: '/admin/scenarios', en: 'Leadership simulation', ru: 'Симуляция лидерства' },
+  { code: 'M3', href: '/commission/simulation-report', en: 'Report and candidate feedback', ru: 'Отчёт и отзыв кандидату' },
+  { code: 'M4', href: '/interviewer/interview', en: 'Interview transcript and draft', ru: 'Расшифровка интервью и черновик' },
+  { code: 'M5', href: '/commission/quality-guard', en: 'Quality guard', ru: 'Контроль качества' },
+  { code: 'S', href: '/interviewer/brief', en: 'Surprise question', ru: 'Сюрпризный вопрос' },
 ];
 
 const copy = {
@@ -53,22 +63,28 @@ const copy = {
     eyebrow: 'Admin',
     title: 'System',
     lede: 'Everything the demo is made of, and everything that happened in it.',
-    tiles: { api: 'API', calls: 'Live AI calls', budget: 'AI budget', modules: 'Modules on preview' },
-    apiValue: 'Mock',
-    apiNote: 'the real API arrives with F0 (#3)',
-    callsNote: 'replay only in the preview',
+    tiles: { ml: 'ML service', calls: 'Live AI calls', budget: 'AI budget', demo: 'Demo mode' },
+    mlUp: 'Up',
+    mlDown: 'Down',
+    replayed: (count: number) => `${count} replayed`,
+    demoOn: 'On',
+    demoOff: 'Off',
     modulesTitle: 'Modules',
-    state: { live: 'On the API', preview: 'Preview', locked: 'Not built' },
+    on: 'On',
+    off: 'Off',
     open: 'Open',
     rolesTitle: 'Roles and what they see',
     screens: (count: number) => `${count} screens`,
     logTitle: 'Activity',
     logEmpty: 'Nothing yet. Actions on any screen, in any role, appear here.',
+    system: 'system',
     controlsTitle: 'Demo controls',
+    controlsOff: 'The demo controls work only with DEMO_MODE=true.',
     reset: 'Reset the demo',
     confirm: 'Reset everything?',
     yes: 'Reset',
     no: 'Cancel',
+    recorded: (label: string) => `Finish ${label}’s simulation from the recording`,
     overview: 'Demo overview',
     kit: 'Evidence components',
   },
@@ -76,41 +92,53 @@ const copy = {
     eyebrow: 'Админ',
     title: 'Система',
     lede: 'Из чего состоит демо и всё, что в нём произошло.',
-    tiles: { api: 'API', calls: 'Живых вызовов ИИ', budget: 'Бюджет ИИ', modules: 'Модулей на превью' },
-    apiValue: 'Моки',
-    apiNote: 'настоящий API появится с F0 (#3)',
-    callsNote: 'в превью только replay',
+    tiles: { ml: 'ML-сервис', calls: 'Живых вызовов ИИ', budget: 'Бюджет ИИ', demo: 'Режим демо' },
+    mlUp: 'Работает',
+    mlDown: 'Не отвечает',
+    replayed: (count: number) => `из записи: ${count}`,
+    demoOn: 'Включён',
+    demoOff: 'Выключен',
     modulesTitle: 'Модули',
-    state: { live: 'На API', preview: 'Превью', locked: 'Не готов' },
+    on: 'Включён',
+    off: 'Выключен',
     open: 'Открыть',
     rolesTitle: 'Роли и что они видят',
     screens: (count: number) => `экранов: ${count}`,
     logTitle: 'Журнал',
     logEmpty: 'Пока пусто. Действия на любом экране в любой роли появятся здесь.',
+    system: 'система',
     controlsTitle: 'Управление демо',
+    controlsOff: 'Управление демо работает только при DEMO_MODE=true.',
     reset: 'Сбросить демо',
     confirm: 'Сбросить всё?',
     yes: 'Сбросить',
     no: 'Отмена',
+    recorded: (label: string) => `Завершить симуляцию: ${label}, из записи`,
     overview: 'Обзор демо',
     kit: 'Компоненты доказательств',
   },
 };
 
-/** The admin's home: system state, who sees what, a live activity log, and the demo's controls. */
+/** The admin's home, from the API: system state, who sees what, the audit log, and the demo's controls. */
 export default function AdminHome() {
   const { locale } = useStaffLocale();
   const text = copy[locale];
-  const world = useWorld();
+  const overview = useAdminOverview();
+  const audit = useAuditEvents();
+  const candidates = useCandidates();
+  const reset = useDemoReset();
+  const recorded = useRecordedSession();
   const [confirming, setConfirming] = useState(false);
   const time = new Intl.DateTimeFormat(locale, { timeStyle: 'medium' });
-  const stateTone: Record<ModuleState, Tone> = { live: 'done', preview: 'active', locked: 'locked' };
+  const data = overview.data;
+  const states = new Map(data?.modules.map((module) => [module.module, module.state]));
+  const unplayed = (candidates.data ?? []).filter((candidate) => /^Candidate [ABC]$/.test(candidate.label) && !candidate.progress?.simulation);
 
   const tiles = [
-    { label: text.tiles.api, value: text.apiValue, note: text.apiNote },
-    { label: text.tiles.calls, value: '0', note: text.callsNote },
-    { label: text.tiles.budget, value: '$0.00 / $20', note: 'BUDGET_USD_CAP' },
-    { label: text.tiles.modules, value: `${modules.filter((m) => m.state === 'preview').length} / 5` },
+    { label: text.tiles.ml, value: data ? (data.ml === 'up' ? text.mlUp : text.mlDown) : '—', note: data?.gatewayMode },
+    { label: text.tiles.calls, value: data ? String(data.usage.liveCalls) : '—', note: data ? text.replayed(data.usage.replayedCalls) : undefined },
+    { label: text.tiles.budget, value: data ? `$${data.usage.spentUsd.toFixed(2)} / $${data.usage.capUsd.toFixed(0)}` : '—', note: 'BUDGET_USD_CAP' },
+    { label: text.tiles.demo, value: data ? (data.demoMode ? text.demoOn : text.demoOff) : '—', note: 'DEMO_MODE' },
   ];
 
   return (
@@ -120,6 +148,12 @@ export default function AdminHome() {
         <h1 className="text-balance-tight text-2xl font-extrabold sm:text-3xl">{text.title}</h1>
         <p className="max-w-3xl text-sm text-text-secondary">{text.lede}</p>
       </header>
+
+      {overview.isError ? (
+        <p role="alert" className="text-sm font-semibold text-text-primary">
+          {errorText(overview.error, locale)}
+        </p>
+      ) : null}
 
       <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-panel border border-border-subtle bg-border-subtle lg:grid-cols-4">
         {tiles.map((tile) => (
@@ -136,22 +170,23 @@ export default function AdminHome() {
           <section className="rounded-panel border border-border-subtle bg-bg-surface">
             <h2 className="border-b border-border-subtle px-5 py-3 text-sm font-semibold text-text-primary">{text.modulesTitle}</h2>
             <ul className="divide-y divide-border-subtle">
-              {modules.map((module) => (
-                <li key={module.code} className="flex items-center justify-between gap-3 px-5 py-3">
-                  <span className="flex items-center gap-3">
-                    <span className="w-7 font-mono text-[0.75rem] font-bold text-text-primary">{module.code}</span>
-                    <span className="text-sm text-text-secondary">{module[locale]}</span>
-                  </span>
-                  <span className="flex items-center gap-3">
-                    <StatusPill tone={stateTone[module.state]}>{text.state[module.state]}</StatusPill>
-                    {module.href ? (
+              {modules.map((module) => {
+                const on = states.get(module.code) !== 'off';
+                return (
+                  <li key={module.code} className="flex items-center justify-between gap-3 px-5 py-3">
+                    <span className="flex items-center gap-3">
+                      <span className="w-7 font-mono text-[0.75rem] font-bold text-text-primary">{module.code}</span>
+                      <span className="text-sm text-text-secondary">{module[locale]}</span>
+                    </span>
+                    <span className="flex items-center gap-3">
+                      <StatusPill tone={on ? 'done' : 'locked'}>{on ? text.on : text.off}</StatusPill>
                       <Link href={module.href} className="text-sm font-semibold text-brand-ink hover:underline">
                         {text.open}
                       </Link>
-                    ) : null}
-                  </span>
-                </li>
-              ))}
+                    </span>
+                  </li>
+                );
+              })}
             </ul>
           </section>
 
@@ -180,31 +215,51 @@ export default function AdminHome() {
           <section className="rounded-panel border border-border-subtle bg-bg-surface p-5">
             <h2 className="text-sm font-semibold text-text-primary">{text.controlsTitle}</h2>
             <div className="mt-3 flex flex-col gap-2">
-              {confirming ? (
-                <div className="flex items-center gap-2">
-                  <span className="text-[0.8rem] text-text-secondary">{text.confirm}</span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      resetWorld();
-                      setConfirming(false);
-                    }}
-                    className="rounded-control bg-status-low px-3 py-1.5 text-sm font-semibold text-white"
-                  >
-                    {text.yes}
-                  </button>
-                  <button type="button" onClick={() => setConfirming(false)} className="rounded-control border border-border-subtle px-3 py-1.5 text-sm">
-                    {text.no}
-                  </button>
-                </div>
+              {data && !data.demoMode ? (
+                <p className="text-[0.8rem] text-text-muted">{text.controlsOff}</p>
               ) : (
-                <button
-                  type="button"
-                  onClick={() => setConfirming(true)}
-                  className="rounded-control border border-border-subtle px-3 py-2 text-left text-sm text-text-secondary transition-colors hover:bg-bg-elevated"
-                >
-                  {text.reset}
-                </button>
+                <>
+                  {confirming ? (
+                    <div className="flex items-center gap-2">
+                      <span className="text-[0.8rem] text-text-secondary">{text.confirm}</span>
+                      <button
+                        type="button"
+                        disabled={reset.isPending}
+                        onClick={() => reset.mutate(undefined, { onSettled: () => setConfirming(false) })}
+                        className="rounded-control bg-status-low px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-50"
+                      >
+                        {text.yes}
+                      </button>
+                      <button type="button" onClick={() => setConfirming(false)} className="rounded-control border border-border-subtle px-3 py-1.5 text-sm">
+                        {text.no}
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setConfirming(true)}
+                      className="rounded-control border border-border-subtle px-3 py-2 text-left text-sm text-text-secondary transition-colors hover:bg-bg-elevated"
+                    >
+                      {text.reset}
+                    </button>
+                  )}
+                  {unplayed.map((candidate) => (
+                    <button
+                      key={candidate.candidateId}
+                      type="button"
+                      disabled={recorded.isPending}
+                      onClick={() => recorded.mutate(candidate.candidateId)}
+                      className="rounded-control border border-border-subtle px-3 py-2 text-left text-sm text-text-secondary transition-colors hover:bg-bg-elevated disabled:opacity-50"
+                    >
+                      {text.recorded(candidate.label)}
+                    </button>
+                  ))}
+                  {reset.isError || recorded.isError ? (
+                    <p role="alert" className="text-[0.8rem] text-text-primary">
+                      {errorText(reset.error ?? recorded.error, locale)}
+                    </p>
+                  ) : null}
+                </>
               )}
               <div className="mt-1 flex gap-4 text-sm">
                 <Link href="/demo/candidates" className="font-medium text-brand-ink hover:underline">
@@ -219,16 +274,24 @@ export default function AdminHome() {
 
           <section className="rounded-panel border border-border-subtle bg-bg-surface" aria-live="polite">
             <h2 className="border-b border-border-subtle px-5 py-3 text-sm font-semibold text-text-primary">{text.logTitle}</h2>
-            {world.events.length === 0 ? (
+            {audit.isError ? (
+              <p role="alert" className="px-5 py-4 text-[0.8rem] text-text-primary">
+                {errorText(audit.error, locale)}
+              </p>
+            ) : !audit.data?.length ? (
               <p className="px-5 py-4 text-[0.8rem] text-text-muted">{text.logEmpty}</p>
             ) : (
-              <ol className="max-h-80 divide-y divide-border-subtle overflow-y-auto">
-                {world.events.map((event) => (
-                  <li key={event.id} className="flex items-baseline gap-3 px-5 py-2.5">
+              <ol className="max-h-96 divide-y divide-border-subtle overflow-y-auto">
+                {audit.data.map((event) => (
+                  <li key={event.eventId} className="flex items-baseline gap-3 px-5 py-2.5">
                     <time className="shrink-0 font-mono text-[0.65rem] tabular-nums text-text-muted">{time.format(new Date(event.at))}</time>
                     <span className="text-[0.82rem] text-text-primary">
-                      {events[locale][event.code]}
-                      {event.candidate ? <span className="text-text-muted"> · {event.candidate}</span> : null}
+                      {actions[locale][event.action]}
+                      {event.candidateLabel ? <span className="text-text-muted"> · {event.candidateLabel}</span> : null}
+                      <span className="text-text-muted">
+                        {' '}
+                        · {event.actorRole === 'system' ? text.system : roleMeta[event.actorRole === 'platform' ? 'candidate' : event.actorRole].copy[locale].name}
+                      </span>
                     </span>
                   </li>
                 ))}

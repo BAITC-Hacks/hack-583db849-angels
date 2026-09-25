@@ -92,7 +92,7 @@ export class SimulationsService {
       }
       throw error;
     }
-    await this.audit.record({ action: 'simulation.created', targetType: 'simulation', targetId: created.id, candidateId, actorRole,
+    await this.audit.record({ action: 'simulation.started', targetType: 'simulation', targetId: created.id, candidateId, actorRole,
       metadata: { scenarioId: scenario.scenarioId, nextBeat: opening.director.nextBeat } });
     if (created.status === 'completed') await this.assessments.startAutomatically(created.id);
     return this.toDto(created);
@@ -231,8 +231,8 @@ export class SimulationsService {
       throw new ConflictException({ code: 'TURN_IN_FLIGHT', message: 'A turn is already being processed.' });
     }
     const simulation = await this.load(simulationId);
-    await this.audit.record({ action: 'simulation.completed', targetType: 'simulation', targetId: simulationId,
-      candidateId: simulation.candidateId, actorRole, metadata: { ending: reason } });
+    await this.audit.record({ action: reason === 'stopped' ? 'simulation.stopped' : 'simulation.completed', targetType: 'simulation',
+      targetId: simulationId, candidateId: simulation.candidateId, actorRole, metadata: { ending: reason } });
     await this.assessments.startAutomatically(simulationId);
     return this.toDto(simulation);
   }
