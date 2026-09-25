@@ -2,8 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { homeFor } from '../lib/demo/world';
-import { demoRoles, type DemoRole } from '../lib/roles';
+import { demoRoles, homeFor, type DemoRole } from '../lib/roles';
 
 /** Each role starts on its own home. */
 export default function Home() {
