@@ -31,6 +31,7 @@ export function toInterviewRecord(interview: WireInterview): InterviewRecord {
           E: interview.interviewerScores.E as Score,
         }
       : null,
+    notes: (interview.notes ?? []).map((note) => ({ id: note.id, text: note.text })),
   };
 }
 

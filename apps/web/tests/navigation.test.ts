@@ -25,7 +25,7 @@ function routeExists(href: string): boolean {
 describe('navigation by role', () => {
   it('gives the interviewer no simulation reports: they score blind', () => {
     expect(ids('interviewer')).not.toContain('reports');
-    expect(ids('interviewer')).toEqual(expect.arrayContaining(['interviewer-home', 'briefs', 'interviews']));
+    expect(ids('interviewer')).toEqual(expect.arrayContaining(['interviewer-home', 'briefs', 'interviews', 'schedule']));
   });
 
   it('gives the commission the reports and the quality guard, not the interview form', () => {
@@ -34,7 +34,7 @@ describe('navigation by role', () => {
   });
 
   it('shows a candidate only their own screens', () => {
-    expect(ids('candidate')).toEqual(['candidate-home', 'simulation', 'feedback', 'stand']);
+    expect(ids('candidate')).toEqual(['candidate-home', 'simulation', 'feedback', 'my-interview', 'stand']);
   });
 
   it('shows the admin everything', () => {

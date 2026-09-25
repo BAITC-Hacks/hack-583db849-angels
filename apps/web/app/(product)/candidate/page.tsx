@@ -63,6 +63,13 @@ export default function CandidateHome() {
       : null;
 
   const presentation = progress?.presentation ?? null;
+  const interviewSlot = progress?.interviewSlot ?? null;
+  const interviewStep =
+    interviewSlot?.status === 'done' || interviewSlot?.status === 'live'
+      ? 'held'
+      : interviewSlot?.status === 'booked' || interviewSlot?.status === 'waiting'
+        ? 'booked'
+        : 'book';
 
   const status = simulation === null ? 'Not started yet' : simulation.status === 'completed' ? 'Finished — thank you' : 'In progress';
   const startError =
@@ -202,6 +209,27 @@ export default function CandidateHome() {
           ) : (
             <Link href="/candidate/presentation" className={`group ${stepAction}`}>
               Record your presentation
+              <ArrowRightIcon aria-hidden="true" className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
+            </Link>
+          )}
+        </article>
+        <article className="flex flex-col gap-3 rounded-panel border border-border-subtle bg-bg-surface p-5">
+          <p className="font-mono text-[0.6rem] tracking-[0.14em] text-text-muted uppercase">Step 5 · your interview</p>
+          <p className="flex items-center gap-2 text-sm font-semibold text-text-primary">
+            <ClockIcon aria-hidden="true" className="h-4 w-4 text-text-muted" />
+            A live video call, in English
+          </p>
+          <p className="text-[0.82rem] text-text-secondary">
+            A conversation with one interviewer. Choose a time that suits you; you can join from this page.
+          </p>
+          {interviewStep === 'held' ? (
+            <p className="mt-auto flex items-center gap-1.5 text-sm font-semibold text-text-primary">
+              <CheckCircleIcon aria-hidden="true" className="h-4 w-4 text-brand-ink" />
+              Your interview has taken place
+            </p>
+          ) : (
+            <Link href="/candidate/interview" className={`group ${stepAction}`}>
+              {interviewStep === 'booked' ? 'See your interview time' : 'Book your interview'}
               <ArrowRightIcon aria-hidden="true" className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
             </Link>
           )}

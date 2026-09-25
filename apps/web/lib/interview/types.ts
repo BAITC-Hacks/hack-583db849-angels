@@ -38,5 +38,7 @@ export interface InterviewRecord {
   transcript: InterviewTurn[];
   /** The interviewer's own scores once saved — fixed from then on. */
   savedScores: Record<Competency, Score> | null;
+  /** Taken during the call; they feed the draft, and close with the scores. */
+  notes: { id: string; text: string }[];
 }
 

@@ -15,6 +15,7 @@ describe('CandidatesService', () => {
     assessments: [],
     briefs: [],
     interviews: [],
+    interviewSlots: [] as { id: string; startsAt: Date; durationMin: number; candidateId: string; candidateJoinedAt: Date | null; interviewerJoinedAt: Date | null }[],
     consistencyReports: [],
   };
   const briefs = { startFor: jest.fn().mockResolvedValue(undefined) };
@@ -64,10 +65,21 @@ describe('CandidatesService', () => {
     expect(progress).toEqual({
       candidateId: row.id, label: 'Candidate A', brief: null,
       simulation: { simulationId: 'simulation-id', status: 'active', ending: null },
-      assessment: null, interview: null, surprise: null, presentation: null,
+      assessment: null, interview: null, surprise: null, presentation: null, interviewSlot: null,
       consistency: { before: null, after: null }, accommodation: null,
     });
     expect(listed.items[0].progress).toEqual(progress);
+  });
+
+  it('shows the latest interview slot with its status, worked out from the times', async () => {
+    const startsAt = new Date(Date.now() - 10 * 60_000);
+    const booked = { ...row, interviewSlots: [{ id: 'slot-1', startsAt, durationMin: 30, candidateId: row.id, candidateJoinedAt: null, interviewerJoinedAt: startsAt }] };
+    const prisma = { candidate: { findUnique: jest.fn().mockResolvedValue(booked) } };
+    const service = new CandidatesService(prisma as never, briefs as never);
+    // The interviewer came and the candidate did not, and ten minutes have passed: missed.
+    await expect(service.progress(row.id, 'platform')).resolves.toMatchObject({
+      interviewSlot: { slotId: 'slot-1', startsAt: startsAt.toISOString(), status: 'missed' },
+    });
   });
 
   it('stores the missing demo certificate as database null', async () => {

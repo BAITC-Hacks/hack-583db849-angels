@@ -6,7 +6,8 @@ export const AUDIT_ACTIONS = [
   'candidate.created', 'brief.ready', 'simulation.started', 'simulation.completed', 'simulation.stopped',
   'assessment.ready', 'interview.created', 'recording.uploaded', 'transcript.ready', 'scores.saved',
   'draft.created', 'surprise.started', 'surprise.answered', 'surprise.video.viewed', 'surprise.video.deleted',
-  'presentation.submitted', 'presentation.video.viewed', 'presentation.video.deleted', 'demo.reset',
+  'presentation.submitted', 'presentation.video.viewed', 'presentation.video.deleted',
+  'slot.created', 'slot.booked', 'call.joined', 'demo.reset',
 ] as const;
 export type AuditAction = (typeof AUDIT_ACTIONS)[number];
 

@@ -1,5 +1,6 @@
 import {
   BuildingLibraryIcon,
+  CalendarDaysIcon,
   HomeIcon,
   PresentationChartBarIcon,
   RectangleStackIcon,
@@ -95,6 +96,15 @@ export const navItems: NavItem[] = [
     module: 'M4',
   },
   {
+    id: 'schedule',
+    section: 'workspace',
+    icon: CalendarDaysIcon,
+    label: { en: 'Schedule', ru: 'Расписание' },
+    roles: ['interviewer', 'admin'],
+    href: '/interviewer/schedule',
+    match: '/interviewer/schedule',
+  },
+  {
     id: 'reports',
     section: 'workspace',
     icon: ChartBarSquareIcon,
@@ -141,6 +151,15 @@ export const navItems: NavItem[] = [
     href: '/feedback',
     match: '/feedback',
     module: 'M3',
+  },
+  {
+    id: 'my-interview',
+    section: 'workspace',
+    icon: CalendarDaysIcon,
+    label: { en: 'My interview', ru: 'My interview' },
+    roles: ['candidate'],
+    href: '/candidate/interview',
+    match: '/candidate/interview',
   },
   {
     id: 'overview',
