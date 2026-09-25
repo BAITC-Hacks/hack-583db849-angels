@@ -9,7 +9,7 @@ import { candidateSnapshot, snapshotSelect } from '../../privacy/candidate-snaps
 import { AuditService } from '../audit/audit.service';
 import { BriefsService } from '../briefs/briefs.service';
 import { SurpriseQuestionDto, SurpriseSegmentDto } from './dto/surprise.dto';
-import { SurpriseMediaService, videoTypes, type VideoExtension } from './surprise-media.service';
+import { SurpriseMediaService, type VideoExtension } from './surprise-media.service';
 import { READING_SECONDS, surpriseStatus } from './surprise-status';
 
 export interface UploadedVideo {
@@ -148,10 +148,21 @@ export class SurpriseService {
     }
   }
 
+  /**
+   * The container, read from the file's first bytes rather than its declared
+   * type: a browser labels a recording `video/webm;codecs=vp8,opus`, and the
+   * comma in it is not a valid header value, so the declared type cannot be
+   * relied on.
+   */
   private extension(video: UploadedVideo | undefined): VideoExtension {
-    const found = video && video.size > 0
-      ? (Object.entries(videoTypes).find(([, type]) => video.mimetype.split(';')[0] === type)?.[0] as VideoExtension | undefined)
-      : undefined;
+    const head = video?.buffer.subarray(0, 12);
+    const found: VideoExtension | undefined = !head || head.length < 12
+      ? undefined
+      : head.readUInt32BE(0) === 0x1a45dfa3
+        ? 'webm'
+        : head.toString('latin1', 4, 8) === 'ftyp'
+          ? 'mp4'
+          : undefined;
     if (!found) throw new BadRequestException({ code: 'VALIDATION_ERROR', message: 'A webm or mp4 video is required.', details: { fields: ['video'] } });
     return found;
   }
