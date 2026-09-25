@@ -22,6 +22,7 @@ from ..schemas.contracts import (
     Observation,
 )
 from .consistency import before_consistency
+from .model_view import model_brief_request
 
 
 ROOT_PROMPT = Path(__file__).resolve().parents[4] / "config/prompts/m1-brief.md"
@@ -49,7 +50,7 @@ class BriefGenerator:
             GatewayRequest(
                 task=TaskName.BRIEF,
                 prompt=self._prompt,
-                payload={**request.model_dump(mode="json"), "attempt": attempt},
+                payload={**model_brief_request(request), "attempt": attempt},
                 output_schema=BriefResult,
             )
         )

@@ -4,9 +4,9 @@
   "output_tokens": 8,
   "provider": "openai",
   "recorded_at": "2026-09-24T00:00:00Z",
-  "request_hash": "92eae4f8c44804fff640c66d4c4cb6da6dcafb72d0ac1c35de7e7f56bff9fa2a",
+  "request_hash": "9e824c06bb69887291dc4e6d0513e37ef519a55a846b3dea9e17f2c7dbfe95a4",
   "request_id": "synthetic-m2a-fixture",
-  "response": "{\"text\": \"Will you make Timur the villain for this?\"}",
+  "response": "{\"text\": \"What is your concrete plan for the demo?\"}",
   "task": "simulation_actor",
   "version": 1
 }

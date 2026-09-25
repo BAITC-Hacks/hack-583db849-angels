@@ -12,6 +12,7 @@ from ..gateway.config import TaskName
 from ..gateway.types import GatewayRequest, GatewayResult
 from ..schemas.contracts import ScenarioConfig, Turn
 from .director import DirectorOutcome
+from .model_view import model_turns
 
 
 ROOT_PROMPT = (
@@ -102,7 +103,7 @@ class ScenarioActor:
                         "beat": outcome.decision.beat,
                         "characterIntent": outcome.character_intent,
                     },
-                    "transcript": [turn.model_dump(mode="json") for turn in turns],
+                    "transcript": model_turns(turns),
                 },
                 output_schema=output_schema,
             )

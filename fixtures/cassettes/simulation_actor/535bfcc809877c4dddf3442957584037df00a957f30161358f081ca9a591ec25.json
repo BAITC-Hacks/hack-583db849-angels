@@ -4,7 +4,7 @@
   "output_tokens": 6,
   "provider": "openai",
   "recorded_at": "2026-09-24T00:00:00Z",
-  "request_hash": "abc183a9a39b72801338061b8d9f87e846ab7fb0da50087ddff1087da5c9f507",
+  "request_hash": "535bfcc809877c4dddf3442957584037df00a957f30161358f081ca9a591ec25",
   "request_id": "synthetic-m2a-fixture",
   "response": "{\"text\": \"The Thursday run failed. What now?\"}",
   "task": "simulation_actor",

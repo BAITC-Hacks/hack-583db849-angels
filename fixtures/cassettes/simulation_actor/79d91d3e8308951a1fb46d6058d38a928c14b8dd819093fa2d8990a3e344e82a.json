@@ -4,7 +4,7 @@
   "output_tokens": 22,
   "provider": "openai",
   "recorded_at": "2026-09-24T00:00:00Z",
-  "request_hash": "da32fbee7a4bde162a4d0ffec35b569816495563e234c1fa1223071c7e86c927",
+  "request_hash": "79d91d3e8308951a1fb46d6058d38a928c14b8dd819093fa2d8990a3e344e82a",
   "request_id": "synthetic-m2a-fixture",
   "response": "{\"text\": \"Alright. If we write down who owns what, I'm in. But you tell Timur, not me. I don't want another argument tonight.\"}",
   "task": "simulation_actor",

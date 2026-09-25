@@ -4,9 +4,9 @@
   "output_tokens": 9,
   "provider": "openai",
   "recorded_at": "2026-09-24T00:00:00Z",
-  "request_hash": "106e07a76edb827bdb5ab89ec50eeb7d035eee7f93ec773eb3fd9cfd8956340d",
+  "request_hash": "4760e8b6db3055b0f288772e3cc4b4adebe7501366850c848f57af502e85f193",
   "request_id": "synthetic-m2a-fixture",
-  "response": "{\"text\": \"How do I know this will not happen again?\"}",
+  "response": "{\"text\": \"Who decides which version we keep for the demo?\"}",
   "task": "simulation_actor",
   "version": 1
 }
