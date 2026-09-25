@@ -8,5 +8,8 @@ export interface AiGateway {
   simulationTurn(request: components['schemas']['TurnRequest']): Promise<components['schemas']['TurnResult']>;
   simulationAssessment(request: components['schemas']['AssessmentRequest']): Promise<components['schemas']['AssessmentResult']>;
   transcribeTurn(audioRef: string): Promise<components['schemas']['TranscribeResult']>;
+  surpriseQuestion(request: components['schemas']['SurpriseRequest']): Promise<components['schemas']['SurpriseResult']>;
+  /** The audio track of a surprise answer, one speaker. Never the video. */
+  transcribeSurprise(audioRef: string): Promise<components['schemas']['TranscribeResult']>;
   speech(text: string, scenarioId: string): Promise<Buffer>;
 }

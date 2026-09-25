@@ -53,6 +53,17 @@ describe('MlHttpAdapter', () => {
     });
   });
 
+  it('asks for a one-speaker surprise transcription of the audio only', async () => {
+    const fetchImplementation = jest.fn().mockResolvedValue(new Response(JSON.stringify({ turns: [], durationSec: 0 }), {
+      status: 200, headers: { 'Content-Type': 'application/json' },
+    }));
+    const adapter = new MlHttpAdapter(config, fetchImplementation);
+    await adapter.transcribeSurprise('surprise/id/answer.wav');
+    const [request] = fetchImplementation.mock.calls[0] as [Request];
+    expect(new URL(request.url).pathname).toBe('/internal/v1/transcribe');
+    await expect(request.clone().json()).resolves.toEqual({ purpose: 'surprise', speakers: 1, audioRef: 'surprise/id/answer.wav', language: 'en' });
+  });
+
   it('passes a budget error from the binary speech endpoint through unchanged', async () => {
     const fetchImplementation = jest.fn().mockResolvedValue(new Response(JSON.stringify({
       error: { code: 'AI_BUDGET_EXCEEDED', message: 'Synthetic budget', details: {}, traceId: 'ml-trace' },

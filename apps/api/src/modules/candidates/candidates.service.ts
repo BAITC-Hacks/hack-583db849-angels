@@ -7,6 +7,7 @@ import { PrismaService } from '../../database/prisma.service';
 import { CreateCandidateDto } from './create-candidate.dto';
 import { CandidateDto, CandidateProgressDto } from './dto/candidate.dto';
 import { filterProgressForRole } from './filter-progress-for-role';
+import { surpriseStatus } from '../surprise/surprise-status';
 
 const candidateSelect = { id: true, externalId: true, label: true, createdAt: true } as const;
 const candidateWithSimulationSelect = {
@@ -23,6 +24,7 @@ const candidateWithSimulationSelect = {
   },
   accommodation: { select: { textMode: true, reason: true } },
   briefs: { orderBy: { createdAt: 'desc' }, take: 1, select: { id: true, status: true } },
+  surprise: { select: { id: true, status: true, answerDeadline: true } },
 } as const satisfies Prisma.CandidateSelect;
 
 type SafeCandidate = Prisma.CandidateGetPayload<{ select: typeof candidateSelect }>;
@@ -100,7 +102,7 @@ export class CandidatesService {
       } : null,
       assessment: assessment ? { assessmentId: assessment.id, status: assessment.status as 'pending' | 'ready' | 'failed' } : null,
       interview: null,
-      surprise: null,
+      surprise: candidate.surprise ? { surpriseId: candidate.surprise.id, status: surpriseStatus(candidate.surprise) } : null,
       consistency: { before: null, after: null },
       accommodation: candidate.accommodation
         ? { textMode: candidate.accommodation.textMode, reason: candidate.accommodation.reason }

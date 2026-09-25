@@ -22,4 +22,9 @@ export class CandidateAiService {
       ...(simulationEnglish ? { simulationEnglish } : {}),
     });
   }
+
+  /** The surprise question, written from the candidate's own answers — again only through `toLlmView`. */
+  surpriseQuestion(candidateId: string, snapshot: CandidateSnapshot): Promise<components['schemas']['SurpriseResult']> {
+    return this.gateway.surpriseQuestion({ candidate: this.privacy.toLlmView(candidateId, snapshot) });
+  }
 }

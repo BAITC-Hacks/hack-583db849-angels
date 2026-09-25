@@ -618,6 +618,199 @@
           "simulation-assessments"
         ]
       }
+    },
+    "/v1/surprise-questions": {
+      "post": {
+        "operationId": "SurpriseController_create",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSurpriseDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SurpriseQuestionDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "surprise-questions"
+        ]
+      }
+    },
+    "/v1/surprise-questions/{surpriseId}/start": {
+      "post": {
+        "operationId": "SurpriseController_start",
+        "parameters": [
+          {
+            "name": "surpriseId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SurpriseQuestionDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "surprise-questions"
+        ]
+      }
+    },
+    "/v1/surprise-questions/{surpriseId}/answer": {
+      "post": {
+        "operationId": "SurpriseController_answer",
+        "parameters": [
+          {
+            "name": "surpriseId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/SurpriseAnswerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SurpriseQuestionDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "surprise-questions"
+        ]
+      }
+    },
+    "/v1/surprise-questions/{surpriseId}": {
+      "get": {
+        "operationId": "SurpriseController_get",
+        "parameters": [
+          {
+            "name": "surpriseId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SurpriseQuestionDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "surprise-questions"
+        ]
+      }
+    },
+    "/v1/surprise-questions/{surpriseId}/video": {
+      "get": {
+        "operationId": "SurpriseController_video",
+        "parameters": [
+          {
+            "name": "surpriseId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "video/webm": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "video/mp4": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "surprise-questions"
+        ]
+      }
     }
   },
   "info": {
@@ -2082,6 +2275,118 @@
           "strengths",
           "growth",
           "nextTime"
+        ]
+      },
+      "CreateSurpriseDto": {
+        "type": "object",
+        "properties": {
+          "candidateId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "candidateId"
+        ]
+      },
+      "SurpriseQuestionDto": {
+        "type": "object",
+        "properties": {
+          "surpriseId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "candidateId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ready",
+              "started",
+              "transcribing",
+              "answered",
+              "expired",
+              "failed"
+            ]
+          },
+          "question": {
+            "type": "string",
+            "nullable": true
+          },
+          "answerSeconds": {
+            "type": "number"
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "answerDeadline": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "competency": {
+            "type": "string",
+            "enum": [
+              "D",
+              "R",
+              "I",
+              "V",
+              "E"
+            ]
+          },
+          "why": {
+            "type": "string"
+          },
+          "segments": {
+            "nullable": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SurpriseSegmentDto"
+            }
+          },
+          "videoAvailable": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "surpriseId",
+          "candidateId",
+          "status",
+          "question",
+          "answerSeconds",
+          "startedAt",
+          "answerDeadline"
+        ]
+      },
+      "SurpriseAnswerDto": {
+        "type": "object",
+        "properties": {
+          "video": {
+            "type": "string",
+            "format": "binary",
+            "description": "webm or mp4, up to 50 MB"
+          },
+          "consentVideo": {
+            "type": "string",
+            "enum": [
+              "true"
+            ]
+          },
+          "consentProcessing": {
+            "type": "string",
+            "enum": [
+              "true"
+            ]
+          }
+        },
+        "required": [
+          "video",
+          "consentVideo",
+          "consentProcessing"
         ]
       }
     }
