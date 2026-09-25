@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 
 import { AI_GATEWAY, AiGateway } from './ai-gateway.port';
+import type { components } from './schema';
 import { CandidateSnapshot, ToLlmViewService } from '../privacy/to-llm-view.service';
 
 @Injectable()
@@ -10,7 +11,15 @@ export class CandidateAiService {
     @Inject(AI_GATEWAY) private readonly gateway: AiGateway,
   ) {}
 
-  sendCandidateContext(candidateId: string, snapshot: CandidateSnapshot): Promise<void> {
-    return this.gateway.sendCandidateContext(this.privacy.toLlmView(candidateId, snapshot));
+  /** The M1 brief. Only `toLlmView` reaches ML: the answers with the candidate's identifiers redacted, never the profile. */
+  brief(
+    candidateId: string,
+    snapshot: CandidateSnapshot,
+    simulationEnglish?: components['schemas']['EnglishMetrics'] | null,
+  ): Promise<components['schemas']['BriefResult']> {
+    return this.gateway.brief({
+      candidate: this.privacy.toLlmView(candidateId, snapshot),
+      ...(simulationEnglish ? { simulationEnglish } : {}),
+    });
   }
 }

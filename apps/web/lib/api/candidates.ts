@@ -28,13 +28,20 @@ export function useCandidates({ poll = false }: { poll?: boolean | 'while-pendin
   });
 }
 
-/** A step the homes are waiting on: a simulation still running, or an assessment being written. */
+/** A step the homes are waiting on: a brief or an assessment being written, or a simulation still running. */
 export function somethingPending(candidates: WireCandidate[] | undefined): boolean {
   return Boolean(
     candidates?.some(
-      (candidate) => candidate.progress?.simulation?.status === 'active' || candidate.progress?.assessment?.status === 'pending',
+      (candidate) =>
+        candidate.progress?.brief?.status === 'pending' ||
+        candidate.progress?.simulation?.status === 'active' ||
+        candidate.progress?.assessment?.status === 'pending',
     ),
   );
+}
+
+export function candidateById(candidates: WireCandidate[] | undefined, candidateId: string): WireCandidate | undefined {
+  return candidates?.find((candidate) => candidate.candidateId === candidateId);
 }
 
 export function candidateByCode(candidates: WireCandidate[] | undefined, code: CandidateCode): WireCandidate | undefined {

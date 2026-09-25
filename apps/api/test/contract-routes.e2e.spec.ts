@@ -1,4 +1,4 @@
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { INestApplication, NotFoundException, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
 
@@ -8,8 +8,16 @@ import { ApiKeyGuard } from '../src/auth/api-key.guard';
 import { RolesGuard } from '../src/auth/roles.guard';
 import { contractExample } from '../src/contract-example';
 import { PrismaService } from '../src/database/prisma.service';
+import { BriefsService } from '../src/modules/briefs/briefs.service';
 import { SimulationsService } from '../src/modules/simulations/simulations.service';
 import { SimulationAssessmentsService } from '../src/modules/simulation-assessments/simulation-assessments.service';
+
+const briefs = {
+  startFor: jest.fn().mockResolvedValue(undefined),
+  latestFor: jest.fn().mockRejectedValue(new NotFoundException({ code: 'BRIEF_NOT_FOUND', message: 'There is no brief for this candidate yet.' })),
+  get: jest.fn(),
+  rerun: jest.fn(),
+};
 
 describe('PR 1 contract routes', () => {
   let app: INestApplication;
@@ -20,6 +28,7 @@ describe('PR 1 contract routes', () => {
     profile: { fullName: 'Synthetic Person', email: 'synthetic@example.test' },
     simulations: [],
     assessments: [],
+    briefs: [],
   };
   const previousKeys = process.env.API_KEYS;
   const previousDemoMode = process.env.DEMO_MODE;
@@ -44,6 +53,8 @@ describe('PR 1 contract routes', () => {
         get: jest.fn().mockImplementation(() => contractExample('assessment.json')),
         feedback: jest.fn().mockImplementation(() => contractExample('candidate-feedback.json')),
       })
+      .overrideProvider(BriefsService)
+      .useValue(briefs)
       .overrideProvider(PrismaService)
       .useValue({
         candidate: {
@@ -106,6 +117,20 @@ describe('PR 1 contract routes', () => {
     expect(progress.body.assessment).toBeNull();
     expect(JSON.stringify([created.body, listed.body, found.body, progress.body])).not.toContain('Synthetic Person');
     expect(JSON.stringify([created.body, listed.body, found.body, progress.body])).not.toContain('profile');
+  });
+
+  it('makes a brief by itself for a new candidate, and keeps briefs from the candidate channel', async () => {
+    const server = app.getHttpServer();
+    await request(server).post('/v1/candidates').set('X-API-Key', 'platform-key')
+      .send({ externalId: 'inv-2026-demo-a', profile: candidateRow.profile, application: { answers: [] }, test: { answers: [] } })
+      .expect(201);
+    expect(briefs.startFor).toHaveBeenCalledWith(candidateId);
+
+    await request(server).get(`/v1/candidates/${candidateId}/brief`).set('X-API-Key', 'platform-key').expect(403);
+    await request(server).get('/v1/briefs/6f1c2a0e-0000-4000-8000-00000000b001').set('X-API-Key', 'platform-key').expect(403);
+    await request(server).post('/v1/briefs').set('X-API-Key', 'commission-key').send({ candidateId }).expect(403);
+    const missing = await request(server).get(`/v1/candidates/${candidateId}/brief`).set('X-API-Key', 'interviewer-key').expect(404);
+    expect(missing.body.error.code).toBe('BRIEF_NOT_FOUND');
   });
 
   it('answers 404, not 500, for an id that is not a UUID', async () => {

@@ -1,12 +1,15 @@
 'use client';
 
 import { useEffect } from 'react';
-import { record } from '../../lib/demo/world';
+import { record, type CandidateCode } from '../../lib/demo/world';
 
-/** Tells the interviewer's home that the brief has been opened. */
-export function MarkBriefViewed() {
+/**
+ * Tells the interviewer's home, in this tab only, that the brief has been
+ * opened. The server keeps no "read" mark (`docs/INTEGRATION.md`, G13).
+ */
+export function MarkBriefViewed({ code }: { code: CandidateCode }) {
   useEffect(() => {
-    record('brief-viewed', 'A', { briefViewed: true });
-  }, []);
+    record('brief-viewed', code, { briefViewed: true });
+  }, [code]);
   return null;
 }
