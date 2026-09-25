@@ -1,7 +1,11 @@
 'use client';
 
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { setTextMode, useWorld, type CandidateCode } from '../../lib/demo/world';
+import { candidateByCode, candidatesKey, useCandidates } from '../../lib/api/candidates';
+import { api, unwrap } from '../../lib/api/client';
+import { errorText } from '../../lib/api/errors';
+import { storeAccommodation, useWorld, type CandidateCode } from '../../lib/demo/world';
 import { useStaffLocale } from '../../lib/i18n/StaffLocaleProvider';
 
 const copy = {
@@ -16,6 +20,7 @@ const copy = {
     switchOff: 'Back to speaking',
     started: 'The simulation has started — this can no longer be changed.',
     candidate: 'Candidate',
+    unavailable: 'Not reachable right now.',
   },
   ru: {
     title: 'Как отвечает каждый кандидат',
@@ -28,19 +33,39 @@ const copy = {
     switchOff: 'Вернуть голос',
     started: 'Симуляция началась — это уже нельзя изменить.',
     candidate: 'Кандидат',
+    unavailable: 'Сейчас недоступно.',
   },
 };
 
 /**
  * The accommodation, in the hands of staff rather than the candidate. The
- * server holds the same two rules: a reason is required, and nothing changes
- * once the simulation has started (`409 SIMULATION_STARTED`).
+ * server holds the rules — a reason is required, and nothing changes once the
+ * simulation has started (`409 SIMULATION_STARTED`) — and its answer is what
+ * the row shows.
  */
 export function AccommodationControl() {
   const { locale } = useStaffLocale();
   const text = copy[locale];
   const world = useWorld();
   const [reasons, setReasons] = useState<Partial<Record<CandidateCode, string>>>({});
+  const client = useQueryClient();
+  const candidates = useCandidates();
+  const change = useMutation({
+    mutationFn: async ({ candidateId, textMode, reason }: { code: CandidateCode; candidateId: string; textMode: boolean; reason: string }) =>
+      unwrap(
+        await api.PUT('/v1/candidates/{candidateId}/accommodations', {
+          params: { path: { candidateId } },
+          body: { textMode, reason },
+        }),
+      ),
+    onSuccess: (saved, { code }) => {
+      storeAccommodation(code, { textMode: saved.textMode, reason: saved.reason });
+      void client.invalidateQueries({ queryKey: candidatesKey });
+    },
+  });
+  const set = (code: CandidateCode, candidateId: string | undefined, textMode: boolean, reason: string) => {
+    if (candidateId) change.mutate({ code, candidateId, textMode, reason });
+  };
 
   return (
     <section className="flex flex-col gap-3 rounded-panel border border-border-subtle bg-bg-surface p-5">
@@ -52,8 +77,11 @@ export function AccommodationControl() {
       <ul className="flex flex-col divide-y divide-border-subtle">
         {(['A', 'B', 'C'] as const).map((code) => {
           const accommodation = world.accommodations[code];
-          const started = world.candidates[code].simulation !== 'not-started';
+          const candidate = candidateByCode(candidates.data, code);
+          const started = Boolean(candidate?.progress?.simulation);
           const reason = reasons[code] ?? accommodation.reason;
+          const failed = change.isError && change.variables?.code === code ? errorText(change.error, locale) : null;
+          const unavailable = candidates.isError || (candidates.isSuccess && !candidate);
 
           return (
             <li key={code} className="flex flex-wrap items-center gap-3 py-3">
@@ -71,8 +99,8 @@ export function AccommodationControl() {
                   </span>
                   <button
                     type="button"
-                    disabled={started}
-                    onClick={() => setTextMode(code, false, '')}
+                    disabled={started || unavailable || change.isPending}
+                    onClick={() => set(code, candidate?.candidateId, false, accommodation.reason || 'Back to speaking')}
                     className="rounded-control border border-border-strong px-3 py-1.5 text-sm font-semibold text-text-primary hover:bg-bg-elevated disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {text.switchOff}
@@ -92,8 +120,8 @@ export function AccommodationControl() {
                   </label>
                   <button
                     type="button"
-                    disabled={started || reason.trim().length === 0}
-                    onClick={() => setTextMode(code, true, reason.trim())}
+                    disabled={started || unavailable || change.isPending || reason.trim().length === 0}
+                    onClick={() => set(code, candidate?.candidateId, true, reason.trim())}
                     className="rounded-control border border-border-strong px-3 py-1.5 text-sm font-semibold text-text-primary hover:bg-bg-elevated disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {text.switchOn}
@@ -102,6 +130,12 @@ export function AccommodationControl() {
               )}
 
               {started ? <span className="w-full text-[0.72rem] text-text-muted">{text.started}</span> : null}
+              {unavailable ? <span className="w-full text-[0.72rem] text-text-muted">{text.unavailable}</span> : null}
+              {failed ? (
+                <span role="alert" className="w-full text-[0.72rem] text-text-primary">
+                  {failed}
+                </span>
+              ) : null}
             </li>
           );
         })}
