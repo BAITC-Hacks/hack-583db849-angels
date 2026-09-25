@@ -1,4 +1,4 @@
-"""Candidate-A F0 stubs for later-slice JSON operations."""
+"""Internal consistency, draft, and remaining demo JSON operations."""
 
 from __future__ import annotations
 
@@ -11,6 +11,7 @@ from ..config import GatewayMode
 from ..examples import load_example
 from ..gateway.usage import FileUsageStore
 from ..modules.interview_draft import InterviewDraftService
+from ..modules.consistency import ConsistencyService
 from ..schemas.contracts import (
     ConsistencyRequest,
     ConsistencyResult,
@@ -31,13 +32,13 @@ def extended_router(
     gateway_mode: GatewayMode,
     cap_usd: Decimal,
     draft_service: InterviewDraftService,
+    consistency_service: ConsistencyService,
 ) -> APIRouter:
     router = APIRouter(prefix="/internal/v1", dependencies=[Depends(authenticate)])
 
     @router.post("/consistency", response_model=ConsistencyResult)
     async def consistency(request: ConsistencyRequest) -> ConsistencyResult:
-        filename = f"consistency-{request.stage}.response.json"
-        return load_example(filename, ConsistencyResult)
+        return await consistency_service.prepare(request)
 
     @router.post("/surprise-question", response_model=SurpriseResult)
     async def surprise_question(request: SurpriseRequest) -> SurpriseResult:

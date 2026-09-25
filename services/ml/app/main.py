@@ -18,6 +18,7 @@ from .gateway.service import LazyModelGateway, ModelGateway, create_gateway
 from .modules.actor import ScenarioActor
 from .modules.assessment import AssessmentService
 from .modules.brief import BriefGenerator, BriefService
+from .modules.consistency import ConsistencyGenerator, ConsistencyService
 from .modules.judge import SimulationJudge
 from .metrics.languagetool import LocalLanguageTool
 from .modules.director import ScenarioDirector
@@ -38,6 +39,7 @@ def create_app(
     simulation_service: SimulationService | None = None,
     assessment_service: AssessmentService | None = None,
     brief_service: BriefService | None = None,
+    consistency_service: ConsistencyService | None = None,
     draft_service: InterviewDraftService | None = None,
 ) -> FastAPI:
     resolved = settings or load_settings()
@@ -66,6 +68,9 @@ def create_app(
     )
     resolved_brief_service = brief_service or BriefService(
         BriefGenerator(resolved_model_gateway)
+    )
+    resolved_consistency_service = consistency_service or ConsistencyService(
+        ConsistencyGenerator(resolved_model_gateway), resolved_brief_service,
     )
     resolved_draft_service = draft_service or InterviewDraftService(
         InterviewDraftGenerator(resolved_model_gateway)
@@ -100,6 +105,7 @@ def create_app(
         extended_router(
             authenticate, usage_store, resolved.gateway_mode, resolved.budget_usd_cap,
             resolved_draft_service,
+            resolved_consistency_service,
         )
     )
     return app
