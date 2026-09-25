@@ -113,7 +113,6 @@ export const navItems: NavItem[] = [
     label: { en: 'Scenario pool', ru: 'Пул сценариев' },
     roles: ['admin'],
     href: '/admin/scenarios',
-    preview: true,
     module: 'M2',
   },
   {
