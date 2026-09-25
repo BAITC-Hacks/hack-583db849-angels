@@ -23,6 +23,8 @@ export interface CandidateProgress {
   briefViewed: boolean;
   simulation: SimulationStatus;
   assessmentReady: boolean;
+  /** Where the assessment is, from the API: shown so a failed one is not mistaken for one not started. */
+  assessment?: 'pending' | 'ready' | 'failed' | null;
   transcript: TranscriptStatus;
   scoresSaved: boolean;
   draftReady: boolean;
