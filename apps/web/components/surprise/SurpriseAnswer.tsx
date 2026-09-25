@@ -1,6 +1,7 @@
 'use client';
 
 import { PlayCircleIcon } from '@heroicons/react/24/outline';
+import { useState } from 'react';
 import { competencies } from '../../lib/drive';
 import { useStaffLocale } from '../../lib/i18n/StaffLocaleProvider';
 import type { SurpriseAnswerView } from '../../lib/surprise/types';
@@ -15,6 +16,10 @@ const copy = {
     video: 'Play the recording',
     videoNote: 'Every viewing is written to the audit log. The video never reaches a model — only this transcript does.',
     waiting: 'The answer has not been recorded yet.',
+    transcribing: 'The answer is being transcribed.',
+    failed: 'The answer could not be transcribed. The video is kept.',
+    expired: 'The question was opened and not answered in time.',
+    silent: 'No speech was recognised in the answer.',
   },
   ru: {
     title: 'Сюрпризный ответ',
@@ -25,6 +30,10 @@ const copy = {
     video: 'Посмотреть запись',
     videoNote: 'Каждый просмотр пишется в журнал. Видео не попадает в модель — туда идёт только эта расшифровка.',
     waiting: 'Ответ ещё не записан.',
+    transcribing: 'Ответ расшифровывается.',
+    failed: 'Ответ не удалось расшифровать. Видео сохранено.',
+    expired: 'Вопрос открыли, но не ответили вовремя.',
+    silent: 'В ответе не распознано речи.',
   },
 };
 
@@ -39,10 +48,21 @@ function timecode(seconds: number): string {
  * against the moment it came from. The recording itself sits behind a button
  * that writes an audit line.
  */
-export function SurpriseAnswer({ surprise }: { surprise: SurpriseAnswerView }) {
+export function SurpriseAnswer({ surprise, videoUrl }: { surprise: SurpriseAnswerView; videoUrl?: string | null }) {
   const { locale } = useStaffLocale();
   const text = copy[locale];
   const segments = surprise.segments ?? [];
+  const [playing, setPlaying] = useState(false);
+  const status =
+    surprise.status === 'transcribing'
+      ? text.transcribing
+      : surprise.status === 'failed'
+        ? text.failed
+        : surprise.status === 'expired'
+          ? text.expired
+          : surprise.status === 'answered'
+            ? text.silent
+            : text.waiting;
 
   return (
     <section aria-labelledby="surprise-title" className="flex flex-col gap-3 rounded-panel border border-border-subtle bg-bg-surface p-5">
@@ -70,7 +90,7 @@ export function SurpriseAnswer({ surprise }: { surprise: SurpriseAnswerView }) {
           <p className="font-mono text-[0.58rem] tracking-[0.1em] text-text-muted uppercase">{text.transcript}</p>
           <ol className="flex flex-col gap-2">
             {segments.map((segment) => (
-              <li key={segment.segmentId} className="flex gap-3 border-l-2 border-status-evidence pl-3">
+              <li key={segment.segmentId} id={`source-${segment.segmentId}`} className="flex scroll-mt-6 gap-3 border-l-2 border-status-evidence pl-3">
                 <span className="font-mono text-[0.62rem] tabular-nums text-status-evidence">{timecode(segment.startSec)}</span>
                 <span lang="en" className="text-sm text-text-primary">
                   {segment.text}
@@ -80,18 +100,24 @@ export function SurpriseAnswer({ surprise }: { surprise: SurpriseAnswerView }) {
           </ol>
         </>
       ) : (
-        <p className="text-sm text-text-secondary">{text.waiting}</p>
+        <p className="text-sm text-text-secondary">{status}</p>
       )}
 
-      {surprise.videoAvailable ? (
+      {surprise.videoAvailable && videoUrl ? (
         <div className="flex flex-col gap-1.5">
-          <button
-            type="button"
-            className="inline-flex w-fit items-center gap-1.5 rounded-control border border-border-strong px-3 py-2 text-sm font-semibold text-text-primary hover:bg-bg-elevated"
-          >
-            <PlayCircleIcon aria-hidden="true" className="h-4 w-4" />
-            {text.video}
-          </button>
+          {/* The video is fetched only on this click, so each view is one audit line on the server. */}
+          {playing ? (
+            <video controls autoPlay src={videoUrl} className="w-full rounded-control bg-bg-elevated" aria-label={text.video} />
+          ) : (
+            <button
+              type="button"
+              onClick={() => setPlaying(true)}
+              className="inline-flex w-fit items-center gap-1.5 rounded-control border border-border-strong px-3 py-2 text-sm font-semibold text-text-primary hover:bg-bg-elevated"
+            >
+              <PlayCircleIcon aria-hidden="true" className="h-4 w-4" />
+              {text.video}
+            </button>
+          )}
           <p className="text-[0.72rem] text-text-muted">{text.videoNote}</p>
         </div>
       ) : null}

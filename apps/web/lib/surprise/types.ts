@@ -1,6 +1,7 @@
 import type { Competency } from '../drive';
 
-export type SurpriseStatus = 'ready' | 'started' | 'transcribing' | 'answered' | 'failed';
+/** `expired`: opened, and not answered before the deadline. */
+export type SurpriseStatus = 'ready' | 'started' | 'transcribing' | 'answered' | 'expired' | 'failed';
 
 export interface SurpriseSegment {
   segmentId: string;
@@ -36,4 +37,6 @@ export interface SurpriseQuestion {
 }
 
 /** What staff read of an answer: the question, why it was asked and what was said. */
-export type SurpriseAnswerView = Pick<SurpriseQuestion, 'question' | 'competency' | 'why' | 'segments' | 'videoAvailable'>;
+export type SurpriseAnswerView = Pick<SurpriseQuestion, 'question' | 'competency' | 'why' | 'segments' | 'videoAvailable'> & {
+  status?: SurpriseQuestion['status'];
+};
