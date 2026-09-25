@@ -1,12 +1,12 @@
 {
   "input_tokens": 40,
   "model": "gpt-6-luna",
-  "output_tokens": 8,
+  "output_tokens": 9,
   "provider": "openai",
   "recorded_at": "2026-09-24T00:00:00Z",
-  "request_hash": "4766c0a50d424da30130d497d33e8e12dde33176bfee9e2793b062b1ac90c7b3",
+  "request_hash": "4bb3ff57edf87825cd98e6ce9ca0d7fda8bd2aa1bddffe78688dea97d59b23ca",
   "request_id": "synthetic-m2a-fixture",
-  "response": "{\"text\": \"What is your concrete plan for the demo?\"}",
+  "response": "{\"text\": \"How do I know this will not happen again?\"}",
   "task": "simulation_actor",
   "version": 1
 }

@@ -42,7 +42,9 @@ def test_brief_generator_uses_typed_gateway_without_profile() -> None:
     assert sent.task == TaskName.BRIEF
     assert sent.output_schema is BriefResult
     assert sent.payload["attempt"] == 1
-    assert sent.payload["candidate"]["candidateId"] == request.candidate.candidateId
+    # The id changes between the API and replay and never helps the model.
+    assert "candidateId" not in sent.payload["candidate"]
+    assert sent.payload["candidate"]["application"] == request.candidate.application.model_dump(mode="json")
     assert sent.payload["simulationEnglish"]["cefrEstimate"] == "B2"
     assert "profile" not in str(sent.payload)
     assert "invision_knowledge" in sent.prompt

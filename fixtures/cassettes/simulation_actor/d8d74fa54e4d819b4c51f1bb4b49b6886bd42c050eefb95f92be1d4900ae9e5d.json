@@ -1,12 +1,12 @@
 {
   "input_tokens": 40,
   "model": "gpt-6-luna",
-  "output_tokens": 9,
+  "output_tokens": 6,
   "provider": "openai",
   "recorded_at": "2026-09-24T00:00:00Z",
-  "request_hash": "eb9079cf598d43c08b59a5313df793f111e74ddf440a24d4ea52418c3094db02",
+  "request_hash": "d8d74fa54e4d819b4c51f1bb4b49b6886bd42c050eefb95f92be1d4900ae9e5d",
   "request_id": "synthetic-m2a-fixture",
-  "response": "{\"text\": \"How do I know this will not happen again?\"}",
+  "response": "{\"text\": \"The Thursday run failed. What now?\"}",
   "task": "simulation_actor",
   "version": 1
 }

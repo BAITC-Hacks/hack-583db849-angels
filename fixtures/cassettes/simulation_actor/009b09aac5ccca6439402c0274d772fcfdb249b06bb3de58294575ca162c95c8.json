@@ -4,7 +4,7 @@
   "output_tokens": 14,
   "provider": "openai",
   "recorded_at": "2026-09-24T00:00:00Z",
-  "request_hash": "ea47d8daf95774f3c18c9e4dfe70f2f1f48aace93a5c3767739c8c4c182515b9",
+  "request_hash": "009b09aac5ccca6439402c0274d772fcfdb249b06bb3de58294575ca162c95c8",
   "request_id": "synthetic-m2a-fixture",
   "response": "{\"text\": \"I will stay for the demo, but the team needs a safer recovery plan.\"}",
   "task": "simulation_actor",
