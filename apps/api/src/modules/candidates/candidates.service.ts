@@ -15,6 +15,11 @@ const candidateWithSimulationSelect = {
     take: 1,
     select: { id: true, status: true, ending: true },
   },
+  assessments: {
+    orderBy: { createdAt: 'desc' },
+    take: 1,
+    select: { id: true, status: true },
+  },
 } as const satisfies Prisma.CandidateSelect;
 
 type SafeCandidate = Prisma.CandidateGetPayload<{ select: typeof candidateSelect }>;
@@ -77,6 +82,7 @@ export class CandidatesService {
 
   private toProgress(candidate: CandidateWithSimulation, role: ApiRole): CandidateProgressDto {
     const simulation = candidate.simulations[0];
+    const assessment = candidate.assessments[0];
     const progress: CandidateProgressDto = {
       candidateId: candidate.id,
       label: candidate.label,
@@ -86,7 +92,7 @@ export class CandidatesService {
         status: simulation.status,
         ending: simulation.ending as 'completed' | 'stopped' | null,
       } : null,
-      assessment: null,
+      assessment: assessment ? { assessmentId: assessment.id, status: assessment.status as 'pending' | 'ready' | 'failed' } : null,
       interview: null,
       surprise: null,
       consistency: { before: null, after: null },

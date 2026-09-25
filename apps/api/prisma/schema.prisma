@@ -95,7 +95,9 @@ model Assessment {
   id           String     @id @default(uuid()) @db.Uuid
   simulationId String     @unique @db.Uuid
   candidateId  String     @db.Uuid
-  result       Json
+  status       String     @default("pending")
+  result       Json?
+  feedback     Json?
   createdAt    DateTime   @default(now())
   simulation   Simulation @relation(fields: [simulationId], references: [id], onDelete: Cascade)
   candidate    Candidate  @relation(fields: [candidateId], references: [id], onDelete: Cascade)
