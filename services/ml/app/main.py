@@ -21,6 +21,7 @@ from .modules.brief import BriefGenerator, BriefService
 from .modules.judge import SimulationJudge
 from .metrics.languagetool import LocalLanguageTool
 from .modules.director import ScenarioDirector
+from .modules.interview_transcription import InterviewTranscriptionService
 from .modules.matcher import LazyLocalMatcher
 from .modules.simulation import SimulationService
 from .modules.speech import SpeechService
@@ -46,6 +47,7 @@ def create_app(
     models = load_models_configuration()
     resolved_media_gateway = media_gateway or create_media_gateway(resolved, models)
     turn_transcription = TurnTranscriptionService(resolved_media_gateway)
+    interview_transcription = InterviewTranscriptionService(resolved_media_gateway)
     speech_service = SpeechService(resolved_media_gateway, scenario_repository)
     resolved_model_gateway = model_gateway or LazyModelGateway(
         lambda: create_gateway(resolved, models)
@@ -85,6 +87,7 @@ def create_app(
             authenticate,
             resolved.uploads_dir,
             turn_transcription,
+            interview_transcription,
             speech_service,
         )
     )
