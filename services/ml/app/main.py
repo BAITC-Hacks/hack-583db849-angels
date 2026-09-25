@@ -22,6 +22,7 @@ from .modules.judge import SimulationJudge
 from .metrics.languagetool import LocalLanguageTool
 from .modules.director import ScenarioDirector
 from .modules.interview_transcription import InterviewTranscriptionService
+from .modules.interview_draft import InterviewDraftGenerator, InterviewDraftService
 from .modules.matcher import LazyLocalMatcher
 from .modules.simulation import SimulationService
 from .modules.speech import SpeechService
@@ -37,6 +38,7 @@ def create_app(
     simulation_service: SimulationService | None = None,
     assessment_service: AssessmentService | None = None,
     brief_service: BriefService | None = None,
+    draft_service: InterviewDraftService | None = None,
 ) -> FastAPI:
     resolved = settings or load_settings()
     app = FastAPI(title="AI Leader ID ML API", version="1.0.0")
@@ -64,6 +66,9 @@ def create_app(
     )
     resolved_brief_service = brief_service or BriefService(
         BriefGenerator(resolved_model_gateway)
+    )
+    resolved_draft_service = draft_service or InterviewDraftService(
+        InterviewDraftGenerator(resolved_model_gateway)
     )
 
     @app.get(
@@ -93,7 +98,8 @@ def create_app(
     )
     app.include_router(
         extended_router(
-            authenticate, usage_store, resolved.gateway_mode, resolved.budget_usd_cap
+            authenticate, usage_store, resolved.gateway_mode, resolved.budget_usd_cap,
+            resolved_draft_service,
         )
     )
     return app

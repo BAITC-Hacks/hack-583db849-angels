@@ -10,6 +10,7 @@ from fastapi import APIRouter, Depends
 from ..config import GatewayMode
 from ..examples import load_example
 from ..gateway.usage import FileUsageStore
+from ..modules.interview_draft import InterviewDraftService
 from ..schemas.contracts import (
     ConsistencyRequest,
     ConsistencyResult,
@@ -29,6 +30,7 @@ def extended_router(
     usage_store: FileUsageStore,
     gateway_mode: GatewayMode,
     cap_usd: Decimal,
+    draft_service: InterviewDraftService,
 ) -> APIRouter:
     router = APIRouter(prefix="/internal/v1", dependencies=[Depends(authenticate)])
 
@@ -48,8 +50,7 @@ def extended_router(
 
     @router.post("/interview/draft", response_model=DraftResult)
     async def interview_draft(request: DraftRequest) -> DraftResult:
-        del request
-        return load_example("interview-draft.response.json", DraftResult)
+        return await draft_service.prepare(request)
 
     @router.post("/quality-check", response_model=QualityCheckResult)
     async def quality_check(request: QualityCheckRequest) -> QualityCheckResult:

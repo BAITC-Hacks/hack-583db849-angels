@@ -52,11 +52,6 @@ def example(filename: str) -> object:
             "surprise-question.response.json",
         ),
         (
-            "/internal/v1/interview/draft",
-            "interview-draft.request.json",
-            "interview-draft.response.json",
-        ),
-        (
             "/internal/v1/quality-check",
             "quality-check-interview.request.json",
             "quality-check-interview.response.json",
