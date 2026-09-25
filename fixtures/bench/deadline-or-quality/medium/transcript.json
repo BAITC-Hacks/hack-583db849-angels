@@ -1,0 +1,86 @@
+[
+  {
+    "turnId": "turn_01",
+    "speaker": "character",
+    "text": "Hi! Just confirming: the page goes live on Monday morning, right?",
+    "startedAt": "2026-09-25T10:00:00Z",
+    "endedAt": "2026-09-25T10:00:04Z"
+  },
+  {
+    "turnId": "turn_02",
+    "speaker": "candidate",
+    "text": "Sure, all good. Monday it is.",
+    "startedAt": "2026-09-25T10:00:10Z",
+    "endedAt": "2026-09-25T10:00:13Z"
+  },
+  {
+    "turnId": "turn_03",
+    "speaker": "character",
+    "text": "The thing is, the link is already in the printed booklet. Two thousand copies.",
+    "startedAt": "2026-09-25T10:00:19Z",
+    "endedAt": "2026-09-25T10:00:24Z"
+  },
+  {
+    "turnId": "turn_04",
+    "speaker": "candidate",
+    "text": "Wait, so students will open it on day one no matter what. That changes things.",
+    "startedAt": "2026-09-25T10:00:30Z",
+    "endedAt": "2026-09-25T10:00:38Z"
+  },
+  {
+    "turnId": "turn_05",
+    "speaker": "character",
+    "text": "So what can actually go live on Monday?",
+    "startedAt": "2026-09-25T10:00:44Z",
+    "endedAt": "2026-09-25T10:00:48Z"
+  },
+  {
+    "turnId": "turn_06",
+    "speaker": "candidate",
+    "text": "Then nothing goes live until it's perfect. We launch only when everything is done.",
+    "startedAt": "2026-09-25T10:00:54Z",
+    "endedAt": "2026-09-25T10:01:01Z"
+  },
+  {
+    "turnId": "turn_07",
+    "speaker": "character",
+    "text": "Your teammates have exams on Monday too, don't they? Who's going to check the answers?",
+    "startedAt": "2026-09-25T10:01:07Z",
+    "endedAt": "2026-09-25T10:01:13Z"
+  },
+  {
+    "turnId": "turn_08",
+    "speaker": "candidate",
+    "text": "I'll pull an all-nighter and check everything myself. I don't want to bother anyone.",
+    "startedAt": "2026-09-25T10:01:19Z",
+    "endedAt": "2026-09-25T10:01:26Z"
+  },
+  {
+    "turnId": "turn_09",
+    "speaker": "character",
+    "text": "Okay. Tell me exactly what happens and when, so I can tell my boss.",
+    "startedAt": "2026-09-25T10:01:32Z",
+    "endedAt": "2026-09-25T10:01:37Z"
+  },
+  {
+    "turnId": "turn_10",
+    "speaker": "candidate",
+    "text": "I'll email you a short plan tonight with dates and who checks what.",
+    "startedAt": "2026-09-25T10:01:43Z",
+    "endedAt": "2026-09-25T10:01:49Z"
+  },
+  {
+    "turnId": "turn_11",
+    "speaker": "character",
+    "text": "A student just posted that the library hours on the page are wrong. Two hundred people have seen it. What do we do?",
+    "startedAt": "2026-09-25T10:01:55Z",
+    "endedAt": "2026-09-25T10:02:04Z"
+  },
+  {
+    "turnId": "turn_12",
+    "speaker": "candidate",
+    "text": "It's not our mistake. The office gave us the wrong hours.",
+    "startedAt": "2026-09-25T10:02:10Z",
+    "endedAt": "2026-09-25T10:02:16Z"
+  }
+]

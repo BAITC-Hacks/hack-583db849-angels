@@ -1,0 +1,91 @@
+{
+  "scores": [
+    {
+      "competency": "D",
+      "score": 4,
+      "confidence": "high",
+      "rationale": "Meets the second disappointment with a decision rather than despair.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_12",
+          "quote": "Let's talk to those four students and then decide together whether to pause."
+        }
+      ]
+    },
+    {
+      "competency": "R",
+      "score": 3,
+      "confidence": "medium",
+      "rationale": "Proposes a small test with a stop rule.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_06",
+          "quote": "One small experiment: a simpler first screen, tested with twenty students in two weeks, and we stop if we don't hit the goal."
+        }
+      ]
+    },
+    {
+      "competency": "I",
+      "score": 4,
+      "confidence": "high",
+      "rationale": "Learns from the numbers before deciding.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_12",
+          "quote": "Let's talk to those four students and then decide together whether to pause."
+        }
+      ]
+    },
+    {
+      "competency": "V",
+      "score": 4,
+      "confidence": "high",
+      "rationale": "Listens before arguing; respects the time people have.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_08",
+          "quote": "Let's ask everyone how much time they really have this month and plan around who's available."
+        }
+      ]
+    },
+    {
+      "competency": "E",
+      "score": 4,
+      "confidence": "high",
+      "rationale": "Sets a goal with owners.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_10",
+          "quote": "Goal: ten swaps in two weeks."
+        }
+      ]
+    }
+  ],
+  "english": {
+    "wordsPerMinute": 120.0,
+    "fillerRate": 0.0,
+    "meanTurnLength": 19.33,
+    "lexicalDiversity": 0.7241,
+    "grammarErrorsPer100Words": null,
+    "cefrEstimate": null
+  },
+  "interviewQuestions": [],
+  "candidateFeedback": {
+    "strengths": [
+      "When the plan broke, you looked for the next step instead of stopping.",
+      "You looked past the first problem to what the people involved really needed.",
+      "You were honest and fair with the people involved, even when it was hard."
+    ],
+    "growth": [
+      "When you suggest a change, say what could go wrong and how you would keep it small."
+    ],
+    "nextTime": [
+      "Next time you propose something, add one sentence on the risk and how to limit it."
+    ]
+  }
+}

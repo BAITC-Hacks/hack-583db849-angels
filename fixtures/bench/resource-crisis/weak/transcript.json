@@ -1,0 +1,100 @@
+[
+  {
+    "turnId": "turn_01",
+    "speaker": "character",
+    "text": "The council just cut our grant in half. We can't pay for the room or the lunches, and the deposit is due Friday. I think we have to cancel.",
+    "startedAt": "2026-09-25T10:00:00Z",
+    "endedAt": "2026-09-25T10:00:11Z"
+  },
+  {
+    "turnId": "turn_02",
+    "speaker": "candidate",
+    "text": "If the money is gone, the workshop is gone. Let's just call it off.",
+    "startedAt": "2026-09-25T10:00:17Z",
+    "endedAt": "2026-09-25T10:00:24Z"
+  },
+  {
+    "turnId": "turn_03",
+    "speaker": "character",
+    "text": "So what do we do? We have half the money and seven days.",
+    "startedAt": "2026-09-25T10:00:30Z",
+    "endedAt": "2026-09-25T10:00:35Z"
+  },
+  {
+    "turnId": "turn_04",
+    "speaker": "candidate",
+    "text": "I don't know, you're the treasurer. Maybe it will sort itself out.",
+    "startedAt": "2026-09-25T10:00:41Z",
+    "endedAt": "2026-09-25T10:00:47Z"
+  },
+  {
+    "turnId": "turn_05",
+    "speaker": "character",
+    "text": "Everyone's panicking in the chat. Madi and Sara say they're out if we're going to fail anyway.",
+    "startedAt": "2026-09-25T10:00:53Z",
+    "endedAt": "2026-09-25T10:01:00Z"
+  },
+  {
+    "turnId": "turn_06",
+    "speaker": "candidate",
+    "text": "If they want to quit, let them. We'll manage without them.",
+    "startedAt": "2026-09-25T10:01:06Z",
+    "endedAt": "2026-09-25T10:01:12Z"
+  },
+  {
+    "turnId": "turn_07",
+    "speaker": "character",
+    "text": "If we can't do everything, what do we protect?",
+    "startedAt": "2026-09-25T10:01:18Z",
+    "endedAt": "2026-09-25T10:01:22Z"
+  },
+  {
+    "turnId": "turn_08",
+    "speaker": "candidate",
+    "text": "We promised everything, so we keep everything. Cutting anything would look bad.",
+    "startedAt": "2026-09-25T10:01:28Z",
+    "endedAt": "2026-09-25T10:01:34Z"
+  },
+  {
+    "turnId": "turn_09",
+    "speaker": "character",
+    "text": "Sixty kids signed up and we have thirty seats. How do we choose?",
+    "startedAt": "2026-09-25T10:01:40Z",
+    "endedAt": "2026-09-25T10:01:45Z"
+  },
+  {
+    "turnId": "turn_10",
+    "speaker": "candidate",
+    "text": "Let's not tell the others they're out. They'll figure it out.",
+    "startedAt": "2026-09-25T10:01:51Z",
+    "endedAt": "2026-09-25T10:01:57Z"
+  },
+  {
+    "turnId": "turn_11",
+    "speaker": "character",
+    "text": "Okay. The deposit is due Friday. What exactly do we do before then?",
+    "startedAt": "2026-09-25T10:02:03Z",
+    "endedAt": "2026-09-25T10:02:08Z"
+  },
+  {
+    "turnId": "turn_12",
+    "speaker": "candidate",
+    "text": "Let's all try our best this week and see how it goes.",
+    "startedAt": "2026-09-25T10:02:14Z",
+    "endedAt": "2026-09-25T10:02:20Z"
+  },
+  {
+    "turnId": "turn_13",
+    "speaker": "character",
+    "text": "The university room fell through. All we can get is a small room for twenty people. Now what?",
+    "startedAt": "2026-09-25T10:02:26Z",
+    "endedAt": "2026-09-25T10:02:33Z"
+  },
+  {
+    "turnId": "turn_14",
+    "speaker": "candidate",
+    "text": "That's it, we cancel. I told you this wouldn't work.",
+    "startedAt": "2026-09-25T10:02:39Z",
+    "endedAt": "2026-09-25T10:02:44Z"
+  }
+]

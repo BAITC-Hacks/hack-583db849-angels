@@ -1,0 +1,86 @@
+[
+  {
+    "turnId": "turn_01",
+    "speaker": "character",
+    "text": "I read your proposal. Thanks, but no. The one-to-one sessions work, and the parents trust them.",
+    "startedAt": "2026-09-25T10:00:00Z",
+    "endedAt": "2026-09-25T10:00:06Z"
+  },
+  {
+    "turnId": "turn_02",
+    "speaker": "candidate",
+    "text": "But it's clearly better, trust me. The old way is outdated.",
+    "startedAt": "2026-09-25T10:00:12Z",
+    "endedAt": "2026-09-25T10:00:18Z"
+  },
+  {
+    "turnId": "turn_03",
+    "speaker": "character",
+    "text": "What makes you so sure it works better?",
+    "startedAt": "2026-09-25T10:00:24Z",
+    "endedAt": "2026-09-25T10:00:28Z"
+  },
+  {
+    "turnId": "turn_04",
+    "speaker": "candidate",
+    "text": "Lots of schools do this now. I read that group learning is more effective.",
+    "startedAt": "2026-09-25T10:00:34Z",
+    "endedAt": "2026-09-25T10:00:41Z"
+  },
+  {
+    "turnId": "turn_05",
+    "speaker": "character",
+    "text": "Say we tried it. What could go wrong, and who would pay for it?",
+    "startedAt": "2026-09-25T10:00:47Z",
+    "endedAt": "2026-09-25T10:00:52Z"
+  },
+  {
+    "turnId": "turn_06",
+    "speaker": "candidate",
+    "text": "Parents may worry, so we'd tell them first. If the results drop, we switch back.",
+    "startedAt": "2026-09-25T10:00:58Z",
+    "endedAt": "2026-09-25T10:01:06Z"
+  },
+  {
+    "turnId": "turn_07",
+    "speaker": "character",
+    "text": "The others already have full Saturdays. Who's going to run this?",
+    "startedAt": "2026-09-25T10:01:12Z",
+    "endedAt": "2026-09-25T10:01:16Z"
+  },
+  {
+    "turnId": "turn_08",
+    "speaker": "candidate",
+    "text": "If you say no, I'll ask the tutors directly and start without you.",
+    "startedAt": "2026-09-25T10:01:22Z",
+    "endedAt": "2026-09-25T10:01:28Z"
+  },
+  {
+    "turnId": "turn_09",
+    "speaker": "character",
+    "text": "Alright. One trial. But I want to know exactly how it would work.",
+    "startedAt": "2026-09-25T10:01:34Z",
+    "endedAt": "2026-09-25T10:01:39Z"
+  },
+  {
+    "turnId": "turn_10",
+    "speaker": "candidate",
+    "text": "Let's just start next week and figure out the details as we go.",
+    "startedAt": "2026-09-25T10:01:45Z",
+    "endedAt": "2026-09-25T10:01:51Z"
+  },
+  {
+    "turnId": "turn_11",
+    "speaker": "character",
+    "text": "Two pupils came out confused, and a mother called me. So. What now?",
+    "startedAt": "2026-09-25T10:01:57Z",
+    "endedAt": "2026-09-25T10:02:02Z"
+  },
+  {
+    "turnId": "turn_12",
+    "speaker": "candidate",
+    "text": "Let's keep the trial but fix what confused them.",
+    "startedAt": "2026-09-25T10:02:08Z",
+    "endedAt": "2026-09-25T10:02:12Z"
+  }
+]

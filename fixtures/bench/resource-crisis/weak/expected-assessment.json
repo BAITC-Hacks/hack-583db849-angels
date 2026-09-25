@@ -1,0 +1,111 @@
+{
+  "scores": [
+    {
+      "competency": "D",
+      "score": 0,
+      "confidence": "high",
+      "rationale": "Gives up at the first and the last difficulty.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_06",
+          "quote": "If they want to quit, let them."
+        }
+      ]
+    },
+    {
+      "competency": "R",
+      "score": null,
+      "confidence": null,
+      "rationale": null,
+      "evidence": []
+    },
+    {
+      "competency": "I",
+      "score": 1,
+      "confidence": "medium",
+      "rationale": "The cited turn is the clearest Insightful Vision moment.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_08",
+          "quote": "Cutting anything would look bad."
+        }
+      ]
+    },
+    {
+      "competency": "V",
+      "score": 1,
+      "confidence": "medium",
+      "rationale": "Leaves pupils uninformed.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_06",
+          "quote": "If they want to quit, let them."
+        }
+      ]
+    },
+    {
+      "competency": "E",
+      "score": 0,
+      "confidence": "high",
+      "rationale": "Has no plan.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_12",
+          "quote": "Let's all try our best this week and see how it goes."
+        }
+      ]
+    }
+  ],
+  "english": {
+    "wordsPerMinute": 117.14,
+    "fillerRate": 0.0,
+    "meanTurnLength": 11.71,
+    "lexicalDiversity": 0.7561,
+    "grammarErrorsPer100Words": null,
+    "cefrEstimate": null
+  },
+  "interviewQuestions": [
+    {
+      "competency": "D",
+      "question": "Tell me about a plan that failed. What did you do first, and how did you know the recovery was working?",
+      "reason": "The simulation shows little Disciplined Resilience; ask for an example from the candidate's own life."
+    },
+    {
+      "competency": "R",
+      "question": "Describe a change you initiated. What could have gone wrong, and what safeguard did you put in place?",
+      "reason": "No verified evidence for Responsible Innovation in the simulation."
+    },
+    {
+      "competency": "I",
+      "question": "Think of a conflict that looked simple at first. What was the deeper issue, and what longer-term goal guided you?",
+      "reason": "The simulation shows little Insightful Vision; ask for an example from the candidate's own life."
+    },
+    {
+      "competency": "V",
+      "question": "Tell me about a time doing the right thing had a real cost. What boundary did you set, and how did you explain it?",
+      "reason": "The simulation shows little Values-Driven Leadership; ask for an example from the candidate's own life."
+    },
+    {
+      "competency": "E",
+      "question": "Choose an idea you actually delivered. How did you prioritize the work, assign ownership, and measure the result?",
+      "reason": "The simulation shows little Entrepreneurial Execution; ask for an example from the candidate's own life."
+    }
+  ],
+  "candidateFeedback": {
+    "strengths": [
+      "You stayed in the conversation to the end and answered every turn."
+    ],
+    "growth": [
+      "When something goes wrong, name the next step and who takes it before deciding to stop.",
+      "End with a plan: what happens next, who owns it, and when you will check on it."
+    ],
+    "nextTime": [
+      "Next time a plan breaks, pause, name one recovery step, and ask who can help.",
+      "Next time, close the conversation with owners and a date for every step."
+    ]
+  }
+}

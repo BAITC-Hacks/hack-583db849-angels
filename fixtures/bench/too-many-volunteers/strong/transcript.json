@@ -1,0 +1,86 @@
+[
+  {
+    "turnId": "turn_01",
+    "speaker": "character",
+    "text": "Everyone's just standing around. There are twice as many of us as they planned. Do you know what's going on?",
+    "startedAt": "2026-09-25T10:00:00Z",
+    "endedAt": "2026-09-25T10:00:08Z"
+  },
+  {
+    "turnId": "turn_02",
+    "speaker": "candidate",
+    "text": "Nobody's in charge yet. Let me call the organiser and ask what the plan was, then we can get people started.",
+    "startedAt": "2026-09-25T10:00:14Z",
+    "endedAt": "2026-09-25T10:00:24Z"
+  },
+  {
+    "turnId": "turn_03",
+    "speaker": "character",
+    "text": "Some people are already leaving. We've got eighty people and forty pairs of gloves. What do we do?",
+    "startedAt": "2026-09-25T10:00:30Z",
+    "endedAt": "2026-09-25T10:00:37Z"
+  },
+  {
+    "turnId": "turn_04",
+    "speaker": "candidate",
+    "text": "Let's pair people up: one picks up with gloves, the other holds the bag, and they swap every half hour.",
+    "startedAt": "2026-09-25T10:00:43Z",
+    "endedAt": "2026-09-25T10:00:53Z"
+  },
+  {
+    "turnId": "turn_05",
+    "speaker": "character",
+    "text": "Should we split the park into zones? Someone has to lead each one.",
+    "startedAt": "2026-09-25T10:00:59Z",
+    "endedAt": "2026-09-25T10:01:04Z"
+  },
+  {
+    "turnId": "turn_06",
+    "speaker": "candidate",
+    "text": "Let's split into zones and ask four people to each lead one. You know the park; could you take the lake side?",
+    "startedAt": "2026-09-25T10:01:10Z",
+    "endedAt": "2026-09-25T10:01:21Z"
+  },
+  {
+    "turnId": "turn_07",
+    "speaker": "character",
+    "text": "Someone found a pile of broken glass and rusty metal by the playground. Half of them don't have gloves. What do we do?",
+    "startedAt": "2026-09-25T10:01:27Z",
+    "endedAt": "2026-09-25T10:01:36Z"
+  },
+  {
+    "turnId": "turn_08",
+    "speaker": "candidate",
+    "text": "Nobody touches that area. Let's tape it off, move that group somewhere else, and tell the park office.",
+    "startedAt": "2026-09-25T10:01:42Z",
+    "endedAt": "2026-09-25T10:01:51Z"
+  },
+  {
+    "turnId": "turn_09",
+    "speaker": "character",
+    "text": "Here's Asel, the organiser. She looks surprised. She's asking who's been running things.",
+    "startedAt": "2026-09-25T10:01:57Z",
+    "endedAt": "2026-09-25T10:02:02Z"
+  },
+  {
+    "turnId": "turn_10",
+    "speaker": "candidate",
+    "text": "Glad you're here. Here's what we did, who leads each zone, and the spot we marked off. It's yours from here.",
+    "startedAt": "2026-09-25T10:02:08Z",
+    "endedAt": "2026-09-25T10:02:18Z"
+  },
+  {
+    "turnId": "turn_11",
+    "speaker": "character",
+    "text": "It's starting to rain. Half the bags are full and people want to go. What now?",
+    "startedAt": "2026-09-25T10:02:24Z",
+    "endedAt": "2026-09-25T10:02:30Z"
+  },
+  {
+    "turnId": "turn_12",
+    "speaker": "candidate",
+    "text": "Rain's here. Let's finish the zone we're in, stack the bags by the gate, and thank everyone before they go.",
+    "startedAt": "2026-09-25T10:02:36Z",
+    "endedAt": "2026-09-25T10:02:46Z"
+  }
+]

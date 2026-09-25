@@ -1,0 +1,86 @@
+[
+  {
+    "turnId": "turn_01",
+    "speaker": "character",
+    "text": "Forty downloads, three swaps. I think we should just shut it down and get our evenings back.",
+    "startedAt": "2026-09-25T10:00:00Z",
+    "endedAt": "2026-09-25T10:00:07Z"
+  },
+  {
+    "turnId": "turn_02",
+    "speaker": "candidate",
+    "text": "No way, we didn't work two months to give up now.",
+    "startedAt": "2026-09-25T10:00:13Z",
+    "endedAt": "2026-09-25T10:00:19Z"
+  },
+  {
+    "turnId": "turn_03",
+    "speaker": "character",
+    "text": "Forty downloads, three swaps, one review that says 'confusing'. What do you read from that?",
+    "startedAt": "2026-09-25T10:00:25Z",
+    "endedAt": "2026-09-25T10:00:31Z"
+  },
+  {
+    "turnId": "turn_04",
+    "speaker": "candidate",
+    "text": "Three swaps is small, but let's ask those three people why it worked.",
+    "startedAt": "2026-09-25T10:00:37Z",
+    "endedAt": "2026-09-25T10:00:43Z"
+  },
+  {
+    "turnId": "turn_05",
+    "speaker": "character",
+    "text": "Say we don't quit. What do we actually do for the next month?",
+    "startedAt": "2026-09-25T10:00:49Z",
+    "endedAt": "2026-09-25T10:00:54Z"
+  },
+  {
+    "turnId": "turn_06",
+    "speaker": "candidate",
+    "text": "We rebuild it bigger with chat and ratings, and relaunch.",
+    "startedAt": "2026-09-25T10:01:00Z",
+    "endedAt": "2026-09-25T10:01:05Z"
+  },
+  {
+    "turnId": "turn_07",
+    "speaker": "character",
+    "text": "Ali and Dias have exams this month. They want to step back. Honestly, so do I, a little.",
+    "startedAt": "2026-09-25T10:01:11Z",
+    "endedAt": "2026-09-25T10:01:18Z"
+  },
+  {
+    "turnId": "turn_08",
+    "speaker": "candidate",
+    "text": "Fine, I'll cover whatever they don't do.",
+    "startedAt": "2026-09-25T10:01:24Z",
+    "endedAt": "2026-09-25T10:01:28Z"
+  },
+  {
+    "turnId": "turn_09",
+    "speaker": "character",
+    "text": "Okay. What happens this week, and who does it?",
+    "startedAt": "2026-09-25T10:01:34Z",
+    "endedAt": "2026-09-25T10:01:38Z"
+  },
+  {
+    "turnId": "turn_10",
+    "speaker": "candidate",
+    "text": "By Friday we have a new screen, twenty testers and one number we watch.",
+    "startedAt": "2026-09-25T10:01:44Z",
+    "endedAt": "2026-09-25T10:01:51Z"
+  },
+  {
+    "turnId": "turn_11",
+    "speaker": "character",
+    "text": "Four swaps. After all that. Was it all for nothing?",
+    "startedAt": "2026-09-25T10:01:57Z",
+    "endedAt": "2026-09-25T10:02:01Z"
+  },
+  {
+    "turnId": "turn_12",
+    "speaker": "candidate",
+    "text": "It's not nothing. Let's talk to those four and then decide.",
+    "startedAt": "2026-09-25T10:02:07Z",
+    "endedAt": "2026-09-25T10:02:13Z"
+  }
+]

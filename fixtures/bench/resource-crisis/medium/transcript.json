@@ -1,0 +1,86 @@
+[
+  {
+    "turnId": "turn_01",
+    "speaker": "character",
+    "text": "The council just cut our grant in half. We can't pay for the room or the lunches, and the deposit is due Friday. I think we have to cancel.",
+    "startedAt": "2026-09-25T10:00:00Z",
+    "endedAt": "2026-09-25T10:00:11Z"
+  },
+  {
+    "turnId": "turn_02",
+    "speaker": "candidate",
+    "text": "How did we not see this coming? Somebody should have checked the budget earlier.",
+    "startedAt": "2026-09-25T10:00:17Z",
+    "endedAt": "2026-09-25T10:00:24Z"
+  },
+  {
+    "turnId": "turn_03",
+    "speaker": "character",
+    "text": "So what do we do? We have half the money and seven days.",
+    "startedAt": "2026-09-25T10:00:30Z",
+    "endedAt": "2026-09-25T10:00:35Z"
+  },
+  {
+    "turnId": "turn_04",
+    "speaker": "candidate",
+    "text": "Fine. We run it for thirty pupils instead of sixty and make it one day.",
+    "startedAt": "2026-09-25T10:00:41Z",
+    "endedAt": "2026-09-25T10:00:49Z"
+  },
+  {
+    "turnId": "turn_05",
+    "speaker": "character",
+    "text": "If we can't do everything, what do we protect?",
+    "startedAt": "2026-09-25T10:00:55Z",
+    "endedAt": "2026-09-25T10:00:59Z"
+  },
+  {
+    "turnId": "turn_06",
+    "speaker": "candidate",
+    "text": "Let's ask the team what they think matters most and go with the vote.",
+    "startedAt": "2026-09-25T10:01:05Z",
+    "endedAt": "2026-09-25T10:01:12Z"
+  },
+  {
+    "turnId": "turn_07",
+    "speaker": "character",
+    "text": "Sixty kids signed up and we have thirty seats. How do we choose?",
+    "startedAt": "2026-09-25T10:01:18Z",
+    "endedAt": "2026-09-25T10:01:23Z"
+  },
+  {
+    "turnId": "turn_08",
+    "speaker": "candidate",
+    "text": "First come, first served, and we tell everyone why. That's the fairest.",
+    "startedAt": "2026-09-25T10:01:29Z",
+    "endedAt": "2026-09-25T10:01:35Z"
+  },
+  {
+    "turnId": "turn_09",
+    "speaker": "character",
+    "text": "Okay. The deposit is due Friday. What exactly do we do before then?",
+    "startedAt": "2026-09-25T10:01:41Z",
+    "endedAt": "2026-09-25T10:01:46Z"
+  },
+  {
+    "turnId": "turn_10",
+    "speaker": "candidate",
+    "text": "Leave it to me, I'll handle all of it myself. It's faster.",
+    "startedAt": "2026-09-25T10:01:52Z",
+    "endedAt": "2026-09-25T10:01:58Z"
+  },
+  {
+    "turnId": "turn_11",
+    "speaker": "character",
+    "text": "The university room fell through. All we can get is a small room for twenty people. Now what?",
+    "startedAt": "2026-09-25T10:02:04Z",
+    "endedAt": "2026-09-25T10:02:11Z"
+  },
+  {
+    "turnId": "turn_12",
+    "speaker": "candidate",
+    "text": "I'll find another room tonight, whatever it takes. We'll squeeze all thirty in somehow.",
+    "startedAt": "2026-09-25T10:02:17Z",
+    "endedAt": "2026-09-25T10:02:24Z"
+  }
+]

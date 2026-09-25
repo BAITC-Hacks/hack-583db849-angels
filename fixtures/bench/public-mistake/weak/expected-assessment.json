@@ -1,0 +1,117 @@
+{
+  "scores": [
+    {
+      "competency": "D",
+      "score": 0,
+      "confidence": "high",
+      "rationale": "Goes silent when people are angry.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_14",
+          "quote": "Let's turn off the comments and just ignore them now."
+        }
+      ]
+    },
+    {
+      "competency": "R",
+      "score": 0,
+      "confidence": "high",
+      "rationale": "Promises what the club can't deliver.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_08",
+          "quote": "Tell them we'll get them in, no matter what."
+        }
+      ]
+    },
+    {
+      "competency": "I",
+      "score": 0,
+      "confidence": "high",
+      "rationale": "Hides the mistake and protects the page instead of the pupils.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_04",
+          "quote": "We need to protect the club's name."
+        }
+      ]
+    },
+    {
+      "competency": "V",
+      "score": 0,
+      "confidence": "high",
+      "rationale": "Hides the mistake and protects the page instead of the pupils.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_06",
+          "quote": "Okay, then let's just say nothing to protect you."
+        }
+      ]
+    },
+    {
+      "competency": "E",
+      "score": 0,
+      "confidence": "high",
+      "rationale": "Changes nothing in how it posts.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_12",
+          "quote": "It was one mistake, no need for rules."
+        }
+      ]
+    }
+  ],
+  "english": {
+    "wordsPerMinute": 125.0,
+    "fillerRate": 0.0,
+    "meanTurnLength": 10.71,
+    "lexicalDiversity": 0.7467,
+    "grammarErrorsPer100Words": null,
+    "cefrEstimate": null
+  },
+  "interviewQuestions": [
+    {
+      "competency": "D",
+      "question": "Tell me about a plan that failed. What did you do first, and how did you know the recovery was working?",
+      "reason": "The simulation shows little Disciplined Resilience; ask for an example from the candidate's own life."
+    },
+    {
+      "competency": "R",
+      "question": "Describe a change you initiated. What could have gone wrong, and what safeguard did you put in place?",
+      "reason": "The simulation shows little Responsible Innovation; ask for an example from the candidate's own life."
+    },
+    {
+      "competency": "I",
+      "question": "Think of a conflict that looked simple at first. What was the deeper issue, and what longer-term goal guided you?",
+      "reason": "The simulation shows little Insightful Vision; ask for an example from the candidate's own life."
+    },
+    {
+      "competency": "V",
+      "question": "Tell me about a time doing the right thing had a real cost. What boundary did you set, and how did you explain it?",
+      "reason": "The simulation shows little Values-Driven Leadership; ask for an example from the candidate's own life."
+    },
+    {
+      "competency": "E",
+      "question": "Choose an idea you actually delivered. How did you prioritize the work, assign ownership, and measure the result?",
+      "reason": "The simulation shows little Entrepreneurial Execution; ask for an example from the candidate's own life."
+    }
+  ],
+  "candidateFeedback": {
+    "strengths": [
+      "You stayed in the conversation to the end and answered every turn."
+    ],
+    "growth": [
+      "When something goes wrong, name the next step and who takes it before deciding to stop.",
+      "When you suggest a change, say what could go wrong and how you would keep it small."
+    ],
+    "nextTime": [
+      "Next time a plan breaks, pause, name one recovery step, and ask who can help.",
+      "Next time you propose something, add one sentence on the risk and how to limit it."
+    ]
+  }
+}

@@ -1,0 +1,86 @@
+[
+  {
+    "turnId": "turn_01",
+    "speaker": "character",
+    "text": "Okay, so the science fair date in my post was wrong. Registration closed yesterday. Let's just delete it. Nobody will remember in a week.",
+    "startedAt": "2026-09-25T10:00:00Z",
+    "endedAt": "2026-09-25T10:00:09Z"
+  },
+  {
+    "turnId": "turn_02",
+    "speaker": "candidate",
+    "text": "How did you get the date wrong, Daniyar? You should have checked.",
+    "startedAt": "2026-09-25T10:00:15Z",
+    "endedAt": "2026-09-25T10:00:21Z"
+  },
+  {
+    "turnId": "turn_03",
+    "speaker": "character",
+    "text": "Three hundred shares. And some pupils are saying they missed registration because of us.",
+    "startedAt": "2026-09-25T10:00:27Z",
+    "endedAt": "2026-09-25T10:00:32Z"
+  },
+  {
+    "turnId": "turn_04",
+    "speaker": "candidate",
+    "text": "Deleting won't help the people who relied on us. We owe those pupils more than that.",
+    "startedAt": "2026-09-25T10:00:38Z",
+    "endedAt": "2026-09-25T10:00:46Z"
+  },
+  {
+    "turnId": "turn_05",
+    "speaker": "character",
+    "text": "Okay, but what can we actually do for them? Registration is closed.",
+    "startedAt": "2026-09-25T10:00:52Z",
+    "endedAt": "2026-09-25T10:00:57Z"
+  },
+  {
+    "turnId": "turn_06",
+    "speaker": "candidate",
+    "text": "We post sorry, and that's it. An apology is enough.",
+    "startedAt": "2026-09-25T10:01:03Z",
+    "endedAt": "2026-09-25T10:01:08Z"
+  },
+  {
+    "turnId": "turn_07",
+    "speaker": "character",
+    "text": "So what do we actually post?",
+    "startedAt": "2026-09-25T10:01:14Z",
+    "endedAt": "2026-09-25T10:01:18Z"
+  },
+  {
+    "turnId": "turn_08",
+    "speaker": "candidate",
+    "text": "We say plainly that the date was wrong, we're sorry, and link the official page.",
+    "startedAt": "2026-09-25T10:01:24Z",
+    "endedAt": "2026-09-25T10:01:32Z"
+  },
+  {
+    "turnId": "turn_09",
+    "speaker": "character",
+    "text": "How do we make sure this never happens again? Without making every post take a week.",
+    "startedAt": "2026-09-25T10:01:38Z",
+    "endedAt": "2026-09-25T10:01:44Z"
+  },
+  {
+    "turnId": "turn_10",
+    "speaker": "candidate",
+    "text": "Only I can post from now on. Nobody posts anything without my approval.",
+    "startedAt": "2026-09-25T10:01:50Z",
+    "endedAt": "2026-09-25T10:01:56Z"
+  },
+  {
+    "turnId": "turn_11",
+    "speaker": "character",
+    "text": "The organisers said no. No late registration. The comments are getting angry again.",
+    "startedAt": "2026-09-25T10:02:02Z",
+    "endedAt": "2026-09-25T10:02:07Z"
+  },
+  {
+    "turnId": "turn_12",
+    "speaker": "candidate",
+    "text": "It's hard news, but we reply to each comment ourselves.",
+    "startedAt": "2026-09-25T10:02:13Z",
+    "endedAt": "2026-09-25T10:02:18Z"
+  }
+]

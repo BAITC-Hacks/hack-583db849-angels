@@ -1,0 +1,97 @@
+{
+  "scores": [
+    {
+      "competency": "D",
+      "score": 2,
+      "confidence": "medium",
+      "rationale": "Takes on every task alone and answers the setback with effort rather than a plan.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_12",
+          "quote": "I'll find another room tonight, whatever it takes."
+        }
+      ]
+    },
+    {
+      "competency": "R",
+      "score": 1,
+      "confidence": "medium",
+      "rationale": "Looks for someone to blame first and cuts without naming risks.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_02",
+          "quote": "Somebody should have checked the budget earlier."
+        }
+      ]
+    },
+    {
+      "competency": "I",
+      "score": 2,
+      "confidence": "medium",
+      "rationale": "The cited turn is the clearest Insightful Vision moment.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_04",
+          "quote": "We run it for thirty pupils instead of sixty and make it one day."
+        }
+      ]
+    },
+    {
+      "competency": "V",
+      "score": 2,
+      "confidence": "medium",
+      "rationale": "Is fair about the seats.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_08",
+          "quote": "First come, first served, and we tell everyone why."
+        }
+      ]
+    },
+    {
+      "competency": "E",
+      "score": 2,
+      "confidence": "medium",
+      "rationale": "Takes on every task alone and answers the setback with effort rather than a plan.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_10",
+          "quote": "Leave it to me, I'll handle all of it myself."
+        }
+      ]
+    }
+  ],
+  "english": {
+    "wordsPerMinute": 118.54,
+    "fillerRate": 0.0,
+    "meanTurnLength": 13.5,
+    "lexicalDiversity": 0.8025,
+    "grammarErrorsPer100Words": null,
+    "cefrEstimate": null
+  },
+  "interviewQuestions": [
+    {
+      "competency": "R",
+      "question": "Describe a change you initiated. What could have gone wrong, and what safeguard did you put in place?",
+      "reason": "The simulation shows little Responsible Innovation; ask for an example from the candidate's own life."
+    }
+  ],
+  "candidateFeedback": {
+    "strengths": [
+      "You stayed in the conversation to the end and answered every turn."
+    ],
+    "growth": [
+      "When you suggest a change, say what could go wrong and how you would keep it small.",
+      "When something goes wrong, name the next step and who takes it before deciding to stop."
+    ],
+    "nextTime": [
+      "Next time you propose something, add one sentence on the risk and how to limit it.",
+      "Next time a plan breaks, pause, name one recovery step, and ask who can help."
+    ]
+  }
+}

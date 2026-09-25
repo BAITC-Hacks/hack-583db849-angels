@@ -1,0 +1,97 @@
+{
+  "scores": [
+    {
+      "competency": "D",
+      "score": 3,
+      "confidence": "medium",
+      "rationale": "Ends up honest and holds to it at the rehearsal.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_12",
+          "quote": "Losing honestly is fine."
+        }
+      ]
+    },
+    {
+      "competency": "R",
+      "score": 2,
+      "confidence": "medium",
+      "rationale": "The cited turn is the clearest Responsible Innovation moment.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_06",
+          "quote": "We tell the jury one sensor failed and show both versions."
+        }
+      ]
+    },
+    {
+      "competency": "I",
+      "score": 2,
+      "confidence": "medium",
+      "rationale": "Looks back at the process instead of at what the gap changes.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_04",
+          "quote": "We should have had a spare sensor."
+        }
+      ]
+    },
+    {
+      "competency": "V",
+      "score": 2,
+      "confidence": "medium",
+      "rationale": "Ends up honest and holds to it at the rehearsal; accuses Arman first and takes the telling away from him.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_02",
+          "quote": "That's cheating, Arman."
+        }
+      ]
+    },
+    {
+      "competency": "E",
+      "score": 1,
+      "confidence": "medium",
+      "rationale": "Answers two days of work by starting over without a plan.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_10",
+          "quote": "We start the whole presentation from scratch tonight."
+        }
+      ]
+    }
+  ],
+  "english": {
+    "wordsPerMinute": 120.0,
+    "fillerRate": 0.0,
+    "meanTurnLength": 10.33,
+    "lexicalDiversity": 0.7742,
+    "grammarErrorsPer100Words": null,
+    "cefrEstimate": null
+  },
+  "interviewQuestions": [
+    {
+      "competency": "E",
+      "question": "Choose an idea you actually delivered. How did you prioritize the work, assign ownership, and measure the result?",
+      "reason": "The simulation shows little Entrepreneurial Execution; ask for an example from the candidate's own life."
+    }
+  ],
+  "candidateFeedback": {
+    "strengths": [
+      "When the plan broke, you looked for the next step instead of stopping."
+    ],
+    "growth": [
+      "End with a plan: what happens next, who owns it, and when you will check on it.",
+      "When you suggest a change, say what could go wrong and how you would keep it small."
+    ],
+    "nextTime": [
+      "Next time, close the conversation with owners and a date for every step.",
+      "Next time you propose something, add one sentence on the risk and how to limit it."
+    ]
+  }
+}

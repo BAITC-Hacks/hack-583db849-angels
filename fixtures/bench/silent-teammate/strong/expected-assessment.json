@@ -1,0 +1,91 @@
+{
+  "scores": [
+    {
+      "competency": "D",
+      "score": 4,
+      "confidence": "high",
+      "rationale": "Stays calm when the file is lost.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_12",
+          "quote": "We lost two days, not the film."
+        }
+      ]
+    },
+    {
+      "competency": "R",
+      "score": 3,
+      "confidence": "medium",
+      "rationale": "Shares the work and names a plan B.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_06",
+          "quote": "Let's pair you with Saule for two evenings, and split the film into three parts so you take the one you're most comfortable with."
+        }
+      ]
+    },
+    {
+      "competency": "I",
+      "score": 4,
+      "confidence": "high",
+      "rationale": "Looks past \"it's fine\" to the real problem.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_04",
+          "quote": "It's okay to be stuck."
+        }
+      ]
+    },
+    {
+      "competency": "V",
+      "score": 4,
+      "confidence": "high",
+      "rationale": "Makes it safe to admit; tells the team the truth without blame.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_08",
+          "quote": "We tell Dias and Saule the truth: you hit a wall and we have a plan."
+        }
+      ]
+    },
+    {
+      "competency": "E",
+      "score": 4,
+      "confidence": "high",
+      "rationale": "Plans owners and check-ins with a spare day.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_10",
+          "quote": "You and Saule edit part one by Sunday, I do the music, a rough cut by day six, and a short check-in every other evening."
+        }
+      ]
+    }
+  ],
+  "english": {
+    "wordsPerMinute": 124.29,
+    "fillerRate": 0.0,
+    "meanTurnLength": 19.33,
+    "lexicalDiversity": 0.6897,
+    "grammarErrorsPer100Words": null,
+    "cefrEstimate": null
+  },
+  "interviewQuestions": [],
+  "candidateFeedback": {
+    "strengths": [
+      "When the plan broke, you looked for the next step instead of stopping.",
+      "You looked past the first problem to what the people involved really needed.",
+      "You were honest and fair with the people involved, even when it was hard."
+    ],
+    "growth": [
+      "When you suggest a change, say what could go wrong and how you would keep it small."
+    ],
+    "nextTime": [
+      "Next time you propose something, add one sentence on the risk and how to limit it."
+    ]
+  }
+}

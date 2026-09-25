@@ -1,0 +1,86 @@
+[
+  {
+    "turnId": "turn_01",
+    "speaker": "character",
+    "text": "Hey. Yeah, sorry, I've been busy. The edit is going fine, don't worry.",
+    "startedAt": "2026-09-25T10:00:00Z",
+    "endedAt": "2026-09-25T10:00:05Z"
+  },
+  {
+    "turnId": "turn_02",
+    "speaker": "candidate",
+    "text": "Good to hear you. No stress, tell me honestly how the edit is going.",
+    "startedAt": "2026-09-25T10:00:11Z",
+    "endedAt": "2026-09-25T10:00:18Z"
+  },
+  {
+    "turnId": "turn_03",
+    "speaker": "character",
+    "text": "It's just... the software is more complicated than I thought. I'll figure it out.",
+    "startedAt": "2026-09-25T10:00:24Z",
+    "endedAt": "2026-09-25T10:00:29Z"
+  },
+  {
+    "turnId": "turn_04",
+    "speaker": "candidate",
+    "text": "Lots of people find that software tough. It's okay to be stuck. Show me where you're stuck.",
+    "startedAt": "2026-09-25T10:00:35Z",
+    "endedAt": "2026-09-25T10:00:43Z"
+  },
+  {
+    "turnId": "turn_05",
+    "speaker": "character",
+    "text": "So how do we finish this in ten days?",
+    "startedAt": "2026-09-25T10:00:49Z",
+    "endedAt": "2026-09-25T10:00:53Z"
+  },
+  {
+    "turnId": "turn_06",
+    "speaker": "candidate",
+    "text": "Let's pair you with Saule for two evenings, and split the film into three parts so you take the one you're most comfortable with.",
+    "startedAt": "2026-09-25T10:00:59Z",
+    "endedAt": "2026-09-25T10:01:11Z"
+  },
+  {
+    "turnId": "turn_07",
+    "speaker": "character",
+    "text": "Dias and Saule must be annoyed with me. What are we going to tell them?",
+    "startedAt": "2026-09-25T10:01:17Z",
+    "endedAt": "2026-09-25T10:01:23Z"
+  },
+  {
+    "turnId": "turn_08",
+    "speaker": "candidate",
+    "text": "We tell Dias and Saule the truth: you hit a wall and we have a plan. No blaming.",
+    "startedAt": "2026-09-25T10:01:29Z",
+    "endedAt": "2026-09-25T10:01:38Z"
+  },
+  {
+    "turnId": "turn_09",
+    "speaker": "character",
+    "text": "Okay. What exactly happens over the next ten days?",
+    "startedAt": "2026-09-25T10:01:44Z",
+    "endedAt": "2026-09-25T10:01:48Z"
+  },
+  {
+    "turnId": "turn_10",
+    "speaker": "candidate",
+    "text": "You and Saule edit part one by Sunday, I do the music, a rough cut by day six, and a short check-in every other evening.",
+    "startedAt": "2026-09-25T10:01:54Z",
+    "endedAt": "2026-09-25T10:02:06Z"
+  },
+  {
+    "turnId": "turn_11",
+    "speaker": "character",
+    "text": "The project file is corrupted. We lost two days of editing. I'm so sorry.",
+    "startedAt": "2026-09-25T10:02:12Z",
+    "endedAt": "2026-09-25T10:02:17Z"
+  },
+  {
+    "turnId": "turn_12",
+    "speaker": "candidate",
+    "text": "Okay, deep breath. We lost two days, not the film. We redo the most important scene first.",
+    "startedAt": "2026-09-25T10:02:23Z",
+    "endedAt": "2026-09-25T10:02:31Z"
+  }
+]

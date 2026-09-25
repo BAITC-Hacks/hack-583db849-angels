@@ -1,0 +1,100 @@
+[
+  {
+    "turnId": "turn_01",
+    "speaker": "character",
+    "text": "Hey. Yeah, sorry, I've been busy. The edit is going fine, don't worry.",
+    "startedAt": "2026-09-25T10:00:00Z",
+    "endedAt": "2026-09-25T10:00:05Z"
+  },
+  {
+    "turnId": "turn_02",
+    "speaker": "candidate",
+    "text": "Alright, great. Just send it when it's ready.",
+    "startedAt": "2026-09-25T10:00:11Z",
+    "endedAt": "2026-09-25T10:00:15Z"
+  },
+  {
+    "turnId": "turn_03",
+    "speaker": "character",
+    "text": "It's just... the software is more complicated than I thought. I'll figure it out.",
+    "startedAt": "2026-09-25T10:00:21Z",
+    "endedAt": "2026-09-25T10:00:26Z"
+  },
+  {
+    "turnId": "turn_04",
+    "speaker": "candidate",
+    "text": "Just watch a tutorial, it's not that hard. You said you could do it.",
+    "startedAt": "2026-09-25T10:00:32Z",
+    "endedAt": "2026-09-25T10:00:39Z"
+  },
+  {
+    "turnId": "turn_05",
+    "speaker": "character",
+    "text": "Maybe I should just leave. You'd be better off with someone who knows what they're doing.",
+    "startedAt": "2026-09-25T10:00:45Z",
+    "endedAt": "2026-09-25T10:00:51Z"
+  },
+  {
+    "turnId": "turn_06",
+    "speaker": "candidate",
+    "text": "If you want to leave, that's your choice. We'll manage.",
+    "startedAt": "2026-09-25T10:00:57Z",
+    "endedAt": "2026-09-25T10:01:02Z"
+  },
+  {
+    "turnId": "turn_07",
+    "speaker": "character",
+    "text": "So how do we finish this in ten days?",
+    "startedAt": "2026-09-25T10:01:08Z",
+    "endedAt": "2026-09-25T10:01:12Z"
+  },
+  {
+    "turnId": "turn_08",
+    "speaker": "candidate",
+    "text": "Let's just make it shorter and simpler. We'll submit whatever we have.",
+    "startedAt": "2026-09-25T10:01:18Z",
+    "endedAt": "2026-09-25T10:01:24Z"
+  },
+  {
+    "turnId": "turn_09",
+    "speaker": "character",
+    "text": "Dias and Saule must be annoyed with me. What are we going to tell them?",
+    "startedAt": "2026-09-25T10:01:30Z",
+    "endedAt": "2026-09-25T10:01:36Z"
+  },
+  {
+    "turnId": "turn_10",
+    "speaker": "candidate",
+    "text": "Let's not tell them anything. We'll pretend it was always the plan.",
+    "startedAt": "2026-09-25T10:01:42Z",
+    "endedAt": "2026-09-25T10:01:48Z"
+  },
+  {
+    "turnId": "turn_11",
+    "speaker": "character",
+    "text": "Okay. What exactly happens over the next ten days?",
+    "startedAt": "2026-09-25T10:01:54Z",
+    "endedAt": "2026-09-25T10:01:58Z"
+  },
+  {
+    "turnId": "turn_12",
+    "speaker": "candidate",
+    "text": "Let's just keep in touch. We'll get it done somehow.",
+    "startedAt": "2026-09-25T10:02:04Z",
+    "endedAt": "2026-09-25T10:02:09Z"
+  },
+  {
+    "turnId": "turn_13",
+    "speaker": "character",
+    "text": "The project file is corrupted. We lost two days of editing. I'm so sorry.",
+    "startedAt": "2026-09-25T10:02:15Z",
+    "endedAt": "2026-09-25T10:02:20Z"
+  },
+  {
+    "turnId": "turn_14",
+    "speaker": "candidate",
+    "text": "Then it's over. There's no point now.",
+    "startedAt": "2026-09-25T10:02:26Z",
+    "endedAt": "2026-09-25T10:02:30Z"
+  }
+]
