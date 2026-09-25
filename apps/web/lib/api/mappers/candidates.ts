@@ -1,4 +1,4 @@
-import type { CandidateProgress as ScreenProgress } from '../../demo/world';
+import type { CandidateProgress as ScreenProgress } from '../../home/types';
 import type { WireCandidate, WireCandidateProgress } from '../contract';
 import { codeFromLabel } from './evidence';
 
