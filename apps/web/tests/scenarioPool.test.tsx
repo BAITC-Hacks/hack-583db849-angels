@@ -1,8 +1,20 @@
 import { render, screen, within } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { ScenarioPoolLive } from '../components/scenarios/ScenarioPoolLive';
 import { ScenarioPool } from '../components/scenarios/ScenarioPool';
 import { navItems } from '../lib/navigation';
-import { previewScenarioPool } from '../lib/scenarios/preview';
+import type { ScenarioSummary } from '../lib/scenarios/types';
+import { apiError, example, json, mockApi, withQuery } from './apiHarness';
+
+/** Today's pool: the first scenario is ready, the nine stories in docs/scenarios are still drafts. */
+const drafts = ['resource-crisis', 'ethical-dilemma', 'project-failure', 'new-idea-resistance', 'sponsor-pulls-out',
+  'silent-teammate', 'deadline-or-quality', 'public-mistake', 'too-many-volunteers'];
+const previewScenarioPool: ScenarioSummary[] = [
+  ...example<ScenarioSummary[]>('scenarios.json'),
+  ...drafts.map((scenarioId) => ({ scenarioId, title: scenarioId, status: 'draft' as const, competencies: [], assignedCount: 0 })),
+];
+
+afterEach(() => vi.unstubAllGlobals());
 
 vi.mock('next/navigation', () => ({ useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }), usePathname: () => '/' }));
 
@@ -36,6 +48,21 @@ describe('the scenario pool', () => {
     const { container } = render(<ScenarioPool scenarios={previewScenarioPool} />);
     // The story, the hidden motive and the branches stay inside the ML service.
     expect(container.textContent).not.toMatch(/hidden|motive|beat|branch/i);
+  });
+});
+
+describe('the pool on the API', () => {
+  it('reads GET /v1/scenarios and shows it', async () => {
+    mockApi({ 'GET /api/v1/scenarios': () => json(previewScenarioPool) });
+    withQuery(<ScenarioPoolLive />);
+    expect(await screen.findByText('A teammate is about to walk away')).toBeTruthy();
+    expect(screen.getByText('1 / 10')).toBeTruthy();
+  });
+
+  it('says so when the pool cannot be read', async () => {
+    mockApi({ 'GET /api/v1/scenarios': () => apiError(403, 'FORBIDDEN') });
+    withQuery(<ScenarioPoolLive />);
+    expect(await screen.findByRole('alert')).toBeTruthy();
   });
 });
 
