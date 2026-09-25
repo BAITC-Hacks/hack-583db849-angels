@@ -6,7 +6,7 @@ describe('CandidateAiService', () => {
     const brief = jest.fn().mockResolvedValue({});
     const service = new CandidateAiService(new ToLlmViewService(), {
       brief, scenarios: jest.fn(), simulationTurn: jest.fn(), transcribeTurn: jest.fn(), speech: jest.fn(),
-      simulationAssessment: jest.fn(), surpriseQuestion: jest.fn(), transcribeSurprise: jest.fn(),
+      simulationAssessment: jest.fn(), surpriseQuestion: jest.fn(), transcribeSurprise: jest.fn(), qualityCheck: jest.fn(),
     });
     await service.brief('candidate-id', {
       externalId: 'external-id',
@@ -26,7 +26,7 @@ describe('CandidateAiService', () => {
     const surpriseQuestion = jest.fn().mockResolvedValue({ question: 'Q?', competency: 'D', why: 'Because.' });
     const service = new CandidateAiService(new ToLlmViewService(), {
       brief: jest.fn(), scenarios: jest.fn(), simulationTurn: jest.fn(), transcribeTurn: jest.fn(), speech: jest.fn(),
-      simulationAssessment: jest.fn(), surpriseQuestion, transcribeSurprise: jest.fn(),
+      simulationAssessment: jest.fn(), surpriseQuestion, transcribeSurprise: jest.fn(), qualityCheck: jest.fn(),
     });
     await service.surpriseQuestion('candidate-id', {
       externalId: 'external-id',

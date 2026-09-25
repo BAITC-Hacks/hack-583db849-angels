@@ -7,7 +7,7 @@ import { SeedPending } from '../../../components/home/SeedPending';
 import { StatusPill } from '../../../components/home/StatusPill';
 import { useHomeProgress } from '../../../lib/home/useHomeProgress';
 import { ApiUnavailable } from '../../../components/home/ApiUnavailable';
-import { previewCalibrationCheck, previewInterviewCheck } from '../../../lib/quality/preview';
+import { latestChecks, useQualityChecks } from '../../../lib/quality/queries';
 import { useStaffLocale } from '../../../lib/i18n/StaffLocaleProvider';
 
 const copy = {
@@ -59,15 +59,18 @@ export default function CommissionHome() {
   const a = candidates.A;
   const all = Object.values(candidates);
 
-  // The two checks the quality guard runs on candidate A's interview and on
-  // that interviewer's month; both are scripted until #18.
-  const qualitySignals = previewInterviewCheck.signals.length + previewCalibrationCheck.signals.length;
+  // The signals in the newest interview check and the newest calibration, from the API.
+  const quality = useQualityChecks();
+  const latest = latestChecks(quality.data);
+  const qualitySignals = quality.isSuccess
+    ? String((latest.interview?.signals.length ?? 0) + (latest.calibration?.signals.length ?? 0))
+    : '—';
 
   const tiles = [
     { label: text.tiles.simulations, value: `${all.filter((c) => c.simulation === 'completed').length} / 3` },
     { label: text.tiles.reports, value: `${all.filter((c) => c.assessmentReady).length} / 3` },
     { label: text.tiles.interviews, value: `${all.filter((c) => c.scoresSaved).length} / 3` },
-    { label: text.tiles.quality, value: String(qualitySignals), note: text.qualityNote, href: '/commission/quality-guard' },
+    { label: text.tiles.quality, value: qualitySignals, note: text.qualityNote, href: '/commission/quality-guard' },
   ];
 
   return (
