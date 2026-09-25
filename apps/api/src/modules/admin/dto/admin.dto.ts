@@ -5,7 +5,7 @@ import { IsInt, IsOptional, Max, Min } from 'class-validator';
 export const AUDIT_ACTIONS = [
   'candidate.created', 'brief.ready', 'simulation.started', 'simulation.completed', 'simulation.stopped',
   'assessment.ready', 'interview.created', 'recording.uploaded', 'transcript.ready', 'scores.saved',
-  'draft.created', 'surprise.started', 'surprise.answered', 'surprise.video.viewed', 'demo.reset',
+  'draft.created', 'surprise.started', 'surprise.answered', 'surprise.video.viewed', 'surprise.video.deleted', 'demo.reset',
 ] as const;
 export type AuditAction = (typeof AUDIT_ACTIONS)[number];
 
