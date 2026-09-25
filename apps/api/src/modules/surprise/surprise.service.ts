@@ -71,6 +71,7 @@ export class SurpriseService {
       data: { status: 'started', startedAt, answerDeadline },
     });
     if (count === 0) throw new ConflictException({ code: 'ALREADY_STARTED', message: 'The question was already opened. There is one attempt.' });
+    await this.audit.record({ action: 'surprise.started', targetType: 'surprise_question', targetId: surpriseId, candidateId: row.candidateId, actorRole: role });
     return this.toDto({ ...row, status: 'started', startedAt, answerDeadline }, role);
   }
 
@@ -137,6 +138,7 @@ export class SurpriseService {
         where: { id: surpriseId },
         data: { status: 'answered', segments: segments as unknown as Prisma.InputJsonValue },
       });
+      await this.audit.record({ action: 'surprise.answered', targetType: 'surprise_question', targetId: surpriseId, candidateId });
       // A new brief, so its quotes can cite the answer. It never throws.
       await this.briefs.startFor(candidateId);
     } catch (error) {

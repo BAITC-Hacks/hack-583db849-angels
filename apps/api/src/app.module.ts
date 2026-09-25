@@ -17,10 +17,12 @@ import { SimulationsModule } from './modules/simulations/simulations.module';
 import { ScenariosModule } from './modules/scenarios/scenarios.module';
 import { SurpriseModule } from './modules/surprise/surprise.module';
 import { ConsistencyModule } from './modules/consistency/consistency.module';
+import { AdminModule } from './modules/admin/admin.module';
+import { DemoModule } from './modules/demo/demo.module';
 import { ApiExceptionFilter } from './api-exception.filter';
 
 @Module({
-  imports: [AuthModule, DatabaseModule, IdempotencyModule, PrivacyModule, AiClientModule, AuditModule, CandidatesModule, ScenariosModule, BriefsModule, SimulationsModule, SimulationAssessmentsModule, InterviewsModule, QualityGuardModule, SurpriseModule, ConsistencyModule],
+  imports: [AuthModule, DatabaseModule, IdempotencyModule, PrivacyModule, AiClientModule, AuditModule, CandidatesModule, ScenariosModule, BriefsModule, SimulationsModule, SimulationAssessmentsModule, InterviewsModule, QualityGuardModule, SurpriseModule, ConsistencyModule, AdminModule, DemoModule],
   controllers: [HealthController],
   providers: [{ provide: APP_FILTER, useClass: ApiExceptionFilter }],
 })

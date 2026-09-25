@@ -1,4 +1,5 @@
 import { ConflictException, HttpException, HttpStatus, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Prisma } from '@prisma/client';
 
 import { AI_GATEWAY, AiGateway } from '../../ai-client/ai-gateway.port';
@@ -6,13 +7,14 @@ import type { components } from '../../ai-client/schema';
 import { BriefsService } from '../briefs/briefs.service';
 import { PrismaService } from '../../database/prisma.service';
 import { ToLlmViewService } from '../../privacy/to-llm-view.service';
+import { readSeed, seedLetter } from '../../seed-files';
 import { AuditService } from '../audit/audit.service';
 import { CandidateFeedbackDto, SimulationAssessmentDto } from './dto/simulation-assessment.dto';
 
 const turnsInOrder = { orderBy: { sequence: 'asc' } } as const;
 const simulationInclude = {
   turns: turnsInOrder,
-  candidate: { select: { profile: true } },
+  candidate: { select: { profile: true, externalId: true } },
 } as const satisfies Prisma.SimulationInclude;
 const assessmentInclude = {
   candidate: { select: { label: true } },
@@ -33,6 +35,7 @@ export class SimulationAssessmentsService {
     private readonly privacy: ToLlmViewService,
     private readonly audit: AuditService,
     private readonly briefs: BriefsService,
+    private readonly config: ConfigService,
   ) {}
 
   async startAutomatically(simulationId: string): Promise<void> {
@@ -165,7 +168,7 @@ export class SimulationAssessmentsService {
       endedAt: (turn.endedAt ?? turn.createdAt).toISOString(),
     }));
     try {
-      const result = await this.gateway.simulationAssessment({
+      const result = await this.recordedResult(simulation) ?? await this.gateway.simulationAssessment({
         candidateId: simulation.candidateId,
         scenarioId: simulation.scenarioId,
         mode: simulation.mode,
@@ -224,6 +227,20 @@ export class SimulationAssessmentsService {
       throw new HttpException({ code: 'INTERNAL_ERROR', message: 'The simulation scenario is unavailable.' }, 500);
     }
     return { title: scenario.title, character: { name: (character as Record<string, string>).name } };
+  }
+
+  /**
+   * In `DEMO_MODE` the recorded session of A, B or C — exactly the seed's
+   * turns — gets the seed's assessment, with no model call: its quotes are
+   * that transcript's. A session played live is assessed by ML as usual.
+   */
+  private async recordedResult(simulation: SimulationForAssessment): Promise<AssessmentResult | null> {
+    const letter = seedLetter(simulation.candidate.externalId);
+    if (!letter || this.config.get<string>('DEMO_MODE') !== 'true') return null;
+    const recorded = await readSeed<{ speaker: string; text: string }[]>('candidates', letter, 'transcript.json');
+    const same = recorded.length === simulation.turns.length &&
+      recorded.every((turn, index) => turn.speaker === simulation.turns[index].speaker && turn.text === simulation.turns[index].text);
+    return same ? readSeed<AssessmentResult>('candidates', letter, 'expected-assessment.json') : null;
   }
 
   private turnId(sequence: number): string { return `turn_${String(sequence).padStart(2, '0')}`; }
