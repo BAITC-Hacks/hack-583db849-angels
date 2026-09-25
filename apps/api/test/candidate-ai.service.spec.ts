@@ -1,13 +1,20 @@
 import { CandidateAiService } from '../src/ai-client/candidate-ai.service';
+import { AiGateway } from '../src/ai-client/ai-gateway.port';
 import { ToLlmViewService } from '../src/privacy/to-llm-view.service';
+
+/** Every gateway method as a mock; a test overrides the one it watches. */
+function gateway(overrides: Partial<Record<keyof AiGateway, jest.Mock>>): AiGateway {
+  const methods: (keyof AiGateway)[] = [
+    'brief', 'scenarios', 'simulationTurn', 'simulationAssessment', 'transcribeTurn', 'speech',
+    'surpriseQuestion', 'transcribeSurprise', 'qualityCheck', 'transcribeInterview', 'interviewDraft',
+  ];
+  return { ...Object.fromEntries(methods.map((method) => [method, jest.fn()])), ...overrides } as unknown as AiGateway;
+}
 
 describe('CandidateAiService', () => {
   it('sends only the LLM view to the gateway port', async () => {
     const brief = jest.fn().mockResolvedValue({});
-    const service = new CandidateAiService(new ToLlmViewService(), {
-      brief, scenarios: jest.fn(), simulationTurn: jest.fn(), transcribeTurn: jest.fn(), speech: jest.fn(),
-      simulationAssessment: jest.fn(), surpriseQuestion: jest.fn(), transcribeSurprise: jest.fn(), qualityCheck: jest.fn(),
-    });
+    const service = new CandidateAiService(new ToLlmViewService(), gateway({ brief }));
     await service.brief('candidate-id', {
       externalId: 'external-id',
       profile: { fullName: 'Ada Example', email: 'ada@example.test' },
@@ -24,10 +31,7 @@ describe('CandidateAiService', () => {
 
   it('writes the surprise question from the LLM view only', async () => {
     const surpriseQuestion = jest.fn().mockResolvedValue({ question: 'Q?', competency: 'D', why: 'Because.' });
-    const service = new CandidateAiService(new ToLlmViewService(), {
-      brief: jest.fn(), scenarios: jest.fn(), simulationTurn: jest.fn(), transcribeTurn: jest.fn(), speech: jest.fn(),
-      simulationAssessment: jest.fn(), surpriseQuestion, transcribeSurprise: jest.fn(), qualityCheck: jest.fn(),
-    });
+    const service = new CandidateAiService(new ToLlmViewService(), gateway({ surpriseQuestion }));
     await service.surpriseQuestion('candidate-id', {
       externalId: 'external-id',
       profile: { fullName: 'Ada Example', email: 'ada@example.test' },

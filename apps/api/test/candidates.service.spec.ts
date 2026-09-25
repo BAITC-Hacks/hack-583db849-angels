@@ -14,6 +14,7 @@ describe('CandidatesService', () => {
     simulations: [{ id: 'simulation-id', status: 'active', ending: null }],
     assessments: [],
     briefs: [],
+    interviews: [],
   };
   const briefs = { startFor: jest.fn().mockResolvedValue(undefined) };
 
@@ -108,6 +109,16 @@ describe('CandidatesService', () => {
       expect((await service.progress(row.id, role))?.accommodation).toEqual({ textMode: true, reason: 'No microphone at home' });
     }
     expect((await service.progress(row.id, 'platform'))?.accommodation).toBeNull();
+  });
+
+  it('shows staff where the interview is, and the candidate channel nothing of it', async () => {
+    const interviewed = { ...row, interviews: [{ id: 'interview-id', transcriptStatus: 'ready', interviewerScore: { id: 'scores-id' }, drafts: [] }] };
+    const prisma = { candidate: { findUnique: jest.fn().mockResolvedValue(interviewed) } };
+    const service = new CandidatesService(prisma as never, briefs as never);
+    expect((await service.progress(row.id, 'interviewer'))?.interview).toEqual({
+      interviewId: 'interview-id', transcriptStatus: 'ready', scoresSaved: true, draftReady: false,
+    });
+    expect((await service.progress(row.id, 'platform'))?.interview).toBeNull();
   });
 
   it('shows every role where the surprise question is, and an unanswered one as expired after its deadline', async () => {

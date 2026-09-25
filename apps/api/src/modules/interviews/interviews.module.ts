@@ -1,3 +1,9 @@
 import { Module } from '@nestjs/common';
-@Module({})
+import { ConfigModule } from '@nestjs/config';
+
+import { InterviewAudioService } from './interview-audio.service';
+import { InterviewsController } from './interviews.controller';
+import { InterviewsService } from './interviews.service';
+
+@Module({ imports: [ConfigModule], controllers: [InterviewsController], providers: [InterviewAudioService, InterviewsService] })
 export class InterviewsModule {}

@@ -36,7 +36,7 @@ export function ConsistencyGate({ children }: { children: ReactNode }) {
       <h1 className="text-xl font-bold text-text-primary">{text.title}</h1>
       <p className="max-w-xl text-sm text-text-secondary">{text.body}</p>
       <Link
-        href="/interviewer/interview/preview"
+        href="/interviewer/interview"
         className="mt-2 rounded-control border border-border-strong px-4 py-2.5 text-sm font-semibold text-text-primary transition-colors hover:bg-bg-elevated"
       >
         {text.action}

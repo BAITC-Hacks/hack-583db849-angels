@@ -105,10 +105,14 @@ model Assessment {
   candidate    Candidate  @relation(fields: [candidateId], references: [id], onDelete: Cascade)
 }
 
+/// M4: one interview. The transcript arrives from inVision's platform or from a recording made on the
+/// interviewer's screen, which is transcribed and then deleted. `interviewerRef` is a pseudonym, never a name.
 model Interview {
   id               String             @id @default(uuid()) @db.Uuid
   candidateId      String             @db.Uuid
+  interviewerRef   String?
   heldAt           DateTime
+  transcriptStatus String             @default("none") // none | transcribing | ready | failed
   transcript       Json?
   transcriptSource String?
   notes            Json?
@@ -116,7 +120,23 @@ model Interview {
   updatedAt        DateTime           @updatedAt
   candidate        Candidate          @relation(fields: [candidateId], references: [id], onDelete: Cascade)
   interviewerScore InterviewerScore?
+  drafts           InterviewDraft[]
   qualityChecks    QualityCheck[]
+
+  @@index([candidateId, createdAt])
+}
+
+/// M4: the AI draft, made by the API itself once the transcript exists and the interviewer's scores are
+/// saved. It never saw those scores. `result` is ML's DraftResult, stored as returned.
+model InterviewDraft {
+  id          String    @id @default(uuid()) @db.Uuid
+  interviewId String    @db.Uuid
+  status      String    @default("pending") // pending | ready | failed
+  result      Json?
+  createdAt   DateTime  @default(now())
+  interview   Interview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+
+  @@index([interviewId, createdAt])
 }
 
 model InterviewerScore {

@@ -3,7 +3,6 @@
 import { CheckCircleIcon } from '@heroicons/react/24/outline';
 import { competencies, competencyOrder } from '../../lib/drive';
 import { useStaffLocale } from '../../lib/i18n/StaffLocaleProvider';
-import { sampleScores } from '../../lib/interview/preview';
 import type { Interview } from '../../lib/interview/useInterview';
 import { Button } from '../ui/Button';
 import { DraftComparison } from './DraftComparison';
@@ -13,8 +12,6 @@ import { ScoreInput } from './ScoreInput';
 
 const copy = {
   en: {
-    preview: 'Preview · a scripted draft — the real one arrives with M4',
-    fill: 'Fill sample scores',
     eyebrow: 'Interview',
     candidate: 'Candidate',
     held: 'Held',
@@ -28,10 +25,10 @@ const copy = {
     draftLede: 'Written from the interview transcript. It proposes; you and the commission decide.',
     loading: 'Loading the draft…',
     waiting: 'Your scores are saved. The draft is written as soon as the interview transcript is ready.',
+    slow: 'The draft is taking longer than usual.',
+    redo: 'Make the draft again',
   },
   ru: {
-    preview: 'Превью · заготовленный черновик — настоящий появится в M4',
-    fill: 'Заполнить примером',
     eyebrow: 'Интервью',
     candidate: 'Кандидат',
     held: 'Проведено',
@@ -45,6 +42,8 @@ const copy = {
     draftLede: 'Написан по расшифровке интервью. Он предлагает — решаете вы и комиссия.',
     loading: 'Загружаем черновик…',
     waiting: 'Баллы сохранены. Черновик появится, как только будет готова расшифровка интервью.',
+    slow: 'Черновик готовится дольше обычного.',
+    redo: 'Сделать черновик заново',
   },
 };
 
@@ -56,7 +55,7 @@ const copy = {
 export function InterviewScreen({ state }: { state: Interview }) {
   const { locale } = useStaffLocale();
   const text = copy[locale];
-  const { interview, phase, scores, complete, draft, error, preview, transcript, transcriptState, waitingForTranscript } = state;
+  const { interview, phase, scores, complete, draft, error, transcript, transcriptState, waitingForTranscript, draftSlow } = state;
   const done = competencyOrder.filter((competency) => scores[competency] !== undefined).length;
   const held = new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short', timeZone: 'UTC' }).format(
     new Date(interview.heldAt),
@@ -64,21 +63,6 @@ export function InterviewScreen({ state }: { state: Interview }) {
 
   return (
     <>
-      {preview ? (
-        <div className="flex flex-wrap items-center justify-center gap-3 border-b border-border-subtle bg-bg-elevated px-5 py-1.5">
-          <p className="font-mono text-[0.6rem] tracking-[0.12em] text-text-muted uppercase">{text.preview}</p>
-          {phase === 'scoring' ? (
-            <button
-              type="button"
-              onClick={() => state.fill(sampleScores)}
-              className="font-mono text-[0.6rem] tracking-[0.12em] text-brand-ink uppercase underline-offset-2 hover:underline"
-            >
-              {text.fill}
-            </button>
-          ) : null}
-        </div>
-      ) : null}
-
       <main className="mx-auto flex max-w-7xl flex-col gap-6 px-5 py-8">
         <header className="flex flex-col gap-2">
           <p className="font-mono text-[0.62rem] tracking-[0.14em] text-text-muted uppercase">{text.eyebrow}</p>
@@ -161,7 +145,20 @@ export function InterviewScreen({ state }: { state: Interview }) {
                   {text.waiting}
                 </p>
               ) : (
-                <p className="text-sm text-text-muted">{text.loading}</p>
+                <div className="flex flex-col gap-2">
+                  <p className="text-sm text-text-muted" aria-live="polite">
+                    {draftSlow ? text.slow : text.loading}
+                  </p>
+                  {draftSlow ? (
+                    <button
+                      type="button"
+                      onClick={state.redoDraft}
+                      className="w-fit rounded-control border border-border-strong px-3 py-2 text-sm font-semibold text-text-primary hover:bg-bg-elevated"
+                    >
+                      {text.redo}
+                    </button>
+                  ) : null}
+                </div>
               )}
             </section>
           </div>
@@ -170,8 +167,9 @@ export function InterviewScreen({ state }: { state: Interview }) {
             <InterviewTranscript
               transcript={transcript}
               state={transcriptState}
-              onRecorded={() => void state.transcribe()}
-              preview={preview}
+              onRecorded={state.upload}
+              uploading={state.uploading}
+              uploadError={state.uploadError}
             />
           </div>
         </div>

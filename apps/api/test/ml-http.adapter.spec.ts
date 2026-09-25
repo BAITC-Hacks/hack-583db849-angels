@@ -53,6 +53,22 @@ describe('MlHttpAdapter', () => {
     });
   });
 
+  it('asks for a two-speaker interview transcription, and posts the draft request as it is', async () => {
+    const fetchImplementation = jest.fn()
+      .mockResolvedValueOnce(new Response(JSON.stringify({ turns: [], durationSec: 0 }), { status: 200, headers: { 'Content-Type': 'application/json' } }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ scores: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+    const adapter = new MlHttpAdapter(config, fetchImplementation);
+    await adapter.transcribeInterview('interviews/id/recording.webm');
+    const draft = { candidateId: 'candidate-id', transcript: [], notes: [] };
+    await adapter.interviewDraft(draft);
+
+    const [transcribe] = fetchImplementation.mock.calls[0] as [Request];
+    await expect(transcribe.clone().json()).resolves.toEqual({ purpose: 'interview', speakers: 2, audioRef: 'interviews/id/recording.webm', language: 'en' });
+    const [drafted] = fetchImplementation.mock.calls[1] as [Request];
+    expect(new URL(drafted.url).pathname).toBe('/internal/v1/interview/draft');
+    await expect(drafted.clone().json()).resolves.toEqual(draft);
+  });
+
   it('posts a quality check to ML as it is', async () => {
     const result = { signals: [], talkShare: null, drift: [], interviews: 3 };
     const fetchImplementation = jest.fn().mockResolvedValue(new Response(JSON.stringify(result), {

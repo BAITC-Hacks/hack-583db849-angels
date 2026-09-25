@@ -1,11 +1,10 @@
-'use client';
+import type { Metadata } from 'next';
+import { InterviewLoader } from '../../../../../components/interview/InterviewLoader';
 
-import { useParams } from 'next/navigation';
-import { InterviewScreen } from '../../../../../components/interview/InterviewScreen';
-import { useInterview } from '../../../../../lib/interview/useInterview';
+export const metadata: Metadata = { title: 'Interview — AI Leader ID' };
 
-/** M4 for the interviewer: their own scores first, then the draft and the differences. */
-export default function InterviewPage() {
-  const { interviewId } = useParams<{ interviewId: string }>();
-  return <InterviewScreen state={useInterview(interviewId)} />;
+/** M4 for the interviewer, from the API: their own scores first, then the draft and the differences. */
+export default async function InterviewPage({ params }: { params: Promise<{ interviewId: string }> }) {
+  const { interviewId } = await params;
+  return <InterviewLoader interviewId={interviewId} />;
 }
