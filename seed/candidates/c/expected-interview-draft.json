@@ -1,0 +1,51 @@
+{
+  "scores": [
+    {
+      "competency": "D",
+      "score": 1,
+      "confidence": "low",
+      "rationale": "The cited candidate response says: \"I think we just kept going.\"",
+      "evidence": [
+        {
+          "source": "interview_turn",
+          "sourceId": "iturn_08",
+          "quote": "I think we just kept going."
+        }
+      ]
+    },
+    {
+      "competency": "R",
+      "score": null,
+      "confidence": null,
+      "rationale": null,
+      "evidence": []
+    },
+    {
+      "competency": "I",
+      "score": null,
+      "confidence": null,
+      "rationale": null,
+      "evidence": []
+    },
+    {
+      "competency": "V",
+      "score": null,
+      "confidence": null,
+      "rationale": null,
+      "evidence": []
+    },
+    {
+      "competency": "E",
+      "score": 0,
+      "confidence": "low",
+      "rationale": "The cited candidate response says: \"I let the team decide.\"",
+      "evidence": [
+        {
+          "source": "interview_turn",
+          "sourceId": "iturn_02",
+          "quote": "I let the team decide."
+        }
+      ]
+    }
+  ]
+}

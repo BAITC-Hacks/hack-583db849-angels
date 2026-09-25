@@ -187,7 +187,7 @@ def assessment(candidate: str, turns: list[dict]) -> dict:
         ]
         feedback = {
             "strengths": ["You connected today's conflict to a longer-term review practice."],
-            "growth": ["When a run fails, protect the team's energy while choosing what to fix."],
+            "growth": ["When a run breaks down, protect the team's energy while choosing what to fix."],
             "nextTime": ["Name a recovery checkpoint before extending anyone's work."],
         }
     else:
