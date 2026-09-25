@@ -27,15 +27,20 @@ export class ApiError extends Error {
 /** The browser could not reach our own server, so there is no code to branch on. */
 export const NETWORK_ERROR = 'NETWORK_ERROR';
 
+/** The body is whatever the API sent — the client has usually parsed it already. */
+export function toApiError(status: number, body: unknown): ApiError {
+  const error = (body as Partial<ApiErrorBody> | null)?.error;
+  if (error?.code) return new ApiError(status, error.code, error.traceId, error.details);
+  return new ApiError(status, codeForStatus(status));
+}
+
 export async function readApiError(response: Response): Promise<ApiError> {
   try {
-    const body = (await response.json()) as Partial<ApiErrorBody>;
-    const error = body.error;
-    if (error?.code) return new ApiError(response.status, error.code, error.traceId, error.details);
+    return toApiError(response.status, await response.json());
   } catch {
-    // An empty or non-JSON body is still an error; fall through to the status.
+    // An empty or non-JSON body is still an error; the status alone names it.
+    return new ApiError(response.status, codeForStatus(response.status));
   }
-  return new ApiError(response.status, codeForStatus(response.status));
 }
 
 function codeForStatus(status: number): string {
