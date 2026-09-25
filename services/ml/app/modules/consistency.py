@@ -352,20 +352,26 @@ def _ground_after(
             raise ValueError("model proposed an unsupported English metric")
         original = originals.get(item.itemId)
         if original is None:
-            if not any(e.source == "application_field" for e in claim_evidence) or not any(
-                e.source == "interview_turn"
-                and len(re.findall(r"\b[\w']+\b", e.quote)) >= 6
-                for e in observation_evidence
-            ):
+            application_quote = next(
+                (e for e in claim_evidence if e.source == "application_field"), None,
+            )
+            interview_quote = next(
+                (
+                    e for e in observation_evidence
+                    if e.source == "interview_turn"
+                    and len(re.findall(r"\b[\w']+\b", e.quote)) >= 6
+                ), None,
+            )
+            if application_quote is None or interview_quote is None:
                 # An appended finding needs a sourced application claim and candidate reply.
                 continue
             observation = Observation(
-                text=f"The candidate said in the interview: {observation_evidence[0].quote}",
+                text=f"The candidate said in the interview: {interview_quote.quote}",
                 evidence=observation_evidence, metric=None,
             )
             grounded.append(item.model_copy(update={
                 "claim": Claim(
-                    text=f"The application response says: {claim_evidence[0].quote}",
+                    text=f"The application response says: {application_quote.quote}",
                     evidence=claim_evidence,
                 ),
                 "observation": observation,
@@ -386,9 +392,11 @@ def _ground_after(
                 )
             observation = Observation(text=observation_text, evidence=[], metric=metric)
             status = item.status
-        elif observation_evidence and any(e.source == "interview_turn" for e in observation_evidence):
+        elif interview_quote := next(
+            (e for e in observation_evidence if e.source == "interview_turn"), None,
+        ):
             observation = Observation(
-                text=f"The candidate said in the interview: {observation_evidence[0].quote}",
+                text=f"The candidate said in the interview: {interview_quote.quote}",
                 evidence=observation_evidence, metric=None,
             )
             status = item.status

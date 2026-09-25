@@ -11,7 +11,9 @@ from services.ml.app.errors import ServiceError
 from services.ml.app.modules.consistency import (
     ConsistencyGenerator, ConsistencyService, reconcile_after_items,
 )
-from services.ml.app.schemas.contracts import BriefResult, ConsistencyRequest, ConsistencyResult
+from services.ml.app.schemas.contracts import (
+    BriefResult, ConsistencyRequest, ConsistencyResult, Evidence,
+)
 
 
 EXAMPLES = Path(__file__).resolve().parents[3] / "docs/contracts/examples/candidate-a/ml"
@@ -256,6 +258,45 @@ def test_grounded_appended_item_gets_next_id() -> None:
     assert result.items[-1].claim.evidence[0].source == "application_field"
     assert result.items[-1].observation.evidence[0].source == "interview_turn"
     assert result.items[-1].askInInterview is None
+
+
+def test_existing_observation_names_the_interview_quote_not_the_first_quote() -> None:
+    request, proposed = example()
+    interview_quote = proposed.items[1].observation.evidence[0].quote
+    proposed.items[1].observation.evidence.insert(0, Evidence(
+        source="simulation_turn", sourceId="turn_02", quote="Okay, let's fix this fast.",
+    ))
+    service, _ = _service(proposed)
+
+    result = asyncio.run(service.prepare(request))
+
+    assert result.items[1].observation.text == (
+        f"The candidate said in the interview: {interview_quote}"
+    )
+
+
+def test_new_item_names_application_and_interview_quotes_in_mixed_evidence() -> None:
+    request, proposed = example()
+    new = proposed.items[1].model_copy(deep=True)
+    new.itemId = "model-selected-id"
+    application_quote = new.claim.evidence[0].quote
+    interview_quote = new.observation.evidence[0].quote
+    new.claim.evidence.insert(0, Evidence(
+        source="test_item", sourceId="block_03",
+        quote="I prefer to decide quickly and explain my reasons later.",
+    ))
+    new.observation.evidence.insert(0, Evidence(
+        source="simulation_turn", sourceId="turn_02", quote="Okay, let's fix this fast.",
+    ))
+    proposed.items.append(new)
+    service, _ = _service(proposed)
+
+    result = asyncio.run(service.prepare(request))
+
+    assert result.items[-1].claim.text == f"The application response says: {application_quote}"
+    assert result.items[-1].observation.text == (
+        f"The candidate said in the interview: {interview_quote}"
+    )
 
 
 def test_exactly_half_bad_quotes_does_not_trigger_retry() -> None:
