@@ -1010,6 +1010,13 @@
             "type": "array",
             "title": "Interviewtranscript",
             "default": []
+          },
+          "beforeItems": {
+            "items": {
+              "$ref": "#/components/schemas/ConsistencyItem"
+            },
+            "type": "array",
+            "title": "Beforeitems"
           }
         },
         "additionalProperties": false,
