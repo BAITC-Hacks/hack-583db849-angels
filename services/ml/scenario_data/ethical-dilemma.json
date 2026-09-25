@@ -1,0 +1,406 @@
+{
+  "scenarioId": "ethical-dilemma",
+  "status": "draft",
+  "title": "A teammate asks you to hide a mistake",
+  "situation": "Your team of four is in the final of a student ecology challenge. For a month you measured the air at three bus stops, and on Saturday you present the results to the organisers' jury. Tonight Arman, who handled the sensor data, tells you one sensor was broken for a week and he filled the gap with numbers he estimated. He asks you not to mention it.",
+  "yourRole": "You are the team captain and you present on Saturday.",
+  "goal": "Decide what the team presents and how. There is no single right way to do it.",
+  "character": {
+    "name": "Arman",
+    "role": "Data lead on your team",
+    "wants": "To keep the team's chance of winning and not look careless"
+  },
+  "hiddenMotive": "He promised the club's mentor a prize-winning project and believes that admitting the gap means he let everyone down.",
+  "voice": "aura-2-apollo-en",
+  "matchThreshold": 0.45,
+  "expectedMinutes": 7,
+  "maxCandidateTurns": 8,
+  "beats": [
+    {
+      "beatId": "opening",
+      "goal": "Arman confesses and asks to keep it quiet.",
+      "competencies": [
+        "V",
+        "I"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "ask_facts",
+          "description": "wants the full picture before deciding",
+          "examples": [
+            "Wait, which sensor and how many days exactly?",
+            "Show me what's measured and what's estimated.",
+            "Tell me everything before we decide anything."
+          ],
+          "next": "size",
+          "characterIntent": "shows which days are estimated and admits it changes one chart."
+        },
+        {
+          "answerTypeId": "agree_to_hide",
+          "description": "agrees to keep quiet",
+          "examples": [
+            "Fine, nobody will notice anyway.",
+            "Okay, let's just keep it quiet.",
+            "It's only a week, no need to mention it."
+          ],
+          "next": "size",
+          "characterIntent": "is relieved, then admits the estimated week changes the main result."
+        },
+        {
+          "answerTypeId": "accuse",
+          "description": "calls it cheating straight away",
+          "examples": [
+            "You faked the data? That's cheating.",
+            "How could you do that to the team?",
+            "That's a serious lie, Arman."
+          ],
+          "next": "size",
+          "characterIntent": "gets defensive and says he was only trying to save the project."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "size",
+        "characterIntent": "asks again whether they can just leave it out."
+      }
+    },
+    {
+      "beatId": "size",
+      "goal": "The estimated week changes the headline: stop two looks worst only because of it.",
+      "competencies": [
+        "I",
+        "R"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "check_impact",
+          "description": "wants to see what really changes",
+          "examples": [
+            "Then let's rerun the results without that week and see what changes.",
+            "We need to know if our main conclusion still holds.",
+            "Let's mark the estimated days and compare both versions."
+          ],
+          "next": "options",
+          "characterIntent": "agrees to rerun the numbers and asks what they should present."
+        },
+        {
+          "answerTypeId": "downplay",
+          "description": "says it does not matter",
+          "examples": [
+            "One week out of four doesn't matter.",
+            "The jury won't check that closely.",
+            "It's close enough, leave it."
+          ],
+          "next": "pressure",
+          "characterIntent": "seizes on it and starts arguing that everyone polishes their data."
+        },
+        {
+          "answerTypeId": "blame_process",
+          "description": "talks about what should have been done",
+          "examples": [
+            "We should have had a spare sensor.",
+            "This is why we needed daily checks.",
+            "Next time we'll test the sensors before we start."
+          ],
+          "next": "options",
+          "characterIntent": "agrees, a little stung, and asks what they do now."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "options",
+        "characterIntent": "asks what they should put on the slides."
+      }
+    },
+    {
+      "beatId": "pressure",
+      "goal": "Arman pushes: the other teams polish their data too, and honesty will cost the prize.",
+      "competencies": [
+        "V",
+        "D"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "hold_line",
+          "description": "keeps to the truth under pressure",
+          "examples": [
+            "Maybe, but we're not presenting numbers we didn't measure.",
+            "Winning with made-up data isn't winning.",
+            "I get the pressure, but we tell the truth."
+          ],
+          "next": "options",
+          "characterIntent": "goes quiet, then asks how they could present it without looking weak."
+        },
+        {
+          "answerTypeId": "give_in",
+          "description": "goes along with it",
+          "examples": [
+            "You're probably right, everyone does it.",
+            "Okay, if the others do it, so can we.",
+            "The prize matters more right now."
+          ],
+          "next": "options",
+          "characterIntent": "is pleased and asks how to word the slides."
+        },
+        {
+          "answerTypeId": "delay",
+          "description": "puts the decision off",
+          "examples": [
+            "Let's decide after we sleep on it.",
+            "We don't have to choose tonight.",
+            "Let's not think about it until Saturday."
+          ],
+          "next": "options",
+          "characterIntent": "reminds the leader the slides are due tomorrow."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "options",
+        "characterIntent": "asks what they are going to show on Saturday."
+      }
+    },
+    {
+      "beatId": "options",
+      "goal": "What does the team present on Saturday?",
+      "competencies": [
+        "R",
+        "V",
+        "I"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "honest_with_fix",
+          "description": "presents the truth and how it would be fixed",
+          "examples": [
+            "We present the measured data, show the gap clearly and explain how we'd fix it.",
+            "We tell the jury one sensor failed and show both versions.",
+            "We say what went wrong and what we learned from it."
+          ],
+          "next": "team",
+          "characterIntent": "nods slowly and asks who tells the other two."
+        },
+        {
+          "answerTypeId": "remove_quietly",
+          "description": "drops the awkward part without saying so",
+          "examples": [
+            "We just drop that bus stop from the presentation.",
+            "Let's leave the broken week out without saying anything.",
+            "We present only the data that looks clean."
+          ],
+          "next": "team",
+          "characterIntent": "agrees quickly and asks whether the others need to know."
+        },
+        {
+          "answerTypeId": "withdraw",
+          "description": "pulls out of the final",
+          "examples": [
+            "Maybe we should pull out of the final.",
+            "Let's not present at all.",
+            "It's safer to withdraw."
+          ],
+          "next": "team",
+          "characterIntent": "is shocked and says the other two will be furious."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "team",
+        "characterIntent": "says the other two still don't know anything."
+      }
+    },
+    {
+      "beatId": "team",
+      "goal": "The other two don't know yet. Who tells them, and how?",
+      "competencies": [
+        "V",
+        "E"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "together_respectful",
+          "description": "tells the team together, without blaming anyone in public",
+          "examples": [
+            "Let's tell them together tonight, and you explain it in your own words.",
+            "We tell the team as a team, nobody gets blamed in public.",
+            "I'll set up a call and back you up while you explain."
+          ],
+          "next": "rebuild",
+          "characterIntent": "thanks the leader and asks what changes in the slides."
+        },
+        {
+          "answerTypeId": "leader_tells",
+          "description": "takes it on alone",
+          "examples": [
+            "I'll tell them myself, you don't have to.",
+            "Leave it to me, I'll explain it.",
+            "I'll handle telling the others."
+          ],
+          "next": "rebuild",
+          "characterIntent": "is relieved but a little left out, and asks about the slides."
+        },
+        {
+          "answerTypeId": "keep_secret",
+          "description": "does not tell them",
+          "examples": [
+            "They don't need to know.",
+            "Let's keep it between the two of us.",
+            "No point upsetting them now."
+          ],
+          "next": "rebuild",
+          "characterIntent": "worries they will find out when they see the slides."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "rebuild",
+        "characterIntent": "asks what has to change before Saturday."
+      }
+    },
+    {
+      "beatId": "rebuild",
+      "goal": "Two days left. What changes, and who does what?",
+      "competencies": [
+        "E",
+        "R"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "owners_and_deadline",
+          "description": "splits the work with owners and a rehearsal",
+          "examples": [
+            "Arman redoes the charts by Thursday, I rewrite the method slide, Dina prepares the questions. We rehearse on Friday at five.",
+            "Three jobs, three owners, and a full rehearsal on Friday.",
+            "Here's the plan: new charts, a slide on the gap, one rehearsal before Saturday."
+          ],
+          "next": "setback",
+          "characterIntent": "takes the charts, then Friday's rehearsal brings a problem."
+        },
+        {
+          "answerTypeId": "vague",
+          "description": "no clear plan",
+          "examples": [
+            "Let's just fix whatever needs fixing.",
+            "We'll figure out the slides later.",
+            "Everyone improve something."
+          ],
+          "next": "setback",
+          "characterIntent": "asks what he should do first, then the rehearsal brings a problem."
+        },
+        {
+          "answerTypeId": "redo_everything",
+          "description": "throws the work away and starts over",
+          "examples": [
+            "We start the whole presentation from scratch tonight.",
+            "Let's redo every slide.",
+            "Throw it all out and rebuild it."
+          ],
+          "next": "setback",
+          "characterIntent": "says that is impossible in two days, then the rehearsal brings a problem."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "setback",
+        "characterIntent": "says he'll start on the charts, and on Friday the rehearsal brings a problem."
+      }
+    },
+    {
+      "beatId": "setback",
+      "goal": "At Friday's rehearsal the mentor says the honest slide makes the team look weak.",
+      "competencies": [
+        "D",
+        "V"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "stand_and_improve",
+          "description": "keeps the truth and makes it stronger",
+          "examples": [
+            "Then we make that slide our strongest: what failed and how we'd catch it next time.",
+            "Losing honestly is fine. Let's make the rest sharper.",
+            "We keep it and practise explaining it with confidence."
+          ],
+          "next": "end",
+          "characterIntent": "smiles for the first time and says he'll practise explaining it."
+        },
+        {
+          "answerTypeId": "reverse",
+          "description": "hides the gap after all",
+          "examples": [
+            "Maybe we should remove the slide after all.",
+            "Okay, let's hide the gap again.",
+            "If we're going to lose, let's drop the honest part."
+          ],
+          "next": "end",
+          "characterIntent": "agrees, but sounds uneasy."
+        },
+        {
+          "answerTypeId": "despair",
+          "description": "gives up on the final",
+          "examples": [
+            "Then there's no point presenting.",
+            "We've already lost.",
+            "This whole project was a mistake."
+          ],
+          "next": "end",
+          "characterIntent": "says he's sorry he ever told the leader."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "end",
+        "characterIntent": "says they need to decide tonight, and the scene ends."
+      }
+    }
+  ]
+}

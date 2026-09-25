@@ -1,0 +1,405 @@
+{
+  "scenarioId": "deadline-or-quality",
+  "status": "draft",
+  "title": "Ship something weak, or ask for more time",
+  "situation": "Your team of three promised the university's first-year office a simple web page that answers new students' common questions. It is due to go live on Monday, before orientation week. It is Friday evening: the page works, but half the answers have not been checked, and the search often shows the wrong result. Aliya, the office's student coordinator who asked for the page, calls to confirm the launch.",
+  "yourRole": "You lead the team that builds the page.",
+  "goal": "Decide what goes live and when, and tell Aliya. There is no single right way to do it.",
+  "character": {
+    "name": "Aliya",
+    "role": "Student coordinator at the first-year office, the person the page is for",
+    "wants": "Something live on Monday that she can announce at orientation"
+  },
+  "hiddenMotive": "She has already put the page's link into the printed orientation booklet.",
+  "voice": "aura-2-selene-en",
+  "matchThreshold": 0.45,
+  "expectedMinutes": 7,
+  "maxCandidateTurns": 8,
+  "beats": [
+    {
+      "beatId": "opening",
+      "goal": "Aliya: \"So, we're live on Monday, right?\"",
+      "competencies": [
+        "V",
+        "I"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "honest_status",
+          "description": "tells her where things really stand",
+          "examples": [
+            "Almost. I want to be honest about what's ready and what isn't.",
+            "The page works, but half the answers aren't checked yet. Can I explain?",
+            "Before I say yes, let me tell you where we really are."
+          ],
+          "next": "stakes",
+          "characterIntent": "pauses, then admits the link is already printed in the orientation booklet."
+        },
+        {
+          "answerTypeId": "yes_fine",
+          "description": "says everything is fine",
+          "examples": [
+            "Yes, all good, Monday it is.",
+            "Sure, no problems.",
+            "Everything's on track."
+          ],
+          "next": "stakes",
+          "characterIntent": "is pleased, and mentions the link is already printed in the booklet."
+        },
+        {
+          "answerTypeId": "no_blunt",
+          "description": "says no, without explaining",
+          "examples": [
+            "No, it's not ready.",
+            "We can't make Monday.",
+            "Forget Monday."
+          ],
+          "next": "stakes",
+          "characterIntent": "goes quiet, then says the link is already printed in the booklet."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "stakes",
+        "characterIntent": "says she needs a clear answer, because the link is already printed."
+      }
+    },
+    {
+      "beatId": "stakes",
+      "goal": "The link is already in the printed booklet.",
+      "competencies": [
+        "I",
+        "R"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "understand_impact",
+          "description": "sees what that means for the students",
+          "examples": [
+            "Okay, that changes things. So students will open it on day one no matter what.",
+            "Then the real risk is students trusting wrong answers. Which questions matter most on day one?",
+            "Got it. So we need something correct at that link on Monday, even if it's small."
+          ],
+          "next": "options",
+          "characterIntent": "relaxes a little and asks what could go live on Monday."
+        },
+        {
+          "answerTypeId": "blame_client",
+          "description": "says it is her problem",
+          "examples": [
+            "You shouldn't have printed it before we confirmed.",
+            "That's your problem, not ours.",
+            "Nobody told us about a booklet."
+          ],
+          "next": "pressure",
+          "characterIntent": "gets tense and says her boss will blame her."
+        },
+        {
+          "answerTypeId": "panic",
+          "description": "panics",
+          "examples": [
+            "Oh no, then we're in trouble.",
+            "This is a disaster.",
+            "I don't know what to do now."
+          ],
+          "next": "pressure",
+          "characterIntent": "catches the panic and says her boss will blame her."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "options",
+        "characterIntent": "asks what could realistically go live on Monday."
+      }
+    },
+    {
+      "beatId": "pressure",
+      "goal": "Aliya's boss will blame her. She asks to just put everything live.",
+      "competencies": [
+        "D",
+        "V"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "steady_and_kind",
+          "description": "stays calm and looks for a way that protects everyone",
+          "examples": [
+            "I understand, and I don't want you blamed. Let's find something we can both stand behind.",
+            "Let's slow down. We can protect you and the students.",
+            "We'll solve this together. Give me two minutes to lay out the options."
+          ],
+          "next": "options",
+          "characterIntent": "takes a breath and asks what the options are."
+        },
+        {
+          "answerTypeId": "give_in",
+          "description": "agrees to put everything live",
+          "examples": [
+            "Okay, we'll put everything live then.",
+            "Fine, whatever you need.",
+            "We'll just ship it as it is."
+          ],
+          "next": "options",
+          "characterIntent": "is relieved, and asks what exactly will be live."
+        },
+        {
+          "answerTypeId": "defensive",
+          "description": "pushes the blame back",
+          "examples": [
+            "It's not our fault your boss is like that.",
+            "We did our best, that's it.",
+            "Don't put this on us."
+          ],
+          "next": "options",
+          "characterIntent": "says blame doesn't help either of them, and asks for options."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "options",
+        "characterIntent": "asks what could go live on Monday."
+      }
+    },
+    {
+      "beatId": "options",
+      "goal": "What goes live on Monday?",
+      "competencies": [
+        "R",
+        "V"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "small_but_correct",
+          "description": "launches less, but only what is right",
+          "examples": [
+            "Monday we launch the twenty most asked questions, all checked, and hide the search until it works.",
+            "Let's go live with fewer answers that are right, and a clear 'more coming Thursday' note.",
+            "Correct and small on Monday; the rest after we check it."
+          ],
+          "next": "team",
+          "characterIntent": "likes it, and asks who will check the answers over the weekend."
+        },
+        {
+          "answerTypeId": "ship_all",
+          "description": "launches everything and fixes later",
+          "examples": [
+            "We put everything live and fix errors as people report them.",
+            "Launch it all, nobody will notice a few mistakes.",
+            "Ship it and patch later."
+          ],
+          "next": "team",
+          "characterIntent": "worries about students getting wrong answers, and asks who is working this weekend."
+        },
+        {
+          "answerTypeId": "delay_all",
+          "description": "launches nothing until it is perfect",
+          "examples": [
+            "Nothing goes live until it's perfect.",
+            "Let's delay the whole thing by two weeks.",
+            "We launch only when everything is done."
+          ],
+          "next": "team",
+          "characterIntent": "reminds the leader the link is printed, and asks who is working this weekend."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "team",
+        "characterIntent": "asks who will work on it this weekend."
+      }
+    },
+    {
+      "beatId": "team",
+      "goal": "The two teammates have exams on Monday. Who checks the answers this weekend?",
+      "competencies": [
+        "V",
+        "E"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "fair_split",
+          "description": "splits the work by the time people really have",
+          "examples": [
+            "Let's ask them what they can do; I'll take the biggest part since their exams are on Monday.",
+            "Nobody sacrifices their exam; we split it by the hours each of us has.",
+            "I'll check most answers, and they review twenty each on Sunday if they can."
+          ],
+          "next": "plan",
+          "characterIntent": "appreciates it, and asks for exact times."
+        },
+        {
+          "answerTypeId": "order_them",
+          "description": "tells them they have to work",
+          "examples": [
+            "Exams or not, they have to work this weekend.",
+            "They'll do it, I'll tell them.",
+            "Everyone works, no excuses."
+          ],
+          "next": "plan",
+          "characterIntent": "hesitates, and asks for exact times."
+        },
+        {
+          "answerTypeId": "do_everything",
+          "description": "does it all alone",
+          "examples": [
+            "I'll do all of it myself, no need to ask them.",
+            "I'll pull an all-nighter and check everything.",
+            "I don't want to bother anyone."
+          ],
+          "next": "plan",
+          "characterIntent": "wonders aloud whether one person can check everything, and asks for exact times."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "plan",
+        "characterIntent": "asks for exact times."
+      }
+    },
+    {
+      "beatId": "plan",
+      "goal": "Aliya: \"Send me exactly what happens, and when.\"",
+      "competencies": [
+        "E",
+        "R"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "clear_timeline",
+          "description": "a timeline she can pass on",
+          "examples": [
+            "Saturday I check the top twenty answers, Sunday Aigul reviews them, Monday at eight it's live, and the rest by Thursday.",
+            "Timeline: checked answers on Sunday night, launch on Monday at 8 a.m., the full version on Thursday, and I update you each evening.",
+            "I'll email you a short plan tonight with dates and who checks what."
+          ],
+          "next": "setback",
+          "characterIntent": "thanks the leader; on Monday morning a problem appears."
+        },
+        {
+          "answerTypeId": "vague",
+          "description": "no times, no owners",
+          "examples": [
+            "We'll do our best over the weekend.",
+            "Something will be there on Monday.",
+            "We'll let you know."
+          ],
+          "next": "setback",
+          "characterIntent": "says that is hard to tell her boss; on Monday morning a problem appears."
+        },
+        {
+          "answerTypeId": "overpromise",
+          "description": "promises more than can be done",
+          "examples": [
+            "Everything will be perfect by Monday, don't worry.",
+            "We'll finish all of it this weekend.",
+            "Full version on Monday, guaranteed."
+          ],
+          "next": "setback",
+          "characterIntent": "is glad but a little doubtful; on Monday morning a problem appears."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "setback",
+        "characterIntent": "says she'll check in on Sunday; on Monday morning a problem appears."
+      }
+    },
+    {
+      "beatId": "setback",
+      "goal": "Monday, 9 a.m.: a student posts that one answer is wrong.",
+      "competencies": [
+        "D",
+        "V"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "own_and_fix",
+          "description": "owns the mistake and corrects it openly",
+          "examples": [
+            "Thanks for catching it. We fix it now and post a correction where the student asked.",
+            "That one's on us. It's fixed within the hour, and we recheck the similar answers.",
+            "We own it, correct it publicly, and tell your boss what happened."
+          ],
+          "next": "end",
+          "characterIntent": "is relieved, and says she'll share the correction with her boss."
+        },
+        {
+          "answerTypeId": "hide_fix",
+          "description": "fixes it quietly",
+          "examples": [
+            "Just quietly change it and say nothing.",
+            "Delete the post and move on.",
+            "Nobody will remember."
+          ],
+          "next": "end",
+          "characterIntent": "worries that students who saw it will still go by the wrong hours."
+        },
+        {
+          "answerTypeId": "blame_source",
+          "description": "blames someone else",
+          "examples": [
+            "The office gave us the wrong hours.",
+            "It's not our mistake.",
+            "Blame whoever wrote that answer."
+          ],
+          "next": "end",
+          "characterIntent": "says the office gave the right hours, and the scene cools."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "end",
+        "characterIntent": "asks for an answer within the hour, and the scene ends."
+      }
+    }
+  ]
+}

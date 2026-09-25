@@ -1,0 +1,405 @@
+{
+  "scenarioId": "too-many-volunteers",
+  "status": "draft",
+  "title": "Twice as many came, nobody is in charge",
+  "situation": "You signed up as one of forty volunteers for a Saturday park clean-up run by a student eco club. Eighty people have turned up, the club's organiser is stuck in traffic for an hour, and there are only enough gloves and bags for half of them. Kamila, another volunteer, turns to you: \"Everyone's just standing around. Do you know what's going on?\"",
+  "yourRole": "A volunteer like everyone else. Nobody has put you in charge.",
+  "goal": "Help the morning go well. Whether and how you lead is up to you. There is no single right way to do it.",
+  "character": {
+    "name": "Kamila",
+    "role": "Another volunteer at the clean-up",
+    "wants": "To actually clean the park instead of standing around"
+  },
+  "hiddenMotive": "Last year she organised a club event that fell apart, and she is afraid to take charge again, though she would help someone who does.",
+  "voice": "aura-2-phoebe-en",
+  "matchThreshold": 0.45,
+  "expectedMinutes": 7,
+  "maxCandidateTurns": 8,
+  "beats": [
+    {
+      "beatId": "opening",
+      "goal": "Kamila asks what is going on.",
+      "competencies": [
+        "I",
+        "R"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "step_up_check",
+          "description": "finds out what was planned before acting",
+          "examples": [
+            "Nobody's in charge yet. Let's call the organiser and find out what she wants done.",
+            "Let me ask the club what the plan was, then we can get people started.",
+            "I'll find out who has the list and the supplies."
+          ],
+          "next": "organise",
+          "characterIntent": "says she'll help, and points out that people are starting to leave."
+        },
+        {
+          "answerTypeId": "wait",
+          "description": "waits for someone else",
+          "examples": [
+            "Let's just wait for the organiser.",
+            "It's not our job, someone will come.",
+            "I'd rather not get involved."
+          ],
+          "next": "organise",
+          "characterIntent": "sighs, and points out that people are starting to leave."
+        },
+        {
+          "answerTypeId": "take_command",
+          "description": "starts giving orders",
+          "examples": [
+            "Okay everyone, listen to me!",
+            "I'll just start giving orders.",
+            "Follow me, I'll run this."
+          ],
+          "next": "organise",
+          "characterIntent": "raises an eyebrow, and points out that there are only forty pairs of gloves."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "organise",
+        "characterIntent": "says people are starting to leave."
+      }
+    },
+    {
+      "beatId": "organise",
+      "goal": "People are drifting away. Eighty people, forty pairs of gloves.",
+      "competencies": [
+        "E",
+        "V"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "share_fairly",
+          "description": "finds a way for everyone to help",
+          "examples": [
+            "Let's pair people up: one picks up with gloves, the other holds the bag, and they swap every half hour.",
+            "We make teams of four with two pairs of gloves each and rotate.",
+            "Everyone gets a turn: pairs share gloves and switch halfway."
+          ],
+          "next": "roles",
+          "characterIntent": "likes it, and asks whether they should split the park into zones."
+        },
+        {
+          "answerTypeId": "send_away",
+          "description": "sends the extra people home",
+          "examples": [
+            "Let's just send half of them home.",
+            "We don't need eighty people.",
+            "Tell the extra people to leave."
+          ],
+          "next": "chaos",
+          "characterIntent": "winces as people start arguing."
+        },
+        {
+          "answerTypeId": "wait_for_organiser",
+          "description": "keeps waiting",
+          "examples": [
+            "The organiser will sort it out when she gets here.",
+            "Let's not decide anything until she arrives.",
+            "Better not to do anything without permission."
+          ],
+          "next": "roles",
+          "characterIntent": "says the organiser is an hour away, and suggests splitting the park into zones."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "roles",
+        "characterIntent": "suggests splitting the park into zones."
+      }
+    },
+    {
+      "beatId": "chaos",
+      "goal": "Volunteers argue about being sent away, and a group walks off annoyed.",
+      "competencies": [
+        "D",
+        "V"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "calm_repair",
+          "description": "owns the mistake and finds everyone a job",
+          "examples": [
+            "Let's apologise to them and find a way everyone can help.",
+            "I got that wrong. Let's give them a real job, like sorting the bags or mapping the areas.",
+            "Okay, let's reset and make sure everyone who stayed has something to do."
+          ],
+          "next": "roles",
+          "characterIntent": "relaxes and suggests zones for the people who stayed."
+        },
+        {
+          "answerTypeId": "shrug",
+          "description": "doesn't care",
+          "examples": [
+            "Whatever, it's their choice.",
+            "Fewer people is easier anyway.",
+            "Not my problem."
+          ],
+          "next": "roles",
+          "characterIntent": "frowns, and suggests zones for the people left."
+        },
+        {
+          "answerTypeId": "argue_back",
+          "description": "argues with the volunteers",
+          "examples": [
+            "They should have signed up properly.",
+            "I'm not going to beg them to stay.",
+            "If they're angry, they can leave too."
+          ],
+          "next": "roles",
+          "characterIntent": "says arguing won't clean the park, and suggests zones."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "roles",
+        "characterIntent": "suggests splitting the rest into zones."
+      }
+    },
+    {
+      "beatId": "roles",
+      "goal": "Split the park into zones? Who leads each?",
+      "competencies": [
+        "V",
+        "E"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "share_lead",
+          "description": "shares the leading",
+          "examples": [
+            "Let's ask four people to each lead a zone. Could you take the lake side?",
+            "We split into zones, and each group picks its own lead.",
+            "You know the park; could you lead one zone while I coordinate?"
+          ],
+          "next": "safety",
+          "characterIntent": "agrees to lead the lake side; soon after, someone finds something dangerous."
+        },
+        {
+          "answerTypeId": "do_it_all",
+          "description": "leads everything alone",
+          "examples": [
+            "I'll lead all the zones myself.",
+            "Everyone just report to me.",
+            "I'll run around and manage everyone."
+          ],
+          "next": "safety",
+          "characterIntent": "shrugs and goes to work; soon after, someone finds something dangerous."
+        },
+        {
+          "answerTypeId": "no_structure",
+          "description": "lets people go where they like",
+          "examples": [
+            "Just go wherever you want.",
+            "People can figure it out themselves.",
+            "No need for zones."
+          ],
+          "next": "safety",
+          "characterIntent": "doubts it will work; soon after, someone finds something dangerous."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "safety",
+        "characterIntent": "gets people moving; soon after, someone finds something dangerous."
+      }
+    },
+    {
+      "beatId": "safety",
+      "goal": "A volunteer finds broken glass and rusty metal near the playground.",
+      "competencies": [
+        "I",
+        "R"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "stop_and_protect",
+          "description": "keeps people away and calls the right people",
+          "examples": [
+            "Nobody touches that area. Let's mark it off and tell the organiser and the park office.",
+            "Safety first. Gloves or not, broken glass is for the park staff.",
+            "Let's tape it off and move that group somewhere else."
+          ],
+          "next": "organiser",
+          "characterIntent": "tapes it off; then the organiser arrives."
+        },
+        {
+          "answerTypeId": "carry_on",
+          "description": "tells people to pick it up anyway",
+          "examples": [
+            "Just be careful and pick it up.",
+            "It's fine, keep going.",
+            "Glass is rubbish too, clean it."
+          ],
+          "next": "organiser",
+          "characterIntent": "warns that someone will get cut; then the organiser arrives."
+        },
+        {
+          "answerTypeId": "panic_stop",
+          "description": "stops everything",
+          "examples": [
+            "Stop everything, everyone go home!",
+            "This is too dangerous, cancel the clean-up.",
+            "We have to call it off."
+          ],
+          "next": "organiser",
+          "characterIntent": "says there is no need to end the whole morning; then the organiser arrives."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "organiser",
+        "characterIntent": "keeps people back from the glass; then the organiser arrives."
+      }
+    },
+    {
+      "beatId": "organiser",
+      "goal": "The organiser arrives, surprised, and a little annoyed that someone took over.",
+      "competencies": [
+        "V",
+        "E"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "hand_back",
+          "description": "briefs her and hands it back",
+          "examples": [
+            "Here's what we did, who leads each zone, and the spot we marked off. It's yours from here.",
+            "Glad you're here. Let me brief you in a minute and hand it over.",
+            "We just got things moving; tell us what you want to change."
+          ],
+          "next": "setback",
+          "characterIntent": "says the organiser looks relieved; then it starts to rain."
+        },
+        {
+          "answerTypeId": "defend_role",
+          "description": "holds on to the lead",
+          "examples": [
+            "I had to take charge, nobody else would.",
+            "Honestly, it's better if I keep running it.",
+            "You weren't here, so I decided."
+          ],
+          "next": "setback",
+          "characterIntent": "says the organiser looks put out; then it starts to rain."
+        },
+        {
+          "answerTypeId": "blame_organiser",
+          "description": "blames the organiser",
+          "examples": [
+            "This was badly organised from the start.",
+            "You should have planned for more people.",
+            "It's your fault we had this mess."
+          ],
+          "next": "setback",
+          "characterIntent": "winces at the tension; then it starts to rain."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "setback",
+        "characterIntent": "says the organiser is taking over; then it starts to rain."
+      }
+    },
+    {
+      "beatId": "setback",
+      "goal": "Rain starts. Half the bags are full, and people want to leave.",
+      "competencies": [
+        "D",
+        "E"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "wrap_up_well",
+          "description": "finishes safely and thanks everyone",
+          "examples": [
+            "Let's finish the zone we're in, stack the bags by the gate, and thank everyone before they go.",
+            "Rain's here. Ten more minutes, then we pack up together and share photos of what we did.",
+            "We stop safely now and set a date to finish the rest."
+          ],
+          "next": "end",
+          "characterIntent": "says it was the best clean-up she has been to."
+        },
+        {
+          "answerTypeId": "force_stay",
+          "description": "makes everyone stay",
+          "examples": [
+            "Nobody leaves until the park is clean.",
+            "A bit of rain never hurt anyone, keep going.",
+            "We finish everything no matter what."
+          ],
+          "next": "end",
+          "characterIntent": "says people are getting soaked and some are leaving anyway."
+        },
+        {
+          "answerTypeId": "abandon",
+          "description": "walks away from it",
+          "examples": [
+            "Everyone just go home and leave the bags.",
+            "Forget it, it's raining.",
+            "Just leave everything where it is."
+          ],
+          "next": "end",
+          "characterIntent": "looks at the full bags left in the rain."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "end",
+        "characterIntent": "says they need to decide quickly, and the scene ends."
+      }
+    }
+  ]
+}

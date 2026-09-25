@@ -1,0 +1,405 @@
+{
+  "scenarioId": "new-idea-resistance",
+  "status": "draft",
+  "title": "Your new approach meets a wall",
+  "situation": "You volunteer at a student-run weekend tutoring club where twenty volunteers help younger pupils with maths. You have noticed that pupils work better in small groups with maths games than in the usual one-to-one drills, and you propose switching half the sessions. Ilyas, who has coordinated the club for three years, says no.",
+  "yourRole": "A volunteer tutor. You are not in charge of the club.",
+  "goal": "Get your idea a fair hearing without breaking the club. There is no single right way to do it.",
+  "character": {
+    "name": "Ilyas",
+    "role": "Coordinator of the tutoring club",
+    "wants": "The club to keep working the way pupils and parents have come to trust"
+  },
+  "hiddenMotive": "Last year another volunteer's new idea fell apart, and Ilyas had to apologise to the parents. He is afraid of going through that again.",
+  "voice": "aura-2-orion-en",
+  "matchThreshold": 0.45,
+  "expectedMinutes": 7,
+  "maxCandidateTurns": 8,
+  "beats": [
+    {
+      "beatId": "opening",
+      "goal": "Ilyas turns the idea down.",
+      "competencies": [
+        "V",
+        "I"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "understand_reason",
+          "description": "asks why before pushing",
+          "examples": [
+            "Fair enough. What worries you about it?",
+            "Can you tell me why it wouldn't work here?",
+            "I'd like to understand your reasons before I push."
+          ],
+          "next": "evidence",
+          "characterIntent": "says he has seen ideas like this before, and asks what makes the candidate so sure."
+        },
+        {
+          "answerTypeId": "insist",
+          "description": "pushes the idea harder",
+          "examples": [
+            "But it's clearly better, trust me.",
+            "I've seen it work, we should just do it.",
+            "The old way is outdated."
+          ],
+          "next": "evidence",
+          "characterIntent": "raises an eyebrow and asks what the candidate is basing that on."
+        },
+        {
+          "answerTypeId": "drop_it",
+          "description": "gives the idea up at once",
+          "examples": [
+            "Okay, forget I said anything.",
+            "Never mind, it was just an idea.",
+            "Fine, we keep things as they are."
+          ],
+          "next": "evidence",
+          "characterIntent": "is a little surprised, and asks whether the candidate had any reason to suggest it."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "evidence",
+        "characterIntent": "asks what made the candidate think of it in the first place."
+      }
+    },
+    {
+      "beatId": "evidence",
+      "goal": "What makes the candidate sure it works?",
+      "competencies": [
+        "R",
+        "I"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "offer_test",
+          "description": "offers a small trial to find out",
+          "examples": [
+            "I don't know yet. Could we try it with one group for two weeks?",
+            "Let's test it small and compare results before changing anything.",
+            "I could run a pilot with five pupils and share what happens."
+          ],
+          "next": "risks",
+          "characterIntent": "is interested despite himself, and asks what could go wrong."
+        },
+        {
+          "answerTypeId": "personal_belief",
+          "description": "relies on a feeling",
+          "examples": [
+            "I just know it works.",
+            "Everyone knows games are better.",
+            "It worked for me when I was little."
+          ],
+          "next": "pushback",
+          "characterIntent": "says a feeling is not enough, and tells what happened last year."
+        },
+        {
+          "answerTypeId": "cite_trend",
+          "description": "points to what others do",
+          "examples": [
+            "Lots of schools do this now.",
+            "I read that group learning is more effective.",
+            "It's the modern way of teaching."
+          ],
+          "next": "risks",
+          "characterIntent": "says other places are not this club, and asks what could go wrong here."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "risks",
+        "characterIntent": "asks what could go wrong if they tried it."
+      }
+    },
+    {
+      "beatId": "pushback",
+      "goal": "Ilyas says a feeling is not enough: last year a new idea upset the parents.",
+      "competencies": [
+        "D",
+        "V"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "stay_curious",
+          "description": "wants to learn from what happened",
+          "examples": [
+            "That's useful to know. What happened last time?",
+            "I didn't know that. How did the parents react?",
+            "Okay, let's learn from that before trying anything."
+          ],
+          "next": "risks",
+          "characterIntent": "explains that the pupils got lost and the parents were never told."
+        },
+        {
+          "answerTypeId": "get_defensive",
+          "description": "takes it personally",
+          "examples": [
+            "That was someone else, not me.",
+            "You're just afraid of change.",
+            "That's not a reason to block every idea."
+          ],
+          "next": "risks",
+          "characterIntent": "stiffens and asks, then, what the candidate would do differently."
+        },
+        {
+          "answerTypeId": "give_up",
+          "description": "stops trying",
+          "examples": [
+            "Then there's no point trying.",
+            "Okay, you win.",
+            "I'll stop suggesting things."
+          ],
+          "next": "risks",
+          "characterIntent": "softens a little and asks what could go wrong, if the candidate did try."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "risks",
+        "characterIntent": "asks what the candidate would do so it doesn't happen again."
+      }
+    },
+    {
+      "beatId": "risks",
+      "goal": "What could go wrong, and for whom?",
+      "competencies": [
+        "R",
+        "V"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "name_risks",
+          "description": "names real risks and how to handle them",
+          "examples": [
+            "Some pupils might get lost in a group, so each group keeps one tutor checking on them.",
+            "Parents may worry, so we'd tell them first and let them choose.",
+            "If the results drop, we switch back straight away."
+          ],
+          "next": "allies",
+          "characterIntent": "nods and says the question now is who would run it."
+        },
+        {
+          "answerTypeId": "no_risks",
+          "description": "sees nothing that could go wrong",
+          "examples": [
+            "Nothing can go wrong, it's just games.",
+            "I don't see any risks.",
+            "It'll be fine."
+          ],
+          "next": "allies",
+          "characterIntent": "says that is exactly what worries him, and asks who would run it."
+        },
+        {
+          "answerTypeId": "shift_risk",
+          "description": "puts the risk on others",
+          "examples": [
+            "If it fails, that's the pupils' problem, not ours.",
+            "Parents will get used to it.",
+            "The tutors will just have to adapt."
+          ],
+          "next": "allies",
+          "characterIntent": "frowns and says the pupils are the reason the club exists."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "allies",
+        "characterIntent": "says the other tutors are busy enough already, and asks who would run it."
+      }
+    },
+    {
+      "beatId": "allies",
+      "goal": "The other tutors are busy. Who would even run it?",
+      "competencies": [
+        "V",
+        "E"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "invite_others",
+          "description": "invites volunteers without pressure",
+          "examples": [
+            "I could ask who wants to join, no pressure on anyone.",
+            "Let's ask the tutors at Saturday's meeting and only take volunteers.",
+            "I'll run it myself first and invite anyone curious."
+          ],
+          "next": "plan",
+          "characterIntent": "says that could work if it's properly organised."
+        },
+        {
+          "answerTypeId": "go_around",
+          "description": "goes around the coordinator",
+          "examples": [
+            "I'll just ask the tutors directly and start without you.",
+            "I'll convince the others and then we vote you down.",
+            "If you say no, I'll take it to the club board."
+          ],
+          "next": "plan",
+          "characterIntent": "says coldly that he would rather be asked than outvoted, but asks for a plan."
+        },
+        {
+          "answerTypeId": "make_ilyas_do",
+          "description": "hands the work to the coordinator",
+          "examples": [
+            "You're the coordinator, you should organise it.",
+            "Can you find people for me?",
+            "That's your job, not mine."
+          ],
+          "next": "plan",
+          "characterIntent": "laughs drily and says it's the candidate's idea, so it's their plan."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "plan",
+        "characterIntent": "says he'd consider a trial if it's properly organised."
+      }
+    },
+    {
+      "beatId": "plan",
+      "goal": "Ilyas agrees to a trial if it is properly organised.",
+      "competencies": [
+        "E",
+        "R"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "concrete_pilot",
+          "description": "dates, people, a measure and the parents told",
+          "examples": [
+            "Two Saturdays, one group of six pupils, me and Aruzhan running it, a short quiz before and after, and we tell parents this week.",
+            "Pilot plan: dates, two tutors, parents informed, and we compare quiz scores on the twentieth.",
+            "I'll write a one-page plan by Wednesday with who, when and how we measure."
+          ],
+          "next": "setback",
+          "characterIntent": "agrees; after the first Saturday he calls with news."
+        },
+        {
+          "answerTypeId": "loose_start",
+          "description": "starts without a plan",
+          "examples": [
+            "Let's just start next week and see.",
+            "We can figure out the details as we go.",
+            "I'll bring some games and we'll try."
+          ],
+          "next": "setback",
+          "characterIntent": "shrugs and lets it happen; after the first Saturday he calls with news."
+        },
+        {
+          "answerTypeId": "all_at_once",
+          "description": "changes everything at once",
+          "examples": [
+            "Let's switch all sessions at once.",
+            "No point testing, let's change everything.",
+            "Go big from the start."
+          ],
+          "next": "setback",
+          "characterIntent": "refuses to switch everything and allows one group; after the first Saturday he calls with news."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "setback",
+        "characterIntent": "allows one group; after the first Saturday he calls with news."
+      }
+    },
+    {
+      "beatId": "setback",
+      "goal": "After the first Saturday, two pupils were confused and a parent complained.",
+      "competencies": [
+        "D",
+        "V"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "own_and_adjust",
+          "description": "owns it and fixes what went wrong",
+          "examples": [
+            "That's on me. I'll call the parent, and next time each group gets clearer instructions.",
+            "Let's keep the trial but fix what confused them.",
+            "We learn from it: smaller groups and a tutor checking in every ten minutes."
+          ],
+          "next": "end",
+          "characterIntent": "says that is how he'd want it handled, and agrees to a second Saturday."
+        },
+        {
+          "answerTypeId": "defend",
+          "description": "defends the idea against the complaint",
+          "examples": [
+            "The parent is overreacting.",
+            "Two confused pupils is normal.",
+            "It wasn't the method's fault."
+          ],
+          "next": "end",
+          "characterIntent": "says that attitude is what worries parents most."
+        },
+        {
+          "answerTypeId": "quit_trial",
+          "description": "abandons the trial",
+          "examples": [
+            "Okay, let's cancel the trial.",
+            "I knew it wouldn't work.",
+            "Forget the whole idea."
+          ],
+          "next": "end",
+          "characterIntent": "says it's a pity to give up after one day."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "end",
+        "characterIntent": "says they'll talk about it on Saturday, and the scene ends."
+      }
+    }
+  ]
+}
