@@ -6,6 +6,7 @@ import re
 from collections.abc import Callable, Iterable
 
 from ..evidence import candidate_view_sources, verify_evidence
+from ..metrics.certificate import mapped_certificate_cefr
 from ..schemas.contracts import (
     BriefRequest,
     Claim,
@@ -66,6 +67,14 @@ def before_consistency(request: BriefRequest) -> list[ConsistencyItem]:
         if measured is not None
         else "No simulation English estimate is available yet."
     )
+    certificate = request.candidate.englishCertificate
+    if certificate is not None:
+        mapped = mapped_certificate_cefr(certificate.type, certificate.score)
+        if mapped is not None:
+            observation += (
+                f" The supplied IELTS overall band indicatively maps to {mapped}; "
+                "the certificate has not been verified."
+            )
     question = "In English, describe a recent project and an unexpected problem you solved."
     return [
         ConsistencyItem(

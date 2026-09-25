@@ -34,7 +34,19 @@ def test_missing_simulation_does_not_invent_a_measurement() -> None:
     item = before_consistency(source)[0]
     assert item.status == "unverified"
     assert item.observation.metric is None
-    assert "B2" not in item.observation.text
+    assert "No simulation English estimate" in item.observation.text
+    assert "IELTS overall band indicatively maps to B2" in item.observation.text
+    assert "has not been verified" in item.observation.text
+
+
+def test_certificate_mapping_is_described_as_unverified_and_not_interview_metric() -> None:
+    source = request()
+    item = before_consistency(source)[0]
+    assert "IELTS overall band indicatively maps to B2" in item.observation.text
+    assert "has not been verified" in item.observation.text
+    assert item.observation.metric.source == "simulation"
+    source.candidate.englishCertificate.score = "8.0"
+    assert "indicatively maps" not in before_consistency(source)[0].observation.text
 
 
 def test_matching_measurement_is_consistent() -> None:
