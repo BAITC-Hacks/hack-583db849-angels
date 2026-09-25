@@ -5,7 +5,9 @@ from pathlib import Path
 import pytest
 
 from services.ml.app.gateway.config import Provider, TaskName
+from services.ml.app.gateway.errors import GatewayOutputError
 from services.ml.app.gateway.types import GatewayResult
+from services.ml.app.errors import ServiceError
 from services.ml.app.modules.consistency import (
     ConsistencyGenerator, ConsistencyService, reconcile_after_items,
 )
@@ -165,3 +167,127 @@ def test_before_and_empty_after_reuse_the_same_m1_brief() -> None:
     assert gateway.requests[0].payload["beforeItems"] == [
         item.model_dump(mode="json") for item in brief_result.consistency
     ]
+
+
+def _service(output: ConsistencyResult) -> tuple[ConsistencyService, FakeGateway]:
+    gateway = FakeGateway(output)
+    brief = FakeBrief(BriefResult.model_validate(json.loads(
+        (EXAMPLES / "brief.response.json").read_text(encoding="utf-8")
+    )))
+    return ConsistencyService(ConsistencyGenerator(gateway), brief), gateway
+
+
+def test_after_service_grounds_candidate_quotes_and_simulation_metric() -> None:
+    request, proposed = example()
+    service, gateway = _service(proposed)
+
+    result = asyncio.run(service.prepare(request))
+
+    assert [item.status for item in result.items] == ["confirmed", "confirmed", "unverified"]
+    assert result.items[0].observation.metric.source == "simulation"
+    assert result.items[0].observation.text == proposed.items[0].observation.text
+    assert result.items[1].observation.evidence[0].sourceId == "iturn_02"
+    assert result.items[2].observation == request.beforeItems[2].observation
+    assert all(item.askInInterview is None for item in result.items)
+    assert len(gateway.requests) == 1
+
+
+def test_tampered_saved_quote_is_rejected_before_model_call() -> None:
+    request, proposed = example()
+    request.beforeItems[0].claim.evidence[0].quote = "Invented C2 quote"
+    service, gateway = _service(proposed)
+
+    with pytest.raises(ServiceError) as error:
+        asyncio.run(service.prepare(request))
+
+    assert error.value.status_code == 422
+    assert gateway.requests == []
+
+
+def test_wrong_speaker_quote_cannot_confirm_a_saved_item() -> None:
+    request, proposed = example()
+    proposed.items[1].observation.evidence[0].sourceId = "iturn_01"
+    service, _ = _service(proposed)
+
+    result = asyncio.run(service.prepare(request))
+
+    assert result.items[1].status == request.beforeItems[1].status
+    assert result.items[1].observation == request.beforeItems[1].observation
+
+
+def test_generic_candidate_reply_does_not_confirm_discrepancy() -> None:
+    request, proposed = example()
+    cited_id = proposed.items[1].observation.evidence[0].sourceId
+    next(turn for turn in request.interviewTranscript if turn.turnId == cited_id).text = "Yes."
+    proposed.items[1].observation.evidence[0].quote = "Yes."
+    service, _ = _service(proposed)
+
+    result = asyncio.run(service.prepare(request))
+
+    assert result.items[1].status == request.beforeItems[1].status
+
+
+def test_unsupported_appended_item_is_dropped() -> None:
+    request, proposed = example()
+    new = proposed.items[1].model_copy(deep=True)
+    new.itemId = "new"
+    new.claim.evidence[0].sourceId = "missing-field"
+    proposed.items.append(new)
+    service, _ = _service(proposed)
+
+    result = asyncio.run(service.prepare(request))
+
+    assert [item.itemId for item in result.items] == ["c_01", "c_02", "c_03"]
+
+
+def test_grounded_appended_item_gets_next_id() -> None:
+    request, proposed = example()
+    new = proposed.items[1].model_copy(deep=True)
+    new.itemId = "model-selected-id"
+    new.claim.evidence[0].sourceId = "english_self"
+    new.claim.evidence[0].quote = "C2."
+    proposed.items.append(new)
+    service, _ = _service(proposed)
+
+    result = asyncio.run(service.prepare(request))
+
+    assert result.items[-1].itemId == "c_04"
+    assert result.items[-1].status == "discrepancy"
+    assert result.items[-1].claim.evidence[0].source == "application_field"
+    assert result.items[-1].observation.evidence[0].source == "interview_turn"
+    assert result.items[-1].askInInterview is None
+
+
+def test_exactly_half_bad_quotes_does_not_trigger_retry() -> None:
+    request, proposed = example()
+    proposed.items[1].claim.evidence[0].quote = "Invented claim"
+    proposed.items[2].claim.evidence[0].quote = "Invented claim"
+    service, gateway = _service(proposed)
+
+    result = asyncio.run(service.prepare(request))
+
+    assert result.items[1].claim == request.beforeItems[1].claim
+    assert len(gateway.requests) == 1
+
+
+def test_majority_bad_quotes_retry_once_then_fail_safely() -> None:
+    request, proposed = example()
+    for item in proposed.items:
+        item.claim.evidence[0].quote = "Invented quote"
+    service, gateway = _service(proposed)
+
+    with pytest.raises(GatewayOutputError):
+        asyncio.run(service.prepare(request))
+
+    assert [sent.payload["attempt"] for sent in gateway.requests] == [1, 2]
+
+
+def test_unsupported_model_metric_retries_once() -> None:
+    request, proposed = example()
+    proposed.items[0].observation.metric.source = "interview"
+    service, gateway = _service(proposed)
+
+    with pytest.raises(GatewayOutputError):
+        asyncio.run(service.prepare(request))
+
+    assert len(gateway.requests) == 2
