@@ -11,6 +11,8 @@ export interface SimulationTurn {
   turnId: string;
   speaker: Speaker;
   text: string;
+  /** Candidate turns only: how sure the recogniser was (0–1), null when typed. A flag for people, never a penalty. */
+  recognitionConfidence?: number | null;
 }
 
 export type SimulationStage = 'opening' | 'in-progress' | 'wrapping-up' | 'finished';

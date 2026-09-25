@@ -12,7 +12,11 @@ export interface SimulationReport {
   assessmentId: string;
   candidate: { id: string; code: 'A' | 'B' | 'C' };
   scenarioTitle: string;
+  /** Labels the character's turns in the transcript. */
+  characterName: string;
   mode: 'text' | 'voice';
+  /** Typed because staff switched text on for this candidate; shown so nobody reads it as a choice. */
+  accommodation: boolean;
   completedAt: string;
   durationMinutes: number;
   turns: SimulationTurn[];
@@ -33,3 +37,6 @@ export interface CandidateFeedback {
   growth: string[];
   nextTime: string[];
 }
+
+/** Below this, a spoken turn is marked in the transcript: the words may not be what was said. */
+export const LOW_RECOGNITION_CONFIDENCE = 0.6;

@@ -1,9 +1,15 @@
 import { render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { FeedbackView } from '../components/report/FeedbackView';
-import { previewFeedback, previewReport } from '../lib/report/preview';
+import type { WireAssessment, WireCandidateFeedback } from '../lib/api/contract';
+import { toCandidateFeedback, toSimulationReport } from '../lib/api/mappers/assessment';
+import { example } from './apiHarness';
 
-describe('preview report', () => {
+// Candidate A's report and feedback as the API sends them, through the screens' mappers.
+const previewReport = toSimulationReport(example<WireAssessment>('assessment.json'));
+const previewFeedback = toCandidateFeedback(example<WireCandidateFeedback>('candidate-feedback.json'));
+
+describe('the report as the API sends it', () => {
   it('quotes every piece of evidence word for word from a candidate turn', () => {
     const turns = new Map(previewReport.turns.map((turn) => [turn.turnId, turn]));
     for (const score of previewReport.scores) {

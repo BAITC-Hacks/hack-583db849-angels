@@ -106,7 +106,7 @@ export const demoSteps: DemoStep[] = [
   },
   {
     module: 'M3',
-    preview: '/commission/simulation-report/preview',
+    preview: '/commission/simulation-report',
     copy: {
       en: { title: 'Report', note: 'D.R.I.V.E. scores with verbatim quotes' },
       ru: { title: 'Отчёт', note: 'Баллы D.R.I.V.E. с дословными цитатами' },
