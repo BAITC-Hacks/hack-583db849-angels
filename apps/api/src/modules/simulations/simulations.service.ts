@@ -307,7 +307,8 @@ export class SimulationsService {
 
   private toTurn(turn: SimulationTurn): SimulationDto['turns'][number] {
     return { turnId: this.turnId(turn.sequence), speaker: turn.speaker, text: turn.text,
-      startedAt: this.turnDate(turn.startedAt, turn.createdAt), endedAt: this.turnDate(turn.endedAt, turn.createdAt) };
+      startedAt: this.turnDate(turn.startedAt, turn.createdAt), endedAt: this.turnDate(turn.endedAt, turn.createdAt),
+      ...(turn.speaker === 'candidate' ? { recognitionConfidence: turn.recognitionConfidence ?? null } : {}) };
   }
 
   private turnDate(date: Date | null, fallback: Date): string { return (date ?? fallback).toISOString(); }

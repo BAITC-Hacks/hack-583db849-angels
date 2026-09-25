@@ -40,6 +40,9 @@ export class TurnDto {
   @ApiProperty() text!: string;
   @ApiProperty({ format: 'date-time' }) startedAt!: string;
   @ApiProperty({ format: 'date-time' }) endedAt!: string;
+  /** Candidate turns only: the recogniser's lowest confidence, null for a typed turn. A flag, never a penalty. */
+  @ApiProperty({ type: Number, nullable: true, required: false, minimum: 0, maximum: 1 })
+  recognitionConfidence?: number | null;
 }
 
 export class SimulationDto {
