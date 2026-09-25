@@ -2,6 +2,7 @@ import { Body, Controller, Get, Headers, Param, Post } from '@nestjs/common';
 import { ApiCreatedResponse, ApiHeader, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
 
 import { Roles } from '../../auth/roles.decorator';
+import { EntityId } from '../../entity-id.pipe';
 import { IdempotencyService } from '../../idempotency/idempotency.service';
 import { CandidateFeedbackDto, CreateSimulationAssessmentDto, SimulationAssessmentDto } from './dto/simulation-assessment.dto';
 import { SimulationAssessmentsService } from './simulation-assessments.service';
@@ -24,7 +25,7 @@ export class SimulationAssessmentsController {
   @Roles('commission', 'admin')
   @ApiParam({ name: 'assessmentId', type: String })
   @ApiOkResponse({ type: SimulationAssessmentDto })
-  get(@Param('assessmentId') assessmentId: string): Promise<SimulationAssessmentDto> {
+  get(@Param('assessmentId', EntityId) assessmentId: string): Promise<SimulationAssessmentDto> {
     return this.assessments.get(assessmentId);
   }
 
@@ -32,7 +33,7 @@ export class SimulationAssessmentsController {
   @Roles('platform', 'interviewer', 'commission', 'admin')
   @ApiParam({ name: 'assessmentId', type: String })
   @ApiOkResponse({ type: CandidateFeedbackDto })
-  feedback(@Param('assessmentId') assessmentId: string): Promise<CandidateFeedbackDto> {
+  feedback(@Param('assessmentId', EntityId) assessmentId: string): Promise<CandidateFeedbackDto> {
     return this.assessments.feedback(assessmentId);
   }
 }

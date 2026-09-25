@@ -4,6 +4,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
 
 import { Roles } from '../../auth/roles.decorator';
+import { EntityId } from '../../entity-id.pipe';
 import { ApiRole } from '../../auth/roles';
 import { IdempotencyService } from '../../idempotency/idempotency.service';
 import { AudioTurnDto, CompleteSimulationDto, CreateSimulationDto, SimulationDto, TextTurnDto, TurnResultDto } from './dto/simulation.dto';
@@ -33,7 +34,7 @@ export class SimulationsController {
   @ApiBody({ schema: { oneOf: [{ $ref: getSchemaPath(TextTurnDto) }, { $ref: getSchemaPath(AudioTurnDto) }] } })
   @ApiOkResponse({ type: TurnResultDto })
   @UseInterceptors(FileInterceptor('audio', { limits: { fileSize: 50 * 1024 * 1024 } }))
-  turn(@Param('simulationId') simulationId: string, @Body() body: Record<string, unknown>,
+  turn(@Param('simulationId', EntityId) simulationId: string, @Body() body: Record<string, unknown>,
     @UploadedFile() audio: UploadedAudio | undefined, @Headers('idempotency-key') key: string | undefined,
     @Req() request: Request & { apiRole: ApiRole }): Promise<TurnResultDto> {
     if (audio && body?.text !== undefined) {
@@ -55,7 +56,7 @@ export class SimulationsController {
   @ApiParam({ name: 'simulationId', type: String })
   @ApiParam({ name: 'turnId', type: String })
   @ApiOkResponse({ content: { 'audio/mpeg': { schema: { type: 'string', format: 'binary' } } } })
-  async audio(@Param('simulationId') simulationId: string, @Param('turnId') turnId: string): Promise<StreamableFile> {
+  async audio(@Param('simulationId', EntityId) simulationId: string, @Param('turnId') turnId: string): Promise<StreamableFile> {
     return new StreamableFile(await this.simulations.characterAudio(simulationId, turnId));
   }
 
@@ -63,7 +64,7 @@ export class SimulationsController {
   @HttpCode(200)
   @ApiParam({ name: 'simulationId', type: String })
   @ApiOkResponse({ type: SimulationDto })
-  complete(@Param('simulationId') simulationId: string, @Body() input: CompleteSimulationDto,
+  complete(@Param('simulationId', EntityId) simulationId: string, @Body() input: CompleteSimulationDto,
     @Req() request: Request & { apiRole: ApiRole }): Promise<SimulationDto> {
     return this.simulations.complete(simulationId, input.reason, request.apiRole);
   }
@@ -71,7 +72,7 @@ export class SimulationsController {
   @Get(':simulationId')
   @ApiParam({ name: 'simulationId', type: String })
   @ApiOkResponse({ type: SimulationDto })
-  get(@Param('simulationId') simulationId: string): Promise<SimulationDto> {
+  get(@Param('simulationId', EntityId) simulationId: string): Promise<SimulationDto> {
     return this.simulations.get(simulationId);
   }
 }

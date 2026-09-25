@@ -8,6 +8,8 @@ export function filterProgressForRole(progress: CandidateProgressDto, role: ApiR
       brief: null,
       interview: null,
       consistency: { before: null, after: null },
+      // The reason can be personal, and the candidate's channel has no use for it.
+      accommodation: null,
     };
   }
   if (role === 'interviewer') {

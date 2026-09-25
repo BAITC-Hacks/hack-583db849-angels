@@ -5,7 +5,8 @@ import { useState } from 'react';
 import { candidateByCode, candidatesKey, useCandidates } from '../../lib/api/candidates';
 import { api, unwrap } from '../../lib/api/client';
 import { errorText } from '../../lib/api/errors';
-import { storeAccommodation, useWorld, type CandidateCode } from '../../lib/demo/world';
+import type { WireCandidate } from '../../lib/api/contract';
+import { record, type CandidateCode } from '../../lib/demo/world';
 import { useStaffLocale } from '../../lib/i18n/StaffLocaleProvider';
 
 const copy = {
@@ -46,7 +47,6 @@ const copy = {
 export function AccommodationControl() {
   const { locale } = useStaffLocale();
   const text = copy[locale];
-  const world = useWorld();
   const [reasons, setReasons] = useState<Partial<Record<CandidateCode, string>>>({});
   const client = useQueryClient();
   const candidates = useCandidates();
@@ -58,8 +58,16 @@ export function AccommodationControl() {
           body: { textMode, reason },
         }),
       ),
-    onSuccess: (saved, { code }) => {
-      storeAccommodation(code, { textMode: saved.textMode, reason: saved.reason });
+    onSuccess: (saved, { code, candidateId }) => {
+      // Show the server's answer at once; the refetch that follows says the same.
+      client.setQueryData<WireCandidate[]>(candidatesKey, (items) =>
+        items?.map((item) =>
+          item.candidateId === candidateId && item.progress
+            ? { ...item, progress: { ...item.progress, accommodation: { textMode: saved.textMode, reason: saved.reason } } }
+            : item,
+        ),
+      );
+      record('accommodation-changed', code);
       void client.invalidateQueries({ queryKey: candidatesKey });
     },
   });
@@ -76,8 +84,8 @@ export function AccommodationControl() {
 
       <ul className="flex flex-col divide-y divide-border-subtle">
         {(['A', 'B', 'C'] as const).map((code) => {
-          const accommodation = world.accommodations[code];
           const candidate = candidateByCode(candidates.data, code);
+          const accommodation = candidate?.progress?.accommodation ?? { textMode: false, reason: '' };
           const started = Boolean(candidate?.progress?.simulation);
           const reason = reasons[code] ?? accommodation.reason;
           const failed = change.isError && change.variables?.code === code ? errorText(change.error, locale) : null;

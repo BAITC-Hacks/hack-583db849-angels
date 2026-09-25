@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import CommissionHome from '../app/(product)/commission/page';
 import InterviewerHome from '../app/(product)/interviewer/page';
@@ -79,7 +79,7 @@ describe('each role has its own working home', () => {
     mockApi({ 'GET /api/v1/candidates': () => json(example<{ items: WireCandidate[] }>('candidates.json')) });
     withQuery(<CommissionHome />);
     expect(screen.queryByRole('link', { name: 'Open report' })).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: 'Use the recorded session' }));
+    act(() => record('assessment-ready', 'A', { assessmentReady: true }));
     expect(screen.getAllByRole('link', { name: /Open (the )?report/ }).length).toBeGreaterThan(0);
   });
 });

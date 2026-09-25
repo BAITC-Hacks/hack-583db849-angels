@@ -258,6 +258,7 @@ interface CandidateProgress {                     // filtered by role, see the R
   } | null;
   surprise: { surpriseId: string; status: SurpriseStatus } | null;
   consistency: { before: StepStatus | null; after: StepStatus | 'locked' | null };
+  accommodation: { textMode: boolean; reason: string } | null;  // staff only; null until set, and always for platform
 }
 
 interface Brief {
