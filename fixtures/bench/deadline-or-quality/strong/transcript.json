@@ -1,0 +1,86 @@
+[
+  {
+    "turnId": "turn_01",
+    "speaker": "character",
+    "text": "Hi! Just confirming: the page goes live on Monday morning, right?",
+    "startedAt": "2026-09-25T10:00:00Z",
+    "endedAt": "2026-09-25T10:00:04Z"
+  },
+  {
+    "turnId": "turn_02",
+    "speaker": "candidate",
+    "text": "Before I say yes, let me be honest: the page works, but half the answers aren't checked yet.",
+    "startedAt": "2026-09-25T10:00:10Z",
+    "endedAt": "2026-09-25T10:00:19Z"
+  },
+  {
+    "turnId": "turn_03",
+    "speaker": "character",
+    "text": "The thing is, the link is already in the printed booklet. Two thousand copies.",
+    "startedAt": "2026-09-25T10:00:25Z",
+    "endedAt": "2026-09-25T10:00:30Z"
+  },
+  {
+    "turnId": "turn_04",
+    "speaker": "candidate",
+    "text": "Then students will open it on day one no matter what. The real risk is them trusting wrong answers.",
+    "startedAt": "2026-09-25T10:00:36Z",
+    "endedAt": "2026-09-25T10:00:46Z"
+  },
+  {
+    "turnId": "turn_05",
+    "speaker": "character",
+    "text": "So what can actually go live on Monday?",
+    "startedAt": "2026-09-25T10:00:52Z",
+    "endedAt": "2026-09-25T10:00:56Z"
+  },
+  {
+    "turnId": "turn_06",
+    "speaker": "candidate",
+    "text": "Monday we launch the twenty most asked questions, all checked, and hide the search until it works. The rest comes on Thursday.",
+    "startedAt": "2026-09-25T10:01:02Z",
+    "endedAt": "2026-09-25T10:01:13Z"
+  },
+  {
+    "turnId": "turn_07",
+    "speaker": "character",
+    "text": "Your teammates have exams on Monday too, don't they? Who's going to check the answers?",
+    "startedAt": "2026-09-25T10:01:19Z",
+    "endedAt": "2026-09-25T10:01:25Z"
+  },
+  {
+    "turnId": "turn_08",
+    "speaker": "candidate",
+    "text": "Nobody sacrifices their exam. I'll check most answers, and the others review twenty each on Sunday if they can.",
+    "startedAt": "2026-09-25T10:01:31Z",
+    "endedAt": "2026-09-25T10:01:41Z"
+  },
+  {
+    "turnId": "turn_09",
+    "speaker": "character",
+    "text": "Okay. Tell me exactly what happens and when, so I can tell my boss.",
+    "startedAt": "2026-09-25T10:01:47Z",
+    "endedAt": "2026-09-25T10:01:52Z"
+  },
+  {
+    "turnId": "turn_10",
+    "speaker": "candidate",
+    "text": "Saturday I check the top twenty, Sunday Aigul reviews them, Monday at eight it's live, and the full version is ready by Thursday.",
+    "startedAt": "2026-09-25T10:01:58Z",
+    "endedAt": "2026-09-25T10:02:10Z"
+  },
+  {
+    "turnId": "turn_11",
+    "speaker": "character",
+    "text": "A student just posted that the library hours on the page are wrong. Two hundred people have seen it. What do we do?",
+    "startedAt": "2026-09-25T10:02:16Z",
+    "endedAt": "2026-09-25T10:02:25Z"
+  },
+  {
+    "turnId": "turn_12",
+    "speaker": "candidate",
+    "text": "That one's on us. We fix it within the hour, post a correction where the student asked, and recheck the similar answers.",
+    "startedAt": "2026-09-25T10:02:31Z",
+    "endedAt": "2026-09-25T10:02:42Z"
+  }
+]

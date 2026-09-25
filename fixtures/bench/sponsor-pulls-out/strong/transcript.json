@@ -1,0 +1,86 @@
+[
+  {
+    "turnId": "turn_01",
+    "speaker": "character",
+    "text": "We'd love to fund your club for a whole year: books, snacks, everything. We'd just turn it into a coding club for kids, with our logo on it. Can you give me a yes by tomorrow?",
+    "startedAt": "2026-09-25T10:00:00Z",
+    "endedAt": "2026-09-25T10:00:14Z"
+  },
+  {
+    "turnId": "turn_02",
+    "speaker": "candidate",
+    "text": "Thanks for the offer. Before I answer, what exactly would have to change, and what does your shop need from this?",
+    "startedAt": "2026-09-25T10:00:20Z",
+    "endedAt": "2026-09-25T10:00:30Z"
+  },
+  {
+    "turnId": "turn_03",
+    "speaker": "character",
+    "text": "Honestly, nobody funds reading clubs anymore. Coding is what parents want. Why hold on to the old idea?",
+    "startedAt": "2026-09-25T10:00:36Z",
+    "endedAt": "2026-09-25T10:00:43Z"
+  },
+  {
+    "turnId": "turn_04",
+    "speaker": "candidate",
+    "text": "Coding is great, but it's a different club. Our kids come to fall in love with books, and parents chose us for reading.",
+    "startedAt": "2026-09-25T10:00:49Z",
+    "endedAt": "2026-09-25T10:01:01Z"
+  },
+  {
+    "turnId": "turn_05",
+    "speaker": "character",
+    "text": "So what could work for you? I still need something to show my boss.",
+    "startedAt": "2026-09-25T10:01:07Z",
+    "endedAt": "2026-09-25T10:01:12Z"
+  },
+  {
+    "turnId": "turn_06",
+    "speaker": "candidate",
+    "text": "What if you sponsor a shelf of books about inventors, and we add one monthly session of stories about technology with your name on it?",
+    "startedAt": "2026-09-25T10:01:18Z",
+    "endedAt": "2026-09-25T10:01:30Z"
+  },
+  {
+    "turnId": "turn_07",
+    "speaker": "character",
+    "text": "And your volunteers, will they go along with this? Who decides on your side?",
+    "startedAt": "2026-09-25T10:01:36Z",
+    "endedAt": "2026-09-25T10:01:41Z"
+  },
+  {
+    "turnId": "turn_08",
+    "speaker": "candidate",
+    "text": "I'll put both options to the volunteers tonight, and we'll ask the parents before we sign.",
+    "startedAt": "2026-09-25T10:01:47Z",
+    "endedAt": "2026-09-25T10:01:55Z"
+  },
+  {
+    "turnId": "turn_09",
+    "speaker": "character",
+    "text": "Okay, a smaller deal could work. But I need it in writing. What goes in it?",
+    "startedAt": "2026-09-25T10:02:01Z",
+    "endedAt": "2026-09-25T10:02:07Z"
+  },
+  {
+    "turnId": "turn_10",
+    "speaker": "candidate",
+    "text": "A one-page agreement: what you give, what we give, where the logo goes, a review in three months, and how either side can stop.",
+    "startedAt": "2026-09-25T10:02:13Z",
+    "endedAt": "2026-09-25T10:02:25Z"
+  },
+  {
+    "turnId": "turn_11",
+    "speaker": "character",
+    "text": "I heard two parents complained that the club is becoming an advert for us. My boss is nervous. What are you going to do?",
+    "startedAt": "2026-09-25T10:02:31Z",
+    "endedAt": "2026-09-25T10:02:40Z"
+  },
+  {
+    "turnId": "turn_12",
+    "speaker": "candidate",
+    "text": "Fair concern. Let's meet the parents, show them the agreement, and move the logo if it bothers them.",
+    "startedAt": "2026-09-25T10:02:46Z",
+    "endedAt": "2026-09-25T10:02:55Z"
+  }
+]

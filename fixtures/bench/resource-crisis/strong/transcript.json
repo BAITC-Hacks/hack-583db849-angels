@@ -1,0 +1,86 @@
+[
+  {
+    "turnId": "turn_01",
+    "speaker": "character",
+    "text": "The council just cut our grant in half. We can't pay for the room or the lunches, and the deposit is due Friday. I think we have to cancel.",
+    "startedAt": "2026-09-25T10:00:00Z",
+    "endedAt": "2026-09-25T10:00:11Z"
+  },
+  {
+    "turnId": "turn_02",
+    "speaker": "candidate",
+    "text": "Thanks for telling me straight away. Before we decide anything, walk me through what the council changed and what we still have.",
+    "startedAt": "2026-09-25T10:00:17Z",
+    "endedAt": "2026-09-25T10:00:28Z"
+  },
+  {
+    "turnId": "turn_03",
+    "speaker": "character",
+    "text": "So what do we do? We have half the money and seven days.",
+    "startedAt": "2026-09-25T10:00:34Z",
+    "endedAt": "2026-09-25T10:00:39Z"
+  },
+  {
+    "turnId": "turn_04",
+    "speaker": "candidate",
+    "text": "Let's ask the university for a free room and ask two cafés to sponsor lunch. The risk is they say no by Friday, so we ask today and keep a smaller plan ready.",
+    "startedAt": "2026-09-25T10:00:45Z",
+    "endedAt": "2026-09-25T10:01:01Z"
+  },
+  {
+    "turnId": "turn_05",
+    "speaker": "character",
+    "text": "If we can't do everything, what do we protect?",
+    "startedAt": "2026-09-25T10:01:07Z",
+    "endedAt": "2026-09-25T10:01:11Z"
+  },
+  {
+    "turnId": "turn_06",
+    "speaker": "candidate",
+    "text": "What matters is that the pupils actually build something. The lunches are nice, but the teaching is the point.",
+    "startedAt": "2026-09-25T10:01:17Z",
+    "endedAt": "2026-09-25T10:01:27Z"
+  },
+  {
+    "turnId": "turn_07",
+    "speaker": "character",
+    "text": "Sixty kids signed up and we have thirty seats. How do we choose?",
+    "startedAt": "2026-09-25T10:01:33Z",
+    "endedAt": "2026-09-25T10:01:38Z"
+  },
+  {
+    "turnId": "turn_08",
+    "speaker": "candidate",
+    "text": "We draw lots in public for the thirty seats, keep half for pupils who have never coded, and write to everyone else ourselves to explain why.",
+    "startedAt": "2026-09-25T10:01:44Z",
+    "endedAt": "2026-09-25T10:01:57Z"
+  },
+  {
+    "turnId": "turn_09",
+    "speaker": "character",
+    "text": "Okay. The deposit is due Friday. What exactly do we do before then?",
+    "startedAt": "2026-09-25T10:02:03Z",
+    "endedAt": "2026-09-25T10:02:08Z"
+  },
+  {
+    "turnId": "turn_10",
+    "speaker": "candidate",
+    "text": "You call the council by Wednesday, I book the free room today, and Madi asks the cafés. We check in on Thursday evening before the deposit is due.",
+    "startedAt": "2026-09-25T10:02:14Z",
+    "endedAt": "2026-09-25T10:02:28Z"
+  },
+  {
+    "turnId": "turn_11",
+    "speaker": "character",
+    "text": "The university room fell through. All we can get is a small room for twenty people. Now what?",
+    "startedAt": "2026-09-25T10:02:34Z",
+    "endedAt": "2026-09-25T10:02:41Z"
+  },
+  {
+    "turnId": "turn_12",
+    "speaker": "candidate",
+    "text": "Okay, that hurts. Let's run two sessions of ten in the smaller room and split the day into shifts.",
+    "startedAt": "2026-09-25T10:02:47Z",
+    "endedAt": "2026-09-25T10:02:57Z"
+  }
+]

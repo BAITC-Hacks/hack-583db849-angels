@@ -1,0 +1,93 @@
+{
+  "scores": [
+    {
+      "competency": "D",
+      "score": 3,
+      "confidence": "medium",
+      "rationale": "Keeps going and learns from the setback.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_12",
+          "quote": "Let's talk to those four and then decide."
+        }
+      ]
+    },
+    {
+      "competency": "R",
+      "score": 2,
+      "confidence": "medium",
+      "rationale": "Bets on a big relaunch without naming what could go wrong.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_06",
+          "quote": "We rebuild it bigger with chat and ratings, and relaunch."
+        }
+      ]
+    },
+    {
+      "competency": "I",
+      "score": 3,
+      "confidence": "medium",
+      "rationale": "Keeps going and learns from the setback.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_04",
+          "quote": "Three swaps is small, but let's ask those three people why it worked."
+        }
+      ]
+    },
+    {
+      "competency": "V",
+      "score": 2,
+      "confidence": "medium",
+      "rationale": "Carries the team instead of asking what people can give.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_02",
+          "quote": "No way, we didn't work two months to give up now."
+        }
+      ]
+    },
+    {
+      "competency": "E",
+      "score": 3,
+      "confidence": "medium",
+      "rationale": "Plans the week with a clear number.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_10",
+          "quote": "By Friday we have a new screen, twenty testers and one number we watch."
+        }
+      ]
+    }
+  ],
+  "english": {
+    "wordsPerMinute": 116.47,
+    "fillerRate": 0.0,
+    "meanTurnLength": 11.0,
+    "lexicalDiversity": 0.8333,
+    "grammarErrorsPer100Words": null,
+    "cefrEstimate": null
+  },
+  "interviewQuestions": [],
+  "candidateFeedback": {
+    "strengths": [
+      "When the plan broke, you looked for the next step instead of stopping.",
+      "You looked past the first problem to what the people involved really needed.",
+      "You turned the discussion into steps: who does what, and by when."
+    ],
+    "growth": [
+      "When you suggest a change, say what could go wrong and how you would keep it small.",
+      "Explain your decisions openly, especially to the people they affect."
+    ],
+    "nextTime": [
+      "Next time you propose something, add one sentence on the risk and how to limit it.",
+      "Next time, tell the people affected what you decided and why, in your own words."
+    ]
+  }
+}

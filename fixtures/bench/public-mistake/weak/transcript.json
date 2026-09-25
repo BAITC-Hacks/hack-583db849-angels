@@ -1,0 +1,100 @@
+[
+  {
+    "turnId": "turn_01",
+    "speaker": "character",
+    "text": "Okay, so the science fair date in my post was wrong. Registration closed yesterday. Let's just delete it. Nobody will remember in a week.",
+    "startedAt": "2026-09-25T10:00:00Z",
+    "endedAt": "2026-09-25T10:00:09Z"
+  },
+  {
+    "turnId": "turn_02",
+    "speaker": "candidate",
+    "text": "Yes, delete it quickly and say nothing.",
+    "startedAt": "2026-09-25T10:00:15Z",
+    "endedAt": "2026-09-25T10:00:19Z"
+  },
+  {
+    "turnId": "turn_03",
+    "speaker": "character",
+    "text": "Three hundred shares. And some pupils are saying they missed registration because of us.",
+    "startedAt": "2026-09-25T10:00:25Z",
+    "endedAt": "2026-09-25T10:00:30Z"
+  },
+  {
+    "turnId": "turn_04",
+    "speaker": "candidate",
+    "text": "Our reputation is what matters now. We need to protect the club's name.",
+    "startedAt": "2026-09-25T10:00:36Z",
+    "endedAt": "2026-09-25T10:00:42Z"
+  },
+  {
+    "turnId": "turn_05",
+    "speaker": "character",
+    "text": "If we admit it, nobody will trust our page again. And everyone will know it was me. I'll be kicked out.",
+    "startedAt": "2026-09-25T10:00:48Z",
+    "endedAt": "2026-09-25T10:00:56Z"
+  },
+  {
+    "turnId": "turn_06",
+    "speaker": "candidate",
+    "text": "Okay, then let's just say nothing to protect you. Let's pretend it never happened.",
+    "startedAt": "2026-09-25T10:01:02Z",
+    "endedAt": "2026-09-25T10:01:09Z"
+  },
+  {
+    "turnId": "turn_07",
+    "speaker": "character",
+    "text": "Okay, but what can we actually do for them? Registration is closed.",
+    "startedAt": "2026-09-25T10:01:15Z",
+    "endedAt": "2026-09-25T10:01:20Z"
+  },
+  {
+    "turnId": "turn_08",
+    "speaker": "candidate",
+    "text": "Tell them we'll get them in, no matter what.",
+    "startedAt": "2026-09-25T10:01:26Z",
+    "endedAt": "2026-09-25T10:01:30Z"
+  },
+  {
+    "turnId": "turn_09",
+    "speaker": "character",
+    "text": "So what do we actually post?",
+    "startedAt": "2026-09-25T10:01:36Z",
+    "endedAt": "2026-09-25T10:01:40Z"
+  },
+  {
+    "turnId": "turn_10",
+    "speaker": "candidate",
+    "text": "Something like 'there may have been a small confusion'.",
+    "startedAt": "2026-09-25T10:01:46Z",
+    "endedAt": "2026-09-25T10:01:50Z"
+  },
+  {
+    "turnId": "turn_11",
+    "speaker": "character",
+    "text": "How do we make sure this never happens again? Without making every post take a week.",
+    "startedAt": "2026-09-25T10:01:56Z",
+    "endedAt": "2026-09-25T10:02:02Z"
+  },
+  {
+    "turnId": "turn_12",
+    "speaker": "candidate",
+    "text": "It was one mistake, no need for rules. Let's just be more careful.",
+    "startedAt": "2026-09-25T10:02:08Z",
+    "endedAt": "2026-09-25T10:02:14Z"
+  },
+  {
+    "turnId": "turn_13",
+    "speaker": "character",
+    "text": "The organisers said no. No late registration. The comments are getting angry again.",
+    "startedAt": "2026-09-25T10:02:20Z",
+    "endedAt": "2026-09-25T10:02:25Z"
+  },
+  {
+    "turnId": "turn_14",
+    "speaker": "candidate",
+    "text": "Let's turn off the comments and just ignore them now.",
+    "startedAt": "2026-09-25T10:02:31Z",
+    "endedAt": "2026-09-25T10:02:36Z"
+  }
+]

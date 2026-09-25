@@ -1,0 +1,91 @@
+{
+  "scores": [
+    {
+      "competency": "D",
+      "score": 4,
+      "confidence": "high",
+      "rationale": "Keeps answering people when the news is bad.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_12",
+          "quote": "It's hard news, but we reply to each comment ourselves and share the next fair's dates."
+        }
+      ]
+    },
+    {
+      "competency": "R",
+      "score": 4,
+      "confidence": "high",
+      "rationale": "Tries to repair the harm without overpromising; adds a light check that keeps posting fast.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_06",
+          "quote": "We can't promise anything, but let's collect the names of pupils who missed it and ask the organisers today for a short extension."
+        }
+      ]
+    },
+    {
+      "competency": "I",
+      "score": 4,
+      "confidence": "high",
+      "rationale": "Gets the facts first; puts the pupils before the page.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_04",
+          "quote": "Then the real problem is the pupils who missed it."
+        }
+      ]
+    },
+    {
+      "competency": "V",
+      "score": 4,
+      "confidence": "high",
+      "rationale": "Puts the pupils before the page; corrects the post honestly.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_08",
+          "quote": "We pin a clear correction at the top: the real date, that we got it wrong, and what we're asking the organisers."
+        }
+      ]
+    },
+    {
+      "competency": "E",
+      "score": 3,
+      "confidence": "medium",
+      "rationale": "Adds a light check that keeps posting fast.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_10",
+          "quote": "From now on every date gets checked against the official source by a second person."
+        }
+      ]
+    }
+  ],
+  "english": {
+    "wordsPerMinute": 119.0,
+    "fillerRate": 0.0,
+    "meanTurnLength": 19.83,
+    "lexicalDiversity": 0.7059,
+    "grammarErrorsPer100Words": null,
+    "cefrEstimate": null
+  },
+  "interviewQuestions": [],
+  "candidateFeedback": {
+    "strengths": [
+      "When the plan broke, you looked for the next step instead of stopping.",
+      "You suggested something new and said what could go wrong with it.",
+      "You looked past the first problem to what the people involved really needed."
+    ],
+    "growth": [
+      "When you suggest a change, say what could go wrong and how you would keep it small."
+    ],
+    "nextTime": [
+      "Next time you propose something, add one sentence on the risk and how to limit it."
+    ]
+  }
+}

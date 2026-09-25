@@ -1,0 +1,100 @@
+[
+  {
+    "turnId": "turn_01",
+    "speaker": "character",
+    "text": "Forty downloads, three swaps. I think we should just shut it down and get our evenings back.",
+    "startedAt": "2026-09-25T10:00:00Z",
+    "endedAt": "2026-09-25T10:00:07Z"
+  },
+  {
+    "turnId": "turn_02",
+    "speaker": "candidate",
+    "text": "Honestly, I agree. It failed, let's stop.",
+    "startedAt": "2026-09-25T10:00:13Z",
+    "endedAt": "2026-09-25T10:00:17Z"
+  },
+  {
+    "turnId": "turn_03",
+    "speaker": "character",
+    "text": "Forty downloads, three swaps, one review that says 'confusing'. What do you read from that?",
+    "startedAt": "2026-09-25T10:00:23Z",
+    "endedAt": "2026-09-25T10:00:29Z"
+  },
+  {
+    "turnId": "turn_04",
+    "speaker": "candidate",
+    "text": "The design is confusing, that's the problem.",
+    "startedAt": "2026-09-25T10:00:35Z",
+    "endedAt": "2026-09-25T10:00:39Z"
+  },
+  {
+    "turnId": "turn_05",
+    "speaker": "character",
+    "text": "Right. So it's my screens. Maybe I should just leave the team, then.",
+    "startedAt": "2026-09-25T10:00:45Z",
+    "endedAt": "2026-09-25T10:00:50Z"
+  },
+  {
+    "turnId": "turn_06",
+    "speaker": "candidate",
+    "text": "Well, facts are facts. Someone has to say it.",
+    "startedAt": "2026-09-25T10:00:56Z",
+    "endedAt": "2026-09-25T10:01:00Z"
+  },
+  {
+    "turnId": "turn_07",
+    "speaker": "character",
+    "text": "Say we don't quit. What do we actually do for the next month?",
+    "startedAt": "2026-09-25T10:01:06Z",
+    "endedAt": "2026-09-25T10:01:11Z"
+  },
+  {
+    "turnId": "turn_08",
+    "speaker": "candidate",
+    "text": "Let's just keep it running and see. Maybe it grows by itself.",
+    "startedAt": "2026-09-25T10:01:17Z",
+    "endedAt": "2026-09-25T10:01:23Z"
+  },
+  {
+    "turnId": "turn_09",
+    "speaker": "character",
+    "text": "Ali and Dias have exams this month. They want to step back. Honestly, so do I, a little.",
+    "startedAt": "2026-09-25T10:01:29Z",
+    "endedAt": "2026-09-25T10:01:36Z"
+  },
+  {
+    "turnId": "turn_10",
+    "speaker": "candidate",
+    "text": "Everyone has to stay. Exams are no excuse.",
+    "startedAt": "2026-09-25T10:01:42Z",
+    "endedAt": "2026-09-25T10:01:46Z"
+  },
+  {
+    "turnId": "turn_11",
+    "speaker": "character",
+    "text": "Okay. What happens this week, and who does it?",
+    "startedAt": "2026-09-25T10:01:52Z",
+    "endedAt": "2026-09-25T10:01:56Z"
+  },
+  {
+    "turnId": "turn_12",
+    "speaker": "candidate",
+    "text": "Let's all do what we can.",
+    "startedAt": "2026-09-25T10:02:02Z",
+    "endedAt": "2026-09-25T10:02:05Z"
+  },
+  {
+    "turnId": "turn_13",
+    "speaker": "character",
+    "text": "Four swaps. After all that. Was it all for nothing?",
+    "startedAt": "2026-09-25T10:02:11Z",
+    "endedAt": "2026-09-25T10:02:15Z"
+  },
+  {
+    "turnId": "turn_14",
+    "speaker": "candidate",
+    "text": "Yes, it was a waste of time. We should never have started.",
+    "startedAt": "2026-09-25T10:02:21Z",
+    "endedAt": "2026-09-25T10:02:27Z"
+  }
+]

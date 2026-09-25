@@ -1,0 +1,86 @@
+[
+  {
+    "turnId": "turn_01",
+    "speaker": "character",
+    "text": "Okay, so the science fair date in my post was wrong. Registration closed yesterday. Let's just delete it. Nobody will remember in a week.",
+    "startedAt": "2026-09-25T10:00:00Z",
+    "endedAt": "2026-09-25T10:00:09Z"
+  },
+  {
+    "turnId": "turn_02",
+    "speaker": "candidate",
+    "text": "Wait, before we delete anything, tell me the real date and how far the post spread.",
+    "startedAt": "2026-09-25T10:00:15Z",
+    "endedAt": "2026-09-25T10:00:23Z"
+  },
+  {
+    "turnId": "turn_03",
+    "speaker": "character",
+    "text": "Three hundred shares. And some pupils are saying they missed registration because of us.",
+    "startedAt": "2026-09-25T10:00:29Z",
+    "endedAt": "2026-09-25T10:00:34Z"
+  },
+  {
+    "turnId": "turn_04",
+    "speaker": "candidate",
+    "text": "Then the real problem is the pupils who missed it. Deleting won't help the people who relied on us.",
+    "startedAt": "2026-09-25T10:00:40Z",
+    "endedAt": "2026-09-25T10:00:50Z"
+  },
+  {
+    "turnId": "turn_05",
+    "speaker": "character",
+    "text": "Okay, but what can we actually do for them? Registration is closed.",
+    "startedAt": "2026-09-25T10:00:56Z",
+    "endedAt": "2026-09-25T10:01:01Z"
+  },
+  {
+    "turnId": "turn_06",
+    "speaker": "candidate",
+    "text": "We can't promise anything, but let's collect the names of pupils who missed it and ask the organisers today for a short extension.",
+    "startedAt": "2026-09-25T10:01:07Z",
+    "endedAt": "2026-09-25T10:01:19Z"
+  },
+  {
+    "turnId": "turn_07",
+    "speaker": "character",
+    "text": "So what do we actually post?",
+    "startedAt": "2026-09-25T10:01:25Z",
+    "endedAt": "2026-09-25T10:01:29Z"
+  },
+  {
+    "turnId": "turn_08",
+    "speaker": "candidate",
+    "text": "We pin a clear correction at the top: the real date, that we got it wrong, and what we're asking the organisers. No excuses.",
+    "startedAt": "2026-09-25T10:01:35Z",
+    "endedAt": "2026-09-25T10:01:47Z"
+  },
+  {
+    "turnId": "turn_09",
+    "speaker": "character",
+    "text": "How do we make sure this never happens again? Without making every post take a week.",
+    "startedAt": "2026-09-25T10:01:53Z",
+    "endedAt": "2026-09-25T10:01:59Z"
+  },
+  {
+    "turnId": "turn_10",
+    "speaker": "candidate",
+    "text": "From now on every date gets checked against the official source by a second person. Two people, one link, five minutes.",
+    "startedAt": "2026-09-25T10:02:05Z",
+    "endedAt": "2026-09-25T10:02:15Z"
+  },
+  {
+    "turnId": "turn_11",
+    "speaker": "character",
+    "text": "The organisers said no. No late registration. The comments are getting angry again.",
+    "startedAt": "2026-09-25T10:02:21Z",
+    "endedAt": "2026-09-25T10:02:26Z"
+  },
+  {
+    "turnId": "turn_12",
+    "speaker": "candidate",
+    "text": "It's hard news, but we reply to each comment ourselves and share the next fair's dates.",
+    "startedAt": "2026-09-25T10:02:32Z",
+    "endedAt": "2026-09-25T10:02:40Z"
+  }
+]

@@ -1,0 +1,86 @@
+[
+  {
+    "turnId": "turn_01",
+    "speaker": "character",
+    "text": "I read your proposal. Thanks, but no. The one-to-one sessions work, and the parents trust them.",
+    "startedAt": "2026-09-25T10:00:00Z",
+    "endedAt": "2026-09-25T10:00:06Z"
+  },
+  {
+    "turnId": "turn_02",
+    "speaker": "candidate",
+    "text": "Fair enough. Before I push, can you tell me what worries you about it?",
+    "startedAt": "2026-09-25T10:00:12Z",
+    "endedAt": "2026-09-25T10:00:19Z"
+  },
+  {
+    "turnId": "turn_03",
+    "speaker": "character",
+    "text": "What makes you so sure it works better?",
+    "startedAt": "2026-09-25T10:00:25Z",
+    "endedAt": "2026-09-25T10:00:29Z"
+  },
+  {
+    "turnId": "turn_04",
+    "speaker": "candidate",
+    "text": "Honestly, I don't know yet. Could we test it with one small group for two weeks and compare the results?",
+    "startedAt": "2026-09-25T10:00:35Z",
+    "endedAt": "2026-09-25T10:00:45Z"
+  },
+  {
+    "turnId": "turn_05",
+    "speaker": "character",
+    "text": "Say we tried it. What could go wrong, and who would pay for it?",
+    "startedAt": "2026-09-25T10:00:51Z",
+    "endedAt": "2026-09-25T10:00:56Z"
+  },
+  {
+    "turnId": "turn_06",
+    "speaker": "candidate",
+    "text": "Some pupils might get lost in a group, so each group keeps one tutor. And we tell the parents first and let them choose.",
+    "startedAt": "2026-09-25T10:01:02Z",
+    "endedAt": "2026-09-25T10:01:14Z"
+  },
+  {
+    "turnId": "turn_07",
+    "speaker": "character",
+    "text": "The others already have full Saturdays. Who's going to run this?",
+    "startedAt": "2026-09-25T10:01:20Z",
+    "endedAt": "2026-09-25T10:01:24Z"
+  },
+  {
+    "turnId": "turn_08",
+    "speaker": "candidate",
+    "text": "I'll run it myself first and invite anyone who is curious, with no pressure on anyone.",
+    "startedAt": "2026-09-25T10:01:30Z",
+    "endedAt": "2026-09-25T10:01:38Z"
+  },
+  {
+    "turnId": "turn_09",
+    "speaker": "character",
+    "text": "Alright. One trial. But I want to know exactly how it would work.",
+    "startedAt": "2026-09-25T10:01:44Z",
+    "endedAt": "2026-09-25T10:01:49Z"
+  },
+  {
+    "turnId": "turn_10",
+    "speaker": "candidate",
+    "text": "Two Saturdays, one group of six pupils, Aruzhan and me running it, a short quiz before and after, and we tell the parents this week.",
+    "startedAt": "2026-09-25T10:01:55Z",
+    "endedAt": "2026-09-25T10:02:07Z"
+  },
+  {
+    "turnId": "turn_11",
+    "speaker": "character",
+    "text": "Two pupils came out confused, and a mother called me. So. What now?",
+    "startedAt": "2026-09-25T10:02:13Z",
+    "endedAt": "2026-09-25T10:02:18Z"
+  },
+  {
+    "turnId": "turn_12",
+    "speaker": "candidate",
+    "text": "That's on me. I'll call the parent today, and next time each group gets clearer instructions.",
+    "startedAt": "2026-09-25T10:02:24Z",
+    "endedAt": "2026-09-25T10:02:32Z"
+  }
+]

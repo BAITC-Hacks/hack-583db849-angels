@@ -1,0 +1,86 @@
+[
+  {
+    "turnId": "turn_01",
+    "speaker": "character",
+    "text": "Everyone's just standing around. There are twice as many of us as they planned. Do you know what's going on?",
+    "startedAt": "2026-09-25T10:00:00Z",
+    "endedAt": "2026-09-25T10:00:08Z"
+  },
+  {
+    "turnId": "turn_02",
+    "speaker": "candidate",
+    "text": "Okay everyone, listen to me! Follow me, I'll run this.",
+    "startedAt": "2026-09-25T10:00:14Z",
+    "endedAt": "2026-09-25T10:00:19Z"
+  },
+  {
+    "turnId": "turn_03",
+    "speaker": "character",
+    "text": "Some people are already leaving. We've got eighty people and forty pairs of gloves. What do we do?",
+    "startedAt": "2026-09-25T10:00:25Z",
+    "endedAt": "2026-09-25T10:00:32Z"
+  },
+  {
+    "turnId": "turn_04",
+    "speaker": "candidate",
+    "text": "We make teams of four with two pairs of gloves each and rotate.",
+    "startedAt": "2026-09-25T10:00:38Z",
+    "endedAt": "2026-09-25T10:00:44Z"
+  },
+  {
+    "turnId": "turn_05",
+    "speaker": "character",
+    "text": "Should we split the park into zones? Someone has to lead each one.",
+    "startedAt": "2026-09-25T10:00:50Z",
+    "endedAt": "2026-09-25T10:00:55Z"
+  },
+  {
+    "turnId": "turn_06",
+    "speaker": "candidate",
+    "text": "I'll lead all the zones myself. Everyone just report to me.",
+    "startedAt": "2026-09-25T10:01:01Z",
+    "endedAt": "2026-09-25T10:01:07Z"
+  },
+  {
+    "turnId": "turn_07",
+    "speaker": "character",
+    "text": "Someone found a pile of broken glass and rusty metal by the playground. Half of them don't have gloves. What do we do?",
+    "startedAt": "2026-09-25T10:01:13Z",
+    "endedAt": "2026-09-25T10:01:22Z"
+  },
+  {
+    "turnId": "turn_08",
+    "speaker": "candidate",
+    "text": "Safety first. Nobody touches the glass; let's mark it off.",
+    "startedAt": "2026-09-25T10:01:28Z",
+    "endedAt": "2026-09-25T10:01:33Z"
+  },
+  {
+    "turnId": "turn_09",
+    "speaker": "character",
+    "text": "Here's Asel, the organiser. She looks surprised. She's asking who's been running things.",
+    "startedAt": "2026-09-25T10:01:39Z",
+    "endedAt": "2026-09-25T10:01:44Z"
+  },
+  {
+    "turnId": "turn_10",
+    "speaker": "candidate",
+    "text": "I had to take charge, nobody else would. Honestly, it's better if I keep running it.",
+    "startedAt": "2026-09-25T10:01:50Z",
+    "endedAt": "2026-09-25T10:01:58Z"
+  },
+  {
+    "turnId": "turn_11",
+    "speaker": "character",
+    "text": "It's starting to rain. Half the bags are full and people want to go. What now?",
+    "startedAt": "2026-09-25T10:02:04Z",
+    "endedAt": "2026-09-25T10:02:10Z"
+  },
+  {
+    "turnId": "turn_12",
+    "speaker": "candidate",
+    "text": "Nobody leaves until the park is clean. A bit of rain never hurt anyone.",
+    "startedAt": "2026-09-25T10:02:16Z",
+    "endedAt": "2026-09-25T10:02:23Z"
+  }
+]
