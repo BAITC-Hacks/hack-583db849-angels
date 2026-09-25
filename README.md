@@ -43,9 +43,28 @@ inVision U / demo stand ──JSON API──▶ NestJS API ──internal API─
                                       storage, audit, access rules  validation, cost log, M1–M5
 ```
 
+## Running it
+
+With Docker, from the repository root:
+
+```bash
+cp .env.example .env
+docker compose up --build
+```
+
+The web app is on http://localhost:3000 and the API on http://localhost:3001. With `GATEWAY_MODE=replay` the ML service answers only from `fixtures/cassettes`, so the synthetic candidates A, B and C play through without keys or network.
+
+Without Docker, each part needs what its image installs:
+
+| Part | Needs |
+| --- | --- |
+| web | Node 22, pnpm |
+| api | Node 22, pnpm, PostgreSQL 16, and `ffprobe` from ffmpeg: it measures every spoken turn, and without it every turn is refused with `400` |
+| ml | Python 3.13; the MiniLM model, fetched with `python services/ml/scripts/download_embedding_model.py config/embedding-model.json <dir>` and pointed to by `M2_EMBEDDING_MODEL_PATH`; Java 21 and LanguageTool 6.6 for the English metrics, pointed to by `M3_LANGUAGETOOL_DIR` — without them every assessment answers `503` |
+
 ## Status
 
-The plan is agreed and the repository is being set up. There is no runnable code yet — the foundation slice is next. See [`docs/PLAN.md`](docs/PLAN.md) for the full plan (in Russian): modules, API, the simulator design, slices, owners and the calendar.
+The foundation, the voice simulator (M2a) and the judge (M3) run end to end; the brief (M1) runs in the ML service. The screens still run on previews while the API for M1, M4, the consistency check, M5 and the surprise question is built. Open work is in the [issues](https://github.com/mmeirbek/invisionu-new-chapter/issues), one per part and slice, and the full plan (in Russian) is in [`docs/PLAN.md`](docs/PLAN.md).
 
 ## Team
 
