@@ -28,6 +28,11 @@ export class CreateInterviewDto {
   @ApiPropertyOptional({ type: [String] }) @IsOptional() @IsArray() @ArrayMaxSize(50) @IsString({ each: true }) @MaxLength(5000, { each: true }) notes?: string[];
 }
 
+/** The notes as they stand now; they replace what was there. */
+export class SaveNotesDto {
+  @ApiProperty({ type: [String] }) @IsArray() @ArrayMaxSize(50) @IsString({ each: true }) @MaxLength(5000, { each: true }) notes!: string[];
+}
+
 /** The multipart body of a recording; the audio arrives as the `audio` file. */
 export class InterviewRecordingDto {
   @ApiProperty({ type: 'string', format: 'binary', description: 'webm, ogg or wav, up to 60 minutes' }) audio!: unknown;

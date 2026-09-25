@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 
-import { Body, Controller, Get, Headers, HttpCode, Param, Post, Req, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Headers, HttpCode, Param, Post, Put, Req, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { ApiAcceptedResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiHeader, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
@@ -10,7 +10,7 @@ import { Roles } from '../../auth/roles.decorator';
 import { EntityId } from '../../entity-id.pipe';
 import { IdempotencyService } from '../../idempotency/idempotency.service';
 import {
-  AssessmentDraftDto, CreateInterviewDto, InterviewDto, InterviewerScoresSavedDto, InterviewRecordingDto, SaveInterviewerScoresDto,
+  AssessmentDraftDto, CreateInterviewDto, InterviewDto, InterviewerScoresSavedDto, InterviewRecordingDto, SaveInterviewerScoresDto, SaveNotesDto,
 } from './dto/interview.dto';
 import { InterviewsService, UploadedAudio } from './interviews.service';
 
@@ -56,6 +56,14 @@ export class InterviewsController {
   @ApiOkResponse({ type: InterviewDto })
   get(@Param('interviewId', EntityId) interviewId: string): Promise<InterviewDto> {
     return this.interviews.get(interviewId);
+  }
+
+  @Put(':interviewId/notes')
+  @Roles('interviewer', 'admin')
+  @ApiParam({ name: 'interviewId', type: String })
+  @ApiOkResponse({ type: InterviewDto })
+  notes(@Param('interviewId', EntityId) interviewId: string, @Body() { notes }: SaveNotesDto): Promise<InterviewDto> {
+    return this.interviews.saveNotes(interviewId, notes);
   }
 
   @Post(':interviewId/interviewer-scores')

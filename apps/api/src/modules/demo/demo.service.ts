@@ -43,12 +43,13 @@ export class DemoService {
 
   /**
    * Starts the demo over: every simulation, assessment, interview, surprise
-   * question, presentation, quality check and the recordings on disk go, and A, B and C
+   * question, presentation, interview slot, quality check and the recordings on disk go, and A, B and C
    * are seeded again. The audit log stays — it is the record of what happened.
    */
   async reset(role: ApiRole): Promise<void> {
     this.demoOnly();
     await this.prisma.$transaction([
+      this.prisma.interviewSlot.deleteMany(),
       this.prisma.qualityCheck.deleteMany(),
       this.prisma.consistencyReport.deleteMany(),
       this.prisma.interviewDraft.deleteMany(),
