@@ -148,3 +148,33 @@ def test_consistency_http_requires_token_and_hides_provider_failure(tmp_path: Pa
     assert response.status_code == 503
     assert response.json()["error"]["code"] == "AI_UNAVAILABLE"
     assert "synthetic provider detail" not in response.text
+
+
+def test_after_http_repairs_reordered_model_claims(tmp_path: Path) -> None:
+    http, gateway, _ = client(tmp_path)
+    request = example("consistency-after.request.json")
+    gateway.output.items.reverse()
+    gateway.output.items[0].claim.text = "A model-invented replacement"
+    gateway.output.items[0].topic = "other"
+
+    response = http.post("/internal/v1/consistency", json=request, headers=TOKEN)
+
+    assert response.status_code == 200
+    assert [item["itemId"] for item in response.json()["items"]] == [
+        "c_01", "c_02", "c_03",
+    ]
+    for saved, returned in zip(request["beforeItems"], response.json()["items"], strict=True):
+        assert returned["claim"] == saved["claim"]
+        assert returned["topic"] == saved["topic"]
+
+
+def test_after_http_rejects_duplicate_source_ids_before_gateway(tmp_path: Path) -> None:
+    http, gateway, _ = client(tmp_path)
+    request = example("consistency-after.request.json")
+    request["interviewTranscript"][1]["turnId"] = request["interviewTranscript"][0]["turnId"]
+
+    response = http.post("/internal/v1/consistency", json=request, headers=TOKEN)
+
+    assert response.status_code == 422
+    assert response.json()["error"]["code"] == "VALIDATION_ERROR"
+    assert gateway.requests == []
