@@ -127,13 +127,18 @@ model InterviewerScore {
   interview   Interview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
 }
 
+/// M5: a check of how an interview was run, or of one interviewer's scale against the panel's.
+/// `result` is the whole QualityCheck the API serves; nothing in it is about a candidate.
 model QualityCheck {
   id             String     @id @default(uuid()) @db.Uuid
+  kind           String     // interview | calibration
   interviewId    String?    @db.Uuid
   interviewerRef String?
   result         Json
   createdAt      DateTime   @default(now())
   interview      Interview? @relation(fields: [interviewId], references: [id], onDelete: SetNull)
+
+  @@index([kind, createdAt])
 }
 
 model AuditEvent {
