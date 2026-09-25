@@ -47,9 +47,9 @@ def test_owned_scenario_matches_the_contract_example() -> None:
 def test_repository_returns_only_the_public_scenario_fields() -> None:
     repository = ScenarioRepository.load(ROOT_SCENARIOS)
 
-    assert [item.scenarioId for item in repository.briefs()] == [
-        "conflict-resolution"
-    ]
+    ids = [item.scenarioId for item in repository.briefs()]
+    assert ids == sorted(path.stem for path in ROOT_SCENARIOS.glob("*.json"))
+    assert "conflict-resolution" in ids
     public = repository.brief("conflict-resolution")
     assert public is not None
     assert public.maxCandidateTurns == 8
@@ -60,14 +60,27 @@ def test_repository_returns_only_the_public_scenario_fields() -> None:
 
 
 def test_packaged_scenario_matches_the_owned_config() -> None:
-    owned = json.loads(
-        (ROOT_SCENARIOS / "conflict-resolution.json").read_text(encoding="utf-8")
-    )
-    packaged = json.loads(
-        (PACKAGED_SCENARIOS / "conflict-resolution.json").read_text(encoding="utf-8")
-    )
+    owned = sorted(path.name for path in ROOT_SCENARIOS.glob("*.json"))
+    assert owned == sorted(path.name for path in PACKAGED_SCENARIOS.glob("*.json"))
+    for name in owned:
+        assert json.loads((PACKAGED_SCENARIOS / name).read_text(encoding="utf-8")) == json.loads(
+            (ROOT_SCENARIOS / name).read_text(encoding="utf-8")
+        ), name
 
-    assert packaged == owned
+
+def test_every_story_has_its_config_and_the_config_is_rebuilt_from_it() -> None:
+    from services.ml.scripts.scenarios_from_stories import STORIES, story_to_config
+
+    voices: dict[str, int] = {}
+    stories = sorted(STORIES.glob("[0-9][0-9]-*.md"))
+    assert len(stories) == 9
+    seen = set()
+    for story in stories:
+        rebuilt = story_to_config(story, voices)
+        owned = json.loads((ROOT_SCENARIOS / f"{rebuilt['scenarioId']}.json").read_text(encoding="utf-8"))
+        assert owned == rebuilt, story.name
+        assert owned["voice"] not in seen, "every character has a voice of its own"
+        seen.add(owned["voice"])
 
 
 def test_repository_rejects_a_filename_id_mismatch(tmp_path: Path) -> None:

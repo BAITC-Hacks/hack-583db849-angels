@@ -1,11 +1,13 @@
 import { randomUUID, createHash } from 'node:crypto';
 
 import { BadRequestException, ConflictException, ForbiddenException, HttpException, HttpStatus, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Prisma, SimulationTurn } from '@prisma/client';
 
 import { AI_GATEWAY, AiGateway } from '../../ai-client/ai-gateway.port';
 import { ApiRole } from '../../auth/roles';
 import { PrismaService } from '../../database/prisma.service';
+import { readSeed, seedLetter } from '../../seed-files';
 import { AuditService } from '../audit/audit.service';
 import { ToLlmViewService } from '../../privacy/to-llm-view.service';
 import { AccommodationDto, UpdateAccommodationDto } from '../candidates/dto/accommodation.dto';
@@ -31,10 +33,11 @@ export class SimulationsService {
     private readonly privacy: ToLlmViewService,
     private readonly audit: AuditService,
     private readonly assessments: SimulationAssessmentsService,
+    private readonly config: ConfigService,
   ) {}
 
   async create(candidateId: string, actorRole: ApiRole): Promise<SimulationDto> {
-    const candidate = await this.prisma.candidate.findUnique({ where: { id: candidateId }, select: { id: true } });
+    const candidate = await this.prisma.candidate.findUnique({ where: { id: candidateId }, select: { id: true, externalId: true } });
     if (!candidate) this.notFound('Candidate');
     const existing = await this.prisma.simulation.findUnique({ where: { candidateId }, select: { id: true } });
     if (existing) this.alreadyExists(existing.id);
@@ -50,7 +53,8 @@ export class SimulationsService {
     }
     const minimum = Math.min(...ready.map((scenario) => assigned.get(scenario.scenarioId) ?? 0));
     const leastAssigned = ready.filter((scenario) => (assigned.get(scenario.scenarioId) ?? 0) === minimum);
-    const selected = leastAssigned[Math.floor(Math.random() * leastAssigned.length)];
+    const seeded = await this.seedScenario(candidate.externalId);
+    const selected = ready.find((item) => item.scenarioId === seeded) ?? leastAssigned[Math.floor(Math.random() * leastAssigned.length)];
     const { status: _status, ...scenario } = selected;
     void _status;
 
@@ -312,6 +316,18 @@ export class SimulationsService {
   }
 
   private turnDate(date: Date | null, fallback: Date): string { return (date ?? fallback).toISOString(); }
+  /**
+   * In `DEMO_MODE`, A, B and C play the scenario their seed session was
+   * recorded in, however many others are ready: that is the one every
+   * recorded answer for the pitch exists for. Everyone else is assigned evenly.
+   */
+  private async seedScenario(externalId: string | undefined): Promise<string | null> {
+    const letter = externalId ? seedLetter(externalId) : null;
+    if (!letter || this.config.get<string>('DEMO_MODE') !== 'true') return null;
+    const session = await readSeed<{ scenarioId?: string }>('candidates', letter, 'm2a-session.json').catch(() => null);
+    return session?.scenarioId ?? null;
+  }
+
   private turnId(sequence: number): string { return `turn_${String(sequence).padStart(2, '0')}`; }
 
   private audioExtension(audio: UploadedAudio): 'webm' | 'ogg' {
