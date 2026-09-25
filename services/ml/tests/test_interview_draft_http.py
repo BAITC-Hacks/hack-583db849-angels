@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 
 from services.ml.app.config import Settings
 from services.ml.app.gateway.config import Provider, TaskName
-from services.ml.app.gateway.errors import GatewayReplayError
+from services.ml.app.gateway.errors import GatewayOutputError, GatewayReplayError
 from services.ml.app.gateway.types import GatewayResult
 from services.ml.app.main import create_app
 from services.ml.app.schemas.contracts import DraftResult, DriveScore, Evidence
@@ -29,16 +29,23 @@ def body(text: str = "I asked each owner to review the plan.") -> dict:
 
 
 class AdaptiveGateway:
-    def __init__(self, *, unavailable: bool = False) -> None:
+    def __init__(
+        self, *, unavailable: bool = False, fabricated: bool = False,
+        malformed: bool = False,
+    ) -> None:
         self.requests = []
         self.unavailable = unavailable
+        self.fabricated = fabricated
+        self.malformed = malformed
 
     async def execute(self, request):
         self.requests.append(request)
         if self.unavailable:
             raise GatewayReplayError("cassette unavailable")
+        if self.malformed:
+            raise GatewayOutputError("provider returned malformed JSON")
         assert request.task == TaskName.INTERVIEW_DRAFT
-        quoted = request.payload["transcript"][1]["text"]
+        quoted = "Fabricated answer" if self.fabricated else request.payload["transcript"][1]["text"]
         scores = [DriveScore(
             competency="D", score=2, confidence="medium", rationale="Untrusted claim",
             evidence=[Evidence(source="interview_turn", sourceId="iturn_02", quote=quoted)],
@@ -119,3 +126,16 @@ def test_replay_failure_uses_safe_error_envelope(tmp_path: Path) -> None:
     assert response.status_code == 503
     assert response.json()["error"]["code"] == "AI_UNAVAILABLE"
     assert "cassette" not in response.text
+
+
+@pytest.mark.parametrize("mode", ["fabricated", "malformed"])
+def test_bad_model_evidence_or_output_is_safe_502(tmp_path: Path, mode: str) -> None:
+    gateway = AdaptiveGateway(**{mode: True})
+    response = client(tmp_path, gateway).post(
+        "/internal/v1/interview/draft", json=body(), headers=TOKEN,
+    )
+    assert response.status_code == 502
+    assert response.json()["error"]["code"] == "AI_INVALID_OUTPUT"
+    assert "Fabricated answer" not in response.text
+    assert "malformed JSON" not in response.text
+    assert len(gateway.requests) == (2 if mode == "fabricated" else 1)

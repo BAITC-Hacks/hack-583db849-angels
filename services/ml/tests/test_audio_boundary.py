@@ -80,9 +80,10 @@ class SyntheticSpeechGateway:
 
 
 class InterviewExampleGateway:
-    def __init__(self, *, valid: bool = True) -> None:
+    def __init__(self, *, valid: bool = True, question: bool = True) -> None:
         self.requests: list[MediaRequest] = []
         self.valid = valid
+        self.question = question
 
     async def execute(self, request: MediaRequest) -> MediaGatewayResult:
         self.requests.append(request)
@@ -94,6 +95,8 @@ class InterviewExampleGateway:
         ]
         if not self.valid:
             del utterances[1]["speaker"]
+        if not self.question:
+            utterances[0]["transcript"] = "Tell me what you did."
         return MediaGatewayResult(
             content=json.dumps({
                 "metadata": {"duration": 5}, "results": {"utterances": utterances},
@@ -272,7 +275,13 @@ def test_unsupported_purpose_speaker_pair_is_rejected_before_gateway(
     assert gateway.requests == []
 
 
-def test_invalid_interview_diarization_is_a_safe_error(tmp_path: Path) -> None:
+@pytest.mark.parametrize("gateway", [
+    InterviewExampleGateway(valid=False),
+    InterviewExampleGateway(question=False),
+])
+def test_invalid_interview_diarization_is_a_safe_error(
+    tmp_path: Path, gateway: InterviewExampleGateway,
+) -> None:
     audio = tmp_path / "synthetic.ogg"
     audio.write_bytes(b"synthetic")
     settings = Settings(
@@ -280,7 +289,7 @@ def test_invalid_interview_diarization_is_a_safe_error(tmp_path: Path) -> None:
         gateway_mode="replay", budget_usd_cap=Decimal("20"), demo_mode=False,
     )
     client = TestClient(
-        create_app(settings, media_gateway=InterviewExampleGateway(valid=False)),
+        create_app(settings, media_gateway=gateway),
         raise_server_exceptions=False,
     )
     response = client.post("/internal/v1/transcribe", json={
