@@ -12,10 +12,16 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import Any
 
-from ..schemas.contracts import BriefRequest, Turn
+from ..schemas.contracts import BriefRequest, InterviewTurn, Turn
 
 
 def model_turns(turns: Sequence[Turn]) -> list[dict[str, Any]]:
+    return [{"turnId": turn.turnId, "speaker": turn.speaker, "text": turn.text} for turn in turns]
+
+
+def model_interview_turns(turns: Sequence[InterviewTurn]) -> list[dict[str, Any]]:
+    """Keep citeable turn ids and speech, but not API/STT timing metadata."""
+
     return [{"turnId": turn.turnId, "speaker": turn.speaker, "text": turn.text} for turn in turns]
 
 

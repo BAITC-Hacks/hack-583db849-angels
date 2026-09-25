@@ -64,6 +64,7 @@ def test_generator_sends_only_transcript_notes_and_rubric() -> None:
     assert [item["code"] for item in sent.payload["rubric"]["competencies"]] == list("DRIVE")
     assert "evidence_examples" not in str(sent.payload["rubric"])
     assert sent.payload["transcript"][1]["text"] == request().transcript[1].text
+    assert set(sent.payload["transcript"][1]) == {"turnId", "speaker", "text"}
     assert sent.payload["notes"][0]["id"] == "note_01"
     assert "candidateId" not in sent.payload
     assert "interviewerScores" not in str(sent.payload)
@@ -81,6 +82,18 @@ def test_generator_uses_supplied_transcript_not_seed_identity() -> None:
 
     assert gateway.requests[0].payload["transcript"] != gateway.requests[1].payload["transcript"]
     assert gateway.requests[0].payload["rubric"] == gateway.requests[1].payload["rubric"]
+
+
+def test_timing_and_candidate_id_do_not_change_model_or_replay_input() -> None:
+    gateway = FakeGateway()
+    generator = InterviewDraftGenerator(gateway)
+    changed = request().model_copy(deep=True)
+    changed.candidateId = "other-synthetic-id"
+    changed.transcript[1].startSec = 3.25
+    changed.transcript[1].endSec = 9
+    asyncio.run(generator.generate(request()))
+    asyncio.run(generator.generate(changed))
+    assert gateway.requests[0].payload == gateway.requests[1].payload
 
 
 def test_draft_result_rejects_wrong_order_and_missing_evidence() -> None:

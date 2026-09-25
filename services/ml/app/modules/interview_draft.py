@@ -12,6 +12,7 @@ from ..gateway.errors import GatewayOutputError
 from ..gateway.types import GatewayRequest, GatewayResult
 from ..rubric import DriveRubric, load_drive_rubric
 from ..schemas.contracts import DraftRequest, DraftResult, DriveScore
+from .model_view import model_interview_turns
 
 
 ROOT_PROMPT = Path(__file__).resolve().parents[4] / "config/prompts/m4-interview-draft.md"
@@ -61,7 +62,7 @@ class InterviewDraftGenerator:
                             for item in self._rubric.competencies
                         ],
                     },
-                    "transcript": [turn.model_dump(mode="json") for turn in request.transcript],
+                    "transcript": model_interview_turns(request.transcript),
                     "notes": [note.model_dump(mode="json") for note in request.notes],
                     "attempt": attempt,
                 },
