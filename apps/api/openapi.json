@@ -1028,6 +1028,12 @@
           "endedAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "recognitionConfidence": {
+            "type": "number",
+            "nullable": true,
+            "minimum": 0,
+            "maximum": 1
           }
         },
         "required": [

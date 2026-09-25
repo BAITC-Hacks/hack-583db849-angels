@@ -124,11 +124,13 @@ The brief's questions cover the five competencies **and** three topics the inter
 
 | Method | Path | Idem. | Success | Errors |
 | --- | --- | --- | --- | --- |
-| `POST` | `/v1/simulation-assessments` | ✱ | `201 Assessment`; body `{ simulationId }` — admin re-run; normally you start it on completion | `409 SIMULATION_NOT_FINISHED`, `502/503` AI |
+| `POST` | `/v1/simulation-assessments` | ✱ | `201 Assessment`; body `{ simulationId }` — admin re-run; normally you start it on completion | `409 SIMULATION_NOT_FINISHED`, `409 NOTHING_TO_ASSESS`, `502/503` AI |
 | `GET` | `/v1/simulation-assessments/:assessmentId` | | `200 Assessment` | `404`, `403` for `interviewer` and `platform` |
 | `GET` | `/v1/simulation-assessments/:assessmentId/candidate-feedback` | | `200 CandidateFeedback` | `404` |
 
-`Assessment` carries the transcript (`simulation.turns`), so the report renders in one call and every quote can link to its turn.
+`Assessment` carries the transcript (`simulation.turns`), so the report renders in one call and every quote can link to its turn. Each candidate turn there carries `recognitionConfidence` (`docs/SPEC.md`, `Turn`), so the report can flag a turn the recogniser was unsure of.
+
+**Nothing to assess.** A candidate who stops before saying anything has no turn to judge, and the ML service refuses such a transcript. Don't start an assessment then: `progress.assessment` stays `null`, and an admin re-run answers `409 NOTHING_TO_ASSESS`.
 
 ### M4 — interviews
 
@@ -500,6 +502,7 @@ interface QualitySignal {
 | `IDEMPOTENCY_KEY_REUSED` | 409 | same key, different body |
 | `SIMULATION_FINISHED` | 409 | a turn or a complete after the end |
 | `SIMULATION_NOT_FINISHED` | 409 | assessing an active simulation |
+| `NOTHING_TO_ASSESS` | 409 | assessing a simulation the candidate stopped before saying anything |
 | `TURN_IN_FLIGHT` | 409 | a turn while the previous one is still being answered |
 | `SCORES_ALREADY_SAVED` | 409 | new interviewer scores after the first save |
 | `DRAFT_LOCKED` | 409 | the draft requested before the interviewer's scores exist |
