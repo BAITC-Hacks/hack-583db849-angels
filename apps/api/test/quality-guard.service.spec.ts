@@ -67,7 +67,7 @@ describe('QualityGuardService', () => {
     expect(sent).toMatchObject({ kind: 'calibration', transcript: [], interviewerRef: 'synthetic-interviewer-a', periodFrom: '2026-09-01', periodTo: '2026-10-01' });
     expect(new Set(sent.history.map((item: { interviewerRef: string }) => item.interviewerRef))).toEqual(new Set(['synthetic-interviewer-a', 'synthetic-interviewer-b']));
     expect(JSON.stringify(sent)).not.toMatch(/candidate|profile/i);
-    expect(check).toMatchObject({ kind: 'calibration', interviewId: null, interviewerRef: 'synthetic-interviewer-a', from: '2026-09-01', to: '2026-10-01' });
+    expect(check).toMatchObject({ kind: 'calibration', interviewId: null, interviewerRef: 'synthetic-interviewer-a', from: '2026-09-01', to: '2026-10-01', interviews: 6 });
     expect(rows[0]).toMatchObject({ kind: 'calibration', interviewerRef: 'synthetic-interviewer-a' });
 
     // The seed history is 10–15 September: ending the period on the 12th leaves two of a's three interviews.
