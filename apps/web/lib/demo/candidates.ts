@@ -122,6 +122,7 @@ export const demoSteps: DemoStep[] = [
   },
   {
     module: 'M5',
+    preview: '/commission/quality-guard',
     copy: {
       en: { title: 'Quality guard', note: 'Question quality and calibration signals' },
       ru: { title: 'Контроль качества', note: 'Сигналы о качестве вопросов и калибровке' },
