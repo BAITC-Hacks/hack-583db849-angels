@@ -4,7 +4,8 @@ import type { WireAssessment, WireCandidateFeedback, WireTurn } from '../contrac
 import { codeFromLabel, toCompetencyScore } from './evidence';
 
 function toTurn(turn: WireTurn): SimulationTurn {
-  return { turnId: turn.turnId, speaker: turn.speaker, text: turn.text };
+  const base = { turnId: turn.turnId, speaker: turn.speaker, text: turn.text };
+  return turn.recognitionConfidence === undefined ? base : { ...base, recognitionConfidence: turn.recognitionConfidence };
 }
 
 /**
@@ -17,7 +18,9 @@ export function toSimulationReport(assessment: WireAssessment): SimulationReport
     assessmentId: assessment.assessmentId,
     candidate: { id: assessment.candidateId, code: codeFromLabel(assessment.candidateLabel) },
     scenarioTitle: assessment.simulation.scenarioTitle,
+    characterName: assessment.simulation.characterName,
     mode: assessment.simulation.mode,
+    accommodation: assessment.simulation.accommodation,
     completedAt: assessment.simulation.completedAt,
     durationMinutes: Math.round(assessment.simulation.durationSeconds / 60),
     turns: assessment.simulation.turns.map(toTurn),

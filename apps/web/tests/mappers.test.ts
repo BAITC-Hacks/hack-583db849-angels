@@ -16,7 +16,6 @@ import { toScreenProgress, toScreenProgressList } from '../lib/api/mappers/candi
 import { toAssessmentDraft, toInterviewTranscript, toInterviewView } from '../lib/api/mappers/interview';
 import { appendTurn, toScenarioBrief, toSimulationState } from '../lib/api/mappers/simulation';
 import { previewDraft, previewInterview, previewTranscript } from '../lib/interview/preview';
-import { previewFeedback, previewReport } from '../lib/report/preview';
 import { previewScenario } from '../lib/simulation/previewScenario';
 
 /**
@@ -32,8 +31,35 @@ describe('the commission report', () => {
   const assessment = example<WireAssessment>('assessment.json');
   const report = toSimulationReport(assessment);
 
-  it('is exactly what the report screen renders', () => {
-    expect(report).toEqual({ ...previewReport, assessmentId: assessment.assessmentId });
+  it('carries everything the report screen renders', () => {
+    expect(report).toMatchObject({
+      assessmentId: assessment.assessmentId,
+      candidate: { id: assessment.candidateId, code: 'A' },
+      scenarioTitle: assessment.simulation.scenarioTitle,
+      characterName: assessment.simulation.characterName,
+      mode: assessment.simulation.mode,
+      accommodation: assessment.simulation.accommodation,
+      completedAt: assessment.simulation.completedAt,
+      durationMinutes: Math.round(assessment.simulation.durationSeconds / 60),
+      english: assessment.english,
+      interviewQuestions: assessment.interviewQuestions,
+    });
+    expect(report.turns.map((turn) => turn.turnId)).toEqual(assessment.simulation.turns.map((turn) => turn.turnId));
+    expect(report.scores.map((score) => score.competency)).toEqual(['D', 'R', 'I', 'V', 'E']);
+  });
+
+  it('keeps the recogniser\'s confidence on a turn when the API sends it', () => {
+    const withConfidence: WireAssessment = {
+      ...assessment,
+      simulation: {
+        ...assessment.simulation,
+        turns: assessment.simulation.turns.map((turn) =>
+          turn.speaker === 'candidate' ? { ...turn, recognitionConfidence: 0.42 } : turn,
+        ),
+      },
+    };
+    const candidate = toSimulationReport(withConfidence).turns.find((turn) => turn.speaker === 'candidate');
+    expect(candidate?.recognitionConfidence).toBe(0.42);
   });
 
   it('keeps every quote word for word in the turn it cites', () => {
@@ -57,7 +83,13 @@ describe("the candidate's feedback", () => {
   const mapped = toCandidateFeedback(feedback);
 
   it('is exactly what the feedback page renders', () => {
-    expect(mapped).toEqual({ ...previewFeedback, assessmentId: feedback.assessmentId });
+    expect(mapped).toEqual({
+      assessmentId: feedback.assessmentId,
+      scenarioTitle: feedback.scenarioTitle,
+      strengths: feedback.strengths,
+      growth: feedback.growth,
+      nextTime: feedback.nextTime,
+    });
   });
 
   it('carries no digit anywhere, because it carries no score', () => {
