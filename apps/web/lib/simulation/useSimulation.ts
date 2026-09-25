@@ -59,8 +59,8 @@ async function postTurn(simulationId: string, input: TurnInput, idempotencyKey: 
  * The screen's only door to a simulation, on the API. The simulation lives on
  * the server under the key `['simulation', id]`, so a reload continues it.
  *
- * Until every home reads the API (#23), the milestones are also written to the
- * demo world, which the other roles' homes still read.
+ * The milestones are also sent to the demo world's activity log, which the
+ * admin reads until it moves to the audit log (#24).
  */
 export function useSimulation(simulationId: string): Simulation {
   const client = useQueryClient();
@@ -83,12 +83,9 @@ export function useSimulation(simulationId: string): Simulation {
     onSuccess: (result) => {
       client.setQueryData<WireSimulation>(key, (current) => (current ? applyTurnResult(current, result) : current));
       playCharacterLine(result.characterAudioUrl, result.characterTurn.text);
-      if (code && result.candidateTurns === 1 && result.status === 'active') {
-        record('simulation-started', code, { simulation: 'in-progress' });
-      }
-      if (code && result.status === 'completed') {
-        record('simulation-completed', code, { simulation: 'completed' });
-      }
+      // The homes read the API; these only feed the admin's activity log until it moves to the audit log (#24).
+      if (code && result.candidateTurns === 1 && result.status === 'active') record('simulation-started', code);
+      if (code && result.status === 'completed') record('simulation-completed', code);
       void client.invalidateQueries({ queryKey: candidatesKey });
     },
   });
@@ -103,7 +100,7 @@ export function useSimulation(simulationId: string): Simulation {
       ) as unknown as WireSimulation,
     onSuccess: (stopped) => {
       client.setQueryData(key, stopped);
-      if (code) record('simulation-stopped', code, { simulation: 'completed' });
+      if (code) record('simulation-stopped', code);
       void client.invalidateQueries({ queryKey: candidatesKey });
     },
   });

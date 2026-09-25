@@ -5,7 +5,7 @@ import { AccommodationControl } from '../../../components/home/AccommodationCont
 import { NextStep } from '../../../components/home/NextStep';
 import { SeedPending } from '../../../components/home/SeedPending';
 import { StatusPill } from '../../../components/home/StatusPill';
-import { useWorld } from '../../../lib/demo/world';
+import { useHomeProgress } from '../../../lib/home/useHomeProgress';
 import { previewCalibrationCheck, previewInterviewCheck } from '../../../lib/quality/preview';
 import { useStaffLocale } from '../../../lib/i18n/StaffLocaleProvider';
 
@@ -21,7 +21,7 @@ const copy = {
     read: { title: 'Candidate A’s report is ready', body: 'D.R.I.V.E. scores with verbatim quotes, questions for the interview, English measured apart.', action: 'Open the report' },
     columns: ['Candidate', 'Simulation', 'Report', 'Interview', 'Consistency', 'Candidate feedback'],
     simulation: { 'not-started': 'Not started', 'in-progress': 'In progress', completed: 'Finished' },
-    report: { open: 'Open report', waiting: 'After the simulation' },
+    report: { open: 'Open report', waiting: 'After the simulation', pending: 'Being prepared', failed: 'Failed — see the report page' },
     interview: { none: 'Not scored yet', scored: 'Scored blind', draft: 'Scored · draft ready' },
     consistency: { open: 'Open comparison', waiting: 'After the interviewer scores' },
     feedback: { open: 'Preview', waiting: 'After the report' },
@@ -38,7 +38,7 @@ const copy = {
     read: { title: 'Отчёт по кандидату A готов', body: 'Баллы D.R.I.V.E. с дословными цитатами, вопросы для интервью, английский отдельно.', action: 'Открыть отчёт' },
     columns: ['Кандидат', 'Симуляция', 'Отчёт', 'Интервью', 'Сверка', 'Отзыв кандидату'],
     simulation: { 'not-started': 'Не начата', 'in-progress': 'Идёт', completed: 'Пройдена' },
-    report: { open: 'Открыть отчёт', waiting: 'После симуляции' },
+    report: { open: 'Открыть отчёт', waiting: 'После симуляции', pending: 'Готовится', failed: 'Не удалось — см. страницу отчёта' },
     interview: { none: 'Ещё не оценено', scored: 'Оценено вслепую', draft: 'Оценено · черновик готов' },
     consistency: { open: 'Открыть сверку', waiting: 'После баллов интервьюера' },
     feedback: { open: 'Посмотреть', waiting: 'После отчёта' },
@@ -50,9 +50,9 @@ const copy = {
 export default function CommissionHome() {
   const { locale } = useStaffLocale();
   const text = copy[locale];
-  const world = useWorld();
-  const a = world.candidates.A;
-  const all = Object.values(world.candidates);
+  const { candidates } = useHomeProgress();
+  const a = candidates.A;
+  const all = Object.values(candidates);
 
   // The two checks the quality guard runs on candidate A's interview and on
   // that interviewer's month; both are scripted until #18.
@@ -119,7 +119,7 @@ export default function CommissionHome() {
           </thead>
           <tbody className="divide-y divide-border-subtle">
             {(['A', 'B', 'C'] as const).map((code) => {
-              const c = world.candidates[code];
+              const c = candidates[code];
               return (
                 <tr key={code} className={c.hasData ? '' : 'opacity-60'}>
                   <td className="px-4 py-3 font-semibold text-text-primary">
@@ -136,6 +136,12 @@ export default function CommissionHome() {
                         {c.assessmentReady ? (
                           <Link href="/commission/simulation-report" className="text-sm font-semibold text-brand-ink hover:underline">
                             {text.report.open}
+                          </Link>
+                        ) : c.assessment === 'pending' ? (
+                          <StatusPill tone="active">{text.report.pending}</StatusPill>
+                        ) : c.assessment === 'failed' ? (
+                          <Link href="/commission/simulation-report" className="text-sm text-status-flag hover:underline">
+                            {text.report.failed}
                           </Link>
                         ) : (
                           <StatusPill tone="locked">{text.report.waiting}</StatusPill>
