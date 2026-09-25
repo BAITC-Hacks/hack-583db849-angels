@@ -32,26 +32,16 @@ def write_scenario(directory: Path, value: dict[str, object]) -> Path:
     return target
 
 
-def test_owned_scenario_changes_only_candidate_a_story_routing() -> None:
+def test_owned_scenario_matches_the_contract_example() -> None:
     owned = json.loads(
         (ROOT_SCENARIOS / "conflict-resolution.json").read_text(encoding="utf-8")
     )
-    expected = payload()
-    beats = {beat["beatId"]: beat for beat in expected["beats"]}
-    process_rule = beats["trust"]["answerTypes"][0]
-    process_rule["next"] = "fairness"
-    process_rule["characterIntent"] = (
-        "Accepts the review rule but worries about a fight with Timur"
-    )
-    beats["fairness"]["answerTypes"][1]["examples"].append(
-        "We keep your version for the demo and move Timur's changes to a separate branch."
-    )
-    beats["setback"]["answerTypes"][0]["examples"].append(
-        "If the run fails, we cut the analytics screen instead of working all night."
-    )
+    beats = {beat["beatId"]: beat for beat in owned["beats"]}
 
-    assert owned == expected
+    assert owned == payload()
     assert owned["status"] == "ready"
+    # Candidate A's five answers walk every beat, fairness included.
+    assert beats["trust"]["answerTypes"][0]["next"] == "fairness"
 
 
 def test_repository_returns_only_the_public_scenario_fields() -> None:
@@ -100,12 +90,10 @@ def test_repository_rejects_an_unknown_transition(tmp_path: Path) -> None:
 
 def test_repository_rejects_an_unreachable_beat(tmp_path: Path) -> None:
     scenario = payload()
-    for answer in (
-        *scenario["beats"][0]["answerTypes"],
-        scenario["beats"][0]["fallback"],
-    ):
-        if answer["next"] == "fairness":
-            answer["next"] = "trust"
+    for beat in scenario["beats"]:
+        for answer in (*beat["answerTypes"], beat["fallback"]):
+            if answer["next"] == "fairness":
+                answer["next"] = "decision"
     write_scenario(tmp_path, scenario)
 
     with pytest.raises(ScenarioConfigurationError, match="unreachable"):
