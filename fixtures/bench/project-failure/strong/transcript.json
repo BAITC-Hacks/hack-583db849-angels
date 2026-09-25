@@ -1,0 +1,86 @@
+[
+  {
+    "turnId": "turn_01",
+    "speaker": "character",
+    "text": "Forty downloads, three swaps. I think we should just shut it down and get our evenings back.",
+    "startedAt": "2026-09-25T10:00:00Z",
+    "endedAt": "2026-09-25T10:00:07Z"
+  },
+  {
+    "turnId": "turn_02",
+    "speaker": "candidate",
+    "text": "I hear you. Before anyone decides, tell me what's been hardest this week.",
+    "startedAt": "2026-09-25T10:00:13Z",
+    "endedAt": "2026-09-25T10:00:19Z"
+  },
+  {
+    "turnId": "turn_03",
+    "speaker": "character",
+    "text": "Forty downloads, three swaps, one review that says 'confusing'. What do you read from that?",
+    "startedAt": "2026-09-25T10:00:25Z",
+    "endedAt": "2026-09-25T10:00:31Z"
+  },
+  {
+    "turnId": "turn_04",
+    "speaker": "candidate",
+    "text": "Let's look at where people dropped off, and talk to ten students who downloaded it and never used it.",
+    "startedAt": "2026-09-25T10:00:37Z",
+    "endedAt": "2026-09-25T10:00:47Z"
+  },
+  {
+    "turnId": "turn_05",
+    "speaker": "character",
+    "text": "Say we don't quit. What do we actually do for the next month?",
+    "startedAt": "2026-09-25T10:00:53Z",
+    "endedAt": "2026-09-25T10:00:58Z"
+  },
+  {
+    "turnId": "turn_06",
+    "speaker": "candidate",
+    "text": "One small experiment: a simpler first screen, tested with twenty students in two weeks, and we stop if we don't hit the goal.",
+    "startedAt": "2026-09-25T10:01:04Z",
+    "endedAt": "2026-09-25T10:01:16Z"
+  },
+  {
+    "turnId": "turn_07",
+    "speaker": "character",
+    "text": "Ali and Dias have exams this month. They want to step back. Honestly, so do I, a little.",
+    "startedAt": "2026-09-25T10:01:22Z",
+    "endedAt": "2026-09-25T10:01:29Z"
+  },
+  {
+    "turnId": "turn_08",
+    "speaker": "candidate",
+    "text": "It's okay to step back. Let's ask everyone how much time they really have this month and plan around who's available.",
+    "startedAt": "2026-09-25T10:01:35Z",
+    "endedAt": "2026-09-25T10:01:45Z"
+  },
+  {
+    "turnId": "turn_09",
+    "speaker": "character",
+    "text": "Okay. What happens this week, and who does it?",
+    "startedAt": "2026-09-25T10:01:51Z",
+    "endedAt": "2026-09-25T10:01:55Z"
+  },
+  {
+    "turnId": "turn_10",
+    "speaker": "candidate",
+    "text": "Goal: ten swaps in two weeks. You redraw the first screen by Wednesday, I recruit twenty testers, and Ali tracks the swaps.",
+    "startedAt": "2026-09-25T10:02:01Z",
+    "endedAt": "2026-09-25T10:02:12Z"
+  },
+  {
+    "turnId": "turn_11",
+    "speaker": "character",
+    "text": "Four swaps. After all that. Was it all for nothing?",
+    "startedAt": "2026-09-25T10:02:18Z",
+    "endedAt": "2026-09-25T10:02:22Z"
+  },
+  {
+    "turnId": "turn_12",
+    "speaker": "candidate",
+    "text": "Four swaps tell us something. Let's talk to those four students and then decide together whether to pause.",
+    "startedAt": "2026-09-25T10:02:28Z",
+    "endedAt": "2026-09-25T10:02:37Z"
+  }
+]

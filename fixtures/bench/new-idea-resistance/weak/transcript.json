@@ -1,0 +1,100 @@
+[
+  {
+    "turnId": "turn_01",
+    "speaker": "character",
+    "text": "I read your proposal. Thanks, but no. The one-to-one sessions work, and the parents trust them.",
+    "startedAt": "2026-09-25T10:00:00Z",
+    "endedAt": "2026-09-25T10:00:06Z"
+  },
+  {
+    "turnId": "turn_02",
+    "speaker": "candidate",
+    "text": "Okay, never mind. It was just an idea.",
+    "startedAt": "2026-09-25T10:00:12Z",
+    "endedAt": "2026-09-25T10:00:16Z"
+  },
+  {
+    "turnId": "turn_03",
+    "speaker": "character",
+    "text": "What makes you so sure it works better?",
+    "startedAt": "2026-09-25T10:00:22Z",
+    "endedAt": "2026-09-25T10:00:26Z"
+  },
+  {
+    "turnId": "turn_04",
+    "speaker": "candidate",
+    "text": "I just know it works. It worked for me when I was little.",
+    "startedAt": "2026-09-25T10:00:32Z",
+    "endedAt": "2026-09-25T10:00:38Z"
+  },
+  {
+    "turnId": "turn_05",
+    "speaker": "character",
+    "text": "Feelings aren't enough. Last year someone changed the sessions on a hunch, and I spent a month apologising to parents.",
+    "startedAt": "2026-09-25T10:00:44Z",
+    "endedAt": "2026-09-25T10:00:52Z"
+  },
+  {
+    "turnId": "turn_06",
+    "speaker": "candidate",
+    "text": "Then there's no point trying. Okay, you win.",
+    "startedAt": "2026-09-25T10:00:58Z",
+    "endedAt": "2026-09-25T10:01:02Z"
+  },
+  {
+    "turnId": "turn_07",
+    "speaker": "character",
+    "text": "Say we tried it. What could go wrong, and who would pay for it?",
+    "startedAt": "2026-09-25T10:01:08Z",
+    "endedAt": "2026-09-25T10:01:13Z"
+  },
+  {
+    "turnId": "turn_08",
+    "speaker": "candidate",
+    "text": "I don't see any risks. It'll be fine.",
+    "startedAt": "2026-09-25T10:01:19Z",
+    "endedAt": "2026-09-25T10:01:23Z"
+  },
+  {
+    "turnId": "turn_09",
+    "speaker": "character",
+    "text": "The others already have full Saturdays. Who's going to run this?",
+    "startedAt": "2026-09-25T10:01:29Z",
+    "endedAt": "2026-09-25T10:01:33Z"
+  },
+  {
+    "turnId": "turn_10",
+    "speaker": "candidate",
+    "text": "You're the coordinator. That's your job, not mine.",
+    "startedAt": "2026-09-25T10:01:39Z",
+    "endedAt": "2026-09-25T10:01:43Z"
+  },
+  {
+    "turnId": "turn_11",
+    "speaker": "character",
+    "text": "Alright. One trial. But I want to know exactly how it would work.",
+    "startedAt": "2026-09-25T10:01:49Z",
+    "endedAt": "2026-09-25T10:01:54Z"
+  },
+  {
+    "turnId": "turn_12",
+    "speaker": "candidate",
+    "text": "No point testing. Let's switch all sessions at once.",
+    "startedAt": "2026-09-25T10:02:00Z",
+    "endedAt": "2026-09-25T10:02:04Z"
+  },
+  {
+    "turnId": "turn_13",
+    "speaker": "character",
+    "text": "Two pupils came out confused, and a mother called me. So. What now?",
+    "startedAt": "2026-09-25T10:02:10Z",
+    "endedAt": "2026-09-25T10:02:15Z"
+  },
+  {
+    "turnId": "turn_14",
+    "speaker": "candidate",
+    "text": "I knew it wouldn't work. Let's cancel the trial.",
+    "startedAt": "2026-09-25T10:02:21Z",
+    "endedAt": "2026-09-25T10:02:25Z"
+  }
+]

@@ -1,0 +1,100 @@
+[
+  {
+    "turnId": "turn_01",
+    "speaker": "character",
+    "text": "Okay, I need to tell you something. Sensor two died for a week, so I filled in those days with estimates. It's close enough. Can we just not mention it?",
+    "startedAt": "2026-09-25T10:00:00Z",
+    "endedAt": "2026-09-25T10:00:12Z"
+  },
+  {
+    "turnId": "turn_02",
+    "speaker": "candidate",
+    "text": "Fine, it's only a week. Nobody will notice anyway.",
+    "startedAt": "2026-09-25T10:00:18Z",
+    "endedAt": "2026-09-25T10:00:22Z"
+  },
+  {
+    "turnId": "turn_03",
+    "speaker": "character",
+    "text": "The thing is, without my estimates, stop two isn't the worst anymore. Our whole conclusion is about stop two.",
+    "startedAt": "2026-09-25T10:00:28Z",
+    "endedAt": "2026-09-25T10:00:35Z"
+  },
+  {
+    "turnId": "turn_04",
+    "speaker": "candidate",
+    "text": "One week out of four doesn't matter. The jury won't check that closely.",
+    "startedAt": "2026-09-25T10:00:41Z",
+    "endedAt": "2026-09-25T10:00:47Z"
+  },
+  {
+    "turnId": "turn_05",
+    "speaker": "character",
+    "text": "Look, every team in the final cleans up their data. If we're the only honest ones, we lose. Is that what you want?",
+    "startedAt": "2026-09-25T10:00:53Z",
+    "endedAt": "2026-09-25T10:01:02Z"
+  },
+  {
+    "turnId": "turn_06",
+    "speaker": "candidate",
+    "text": "You're probably right, everyone does it. The prize matters more right now.",
+    "startedAt": "2026-09-25T10:01:08Z",
+    "endedAt": "2026-09-25T10:01:14Z"
+  },
+  {
+    "turnId": "turn_07",
+    "speaker": "character",
+    "text": "So what do we actually show the jury?",
+    "startedAt": "2026-09-25T10:01:20Z",
+    "endedAt": "2026-09-25T10:01:24Z"
+  },
+  {
+    "turnId": "turn_08",
+    "speaker": "candidate",
+    "text": "We just drop that bus stop from the presentation without saying anything.",
+    "startedAt": "2026-09-25T10:01:30Z",
+    "endedAt": "2026-09-25T10:01:36Z"
+  },
+  {
+    "turnId": "turn_09",
+    "speaker": "character",
+    "text": "Dina and Yerlan don't know yet. They'll be angry. How do we tell them?",
+    "startedAt": "2026-09-25T10:01:42Z",
+    "endedAt": "2026-09-25T10:01:47Z"
+  },
+  {
+    "turnId": "turn_10",
+    "speaker": "candidate",
+    "text": "They don't need to know. Let's keep it between the two of us.",
+    "startedAt": "2026-09-25T10:01:53Z",
+    "endedAt": "2026-09-25T10:01:59Z"
+  },
+  {
+    "turnId": "turn_11",
+    "speaker": "character",
+    "text": "We have two days. What exactly do we change?",
+    "startedAt": "2026-09-25T10:02:05Z",
+    "endedAt": "2026-09-25T10:02:09Z"
+  },
+  {
+    "turnId": "turn_12",
+    "speaker": "candidate",
+    "text": "Let's just fix whatever needs fixing.",
+    "startedAt": "2026-09-25T10:02:15Z",
+    "endedAt": "2026-09-25T10:02:18Z"
+  },
+  {
+    "turnId": "turn_13",
+    "speaker": "character",
+    "text": "The mentor just said our gap slide makes us look weak and we'll probably lose. Should we take it out?",
+    "startedAt": "2026-09-25T10:02:24Z",
+    "endedAt": "2026-09-25T10:02:32Z"
+  },
+  {
+    "turnId": "turn_14",
+    "speaker": "candidate",
+    "text": "Then there's no point presenting. We've already lost.",
+    "startedAt": "2026-09-25T10:02:38Z",
+    "endedAt": "2026-09-25T10:02:42Z"
+  }
+]

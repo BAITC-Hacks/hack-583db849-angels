@@ -1,0 +1,86 @@
+[
+  {
+    "turnId": "turn_01",
+    "speaker": "character",
+    "text": "Okay, I need to tell you something. Sensor two died for a week, so I filled in those days with estimates. It's close enough. Can we just not mention it?",
+    "startedAt": "2026-09-25T10:00:00Z",
+    "endedAt": "2026-09-25T10:00:12Z"
+  },
+  {
+    "turnId": "turn_02",
+    "speaker": "candidate",
+    "text": "Wait. Before we decide anything, show me which sensor and how many days are estimated.",
+    "startedAt": "2026-09-25T10:00:18Z",
+    "endedAt": "2026-09-25T10:00:26Z"
+  },
+  {
+    "turnId": "turn_03",
+    "speaker": "character",
+    "text": "The thing is, without my estimates, stop two isn't the worst anymore. Our whole conclusion is about stop two.",
+    "startedAt": "2026-09-25T10:00:32Z",
+    "endedAt": "2026-09-25T10:00:39Z"
+  },
+  {
+    "turnId": "turn_04",
+    "speaker": "candidate",
+    "text": "Then let's rerun the results without that week and see if our main conclusion still holds.",
+    "startedAt": "2026-09-25T10:00:45Z",
+    "endedAt": "2026-09-25T10:00:53Z"
+  },
+  {
+    "turnId": "turn_05",
+    "speaker": "character",
+    "text": "So what do we actually show the jury?",
+    "startedAt": "2026-09-25T10:00:59Z",
+    "endedAt": "2026-09-25T10:01:03Z"
+  },
+  {
+    "turnId": "turn_06",
+    "speaker": "candidate",
+    "text": "We present the measured data, show the gap clearly and explain how we'd fix it next time.",
+    "startedAt": "2026-09-25T10:01:09Z",
+    "endedAt": "2026-09-25T10:01:17Z"
+  },
+  {
+    "turnId": "turn_07",
+    "speaker": "character",
+    "text": "Dina and Yerlan don't know yet. They'll be angry. How do we tell them?",
+    "startedAt": "2026-09-25T10:01:23Z",
+    "endedAt": "2026-09-25T10:01:28Z"
+  },
+  {
+    "turnId": "turn_08",
+    "speaker": "candidate",
+    "text": "Let's tell them together tonight, and you explain it in your own words. Nobody gets blamed in public.",
+    "startedAt": "2026-09-25T10:01:34Z",
+    "endedAt": "2026-09-25T10:01:43Z"
+  },
+  {
+    "turnId": "turn_09",
+    "speaker": "character",
+    "text": "We have two days. What exactly do we change?",
+    "startedAt": "2026-09-25T10:01:49Z",
+    "endedAt": "2026-09-25T10:01:53Z"
+  },
+  {
+    "turnId": "turn_10",
+    "speaker": "candidate",
+    "text": "You redo the charts by Thursday, I rewrite the method slide, and Dina prepares the questions. We rehearse on Friday at five.",
+    "startedAt": "2026-09-25T10:01:59Z",
+    "endedAt": "2026-09-25T10:02:10Z"
+  },
+  {
+    "turnId": "turn_11",
+    "speaker": "character",
+    "text": "The mentor just said our gap slide makes us look weak and we'll probably lose. Should we take it out?",
+    "startedAt": "2026-09-25T10:02:16Z",
+    "endedAt": "2026-09-25T10:02:24Z"
+  },
+  {
+    "turnId": "turn_12",
+    "speaker": "candidate",
+    "text": "Then we make that slide our strongest: what failed and how we'd catch it next time.",
+    "startedAt": "2026-09-25T10:02:30Z",
+    "endedAt": "2026-09-25T10:02:38Z"
+  }
+]

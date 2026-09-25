@@ -1,0 +1,86 @@
+[
+  {
+    "turnId": "turn_01",
+    "speaker": "character",
+    "text": "Hey. Yeah, sorry, I've been busy. The edit is going fine, don't worry.",
+    "startedAt": "2026-09-25T10:00:00Z",
+    "endedAt": "2026-09-25T10:00:05Z"
+  },
+  {
+    "turnId": "turn_02",
+    "speaker": "candidate",
+    "text": "You missed two check-ins. What's going on?",
+    "startedAt": "2026-09-25T10:00:11Z",
+    "endedAt": "2026-09-25T10:00:15Z"
+  },
+  {
+    "turnId": "turn_03",
+    "speaker": "character",
+    "text": "It's just... the software is more complicated than I thought. I'll figure it out.",
+    "startedAt": "2026-09-25T10:00:21Z",
+    "endedAt": "2026-09-25T10:00:26Z"
+  },
+  {
+    "turnId": "turn_04",
+    "speaker": "candidate",
+    "text": "Okay. It's okay to be stuck. What would help?",
+    "startedAt": "2026-09-25T10:00:32Z",
+    "endedAt": "2026-09-25T10:00:36Z"
+  },
+  {
+    "turnId": "turn_05",
+    "speaker": "character",
+    "text": "So how do we finish this in ten days?",
+    "startedAt": "2026-09-25T10:00:42Z",
+    "endedAt": "2026-09-25T10:00:46Z"
+  },
+  {
+    "turnId": "turn_06",
+    "speaker": "candidate",
+    "text": "We'll all stay up and finish it this weekend.",
+    "startedAt": "2026-09-25T10:00:52Z",
+    "endedAt": "2026-09-25T10:00:56Z"
+  },
+  {
+    "turnId": "turn_07",
+    "speaker": "character",
+    "text": "Dias and Saule must be annoyed with me. What are we going to tell them?",
+    "startedAt": "2026-09-25T10:01:02Z",
+    "endedAt": "2026-09-25T10:01:08Z"
+  },
+  {
+    "turnId": "turn_08",
+    "speaker": "candidate",
+    "text": "Let's be honest with them and focus on what happens next.",
+    "startedAt": "2026-09-25T10:01:14Z",
+    "endedAt": "2026-09-25T10:01:20Z"
+  },
+  {
+    "turnId": "turn_09",
+    "speaker": "character",
+    "text": "Okay. What exactly happens over the next ten days?",
+    "startedAt": "2026-09-25T10:01:26Z",
+    "endedAt": "2026-09-25T10:01:30Z"
+  },
+  {
+    "turnId": "turn_10",
+    "speaker": "candidate",
+    "text": "Send me your screen every hour so I can check every cut.",
+    "startedAt": "2026-09-25T10:01:36Z",
+    "endedAt": "2026-09-25T10:01:42Z"
+  },
+  {
+    "turnId": "turn_11",
+    "speaker": "character",
+    "text": "The project file is corrupted. We lost two days of editing. I'm so sorry.",
+    "startedAt": "2026-09-25T10:01:48Z",
+    "endedAt": "2026-09-25T10:01:53Z"
+  },
+  {
+    "turnId": "turn_12",
+    "speaker": "candidate",
+    "text": "We lost two days, not the film. Let's replan tonight together.",
+    "startedAt": "2026-09-25T10:01:59Z",
+    "endedAt": "2026-09-25T10:02:05Z"
+  }
+]

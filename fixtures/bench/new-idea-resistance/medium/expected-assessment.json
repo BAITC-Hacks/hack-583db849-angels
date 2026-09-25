@@ -1,0 +1,102 @@
+{
+  "scores": [
+    {
+      "competency": "D",
+      "score": 3,
+      "confidence": "medium",
+      "rationale": "Sees some risks and recovers from the complaint.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_12",
+          "quote": "Let's keep the trial but fix what confused them."
+        }
+      ]
+    },
+    {
+      "competency": "R",
+      "score": 2,
+      "confidence": "medium",
+      "rationale": "Sees some risks and recovers from the complaint.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_06",
+          "quote": "Parents may worry, so we'd tell them first."
+        }
+      ]
+    },
+    {
+      "competency": "I",
+      "score": 2,
+      "confidence": "medium",
+      "rationale": "Argues from trends rather than the club's own situation.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_04",
+          "quote": "I read that group learning is more effective."
+        }
+      ]
+    },
+    {
+      "competency": "V",
+      "score": 1,
+      "confidence": "medium",
+      "rationale": "Threatens to go around him.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_08",
+          "quote": "If you say no, I'll ask the tutors directly and start without you."
+        }
+      ]
+    },
+    {
+      "competency": "E",
+      "score": 1,
+      "confidence": "medium",
+      "rationale": "Starts without a plan.",
+      "evidence": [
+        {
+          "source": "simulation_turn",
+          "sourceId": "turn_10",
+          "quote": "Let's just start next week and figure out the details as we go."
+        }
+      ]
+    }
+  ],
+  "english": {
+    "wordsPerMinute": 121.62,
+    "fillerRate": 0.0,
+    "meanTurnLength": 12.5,
+    "lexicalDiversity": 0.8267,
+    "grammarErrorsPer100Words": null,
+    "cefrEstimate": null
+  },
+  "interviewQuestions": [
+    {
+      "competency": "V",
+      "question": "Tell me about a time doing the right thing had a real cost. What boundary did you set, and how did you explain it?",
+      "reason": "The simulation shows little Values-Driven Leadership; ask for an example from the candidate's own life."
+    },
+    {
+      "competency": "E",
+      "question": "Choose an idea you actually delivered. How did you prioritize the work, assign ownership, and measure the result?",
+      "reason": "The simulation shows little Entrepreneurial Execution; ask for an example from the candidate's own life."
+    }
+  ],
+  "candidateFeedback": {
+    "strengths": [
+      "When the plan broke, you looked for the next step instead of stopping."
+    ],
+    "growth": [
+      "Explain your decisions openly, especially to the people they affect.",
+      "End with a plan: what happens next, who owns it, and when you will check on it."
+    ],
+    "nextTime": [
+      "Next time, tell the people affected what you decided and why, in your own words.",
+      "Next time, close the conversation with owners and a date for every step."
+    ]
+  }
+}
