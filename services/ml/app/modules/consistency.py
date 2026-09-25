@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Callable, Iterable
 
 from ..evidence import candidate_view_sources, verify_evidence
 from ..schemas.contracts import (
@@ -77,3 +78,43 @@ def before_consistency(request: BriefRequest) -> list[ConsistencyItem]:
             askInInterview=question,
         )
     ]
+
+
+def assemble_before_consistency(
+    request: BriefRequest,
+    proposed: Iterable[ConsistencyItem],
+    checked: Callable[[Iterable[Evidence]], list[Evidence]],
+) -> list[ConsistencyItem]:
+    """Assemble the same grounded before items for M1 and standalone C."""
+
+    items = before_consistency(request)
+    for proposed_item in proposed:
+        claim_evidence = checked(proposed_item.claim.evidence)
+        observation_evidence = checked(proposed_item.observation.evidence)
+        if proposed_item.topic == "english" or not claim_evidence:
+            continue  # English is measured deterministically above.
+        if proposed_item.observation.metric is not None:
+            # A model may not invent a measurement for another topic.
+            continue
+        observation_text = (
+            f"The cited test or application response is: {observation_evidence[0].quote}"
+            if observation_evidence else "No comparable observation was supplied."
+        )
+        items.append(ConsistencyItem(
+            itemId=f"c_{len(items) + 1:02d}",
+            topic=proposed_item.topic,
+            claim=Claim(
+                text=f"The cited response says: {claim_evidence[0].quote}",
+                evidence=claim_evidence,
+            ),
+            observation=Observation(
+                text=observation_text,
+                evidence=observation_evidence,
+                metric=None,
+            ),
+            # Verified quotes establish source text, not semantic agreement.
+            status="unverified",
+            whatToDo="Ask the candidate to clarify these points with a concrete example.",
+            askInInterview="How do these two points fit together in a recent example?",
+        ))
+    return items
