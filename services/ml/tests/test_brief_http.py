@@ -119,7 +119,8 @@ def test_missing_replay_cassette_never_calls_a_live_provider(tmp_path: Path) -> 
     )
     http = TestClient(create_app(settings), raise_server_exceptions=False)
     request = payload()
-    request["candidate"]["candidateId"] = "new-synthetic-id-without-a-cassette"
+    # The candidate id is not part of the cassette key; new content is.
+    request["candidate"]["application"]["answers"][0]["answer"] += " Also something new."
     response = http.post("/internal/v1/brief", json=request, headers=TOKEN)
     assert response.status_code == 503
     assert response.json()["error"]["code"] == "AI_UNAVAILABLE"
