@@ -5,7 +5,9 @@ import { ToLlmViewService } from '../src/privacy/to-llm-view.service';
 
 const candidateId = '00000000-0000-4000-8000-00000000000a';
 const written = contractExample<{ question: string; competency: string; why: string }>('ml/surprise-question.response.json');
-const video = { buffer: Buffer.from('synthetic video'), mimetype: 'video/webm', size: 15 };
+/** A webm file starts with the EBML magic number; the declared type is whatever the browser wrote. */
+const webm = Buffer.concat([Buffer.from([0x1a, 0x45, 0xdf, 0xa3]), Buffer.from('synthetic video')]);
+const video = { buffer: webm, mimetype: 'application/octet-stream', size: webm.length };
 const consents = { consentVideo: 'true', consentProcessing: 'true' };
 
 type Row = {
@@ -118,6 +120,18 @@ describe('SurpriseService', () => {
       .rejects.toMatchObject({ status: 409, response: { code: 'DEADLINE_PASSED' } });
     expect(current().status).toBe('expired');
     expect(media.saveVideo).not.toHaveBeenCalled();
+  });
+
+  it('takes a webm or mp4 by its content, whatever type it was declared with, and nothing else', async () => {
+    const { service, media } = harness();
+    await service.create(candidateId, 'platform');
+    await service.start('surprise-1', 'platform');
+    const text = Buffer.from('not a video at all');
+    await expect(service.answer('surprise-1', { buffer: text, mimetype: 'video/webm', size: text.length }, consents, 'platform'))
+      .rejects.toMatchObject({ status: 400, response: { code: 'VALIDATION_ERROR', details: { fields: ['video'] } } });
+    const mp4 = Buffer.concat([Buffer.from([0, 0, 0, 0x20]), Buffer.from('ftypisom synthetic')]);
+    await service.answer('surprise-1', { buffer: mp4, mimetype: 'video/mp4;codecs=avc1,mp4a', size: mp4.length }, consents, 'platform');
+    expect(media.saveVideo).toHaveBeenCalledWith('surprise-1', 'mp4', mp4);
   });
 
   it('keeps the video, transcribes only its audio, deletes the audio and makes a new brief', async () => {
