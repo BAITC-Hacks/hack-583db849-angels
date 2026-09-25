@@ -4,12 +4,15 @@ import { Prisma } from '@prisma/client';
 import { contractExample } from '../src/contract-example';
 import { SimulationAssessmentsService } from '../src/modules/simulation-assessments/simulation-assessments.service';
 import { ToLlmViewService } from '../src/privacy/to-llm-view.service';
+import { readSeed } from '../src/seed-files';
 
 const simulationId = '6f1c2a0e-0000-4000-8000-00000000a002';
 const candidateId = '00000000-0000-4000-8000-00000000000a';
 const assessmentId = '6f1c2a0e-0000-4000-8000-00000000a003';
 
-function harness(status: 'active' | 'completed' = 'completed') {
+type Turn = { sequence: number; speaker: string; text: string; startedAt: Date; endedAt: Date; createdAt: Date; recognitionConfidence?: number };
+
+function harness(status: 'active' | 'completed' = 'completed', { demo = false, turns = null as Turn[] | null } = {}) {
   const simulation = {
     id: simulationId,
     candidateId,
@@ -20,9 +23,9 @@ function harness(status: 'active' | 'completed' = 'completed') {
     accommodation: false,
     createdAt: new Date('2026-09-25T10:04:50Z'),
     completedAt: status === 'completed' ? new Date('2026-09-25T10:11:50Z') : null,
-    candidate: { profile: { fullName: 'Ada Example' } },
-    turns: [
-      { sequence: 1, speaker: 'candidate' as const, text: 'Ada Example will listen',
+    candidate: { profile: { fullName: 'Ada Example' }, externalId: 'inv-2026-demo-a' },
+    turns: turns ?? [
+      { sequence: 1, speaker: 'candidate', text: 'Ada Example will listen',
         startedAt: new Date('2026-09-25T10:05:00Z'), endedAt: new Date('2026-09-25T10:05:20Z'),
         createdAt: new Date('2026-09-25T10:05:00Z') },
     ],
@@ -51,11 +54,33 @@ function harness(status: 'active' | 'completed' = 'completed') {
   };
   const audit = { record: jest.fn().mockResolvedValue({}) };
   const briefs = { startFor: jest.fn().mockResolvedValue(undefined) };
-  const service = new SimulationAssessmentsService(prisma as never, gateway as never, new ToLlmViewService(), audit as never, briefs as never);
+  const config = { get: (name: string) => (name === 'DEMO_MODE' ? String(demo) : undefined) };
+  const service = new SimulationAssessmentsService(prisma as never, gateway as never, new ToLlmViewService(), audit as never, briefs as never, config as never);
   return { service, gateway, prisma, audit, briefs, simulation, stored: () => row };
 }
 
 describe('SimulationAssessmentsService', () => {
+  it('gives the recorded session of a seed candidate the seed assessment, with no model call, in DEMO_MODE', async () => {
+    const recorded = await readSeed<{ speaker: string; text: string; startedAt: string; endedAt: string }[]>('candidates', 'a', 'transcript.json');
+    const turns = recorded.map((turn, index) => ({
+      sequence: index + 1, speaker: turn.speaker, text: turn.text,
+      startedAt: new Date(turn.startedAt), endedAt: new Date(turn.endedAt), createdAt: new Date(turn.startedAt),
+    }));
+    const fixture = harness('completed', { demo: true, turns });
+    await fixture.service.startAutomatically(simulationId);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(fixture.gateway.simulationAssessment).not.toHaveBeenCalled();
+    const expected = await readSeed<{ scores: unknown }>('candidates', 'a', 'expected-assessment.json');
+    expect(fixture.stored()).toMatchObject({ status: 'ready', result: expect.objectContaining({ scores: expected.scores }) });
+
+    // The same candidate, played live, is assessed by ML as usual.
+    const live = harness('completed', { demo: true });
+    await live.service.startAutomatically(simulationId);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(live.gateway.simulationAssessment).toHaveBeenCalledTimes(1);
+  });
+
+
   it('shows the recognition confidence on the report, and never sends it to ML', async () => {
     const fixture = harness();
     Object.assign(fixture.simulation.turns[0], { recognitionConfidence: 0.42 });

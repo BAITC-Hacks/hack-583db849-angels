@@ -49,13 +49,14 @@ function harness({ externalId = 'inv-2026-new-0001', demo = false, mlFails = fal
   };
   const config = { get: (name: string) => (name === 'DEMO_MODE' ? (demo ? 'true' : 'false') : undefined) };
   const privacy = new ToLlmViewService();
-  const service = new BriefsService(prisma as never, new CandidateAiService(privacy, gateway as never), privacy, config as never);
-  return { service, prisma, gateway, rows };
+  const audit = { record: jest.fn().mockResolvedValue(undefined) };
+  const service = new BriefsService(prisma as never, new CandidateAiService(privacy, gateway as never), privacy, config as never, audit as never);
+  return { service, prisma, gateway, rows, audit };
 }
 
 describe('BriefsService', () => {
   it('makes a brief by itself, sending ML only the redacted answers', async () => {
-    const { service, gateway, rows } = harness();
+    const { service, gateway, rows, audit } = harness();
     await service.startFor(candidateId);
 
     expect(gateway.brief).toHaveBeenCalledTimes(1);
@@ -63,6 +64,7 @@ describe('BriefsService', () => {
     expect(sent).not.toMatch(/profile|Ada Example|ada@example\.test|000000000000|inv-2026-new-0001/);
     expect(gateway.brief.mock.calls[0][0]).not.toHaveProperty('simulationEnglish');
     expect(Object.values(rows)).toEqual([expect.objectContaining({ status: 'ready', result: briefResult })]);
+    expect(audit.record).toHaveBeenCalledWith(expect.objectContaining({ action: 'brief.ready', candidateId }));
   });
 
   it('sends the simulation English when it is made again after the assessment', async () => {

@@ -182,7 +182,9 @@ describe('SurpriseService', () => {
     await expect(service.video('surprise-1', 'platform')).rejects.toMatchObject({ status: 403 });
     await service.video('surprise-1', 'interviewer');
     await service.video('surprise-1', 'commission');
-    expect(audit.record).toHaveBeenCalledTimes(2);
+    const actions = audit.record.mock.calls.map(([event]: [{ action: string }]) => event.action);
+    expect(actions.filter((action: string) => action === 'surprise.video.viewed')).toHaveLength(2);
+    expect(actions.slice(0, 2)).toEqual(['surprise.started', 'surprise.answered']);
     expect(audit.record).toHaveBeenLastCalledWith(expect.objectContaining({
       action: 'surprise.video.viewed', targetId: 'surprise-1', candidateId, actorRole: 'commission',
     }));

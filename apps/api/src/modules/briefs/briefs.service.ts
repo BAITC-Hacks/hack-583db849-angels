@@ -1,6 +1,3 @@
-import { readFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
-
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Prisma } from '@prisma/client';
@@ -10,6 +7,8 @@ import type { components } from '../../ai-client/schema';
 import { PrismaService } from '../../database/prisma.service';
 import { candidateSnapshot, snapshotSelect } from '../../privacy/candidate-snapshot';
 import { LlmView, ToLlmViewService } from '../../privacy/to-llm-view.service';
+import { readSeed, seedLetter } from '../../seed-files';
+import { AuditService } from '../audit/audit.service';
 import { BriefDto } from './dto/brief.dto';
 
 type BriefResult = components['schemas']['BriefResult'];
@@ -23,9 +22,6 @@ const candidateSelect = {
 } as const satisfies Prisma.CandidateSelect;
 type BriefCandidate = Prisma.CandidateGetPayload<{ select: typeof candidateSelect }>;
 
-/** The seeded demo candidates, by externalId, and where their expected brief lives. */
-const seedLetters: Record<string, string> = { 'inv-2026-demo-a': 'a', 'inv-2026-demo-b': 'b', 'inv-2026-demo-c': 'c' };
-
 @Injectable()
 export class BriefsService {
   private readonly logger = new Logger(BriefsService.name);
@@ -35,6 +31,7 @@ export class BriefsService {
     private readonly candidateAi: CandidateAiService,
     private readonly privacy: ToLlmViewService,
     private readonly config: ConfigService,
+    private readonly audit: AuditService,
   ) {}
 
   /**
@@ -100,6 +97,7 @@ export class BriefsService {
         where: { id: pending.id },
         data: { status: 'ready', result: result as unknown as Prisma.InputJsonValue },
       });
+      await this.audit.record({ action: 'brief.ready', targetType: 'brief', targetId: pending.id, candidateId });
     } catch (error) {
       await this.prisma.brief.update({ where: { id: pending.id }, data: { status: 'failed' } });
       if (rethrow) throw error;
@@ -110,10 +108,9 @@ export class BriefsService {
 
   /** In DEMO_MODE, A, B and C get the brief from `seed/`: it is what the demo shows. */
   private async seedBrief(externalId: string): Promise<BriefResult | null> {
-    const letter = seedLetters[externalId];
+    const letter = seedLetter(externalId);
     if (!letter || this.config.get<string>('DEMO_MODE') !== 'true') return null;
-    const filename = resolve(process.cwd(), '../../seed/candidates', letter, 'expected-brief.json');
-    return JSON.parse(await readFile(filename, 'utf8')) as BriefResult;
+    return readSeed<BriefResult>('candidates', letter, 'expected-brief.json');
   }
 
   private async latestSimulationEnglish(candidateId: string): Promise<EnglishMetrics | null> {

@@ -18,5 +18,7 @@ export interface AiGateway {
   interviewDraft(request: components['schemas']['DraftRequest']): Promise<components['schemas']['DraftResult']>;
   /** C: claimed against measured. After the interview it reads the transcript, and never the interviewer's scores. */
   consistency(request: components['schemas']['ConsistencyRequest']): Promise<components['schemas']['ConsistencyResult']>;
+  /** The gateway's mode, calls and spend, for the admin. */
+  usage(): Promise<components['schemas']['Usage']>;
   speech(text: string, scenarioId: string): Promise<Buffer>;
 }

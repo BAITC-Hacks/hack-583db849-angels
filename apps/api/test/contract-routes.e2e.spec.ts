@@ -15,6 +15,7 @@ import { SurpriseService } from '../src/modules/surprise/surprise.service';
 import { QualityGuardService } from '../src/modules/quality-guard/quality-guard.service';
 import { InterviewsService } from '../src/modules/interviews/interviews.service';
 import { ConsistencyService } from '../src/modules/consistency/consistency.service';
+import { AdminService } from '../src/modules/admin/admin.service';
 
 const briefs = {
   startFor: jest.fn().mockResolvedValue(undefined),
@@ -55,6 +56,14 @@ const consistency = {
   after: jest.fn().mockImplementation(() => contractExample('consistency-after.json')),
   startAfter: jest.fn().mockResolvedValue(undefined),
 };
+
+const admin = {
+  overview: jest.fn().mockImplementation(() => contractExample('admin-overview.json')),
+  auditEvents: jest.fn().mockImplementation(() => contractExample('audit-events.json')),
+};
+
+// Each test here walks many routes over HTTP; under a full parallel run 5 s is too tight.
+jest.setTimeout(20_000);
 
 describe('PR 1 contract routes', () => {
   let app: INestApplication;
@@ -102,6 +111,8 @@ describe('PR 1 contract routes', () => {
       .useValue(interviews)
       .overrideProvider(ConsistencyService)
       .useValue(consistency)
+      .overrideProvider(AdminService)
+      .useValue(admin)
       .overrideProvider(PrismaService)
       .useValue({
         candidate: {
@@ -245,6 +256,21 @@ describe('PR 1 contract routes', () => {
     await request(server).get(`${path}?stage=after`).set('X-API-Key', 'commission-key').expect(200);
     await request(server).get(`${path}?stage=before`).set('X-API-Key', 'platform-key').expect(403);
     await request(server).get(`${path}?stage=during`).set('X-API-Key', 'commission-key').expect(400);
+  });
+
+  it('keeps the admin’s overview and log to the admin, and the demo controls off without DEMO_MODE', async () => {
+    const server = app.getHttpServer();
+    await request(server).get('/v1/admin/overview').set('X-API-Key', 'admin-key').expect(200);
+    await request(server).get('/v1/audit-events?limit=50').set('X-API-Key', 'admin-key').expect(200);
+    for (const role of ['platform-key', 'interviewer-key', 'commission-key']) {
+      await request(server).get('/v1/admin/overview').set('X-API-Key', role).expect(403);
+      await request(server).get('/v1/audit-events').set('X-API-Key', role).expect(403);
+    }
+    // DEMO_MODE is off in this suite: the controls are not there, even for the admin.
+    await request(server).post('/v1/demo/reset').set('X-API-Key', 'admin-key').expect(404);
+    await request(server).post('/v1/demo/recorded-session').set('X-API-Key', 'commission-key').send({ candidateId }).expect(404);
+    await request(server).post('/v1/demo/reset').set('X-API-Key', 'commission-key').expect(403);
+    await request(server).post('/v1/demo/recorded-session').set('X-API-Key', 'interviewer-key').send({ candidateId }).expect(403);
   });
 
   it('answers 404, not 500, for an id that is not a UUID', async () => {
