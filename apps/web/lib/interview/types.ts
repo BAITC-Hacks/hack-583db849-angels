@@ -27,3 +27,16 @@ export interface InterviewView {
 export interface AssessmentDraft {
   scores: Omit<CompetencyScoreProps, 'id'>[];
 }
+
+export type TranscriptStatus = 'none' | 'transcribing' | 'ready' | 'failed';
+
+/** One interview as the API has it, in the screen's shape. */
+export interface InterviewRecord {
+  view: InterviewView;
+  transcriptStatus: TranscriptStatus;
+  /** Empty until the transcript is ready. */
+  transcript: InterviewTurn[];
+  /** The interviewer's own scores once saved — fixed from then on. */
+  savedScores: Record<Competency, Score> | null;
+}
+

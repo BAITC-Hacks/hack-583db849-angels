@@ -119,6 +119,22 @@ describe('the panel on the API', () => {
     expect(posts[1].headers.get('Idempotency-Key')).toBe(posts[0].headers.get('Idempotency-Key'));
   });
 
+  it('checks an interview once its transcript is ready', async () => {
+    const list = example<{ items: WireCandidate[] }>('candidates.json');
+    const calls = mockApi({
+      'GET /api/v1/quality-checks': () => json({ items: [] }),
+      'GET /api/v1/candidates': () => json(list),
+      'POST /api/v1/quality-checks/interview': () => json(wireInterview, 201),
+    });
+    withQuery(<QualityGuardScreen />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Check the interview with Candidate A' }));
+    expect(await screen.findByText('Leading question')).toBeTruthy();
+    const post = calls.find((call) => call.method === 'POST')!;
+    expect(JSON.parse(post.body as string)).toEqual({ interviewId: list.items[0].progress!.interview!.interviewId });
+    // B and C have no transcript, so there is nothing of theirs to check.
+    expect(screen.queryByRole('button', { name: /Candidate B|Candidate C/ })).toBeNull();
+  });
+
   it('tells a role that may not see the checks so', async () => {
     mockApi({ 'GET /api/v1/quality-checks': () => apiError(403, 'FORBIDDEN') });
     withQuery(<QualityGuardScreen />);

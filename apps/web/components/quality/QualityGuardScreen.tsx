@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { ApiError } from '../../lib/api/client';
 import { errorText } from '../../lib/api/errors';
 import { useCopy, useStaffLocale } from '../../lib/i18n/StaffLocaleProvider';
-import { latestChecks, useQualityChecks, useRunCalibration } from '../../lib/quality/queries';
+import { useCandidates } from '../../lib/api/candidates';
+import { latestChecks, useQualityChecks, useRunCalibration, useRunInterviewCheck } from '../../lib/quality/queries';
 import type { QualityCheck } from '../../lib/quality/types';
 import { QualityCheckPanel } from './QualityPanel';
 
@@ -15,7 +16,9 @@ const copy = {
     lede: 'Signals about the process and about an interviewer’s own scale, each with what to do next. Nothing here is about a candidate, and nothing here changes anyone’s score.',
     privacy: 'Built from interview transcripts and from saved scores without candidate data. Quotes are the interviewer’s own questions.',
     interview: 'The latest interview',
-    interviewNone: 'No interview has been checked yet. The check runs on an interview once its transcript is ready.',
+    interviewNone: 'No interview has been checked yet. An interview can be checked once its transcript is ready.',
+    checkInterview: (label: string) => `Check the interview with ${label}`,
+    checking: 'Checking…',
     calibration: 'An interviewer’s scale',
     calibrationNone: 'No scale has been checked yet. Choose an interviewer and a period.',
     ref: 'Interviewer',
@@ -34,7 +37,9 @@ const copy = {
     lede: 'Сигналы о процессе и о шкале самого интервьюера, к каждому — что сделать. Здесь нет ничего о кандидате, и ничего здесь не меняет чьи-либо баллы.',
     privacy: 'Собрано из расшифровок интервью и из сохранённых баллов без данных о кандидатах. Цитаты — собственные вопросы интервьюера.',
     interview: 'Последнее интервью',
-    interviewNone: 'Ни одно интервью ещё не проверено. Проверка запускается, когда у интервью готова расшифровка.',
+    interviewNone: 'Ни одно интервью ещё не проверено. Интервью можно проверить, когда готова его расшифровка.',
+    checkInterview: (label: string) => `Проверить интервью: ${label}`,
+    checking: 'Проверяем…',
     calibration: 'Шкала интервьюера',
     calibrationNone: 'Шкалу ещё не проверяли. Выберите интервьюера и период.',
     ref: 'Интервьюер',
@@ -85,6 +90,12 @@ export function QualityGuardScreen() {
   const { locale } = useStaffLocale();
   const checks = useQualityChecks();
   const run = useRunCalibration();
+  const runInterview = useRunInterviewCheck();
+  const candidates = useCandidates();
+  const transcribed = (candidates.data ?? []).flatMap((candidate) => {
+    const interview = candidate.progress?.interview;
+    return interview?.transcriptStatus === 'ready' && interview.interviewId ? [{ label: candidate.label, interviewId: interview.interviewId }] : [];
+  });
   const latest = latestChecks(checks.data);
   const refs = [...new Set((checks.data ?? []).map((check) => check.interviewerRef).filter((ref): ref is string => Boolean(ref)))];
   const [period, setPeriod] = useState(thisMonth);
@@ -101,6 +112,26 @@ export function QualityGuardScreen() {
     body = (
       <>
         <Section title={text.interview} note={latest.interview ? text.interviewNote(latest.interview) : undefined}>
+          {transcribed.length > 0 ? (
+            <div className="flex flex-wrap items-center gap-2 rounded-panel border border-border-subtle bg-bg-surface p-4">
+              {transcribed.map((item) => (
+                <button
+                  key={item.interviewId}
+                  type="button"
+                  disabled={runInterview.isPending}
+                  onClick={() => runInterview.mutate(item.interviewId)}
+                  className="rounded-control border border-border-strong px-3 py-2 text-sm font-semibold text-text-primary hover:bg-bg-elevated disabled:opacity-50"
+                >
+                  {runInterview.isPending && runInterview.variables === item.interviewId ? text.checking : text.checkInterview(item.label)}
+                </button>
+              ))}
+              {runInterview.isError ? (
+                <p role="alert" className="basis-full text-sm text-text-primary">
+                  {errorText(runInterview.error, locale)}
+                </p>
+              ) : null}
+            </div>
+          ) : null}
           {latest.interview ? (
             <QualityCheckPanel check={latest.interview} />
           ) : (
