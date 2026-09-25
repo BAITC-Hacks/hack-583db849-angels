@@ -20,6 +20,7 @@ const copy = {
     failed: 'The answer could not be transcribed. The video is kept.',
     expired: 'The question was opened and not answered in time.',
     silent: 'No speech was recognised in the answer.',
+    videoGone: 'The video is no longer kept: it is deleted 30 days after the decision. The transcript stays.',
   },
   ru: {
     title: 'Сюрпризный ответ',
@@ -34,6 +35,7 @@ const copy = {
     failed: 'Ответ не удалось расшифровать. Видео сохранено.',
     expired: 'Вопрос открыли, но не ответили вовремя.',
     silent: 'В ответе не распознано речи.',
+    videoGone: 'Видео больше не хранится: оно удаляется через 30 дней после решения. Расшифровка остаётся.',
   },
 };
 
@@ -120,6 +122,8 @@ export function SurpriseAnswer({ surprise, videoUrl }: { surprise: SurpriseAnswe
           )}
           <p className="text-[0.72rem] text-text-muted">{text.videoNote}</p>
         </div>
+      ) : surprise.status === 'answered' && surprise.videoAvailable === false ? (
+        <p className="text-[0.72rem] text-text-muted">{text.videoGone}</p>
       ) : null}
     </section>
   );

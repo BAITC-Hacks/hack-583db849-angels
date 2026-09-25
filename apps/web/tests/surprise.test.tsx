@@ -211,6 +211,14 @@ describe('what staff read afterwards', () => {
     expect(video.getAttribute('src')).toBe(`${path}/video`);
   });
 
+  it('says the video is gone once it has been deleted after the decision, and keeps the transcript', async () => {
+    mockApi({ 'GET /api/v1/candidates': () => json(list), [`GET ${path}`]: () => json({ ...staff, videoAvailable: false }) });
+    withQuery(<CandidateSurprise candidateId={list.items[0].candidateId} />);
+    expect(await screen.findByText(/deleted 30 days after the decision/)).toBeTruthy();
+    expect(screen.getByText(/two people were exhausted/)).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Play the recording' })).toBeNull();
+  });
+
   it('shows nothing for a candidate who has no question', async () => {
     mockApi({ 'GET /api/v1/candidates': () => json(list) });
     const { container } = withQuery(<CandidateSurprise candidateId={list.items[1].candidateId} />);
