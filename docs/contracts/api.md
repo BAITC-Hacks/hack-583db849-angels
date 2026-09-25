@@ -185,7 +185,7 @@ One question about the candidate's own application, one attempt, 90 seconds, on 
 - **One attempt, held by the server:** a second `start` answers `409 ALREADY_STARTED`, and an answer after `answerDeadline` + 15 s answers `409 DEADLINE_PASSED`.
 - **The video never reaches a model.** You extract the audio (`ffmpeg`), send it to `POST /internal/v1/transcribe` with one speaker, store the transcript as segments `sseg_01`, `sseg_02`, …, and delete the audio. The video file stays for staff playback only.
 - **Every video view is an audit event.** The video is deleted on demo reset and 30 days after the decision.
-- **Once the answer is transcribed,** you create a new brief, so its quotes can cite `surprise_answer`.
+- **Once the answer is transcribed,** you create a new brief and send the question and the segments in `BriefRequest.surpriseAnswer` (`ml.md`, rule 6c), so its quotes can cite `surprise_answer`.
 
 ### Admin and demo
 
