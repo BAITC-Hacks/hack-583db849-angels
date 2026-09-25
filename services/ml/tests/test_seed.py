@@ -5,7 +5,9 @@ import re
 from services.ml.app.schemas.contracts import (
     AssessmentResult,
     BriefResult,
+    DraftResult,
     InterviewNote,
+    InterviewTurn,
     ScoredInterview,
     Turn,
 )
@@ -35,12 +37,11 @@ def test_every_candidate_has_the_complete_seed_layout_and_valid_shapes() -> None
             "transcript.json",
             "expected-assessment.json",
             "interview-notes.json",
-                "interviewer-scores.json",
-                "m2a-session.json",
-            }
-        if candidate == "a":
-            expected.add("interview-transcript.json")
-            expected.add("expected-interview-draft.json")
+            "interviewer-scores.json",
+            "m2a-session.json",
+            "interview-transcript.json",
+            "expected-interview-draft.json",
+        }
         assert {path.name for path in directory.iterdir()} == expected
         BriefResult.model_validate(load(directory / "expected-brief.json"))
         AssessmentResult.model_validate(load(directory / "expected-assessment.json"))
@@ -51,6 +52,22 @@ def test_every_candidate_has_the_complete_seed_layout_and_valid_shapes() -> None
         scores = load(directory / "interviewer-scores.json")
         assert scores["candidateId"] == EXPECTED_IDS[candidate]
         assert list(scores["scores"]) == list("DRIVE")
+
+
+def test_interview_draft_quotes_the_candidate_verbatim_and_null_means_no_evidence() -> None:
+    for candidate in CANDIDATES:
+        directory = SEED / "candidates" / candidate
+        turns = [InterviewTurn.model_validate(item) for item in load(directory / "interview-transcript.json")]
+        assert [turn.turnId for turn in turns] == [f"iturn_{index:02d}" for index in range(1, len(turns) + 1)]
+        spoken = {turn.turnId: turn for turn in turns}
+        draft = DraftResult.model_validate(load(directory / "expected-interview-draft.json"))
+        assert [score.competency for score in draft.scores] == list("DRIVE")
+        for score in draft.scores:
+            assert (score.score is None) == (not score.evidence) == (score.confidence is None)
+            for evidence in score.evidence:
+                turn = spoken[evidence.sourceId]
+                assert turn.speaker == "candidate"
+                assert evidence.quote in turn.text
 
 
 def test_assessment_evidence_is_verbatim_and_null_scores_are_not_low_scores() -> None:

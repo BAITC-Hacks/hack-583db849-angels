@@ -1,0 +1,100 @@
+[
+  {
+    "turnId": "iturn_01",
+    "speaker": "interviewer",
+    "text": "Thanks for joining. In the simulation, what was the conflict really about?",
+    "startSec": 5.0,
+    "endSec": 10.0
+  },
+  {
+    "turnId": "iturn_02",
+    "speaker": "candidate",
+    "text": "It was not about code. Dana and Timur both wanted the product to last, they just had no shared rule for changes.",
+    "startSec": 12.0,
+    "endSec": 23.0
+  },
+  {
+    "turnId": "iturn_03",
+    "speaker": "interviewer",
+    "text": "What would you change for the next project?",
+    "startSec": 35.0,
+    "endSec": 39.0
+  },
+  {
+    "turnId": "iturn_04",
+    "speaker": "candidate",
+    "text": "I would set up a weekly review where anyone can propose a change, and we decide together what goes into the release.",
+    "startSec": 41.0,
+    "endSec": 53.0
+  },
+  {
+    "turnId": "iturn_05",
+    "speaker": "interviewer",
+    "text": "What could go wrong with that review?",
+    "startSec": 65.0,
+    "endSec": 69.0
+  },
+  {
+    "turnId": "iturn_06",
+    "speaker": "candidate",
+    "text": "It could turn into long meetings. I would cap it at thirty minutes and write the decision in one place.",
+    "startSec": 71.0,
+    "endSec": 81.0
+  },
+  {
+    "turnId": "iturn_07",
+    "speaker": "interviewer",
+    "text": "The Thursday run failed. What did you do the next morning?",
+    "startSec": 93.0,
+    "endSec": 98.0
+  },
+  {
+    "turnId": "iturn_08",
+    "speaker": "candidate",
+    "text": "Honestly, I told everyone to work harder and stay late. I did not have a plan for what to fix first.",
+    "startSec": 100.0,
+    "endSec": 110.0
+  },
+  {
+    "turnId": "iturn_09",
+    "speaker": "interviewer",
+    "text": "Your application mentions a mentoring plan that was rejected. What happened after that?",
+    "startSec": 122.0,
+    "endSec": 128.0
+  },
+  {
+    "turnId": "iturn_10",
+    "speaker": "candidate",
+    "text": "I was disappointed and stopped working on it. Another student restarted it a month later.",
+    "startSec": 130.0,
+    "endSec": 139.0
+  },
+  {
+    "turnId": "iturn_11",
+    "speaker": "interviewer",
+    "text": "And Timur, how did you treat him in the simulation?",
+    "startSec": 151.0,
+    "endSec": 155.0
+  },
+  {
+    "turnId": "iturn_12",
+    "speaker": "candidate",
+    "text": "I kept Dana's version and did not ask Timur what he needed. Looking back, I should have talked to him.",
+    "startSec": 157.0,
+    "endSec": 167.0
+  },
+  {
+    "turnId": "iturn_13",
+    "speaker": "interviewer",
+    "text": "Who owns what by Friday?",
+    "startSec": 179.0,
+    "endSec": 182.0
+  },
+  {
+    "turnId": "iturn_14",
+    "speaker": "candidate",
+    "text": "Dana owns the release, and I own the review notes. For Timur, I am not sure yet.",
+    "startSec": 184.0,
+    "endSec": 192.0
+  }
+]

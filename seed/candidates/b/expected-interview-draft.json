@@ -1,0 +1,74 @@
+{
+  "scores": [
+    {
+      "competency": "D",
+      "score": 1,
+      "confidence": "medium",
+      "rationale": "The cited candidate response says: \"I told everyone to work harder and stay late. I did not have a plan for what to fix first.\"",
+      "evidence": [
+        {
+          "source": "interview_turn",
+          "sourceId": "iturn_08",
+          "quote": "I told everyone to work harder and stay late. I did not have a plan for what to fix first."
+        }
+      ]
+    },
+    {
+      "competency": "R",
+      "score": 3,
+      "confidence": "medium",
+      "rationale": "The cited candidate response says: \"I would cap it at thirty minutes and write the decision in one place.\"",
+      "evidence": [
+        {
+          "source": "interview_turn",
+          "sourceId": "iturn_06",
+          "quote": "I would cap it at thirty minutes and write the decision in one place."
+        }
+      ]
+    },
+    {
+      "competency": "I",
+      "score": 4,
+      "confidence": "high",
+      "rationale": "The cited candidate response says: \"Dana and Timur both wanted the product to last, they just had no shared rule for changes.\"",
+      "evidence": [
+        {
+          "source": "interview_turn",
+          "sourceId": "iturn_02",
+          "quote": "Dana and Timur both wanted the product to last, they just had no shared rule for changes."
+        },
+        {
+          "source": "interview_turn",
+          "sourceId": "iturn_04",
+          "quote": "I would set up a weekly review where anyone can propose a change"
+        }
+      ]
+    },
+    {
+      "competency": "V",
+      "score": 2,
+      "confidence": "medium",
+      "rationale": "The cited candidate response says: \"Looking back, I should have talked to him.\"",
+      "evidence": [
+        {
+          "source": "interview_turn",
+          "sourceId": "iturn_12",
+          "quote": "Looking back, I should have talked to him."
+        }
+      ]
+    },
+    {
+      "competency": "E",
+      "score": 2,
+      "confidence": "medium",
+      "rationale": "The cited candidate response says: \"Dana owns the release, and I own the review notes.\"",
+      "evidence": [
+        {
+          "source": "interview_turn",
+          "sourceId": "iturn_14",
+          "quote": "Dana owns the release, and I own the review notes."
+        }
+      ]
+    }
+  ]
+}
