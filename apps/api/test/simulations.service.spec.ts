@@ -20,7 +20,7 @@ const opening = { text: 'What should we do?', stage: 'opening' as const, ended: 
 const answer = { text: 'I hear you.', stage: 'in-progress' as const, ended: false,
   director: { beat: 'trust', matchedAnswerType: 'listen', similarity: 0.9, nextBeat: 'decision', reason: 'Listened' } };
 
-function harness(options: { scenarios?: ReturnType<typeof scenario>[]; counts?: Record<string, number>; textMode?: boolean; audio?: AudioStorageService } = {}) {
+function harness(options: { scenarios?: ReturnType<typeof scenario>[]; counts?: Record<string, number>; textMode?: boolean; audio?: AudioStorageService; demo?: boolean; externalId?: string } = {}) {
   let simulation: Record<string, unknown> | null = null;
   const turns: Record<string, unknown>[] = [];
   const idempotencyRows = new Map<string, Record<string, unknown>>();
@@ -41,7 +41,7 @@ function harness(options: { scenarios?: ReturnType<typeof scenario>[]; counts?: 
     speech: jest.fn().mockResolvedValue(Buffer.from('mp3')),
   };
   const prisma: Record<string, unknown> = {
-    candidate: { findUnique: jest.fn().mockResolvedValue({ id: candidateId, profile: { fullName: 'Ada Example' } }) },
+    candidate: { findUnique: jest.fn().mockResolvedValue({ id: candidateId, externalId: options.externalId ?? 'inv-2026-demo-a', profile: { fullName: 'Ada Example' } }) },
     accommodation: {
       findUnique: jest.fn().mockImplementation(() => Promise.resolve(options.textMode ? { textMode: true } : null)),
       upsert: jest.fn().mockImplementation(({ create }: { create: Record<string, unknown> }) => Promise.resolve({ ...create, updatedAt: new Date() })),
@@ -95,7 +95,8 @@ function harness(options: { scenarios?: ReturnType<typeof scenario>[]; counts?: 
   };
   const audit = { record: jest.fn().mockResolvedValue({}) };
   const assessments = { startAutomatically: jest.fn().mockResolvedValue(undefined) };
-  const service = new SimulationsService(prisma as never, gateway as never, audio, new ToLlmViewService(), audit as never, assessments as never);
+  const config = { get: (key: string) => (key === 'DEMO_MODE' ? String(options.demo ?? false) : undefined) };
+  const service = new SimulationsService(prisma as never, gateway as never, audio, new ToLlmViewService(), audit as never, assessments as never, config as never);
   return { service, prisma, gateway, audio, audit, assessments, turns };
 }
 
@@ -113,6 +114,18 @@ describe('SimulationsService', () => {
     await expect(fixture.service.create(candidateId, 'platform')).rejects.toMatchObject({
       status: 409, response: { code: 'SIMULATION_EXISTS', details: { simulationId: created.simulationId } },
     });
+  });
+
+  it('in DEMO_MODE gives A, B and C the scenario of their recorded session, and everyone else the pool', async () => {
+    const pool = [scenario('resource-crisis'), scenario('conflict-resolution'), scenario('ethical-dilemma')];
+    const seeded = harness({ scenarios: pool, counts: { 'conflict-resolution': 5 }, demo: true });
+    await expect(seeded.service.create(candidateId, 'platform')).resolves.toMatchObject({ scenario: { scenarioId: 'conflict-resolution' } });
+
+    const outside = harness({ scenarios: pool, counts: { 'conflict-resolution': 5, 'ethical-dilemma': 5 }, demo: false });
+    await expect(outside.service.create(candidateId, 'platform')).resolves.toMatchObject({ scenario: { scenarioId: 'resource-crisis' } });
+
+    const stranger = harness({ scenarios: pool, counts: { 'conflict-resolution': 5, 'ethical-dilemma': 5 }, demo: true, externalId: 'inv-2026-0042' });
+    await expect(stranger.service.create(candidateId, 'platform')).resolves.toMatchObject({ scenario: { scenarioId: 'resource-crisis' } });
   });
 
   it('breaks equal-count ties randomly and refuses an empty ready pool', async () => {
