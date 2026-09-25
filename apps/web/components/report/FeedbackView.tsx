@@ -33,7 +33,7 @@ export function FeedbackView({ feedback }: { feedback: CandidateFeedback }) {
         </section>
       ))}
       <p className="px-1 text-[0.8rem] text-text-muted">
-        This feedback is written to help you grow. It contains no scores and says nothing about admission decisions.
+        These notes are here to help you grow, and that is all they are for.
       </p>
     </div>
   );

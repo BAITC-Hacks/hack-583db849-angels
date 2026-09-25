@@ -2,7 +2,8 @@ import type { ScenarioBrief, SimulationState, SimulationTurn } from '../../simul
 import type { WireSimulation, WireTurn, WireTurnResult } from '../contract';
 
 function toTurn(turn: WireTurn): SimulationTurn {
-  return { turnId: turn.turnId, speaker: turn.speaker, text: turn.text };
+  const base = { turnId: turn.turnId, speaker: turn.speaker, text: turn.text };
+  return turn.recognitionConfidence === undefined ? base : { ...base, recognitionConfidence: turn.recognitionConfidence };
 }
 
 export function toScenarioBrief(simulation: WireSimulation): ScenarioBrief {

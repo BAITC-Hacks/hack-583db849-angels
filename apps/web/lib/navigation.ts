@@ -102,9 +102,8 @@ export const navItems: NavItem[] = [
     icon: ChartBarSquareIcon,
     label: { en: 'Simulation reports', ru: 'Отчёты симуляций' },
     roles: ['commission', 'admin'],
-    href: '/commission/simulation-report/preview',
+    href: '/commission/simulation-report',
     match: '/commission/simulation-report',
-    preview: true,
     module: 'M3',
   },
   {
@@ -143,9 +142,8 @@ export const navItems: NavItem[] = [
     icon: ChatBubbleBottomCenterTextIcon,
     label: { en: 'My feedback', ru: 'My feedback' },
     roles: ['candidate'],
-    href: '/feedback/preview',
+    href: '/feedback',
     match: '/feedback',
-    preview: true,
     module: 'M3',
   },
   {

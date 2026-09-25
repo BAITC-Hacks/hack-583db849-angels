@@ -1,11 +1,22 @@
 'use client';
 
 import { useCopy } from '../../lib/i18n/StaffLocaleProvider';
+import { LOW_RECOGNITION_CONFIDENCE } from '../../lib/report/types';
 import type { SimulationTurn } from '../../lib/simulation/types';
 
 const copy = {
-  en: { title: 'Transcript', hint: 'Quotes in the report link here.', candidate: 'Candidate' },
-  ru: { title: 'Транскрипт', hint: 'Сюда ведут ссылки из цитат отчёта.', candidate: 'Кандидат' },
+  en: {
+    title: 'Transcript',
+    hint: 'Quotes in the report link here.',
+    candidate: 'Candidate',
+    unsure: 'Recogniser unsure — check the recording before relying on these words',
+  },
+  ru: {
+    title: 'Транскрипт',
+    hint: 'Сюда ведут ссылки из цитат отчёта.',
+    candidate: 'Кандидат',
+    unsure: 'Распознавание неуверенное — сверьтесь с записью, прежде чем опираться на эти слова',
+  },
 };
 
 /**
@@ -35,6 +46,8 @@ export function ReportTranscript({
       <ol className="flex flex-col gap-1 overflow-y-auto p-3" lang="en">
         {turns.map((turn) => {
           const candidate = turn.speaker === 'candidate';
+          const unsure =
+            candidate && typeof turn.recognitionConfidence === 'number' && turn.recognitionConfidence < LOW_RECOGNITION_CONFIDENCE;
           return (
             <li
               key={turn.turnId}
@@ -54,6 +67,11 @@ export function ReportTranscript({
               <p className={`mt-0.5 text-[0.82rem] leading-relaxed ${candidate ? 'text-text-primary' : 'text-text-secondary'}`}>
                 {turn.text}
               </p>
+              {unsure ? (
+                <p className="mt-1 text-[0.7rem] text-status-flag">
+                  {text.unsure} ({turn.recognitionConfidence?.toFixed(2)})
+                </p>
+              ) : null}
             </li>
           );
         })}

@@ -76,7 +76,7 @@ describe('the item the sidebar marks', () => {
     ['interviewer', '/interviewer/interview/preview', 'interviews'],
     ['commission', '/commission', 'commission-home'],
     ['commission', '/commission/quality-guard', 'quality'],
-    ['commission', '/commission/simulation-report/preview', 'reports'],
+    ['commission', '/commission/simulation-report/6f1c2a0e-0000-4000-8000-00000000a003', 'reports'],
     ['admin', '/admin', 'admin-home'],
     ['admin', '/admin/scenarios', 'scenarios'],
     ['candidate', '/candidate', 'candidate-home'],
