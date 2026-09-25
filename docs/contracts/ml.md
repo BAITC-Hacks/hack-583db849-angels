@@ -101,7 +101,7 @@ Each of these is visible on a screen, and a mistake here shows up in the demo.
    - more than half dropped → one retry, then an error.
    
    The web checks the same thing in its tests against these examples.
-3. **`sourceId` must exist in the request:** a `turnId`, a `fieldId`, an `itemId` or a note id you were sent. The screens link every quote to that source; a missing one is a dead link.
+3. **`sourceId` must exist in the request:** a `turnId`, a `fieldId`, an `itemId`, a note id or a surprise segment id (`sseg_01`) you were sent. The screens link every quote to that source; a missing one is a dead link.
 4. **The character says at most 60 words,** stays in the scenario, never grades, never hints at a right answer, and never asks about personal life. The hidden motive in the scenario file never leaves the service: `ScenarioBrief` has only the public fields.
 5. **Candidate feedback contains no score, no number and no decision wording.** The web's test rejects any digit and the words score, rank, admit, reject, accept, pass and fail. It is the only text the candidate ever reads.
 6. **The draft reads the interview transcript and never sees the interviewer's scores.**
@@ -112,6 +112,10 @@ Each of these is visible on a screen, and a mistake here shows up in the demo.
    - the audio is never sent to an LLM — only the resulting text is. For the surprise answer you receive the audio track only, never the video;
    - `api` deletes the audio once the transcript is stored, so you work from the file reference you were given and keep no copy.
 6b. **The surprise question** is about the candidate's own application, answerable in 90 seconds without preparation, in plain English, and never touches personal life, family, health, money or anything on the `profile` list. You return the competency it targets and why — staff see them, the candidate never does.
+6c. **The brief can quote the surprise answer.** Once the answer is transcribed, the API makes a new brief and sends it in `BriefRequest.surpriseAnswer`: the question and the segments `sseg_01`, `sseg_02`, …
+   - A quote from it is `source: "surprise_answer"` with the segment id as `sourceId`, checked verbatim against that segment's `text` like any other quote (rule 2).
+   - It is evidence like the application and the test: it can back a question, a claim or an observation in `consistency`, or something to clarify. Without `surpriseAnswer` in the request the brief never cites `surprise_answer`.
+   - The field is optional, so a request without it is exactly today's request.
 7. **English is separate.**
    - `EnglishMetrics` is computed by code;
    - grammar never moves a D.R.I.V.E. score;
@@ -380,9 +384,24 @@ class AssessmentResult(Strict):
 
 # ---- POST /internal/v1/brief
 
+class SurpriseSegment(Strict):
+    segmentId: Annotated[str, Field(pattern=r"^sseg_\d{2,}$")]
+    text: str                                   # verbatim, as transcribed; never translated
+    startSec: float
+    endSec: float
+
+
+class SurpriseAnswer(Strict):
+    """The transcribed surprise answer: the question and what was said. Never the video, never the audio."""
+
+    question: str
+    segments: list[SurpriseSegment]
+
+
 class BriefRequest(Strict):
     candidate: CandidateView
     simulationEnglish: EnglishMetrics | None = None     # once the simulation is assessed
+    surpriseAnswer: SurpriseAnswer | None = None        # once the surprise answer is transcribed (rule 6c)
 
 
 BriefFocus = Literal["D", "R", "I", "V", "E", "invision_knowledge", "english", "motivation"]
