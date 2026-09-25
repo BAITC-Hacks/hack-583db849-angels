@@ -24,7 +24,6 @@ export function liveKitToken({ apiKey, apiSecret, identity, name, room, ttlSecon
   const payload = {
     iss: apiKey,
     sub: identity,
-    jti: identity,
     name,
     nbf: issuedAt,
     exp: issuedAt + Math.max(60, Math.floor(ttlSeconds)),
