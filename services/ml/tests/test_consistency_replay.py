@@ -1,6 +1,7 @@
 """A/B/C consistency outcomes replay from request-keyed synthetic cassettes."""
 
 import json
+import re
 import socket
 from decimal import Decimal
 from pathlib import Path
@@ -79,6 +80,9 @@ def test_before_and_after_replay_without_network(
             _, submitted, dropped = verify_evidence(evidence, sources)
             assert submitted > 0 or evidence == []
             assert dropped == 0
+    rendered = after.model_dump_json()
+    assert re.search(r"\b(?:admit|reject|accept|pass|fail)\b", rendered, re.I) is None
+    assert all(item.whatToDo for item in after.items)
 
     if candidate == "a":
         assert before.items[0].status == "discrepancy"

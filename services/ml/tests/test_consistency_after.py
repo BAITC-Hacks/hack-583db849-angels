@@ -291,3 +291,15 @@ def test_unsupported_model_metric_retries_once() -> None:
         asyncio.run(service.prepare(request))
 
     assert len(gateway.requests) == 2
+
+
+def test_fabricated_quote_is_never_logged(caplog: pytest.LogCaptureFixture) -> None:
+    request, proposed = example()
+    marker = "Synthetic private answer must not appear in a log"
+    proposed.items[1].observation.evidence[0].quote = marker
+    service, _ = _service(proposed)
+
+    result = asyncio.run(service.prepare(request))
+
+    assert result.items[1].status == request.beforeItems[1].status
+    assert marker not in caplog.text
