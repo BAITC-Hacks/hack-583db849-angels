@@ -1,0 +1,405 @@
+{
+  "scenarioId": "resource-crisis",
+  "status": "draft",
+  "title": "The budget disappears a week before",
+  "situation": "You and five other students are running a free weekend coding workshop for sixty school pupils at a community centre. A week before, the student council cuts your grant in half. The money for the room and the lunches is gone, and the room deposit is due on Friday.",
+  "yourRole": "You lead the organising team.",
+  "goal": "Decide with the team what happens to the workshop. There is no single right way to do it.",
+  "character": {
+    "name": "Aigerim",
+    "role": "Treasurer of the organising team",
+    "wants": "To cancel before the team owes money it cannot pay"
+  },
+  "hiddenMotive": "She approved the budget without a backup plan and is afraid the team will blame her for the gap.",
+  "voice": "aura-2-andromeda-en",
+  "matchThreshold": 0.45,
+  "expectedMinutes": 7,
+  "maxCandidateTurns": 8,
+  "beats": [
+    {
+      "beatId": "opening",
+      "goal": "Aigerim breaks the news and says the workshop should be cancelled.",
+      "competencies": [
+        "V",
+        "I"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "calm_and_understand",
+          "description": "slows things down and asks what exactly changed",
+          "examples": [
+            "Okay, let's slow down. What exactly did the council change?",
+            "Thanks for telling me straight away. Walk me through the numbers.",
+            "Before we decide anything, tell me what we still have."
+          ],
+          "next": "options",
+          "characterIntent": "explains the numbers and relaxes a little, relieved to share it."
+        },
+        {
+          "answerTypeId": "cancel_now",
+          "description": "agrees to cancel at once",
+          "examples": [
+            "Then we cancel, there's no other way.",
+            "Let's just call it off and tell everyone.",
+            "If the money is gone, the workshop is gone."
+          ],
+          "next": "options",
+          "characterIntent": "is surprised the leader gives up so fast, and asks whether there really is nothing else."
+        },
+        {
+          "answerTypeId": "who_is_to_blame",
+          "description": "looks for whose fault it is",
+          "examples": [
+            "How did we not see this coming?",
+            "Who signed the budget without a backup?",
+            "Somebody should have checked this earlier."
+          ],
+          "next": "options",
+          "characterIntent": "gets defensive and says she did the budget the way everyone agreed."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "options",
+        "characterIntent": "repeats that the deposit is due on Friday and asks what the leader wants to do."
+      }
+    },
+    {
+      "beatId": "options",
+      "goal": "With half the money, what can the team still do?",
+      "competencies": [
+        "R",
+        "I"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "new_sources",
+          "description": "proposes new ways to cover the gap and names the risk",
+          "examples": [
+            "We could ask the university for a free room, but it might not be ready in time.",
+            "Let's ask local cafés to sponsor lunch. The risk is they say no by Friday.",
+            "What if pupils bring their own laptops? Some won't have one, so we'd need a backup."
+          ],
+          "next": "priorities",
+          "characterIntent": "likes that there is a plan B and asks what matters most if it only half works."
+        },
+        {
+          "answerTypeId": "shrink_event",
+          "description": "keeps the workshop but makes it smaller",
+          "examples": [
+            "We run it for thirty pupils instead of sixty.",
+            "Let's make it one day instead of two.",
+            "We keep the workshop and drop the lunches."
+          ],
+          "next": "priorities",
+          "characterIntent": "agrees it fits the budget and asks what they are really trying to keep."
+        },
+        {
+          "answerTypeId": "no_idea",
+          "description": "has nothing to offer and hands the problem back",
+          "examples": [
+            "I don't know, you're the treasurer.",
+            "I have no idea what we can do.",
+            "Maybe it will sort itself out."
+          ],
+          "next": "panic",
+          "characterIntent": "goes quiet, then says the team chat is falling apart."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "priorities",
+        "characterIntent": "asks which part of the workshop the leader would protect first."
+      }
+    },
+    {
+      "beatId": "panic",
+      "goal": "The team chat is in panic, and two members say they want to quit.",
+      "competencies": [
+        "D",
+        "V"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "steady_team",
+          "description": "calms the team and gets them working together",
+          "examples": [
+            "Let's get everyone on a call tonight and look at it together.",
+            "Tell them we're not cancelling yet, we still have a week.",
+            "Panic won't help. Let's split what each of us checks today."
+          ],
+          "next": "priorities",
+          "characterIntent": "sounds calmer and says she'll post that they are meeting tonight."
+        },
+        {
+          "answerTypeId": "let_go",
+          "description": "lets people leave without trying to keep them",
+          "examples": [
+            "If they want to quit, let them.",
+            "We'll manage without them.",
+            "I can't stop people from leaving."
+          ],
+          "next": "priorities",
+          "characterIntent": "is uneasy and says that leaves four people to do everything."
+        },
+        {
+          "answerTypeId": "hide_it",
+          "description": "wants to keep the problem from the team",
+          "examples": [
+            "Don't tell the others yet.",
+            "Let's keep this between us for now.",
+            "No need to worry the team."
+          ],
+          "next": "priorities",
+          "characterIntent": "points out that the others already know."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "priorities",
+        "characterIntent": "asks what she should tell the team."
+      }
+    },
+    {
+      "beatId": "priorities",
+      "goal": "What matters most for the pupils?",
+      "competencies": [
+        "I",
+        "V"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "purpose_first",
+          "description": "protects what the pupils came for",
+          "examples": [
+            "What matters is that the pupils actually build something.",
+            "The teaching is the point; the lunches are a nice extra.",
+            "Let's keep what helps the kids learn and cut the rest."
+          ],
+          "next": "fair_choice",
+          "characterIntent": "agrees, then says they only have seats for thirty of the sixty who signed up."
+        },
+        {
+          "answerTypeId": "keep_everything",
+          "description": "refuses to cut anything",
+          "examples": [
+            "We promised everything, so we keep everything.",
+            "Cutting anything would look bad.",
+            "We'll find the money somehow for all of it."
+          ],
+          "next": "fair_choice",
+          "characterIntent": "reminds the leader that the numbers do not allow it, and brings up the seats."
+        },
+        {
+          "answerTypeId": "ask_team",
+          "description": "wants the team or the teachers to decide",
+          "examples": [
+            "Let's ask the team what they think matters most.",
+            "Can we get everyone to vote on what to keep?",
+            "What do the pupils' teachers care about most?"
+          ],
+          "next": "fair_choice",
+          "characterIntent": "says it's a good idea but they still need to decide who gets the seats."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "fair_choice",
+        "characterIntent": "moves on to the seats: sixty signed up, thirty fit."
+      }
+    },
+    {
+      "beatId": "fair_choice",
+      "goal": "Sixty pupils signed up and there are seats for thirty. Who gets in?",
+      "competencies": [
+        "V",
+        "R"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "fair_rule",
+          "description": "picks a rule everyone can see and explains it",
+          "examples": [
+            "First come, first served, and we tell everyone why.",
+            "We draw lots in public so nobody feels cheated.",
+            "We keep half the seats for pupils who've never coded."
+          ],
+          "next": "plan",
+          "characterIntent": "says that is fair and asks what has to happen before Friday."
+        },
+        {
+          "answerTypeId": "favourites",
+          "description": "picks people the team knows or likes",
+          "examples": [
+            "Let's keep the places for our friends' younger siblings.",
+            "Take the pupils who already know some code, they'll learn fastest.",
+            "Pick the ones we already know."
+          ],
+          "next": "plan",
+          "characterIntent": "hesitates and says the other families will notice."
+        },
+        {
+          "answerTypeId": "avoid_telling",
+          "description": "does not want to tell the others they are out",
+          "examples": [
+            "Let's not tell the others they're out until the last day.",
+            "Just stop replying to the extra ones.",
+            "They'll figure it out."
+          ],
+          "next": "plan",
+          "characterIntent": "worries that thirty families will turn up on the day."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "plan",
+        "characterIntent": "says the seats can wait and asks about Friday's deposit."
+      }
+    },
+    {
+      "beatId": "plan",
+      "goal": "The deposit is due Friday. What happens by then, and who does it?",
+      "competencies": [
+        "E",
+        "R"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "owners_and_dates",
+          "description": "gives each task an owner and a deadline",
+          "examples": [
+            "You call the council by Wednesday, I book the free room today, Madi asks the cafés.",
+            "By Friday: new room confirmed, sponsors asked, seats announced. Each of us owns one.",
+            "Here's the plan: three tasks, three owners, and we check in on Thursday evening."
+          ],
+          "next": "setback",
+          "characterIntent": "takes her task, then comes back on Thursday with bad news."
+        },
+        {
+          "answerTypeId": "vague_plan",
+          "description": "hopes it works out",
+          "examples": [
+            "Let's all try our best this week.",
+            "We'll see how it goes.",
+            "Everyone help where they can."
+          ],
+          "next": "setback",
+          "characterIntent": "asks what she personally should do, and gets no answer, then the bad news arrives."
+        },
+        {
+          "answerTypeId": "do_it_alone",
+          "description": "takes every task",
+          "examples": [
+            "I'll handle all of it myself.",
+            "Leave it to me, I'll sort everything.",
+            "It's faster if I just do it."
+          ],
+          "next": "setback",
+          "characterIntent": "offers to help and is turned down, then the bad news arrives."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "setback",
+        "characterIntent": "says she'll do what she can, then comes back on Thursday with bad news."
+      }
+    },
+    {
+      "beatId": "setback",
+      "goal": "Thursday: the free room fell through. Only a small room for twenty is left.",
+      "competencies": [
+        "D",
+        "E"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "adapt_together",
+          "description": "adapts the plan and brings the team along",
+          "examples": [
+            "Okay, we run two sessions of ten in the smaller room.",
+            "Let's regroup and see what we can still offer.",
+            "It's a blow, but we can split the day into shifts."
+          ],
+          "next": "end",
+          "characterIntent": "laughs with relief and says she'll tell the team."
+        },
+        {
+          "answerTypeId": "give_up",
+          "description": "stops trying",
+          "examples": [
+            "That's it, we cancel.",
+            "I told you this wouldn't work.",
+            "There's no point anymore."
+          ],
+          "next": "end",
+          "characterIntent": "quietly agrees and says she'll write to the families."
+        },
+        {
+          "answerTypeId": "push_through_alone",
+          "description": "promises to fix it single-handed",
+          "examples": [
+            "I'll find another room tonight, whatever it takes.",
+            "We'll squeeze all thirty in somehow.",
+            "I'll stay up and fix it myself."
+          ],
+          "next": "end",
+          "characterIntent": "warns that nobody can find a room for thirty overnight."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "end",
+        "characterIntent": "says they need to decide by tonight, and the scene ends."
+      }
+    }
+  ]
+}

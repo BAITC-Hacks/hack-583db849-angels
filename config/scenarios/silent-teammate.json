@@ -1,0 +1,405 @@
+{
+  "scenarioId": "silent-teammate",
+  "status": "draft",
+  "title": "One member quietly stopped delivering",
+  "situation": "Your team of four is making a short documentary about the city's river for a student media contest, and the deadline is in ten days. Nurlan, who is responsible for the editing, has not posted anything in the team chat for a week and missed the last two check-ins. Today he finally answers your call.",
+  "yourRole": "You lead the team.",
+  "goal": "Get the documentary finished and keep Nurlan on the team if you can. There is no single right way to do it.",
+  "character": {
+    "name": "Nurlan",
+    "role": "Editor on your team",
+    "wants": "Not to be embarrassed in front of the team"
+  },
+  "hiddenMotive": "He said he knew the editing software well, but he doesn't, and he has been stuck on it for a week. He would rather go silent than admit it.",
+  "voice": "aura-2-arcas-en",
+  "matchThreshold": 0.45,
+  "expectedMinutes": 7,
+  "maxCandidateTurns": 8,
+  "beats": [
+    {
+      "beatId": "opening",
+      "goal": "Nurlan picks up: \"Sorry, been busy. It's going fine.\"",
+      "competencies": [
+        "V",
+        "I"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "open_question",
+          "description": "asks calmly how the work is really going",
+          "examples": [
+            "Good to hear you. How is the edit actually going?",
+            "No stress. Tell me where you are with it.",
+            "What's the hardest part of the editing right now?"
+          ],
+          "next": "reason",
+          "characterIntent": "hesitates, then hints that the software is harder than he expected."
+        },
+        {
+          "answerTypeId": "confront",
+          "description": "calls out the silence straight away",
+          "examples": [
+            "You've disappeared for a week, that's not okay.",
+            "You missed two check-ins. What's going on?",
+            "We can't rely on you like this."
+          ],
+          "next": "reason",
+          "characterIntent": "gets defensive, then mutters that the software is harder than he expected."
+        },
+        {
+          "answerTypeId": "accept_fine",
+          "description": "takes \"fine\" at face value",
+          "examples": [
+            "Okay, great, as long as it's fine.",
+            "Cool, then just send it when it's ready.",
+            "Alright, no problem then."
+          ],
+          "next": "reason",
+          "characterIntent": "is relieved, then admits the software is giving him some trouble."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "reason",
+        "characterIntent": "says the software is a bit tricky, and goes quiet."
+      }
+    },
+    {
+      "beatId": "reason",
+      "goal": "Nurlan hints the software is harder than expected, but won't say more.",
+      "competencies": [
+        "I",
+        "V"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "safe_space",
+          "description": "makes it safe to admit being stuck",
+          "examples": [
+            "Lots of people find that software tough. What part is getting in the way?",
+            "It's okay to be stuck, thanks for saying it. What would help?",
+            "Nobody will think less of you. Show me where you're stuck."
+          ],
+          "next": "options",
+          "characterIntent": "admits he hasn't finished a single scene, and asks what they can do."
+        },
+        {
+          "answerTypeId": "dismiss_problem",
+          "description": "brushes the problem off",
+          "examples": [
+            "Just watch a tutorial, it's not that hard.",
+            "Everyone figures it out, you'll be fine.",
+            "You said you could do it."
+          ],
+          "next": "pressure",
+          "characterIntent": "goes quiet, then says maybe he should just leave the team."
+        },
+        {
+          "answerTypeId": "take_over",
+          "description": "takes the work away from him",
+          "examples": [
+            "Give me the files, I'll edit it myself.",
+            "Forget it, someone else will do it.",
+            "I'll find another editor."
+          ],
+          "next": "options",
+          "characterIntent": "is hurt but relieved, and asks how it can be done in ten days."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "options",
+        "characterIntent": "asks how they could possibly finish in ten days."
+      }
+    },
+    {
+      "beatId": "pressure",
+      "goal": "Nurlan goes quiet, then says maybe he should just leave the team.",
+      "competencies": [
+        "D",
+        "V"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "repair",
+          "description": "takes back the pressure and keeps him in",
+          "examples": [
+            "Wait, I didn't mean to push you away. I want you on this team.",
+            "Sorry, that was harsh. Let's figure it out together.",
+            "Leaving isn't the answer; getting stuck happens to everyone."
+          ],
+          "next": "options",
+          "characterIntent": "is surprised, and admits how far behind he is."
+        },
+        {
+          "answerTypeId": "let_him_go",
+          "description": "lets him leave",
+          "examples": [
+            "If you want to leave, that's your choice.",
+            "Okay, we'll manage.",
+            "Fine, go if you want."
+          ],
+          "next": "options",
+          "characterIntent": "says okay, quietly, and asks how they will finish without him."
+        },
+        {
+          "answerTypeId": "guilt",
+          "description": "makes him feel guilty",
+          "examples": [
+            "You can't leave now, you'd ruin it for all of us.",
+            "That would be really selfish.",
+            "Think about how that makes us look."
+          ],
+          "next": "options",
+          "characterIntent": "says he'll stay, but sounds miserable."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "options",
+        "characterIntent": "asks what they should do about the edit."
+      }
+    },
+    {
+      "beatId": "options",
+      "goal": "How does the edit get done in ten days?",
+      "competencies": [
+        "R",
+        "E"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "share_and_learn",
+          "description": "shares the work and helps him learn, and names the risk",
+          "examples": [
+            "Let's pair you with Saule for two evenings; she has edited before.",
+            "We split the film into three parts and you take the part you're most comfortable with.",
+            "We switch to a simpler editing tool. The risk is losing a day, but it's safer than being stuck."
+          ],
+          "next": "team",
+          "characterIntent": "sounds hopeful, then worries about what the others think of him."
+        },
+        {
+          "answerTypeId": "lower_quality",
+          "description": "lowers the bar",
+          "examples": [
+            "Let's just make it shorter and simpler.",
+            "Nobody expects great editing anyway.",
+            "We'll submit whatever we have."
+          ],
+          "next": "team",
+          "characterIntent": "agrees, a little disappointed, then worries about the others."
+        },
+        {
+          "answerTypeId": "all_nighters",
+          "description": "plans to push through with no sleep",
+          "examples": [
+            "We'll all stay up and finish it this weekend.",
+            "Just work harder and it'll be fine.",
+            "No sleep until it's done."
+          ],
+          "next": "team",
+          "characterIntent": "says he's already exhausted from trying, then worries about the others."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "team",
+        "characterIntent": "says the others are probably annoyed with him."
+      }
+    },
+    {
+      "beatId": "team",
+      "goal": "The others are annoyed. What do they get told?",
+      "competencies": [
+        "V",
+        "I"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "fair_story",
+          "description": "tells the truth, without blame, and looks forward",
+          "examples": [
+            "We tell them the truth: you hit a wall and we have a plan. No blaming.",
+            "I'll tell them we changed the plan together; you can add what you want.",
+            "Let's be honest with them and focus on what happens next."
+          ],
+          "next": "plan",
+          "characterIntent": "thanks the leader, and asks what the plan is for the ten days."
+        },
+        {
+          "answerTypeId": "blame_him",
+          "description": "puts the blame on him",
+          "examples": [
+            "Honestly, they have a right to be angry with you.",
+            "I'll tell them it was your fault.",
+            "You'll have to explain yourself."
+          ],
+          "next": "plan",
+          "characterIntent": "goes quiet and asks what the plan is."
+        },
+        {
+          "answerTypeId": "cover_up",
+          "description": "invents a story to hide it",
+          "examples": [
+            "Let's not tell them anything.",
+            "I'll make up an excuse for you.",
+            "We'll pretend it was always the plan."
+          ],
+          "next": "plan",
+          "characterIntent": "is uneasy about lying, and asks what the plan is."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "plan",
+        "characterIntent": "asks what the plan is for the next ten days."
+      }
+    },
+    {
+      "beatId": "plan",
+      "goal": "What is the plan for the next ten days?",
+      "competencies": [
+        "E",
+        "R"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "owners_checkins",
+          "description": "owners, check-ins and time to spare",
+          "examples": [
+            "You and Saule edit part one by Sunday, I do the music, and we check in every other evening at eight.",
+            "Three parts, three owners, a rough cut by day six and the final by day nine.",
+            "Here's the plan: a ten-minute check-in each day, a rough cut on Sunday, and one spare day before the deadline."
+          ],
+          "next": "setback",
+          "characterIntent": "takes his part; on day seven he calls with bad news."
+        },
+        {
+          "answerTypeId": "vague",
+          "description": "no structure",
+          "examples": [
+            "Let's just keep in touch.",
+            "Send updates when you can.",
+            "We'll get it done somehow."
+          ],
+          "next": "setback",
+          "characterIntent": "says okay, unsure; on day seven he calls with bad news."
+        },
+        {
+          "answerTypeId": "micromanage",
+          "description": "watches every move",
+          "examples": [
+            "Send me your screen every hour.",
+            "I'll check every cut you make.",
+            "You report to me three times a day."
+          ],
+          "next": "setback",
+          "characterIntent": "agrees stiffly; on day seven he calls with bad news."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "setback",
+        "characterIntent": "says he'll start tonight; on day seven he calls with bad news."
+      }
+    },
+    {
+      "beatId": "setback",
+      "goal": "Day seven: the project file is corrupted and two days of editing are lost.",
+      "competencies": [
+        "D",
+        "E"
+      ],
+      "maxTurns": 1,
+      "answerTypes": [
+        {
+          "answerTypeId": "calm_recover",
+          "description": "stays calm and replans",
+          "examples": [
+            "That hurts, but we have backups from Sunday. Let's see what we can redo in two days and what we cut.",
+            "Okay, deep breath. We redo the most important scene first and keep the rest simple.",
+            "We lost two days, not the film. Let's replan tonight together."
+          ],
+          "next": "end",
+          "characterIntent": "breathes out, finds the backup, and says they can still make it."
+        },
+        {
+          "answerTypeId": "blame_again",
+          "description": "blames him",
+          "examples": [
+            "This is exactly why I didn't trust you with it.",
+            "Of course it went wrong again.",
+            "You should have saved it properly."
+          ],
+          "next": "end",
+          "characterIntent": "goes silent again."
+        },
+        {
+          "answerTypeId": "give_up",
+          "description": "gives up on the contest",
+          "examples": [
+            "Then it's over, we won't make it.",
+            "Let's not submit at all.",
+            "There's no point now."
+          ],
+          "next": "end",
+          "characterIntent": "apologises again and says he knew he'd ruin it."
+        }
+      ],
+      "fallback": {
+        "answerTypeId": "other",
+        "description": "Anything else",
+        "examples": [
+          "...",
+          "ok",
+          "hmm"
+        ],
+        "next": "end",
+        "characterIntent": "asks what they should do now, and the scene ends."
+      }
+    }
+  ]
+}

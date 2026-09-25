@@ -134,3 +134,29 @@ def test_local_encoder_refuses_a_missing_or_wrong_revision(tmp_path: Path) -> No
     (model / ".revision").write_text(configuration.revision + "\n", encoding="utf-8")
     with pytest.raises(GatewayConfigurationError, match="unavailable"):
         OnnxSentenceEncoder(model, configuration)
+
+
+def test_story_walkthrough_lines_match_their_stated_answer_type_on_the_real_encoder() -> None:
+    """Every line of every reference walkthrough, through the real local encoder: $0, no network."""
+    import os
+    import re
+
+    from services.ml.app.modules.matcher import DEFAULT_MODEL_PATH, create_local_matcher
+
+    model = Path(os.environ.get("M2_EMBEDDING_MODEL_PATH", DEFAULT_MODEL_PATH))
+    if not model.exists():
+        pytest.skip("the local sentence-embedding model is bundled in the ML Docker image")
+    repository = ScenarioRepository.load(ROOT_SCENARIOS)
+    matcher = create_local_matcher()
+    stories = Path(__file__).resolve().parents[3] / "docs" / "scenarios"
+    lines = 0
+    for story in sorted(stories.glob("[0-9][0-9]-*.md")):
+        scenario = repository.get(re.sub(r"^\d+-", "", story.stem))
+        assert scenario is not None, story.name
+        text = story.read_text(encoding="utf-8")
+        walkthroughs = text[text.index("## Reference walkthroughs"):]
+        for beat, kind, says in re.findall(r'^\| \d+ \| `([a-z_]+)` \| `([a-z_]+)` \| "(.+)" \|$', walkthroughs, re.M):
+            lines += 1
+            result = matcher.match(scenario, beat, says)
+            assert result.answer_type.answerTypeId == kind, f"{story.name}: {says}"
+    assert lines == 171
