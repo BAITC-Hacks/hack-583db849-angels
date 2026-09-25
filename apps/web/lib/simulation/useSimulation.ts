@@ -1,13 +1,11 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { candidatesKey, useCandidates } from '../api/candidates';
+import { candidatesKey } from '../api/candidates';
 import { api, unwrap } from '../api/client';
 import type { WireSimulation, WireTurnResult } from '../api/contract';
 import { errorText, isRetryable, readApiError } from '../api/errors';
-import { codeFromLabel } from '../api/mappers/evidence';
 import { applyTurnResult, toScenarioBrief, toSimulationState } from '../api/mappers/simulation';
-import { record, type CandidateCode } from '../demo/world';
 import { playCharacterLine, turnAudioUrl } from './characterVoice';
 import type { ScenarioBrief, SimulationState } from './types';
 
@@ -73,19 +71,12 @@ export function useSimulation(simulationId: string): Simulation {
   });
   const simulation = query.data;
 
-  const candidates = useCandidates();
-  const candidate = candidates.data?.find((item) => item.candidateId === simulation?.candidateId);
-  const code: CandidateCode | null = candidate ? codeFromLabel(candidate.label) : null;
-
   const turn = useMutation({
     mutationFn: ({ input, idempotencyKey }: { input: TurnInput; idempotencyKey: string }) =>
       postTurn(simulationId, input, idempotencyKey),
     onSuccess: (result) => {
       client.setQueryData<WireSimulation>(key, (current) => (current ? applyTurnResult(current, result) : current));
       playCharacterLine(result.characterAudioUrl, result.characterTurn.text);
-      // The homes read the API; these only feed the admin's activity log until it moves to the audit log (#24).
-      if (code && result.candidateTurns === 1 && result.status === 'active') record('simulation-started', code);
-      if (code && result.status === 'completed') record('simulation-completed', code);
       void client.invalidateQueries({ queryKey: candidatesKey });
     },
   });
@@ -100,7 +91,6 @@ export function useSimulation(simulationId: string): Simulation {
       ) as unknown as WireSimulation,
     onSuccess: (stopped) => {
       client.setQueryData(key, stopped);
-      if (code) record('simulation-stopped', code);
       void client.invalidateQueries({ queryKey: candidatesKey });
     },
   });

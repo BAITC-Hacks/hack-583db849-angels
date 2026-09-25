@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import type { CandidateCode } from '../demo/world';
+import type { CandidateCode } from '../home/types';
 import { api, unwrap } from './client';
 import type { WireCandidate } from './contract';
 import { codeFromLabel } from './mappers/evidence';

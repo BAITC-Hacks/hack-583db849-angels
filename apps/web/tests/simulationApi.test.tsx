@@ -3,7 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import CandidateHome from '../app/(product)/candidate/page';
 import type { WireCandidate, WireSimulation, WireTurnResult } from '../lib/api/contract';
 import { applyTurnResult } from '../lib/api/mappers/simulation';
-import { resetWorld } from '../lib/demo/world';
 import { useSimulation } from '../lib/simulation/useSimulation';
 import { apiError, example, hookWithQuery, json, mockApi, withQuery } from './apiHarness';
 
@@ -26,7 +25,6 @@ class FakeAudio {
 }
 
 beforeEach(() => {
-  resetWorld();
   played.length = 0;
   push.mockReset();
   vi.stubGlobal('Audio', FakeAudio);

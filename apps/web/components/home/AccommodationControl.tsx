@@ -6,7 +6,7 @@ import { candidateByCode, candidatesKey, useCandidates } from '../../lib/api/can
 import { api, unwrap } from '../../lib/api/client';
 import { errorText } from '../../lib/api/errors';
 import type { WireCandidate } from '../../lib/api/contract';
-import { record, type CandidateCode } from '../../lib/demo/world';
+import type { CandidateCode } from '../../lib/home/types';
 import { useStaffLocale } from '../../lib/i18n/StaffLocaleProvider';
 
 const copy = {
@@ -58,7 +58,7 @@ export function AccommodationControl() {
           body: { textMode, reason },
         }),
       ),
-    onSuccess: (saved, { code, candidateId }) => {
+    onSuccess: (saved, { candidateId }) => {
       // Show the server's answer at once; the refetch that follows says the same.
       client.setQueryData<WireCandidate[]>(candidatesKey, (items) =>
         items?.map((item) =>
@@ -67,7 +67,6 @@ export function AccommodationControl() {
             : item,
         ),
       );
-      record('accommodation-changed', code);
       void client.invalidateQueries({ queryKey: candidatesKey });
     },
   });

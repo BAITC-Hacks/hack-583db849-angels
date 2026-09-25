@@ -26,7 +26,7 @@ export class CandidatesController {
     // An idempotency entry from F0 may still contain a raw Prisma record.
     const candidate = await this.candidates.find(stored.candidateId ?? stored.id ?? '');
     if (!candidate) throw new NotFoundException({ code: 'NOT_FOUND', message: 'Candidate was not found.' });
-    await this.audit.record({ action: 'candidate.upsert', targetType: 'candidate', targetId: candidate.candidateId, candidateId: candidate.candidateId, actorRole: request.apiRole });
+    await this.audit.record({ action: 'candidate.created', targetType: 'candidate', targetId: candidate.candidateId, candidateId: candidate.candidateId, actorRole: request.apiRole });
     return candidate;
   }
   @Get()
