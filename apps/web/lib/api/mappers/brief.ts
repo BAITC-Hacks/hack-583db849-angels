@@ -5,7 +5,8 @@ import { toEvidence } from './evidence';
 type WireBrief = components['schemas']['BriefDto'];
 type WireConsistencyItem = components['schemas']['ConsistencyItemDto'];
 
-function toConsistencyItem(item: WireConsistencyItem): InterviewerBrief['consistency'][number] {
+/** One claim against what was observed — the same shape in the brief and in the commission's comparison. */
+export function toConsistencyItem(item: WireConsistencyItem): InterviewerBrief['consistency'][number] {
   return {
     itemId: item.itemId,
     topic: item.topic,
