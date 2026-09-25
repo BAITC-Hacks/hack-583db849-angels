@@ -13,23 +13,23 @@ beforeEach(() => resetWorld());
 afterEach(() => vi.unstubAllGlobals());
 
 describe('where each candidate is, for the staff homes', () => {
-  it('takes the simulation and the report from the API, and the brief from the world until #11', async () => {
-    mockApi({ 'GET /api/v1/candidates': () => json(list) });
+  it('takes the brief, the simulation and the report from the API, and the id links need', async () => {
+    const withIds = { items: list.items.map((item) => ({ ...item, candidateId: `api-${item.label}`, progress: { ...item.progress!, candidateId: `api-${item.label}` } })) };
+    mockApi({ 'GET /api/v1/candidates': () => json(withIds) });
     const { result } = hookWithQuery(() => useHomeProgress());
     await waitFor(() => expect(result.current.candidates.A.simulation).toBe('completed'));
-    expect(result.current.candidates.A.assessmentReady).toBe(true);
-    expect(result.current.candidates.A.assessment).toBe('ready');
+    expect(result.current.candidates.A).toMatchObject({ id: 'api-Candidate A', brief: 'ready', assessmentReady: true, assessment: 'ready' });
+    // Whether the brief was opened is known to this tab only (G13).
     expect(result.current.candidates.A.briefViewed).toBe(false);
-
     act(() => record('brief-viewed', 'A', { briefViewed: true }));
-    expect(result.current.candidates.A).toMatchObject({ briefViewed: true, simulation: 'completed' });
+    expect(result.current.candidates.A).toMatchObject({ briefViewed: true, brief: 'ready' });
   });
 
   it('shows nothing as done when the API cannot be read', async () => {
     mockApi({ 'GET /api/v1/candidates': () => json({ error: { code: 'AI_UNAVAILABLE', message: 'down' } }, 503) });
     const { result } = hookWithQuery(() => useHomeProgress());
     await waitFor(() => expect(result.current.apiError).not.toBeNull());
-    expect(result.current.candidates.A).toMatchObject({ simulation: 'not-started', assessmentReady: false });
+    expect(result.current.candidates.A).toMatchObject({ brief: null, simulation: 'not-started', assessmentReady: false });
   });
 
   it('says so on the commission home when the API cannot be read', async () => {
@@ -58,9 +58,11 @@ describe('where each candidate is, for the staff homes', () => {
     expect(await screen.findByText('Candidate A has not finished the simulation')).toBeTruthy();
   });
 
-  it('polls only while a simulation runs or an assessment is being written', () => {
-    const at = (simulation: unknown, assessment: unknown) =>
-      [{ ...list.items[0], progress: { ...list.items[0].progress!, simulation, assessment } }] as WireCandidate[];
+  it('polls only while a brief or an assessment is being written, or a simulation runs', () => {
+    const at = (simulation: unknown, assessment: unknown, brief: unknown = null) =>
+      [{ ...list.items[0], progress: { ...list.items[0].progress!, simulation, assessment, brief } }] as WireCandidate[];
+    expect(somethingPending(at(null, null, { briefId: null, status: 'pending' }))).toBe(true);
+    expect(somethingPending(at(null, null, { briefId: 'b', status: 'failed' }))).toBe(false);
     expect(somethingPending(at({ simulationId: 's', status: 'active', ending: null }, null))).toBe(true);
     expect(somethingPending(at(null, { assessmentId: 'a', status: 'pending' }))).toBe(true);
     expect(somethingPending(at({ simulationId: 's', status: 'completed', ending: 'completed' }, { assessmentId: 'a', status: 'ready' }))).toBe(false);
