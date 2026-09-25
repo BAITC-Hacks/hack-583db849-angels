@@ -45,13 +45,28 @@ class DeepgramProvider:
         raise GatewayConfigurationError("unsupported Deepgram operation")
 
     def _transcribe(self, request: MediaProviderRequest) -> MediaProviderResponse:
+        speakers = int(request.parameters.get("speakers", 1))
         parameters = {
             "model": request.model,
             "language": request.parameters.get("language", "en"),
             "smart_format": "true",
             "punctuate": "true",
-            "diarize": str(int(request.parameters.get("speakers", 1)) > 1).lower(),
         }
+        if speakers == 2 and request.parameters.get("purpose") == "interview":
+            diarize_model = request.parameters.get("diarize_model")
+            if diarize_model not in {"latest", "v1", "v2"}:
+                raise GatewayConfigurationError("interview diarization model is missing")
+            if request.model == "nova-2":
+                # The approved fallback uses legacy diarization, never both
+                # diarize and diarize_model in the same Deepgram request.
+                parameters["diarize"] = "true"
+            else:
+                parameters["diarize_model"] = diarize_model
+            parameters["utterances"] = "true"
+        elif speakers == 1:
+            parameters["diarize"] = "false"
+        else:
+            raise GatewayConfigurationError("unsupported transcription speaker count")
         http_request = Request(
             f"{DEEPGRAM_API}/listen?{urlencode(parameters)}",
             data=request.content,

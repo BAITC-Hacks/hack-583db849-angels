@@ -1,0 +1,63 @@
+{
+  "scores": [
+    {
+      "competency": "D",
+      "score": 2,
+      "confidence": "medium",
+      "rationale": "The cited candidate response says: \"We cut scope and move on.\"",
+      "evidence": [
+        {
+          "source": "interview_turn",
+          "sourceId": "iturn_12",
+          "quote": "We cut scope and move on."
+        }
+      ]
+    },
+    {
+      "competency": "R",
+      "score": 3,
+      "confidence": "medium",
+      "rationale": "The cited candidate response says: \"I would add a 24-hour limit for reviews so nobody is blocked.\"",
+      "evidence": [
+        {
+          "source": "interview_turn",
+          "sourceId": "iturn_14",
+          "quote": "I would add a 24-hour limit for reviews so nobody is blocked."
+        }
+      ]
+    },
+    {
+      "competency": "I",
+      "score": null,
+      "confidence": null,
+      "rationale": null,
+      "evidence": []
+    },
+    {
+      "competency": "V",
+      "score": 2,
+      "confidence": "low",
+      "rationale": "The cited candidate response says: \"I felt bad, but rules are rules, so I told the teacher.\"",
+      "evidence": [
+        {
+          "source": "interview_turn",
+          "sourceId": "iturn_10",
+          "quote": "I felt bad, but rules are rules, so I told the teacher."
+        }
+      ]
+    },
+    {
+      "competency": "E",
+      "score": 4,
+      "confidence": "high",
+      "rationale": "The cited candidate response says: \"I made a plan straight away: owners, a deadline and a full run on Thursday.\"",
+      "evidence": [
+        {
+          "source": "interview_turn",
+          "sourceId": "iturn_02",
+          "quote": "I made a plan straight away: owners, a deadline and a full run on Thursday."
+        }
+      ]
+    }
+  ]
+}
