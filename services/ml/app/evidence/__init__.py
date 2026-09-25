@@ -75,6 +75,25 @@ def interview_sources(
     return sources
 
 
+def consistency_sources(
+    candidate: CandidateView,
+    simulation_turns: Iterable[Turn],
+    interview_transcript: Iterable[InterviewTurn],
+) -> dict[SourceKey, str]:
+    """Only supplied candidate speech and application/test fields may support C."""
+
+    sources = candidate_view_sources(candidate)
+    seen_simulation: set[str] = set()
+    for turn in simulation_turns:
+        if turn.turnId in seen_simulation:
+            raise ValueError("duplicate simulation source id")
+        seen_simulation.add(turn.turnId)
+        if turn.speaker == "candidate":
+            sources[("simulation_turn", turn.turnId)] = turn.text
+    sources.update(interview_sources(interview_transcript, []))
+    return sources
+
+
 @dataclass(frozen=True)
 class Verification:
     scores: tuple[DriveScore, ...]

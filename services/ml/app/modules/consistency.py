@@ -7,8 +7,10 @@ from collections.abc import Callable, Iterable
 from pathlib import Path
 from typing import Protocol
 
-from ..evidence import candidate_view_sources, verify_evidence
+from ..evidence import candidate_view_sources, consistency_sources, verify_evidence
+from ..errors import ServiceError
 from ..gateway.config import TaskName
+from ..gateway.errors import GatewayOutputError
 from ..gateway.types import GatewayRequest, GatewayResult
 from ..metrics.certificate import mapped_certificate_cefr
 from ..schemas.contracts import (
@@ -81,6 +83,15 @@ class ConsistencyService:
         self._brief = brief
 
     async def prepare(self, request: ConsistencyRequest) -> ConsistencyResult:
+        try:
+            sources = consistency_sources(
+                request.candidate, request.simulationTurns, request.interviewTranscript,
+            )
+        except ValueError as error:
+            raise ServiceError(
+                status_code=422, code="VALIDATION_ERROR",
+                message="Candidate source identifiers are ambiguous.",
+            ) from error
         if request.stage == "before" or not request.beforeItems:
             brief = await self._brief.prepare(BriefRequest(
                 candidate=request.candidate,
@@ -91,8 +102,18 @@ class ConsistencyService:
             before_items = brief.consistency
         else:
             before_items = request.beforeItems
-        proposed = await self._generator.generate(request, before_items)
-        return reconcile_after_items(before_items, proposed)
+        _validate_before_items(before_items, request, sources)
+        for attempt in (1, 2):
+            proposed = await self._generator.generate(request, before_items, attempt=attempt)
+            try:
+                grounded, submitted, dropped = _ground_after(
+                    before_items, proposed, request, sources,
+                )
+            except ValueError:
+                continue
+            if submitted == 0 or dropped * 2 <= submitted:
+                return grounded
+        raise GatewayOutputError("consistency evidence did not match candidate sources")
 
 
 def english_claim(request: BriefRequest) -> tuple[str, Evidence] | None:
@@ -215,6 +236,7 @@ def _after_status(original: ConsistencyItem, proposed: ConsistencyItem) -> str:
         return proposed.status
     has_candidate_observation = any(
         evidence.source == "interview_turn"
+        and len(re.findall(r"\b[\w']+\b", evidence.quote)) >= 6
         for evidence in proposed.observation.evidence
     )
     has_supplied_english_measurement = (
@@ -270,3 +292,113 @@ def reconcile_after_items(
         }))
         next_id += 1
     return ConsistencyResult(items=reconciled)
+
+
+def _supported_metric(metric: Metric | None, request: ConsistencyRequest) -> bool:
+    if metric is None:
+        return True
+    measured = request.simulationEnglish
+    return bool(
+        metric.source == "simulation"
+        and measured is not None
+        and getattr(measured, metric.name, None) == metric.value
+    )
+
+
+def _validate_before_items(
+    before_items: list[ConsistencyItem], request: ConsistencyRequest,
+    sources: dict[tuple[str, str], str],
+) -> None:
+    ids = [item.itemId for item in before_items]
+    if len(ids) != len(set(ids)) or any(_ITEM_ID.fullmatch(item_id) is None for item_id in ids):
+        raise ServiceError(
+            status_code=422, code="VALIDATION_ERROR",
+            message="Saved consistency item identifiers are ambiguous.",
+        )
+    for item in before_items:
+        if (
+            not item.claim.evidence
+            or any(e.source not in {"application_field", "test_item"} for e in item.claim.evidence)
+            or not _supported_metric(item.observation.metric, request)
+        ):
+            raise ServiceError(
+                status_code=422, code="VALIDATION_ERROR",
+                message="Saved consistency evidence is unsupported.",
+            )
+        for evidence in (item.claim.evidence, item.observation.evidence):
+            _, submitted, dropped = verify_evidence(evidence, sources)
+            if submitted and dropped:
+                raise ServiceError(
+                    status_code=422, code="VALIDATION_ERROR",
+                    message="Saved consistency evidence is unsupported.",
+                )
+
+
+def _ground_after(
+    before_items: list[ConsistencyItem], proposed: ConsistencyResult,
+    request: ConsistencyRequest, sources: dict[tuple[str, str], str],
+) -> tuple[ConsistencyResult, int, int]:
+    submitted = dropped = 0
+    grounded: list[ConsistencyItem] = []
+    originals = {item.itemId: item for item in before_items}
+    for item in proposed.items:
+        claim_evidence, claim_count, claim_dropped = verify_evidence(item.claim.evidence, sources)
+        observation_evidence, observation_count, observation_dropped = verify_evidence(
+            item.observation.evidence, sources,
+        )
+        submitted += claim_count + observation_count
+        dropped += claim_dropped + observation_dropped
+        if not _supported_metric(item.observation.metric, request):
+            raise ValueError("model proposed an unsupported English metric")
+        original = originals.get(item.itemId)
+        if original is None:
+            if not any(e.source == "application_field" for e in claim_evidence) or not any(
+                e.source == "interview_turn"
+                and len(re.findall(r"\b[\w']+\b", e.quote)) >= 6
+                for e in observation_evidence
+            ):
+                # An appended finding needs a sourced application claim and candidate reply.
+                continue
+            observation = Observation(
+                text=f"The candidate said in the interview: {observation_evidence[0].quote}",
+                evidence=observation_evidence, metric=None,
+            )
+            grounded.append(item.model_copy(update={
+                "claim": Claim(
+                    text=f"The application response says: {claim_evidence[0].quote}",
+                    evidence=claim_evidence,
+                ),
+                "observation": observation,
+                "status": "discrepancy",
+                "whatToDo": "Ask the candidate to clarify the cited difference.",
+            }))
+            continue
+        if original.topic == "english" and item.observation.metric is not None:
+            metric = item.observation.metric
+            level = english_claim(BriefRequest(
+                candidate=request.candidate, simulationEnglish=request.simulationEnglish,
+            ))
+            observation_text = f"The simulation measured {metric.value}; review the self-rating separately from leadership."
+            if level is not None and level[0] == "C2" and metric.value == "B2":
+                observation_text = (
+                    "The simulation measured B2, and nothing in the interview points higher; "
+                    "the C2 self-rating is not supported."
+                )
+            observation = Observation(text=observation_text, evidence=[], metric=metric)
+            status = item.status
+        elif observation_evidence and any(e.source == "interview_turn" for e in observation_evidence):
+            observation = Observation(
+                text=f"The candidate said in the interview: {observation_evidence[0].quote}",
+                evidence=observation_evidence, metric=None,
+            )
+            status = item.status
+        else:
+            observation = original.observation
+            status = original.status if original.status in _AFTER_STATUSES else "unverified"
+        grounded.append(item.model_copy(update={
+            "observation": observation,
+            "status": status,
+            "whatToDo": "Review the cited evidence with the candidate before drawing a conclusion.",
+        }))
+    result = reconcile_after_items(before_items, ConsistencyResult(items=grounded))
+    return result, submitted, dropped
