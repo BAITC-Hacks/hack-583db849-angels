@@ -47,23 +47,11 @@ class SyntheticConsistencyProvider:
 
 
 def _interview(candidate: str) -> list[dict]:
-    if candidate == "b":
-        return [
-            {"turnId": "iturn_01", "speaker": "interviewer", "text":
-             "What happened after the mentoring plan was rejected?", "startSec": 1, "endSec": 5},
-            {"turnId": "iturn_02", "speaker": "candidate", "text":
-             "I was disappointed and waited until another student restarted the conversation.",
-             "startSec": 6, "endSec": 15},
-        ]
-    if candidate == "c":
-        return [
-            {"turnId": "iturn_01", "speaker": "interviewer", "text":
-             "Did any project go wrong?", "startSec": 1, "endSec": 4},
-            {"turnId": "iturn_02", "speaker": "candidate", "text":
-             "Actually our event missed its deadline and I had to ask the team to rebuild the plan.",
-             "startSec": 5, "endSec": 17},
-        ]
-    raise ValueError("unknown synthetic candidate")
+    if candidate not in "bc":
+        raise ValueError("unknown synthetic candidate")
+    return json.loads((ROOT / f"seed/candidates/{candidate}/interview-transcript.json").read_text(
+        encoding="utf-8"
+    ))
 
 
 def before_request(candidate: str) -> ConsistencyRequest:
@@ -105,17 +93,17 @@ def authored_proposal(candidate: str, request: ConsistencyRequest) -> Consistenc
         items.append(ConsistencyItem(
             itemId="model-new-item", topic="other",
             claim=Claim(
-                text="The application said nothing important went wrong.",
+                text="The application says the candidate makes decisions independently.",
                 evidence=[Evidence(
-                    source="application_field", sourceId="setback",
-                    quote="Nothing important has gone wrong in my projects.",
+                    source="application_field", sourceId="motivation",
+                    quote="I prefer to make decisions independently and usually do not ask for advice.",
                 )],
             ),
             observation=Observation(
-                text="The interview described a missed deadline.",
+                text="The interview says the candidate let the team decide.",
                 evidence=[Evidence(
                     source="interview_turn", sourceId="iturn_02",
-                    quote="Actually our event missed its deadline and I had to ask the team to rebuild the plan.",
+                    quote="I let the team decide. I did not want to push my own idea.",
                 )], metric=None,
             ),
             status="discrepancy",

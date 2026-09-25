@@ -4,7 +4,7 @@
   "output_tokens": 280,
   "provider": "openai",
   "recorded_at": "2026-09-26T00:00:00Z",
-  "request_hash": "1b011940a6e4f8baebf2a43b5fb246745f0293d8cf72587404d83a3b449ff6ff",
+  "request_hash": "052588fec59c1ad345d75f57661844aaf303da3db91d7625c527ad03750e9a1a",
   "request_id": "synthetic-consistency-fixture",
   "response": "{\"items\":[{\"itemId\":\"c_01\",\"topic\":\"english\",\"claim\":{\"text\":\"Self-rated English as B2.\",\"evidence\":[{\"source\":\"application_field\",\"sourceId\":\"english_self\",\"quote\":\"B2\"}]},\"observation\":{\"text\":\"No simulation English estimate is available yet.\",\"evidence\":[],\"metric\":null},\"status\":\"unverified\",\"whatToDo\":\"Ask an unprepared English question and review the evidence together.\",\"askInInterview\":null}]}",
   "task": "consistency",
