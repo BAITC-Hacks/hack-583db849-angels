@@ -129,10 +129,3 @@ export function resetWorld(): void {
   resetListeners.forEach((listener) => listener());
   record('demo-reset', null);
 }
-
-export const homeFor: Record<'interviewer' | 'commission' | 'admin' | 'candidate', string> = {
-  interviewer: '/interviewer',
-  commission: '/commission',
-  admin: '/admin',
-  candidate: '/candidate',
-};

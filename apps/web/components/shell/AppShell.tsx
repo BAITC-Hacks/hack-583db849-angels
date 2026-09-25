@@ -3,11 +3,10 @@
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, type ReactNode } from 'react';
-import { homeFor } from '../../lib/demo/world';
 import { useStaffLocale } from '../../lib/i18n/StaffLocaleProvider';
 import { createPreference } from '../../lib/preference';
 import { useDemoRole } from '../../lib/DemoRoleProvider';
-import { isStaff, type DemoRole } from '../../lib/roles';
+import { homeFor, isStaff, type DemoRole } from '../../lib/roles';
 import { RoleTile } from './RoleSwitcher';
 import { Sidebar } from './Sidebar';
 

@@ -6,6 +6,7 @@ import { NextStep } from '../../../components/home/NextStep';
 import { SeedPending } from '../../../components/home/SeedPending';
 import { StatusPill } from '../../../components/home/StatusPill';
 import { useHomeProgress } from '../../../lib/home/useHomeProgress';
+import { ApiUnavailable } from '../../../components/home/ApiUnavailable';
 import { previewCalibrationCheck, previewInterviewCheck } from '../../../lib/quality/preview';
 import { useStaffLocale } from '../../../lib/i18n/StaffLocaleProvider';
 
@@ -18,6 +19,8 @@ const copy = {
     qualityNote: 'about the interviews, not the candidates',
     next: 'Next step',
     wait: { title: 'Candidate A has not finished the simulation', body: 'The report appears as soon as the candidate finishes.' },
+    preparing: { title: 'Candidate A’s report is being prepared', body: 'The simulation is finished and the assessment is running. This page updates by itself.' },
+    failed: { title: 'The assessment of candidate A failed', body: 'The simulation is saved. The report page explains, and an admin can run the assessment again.', action: 'Open the report page' },
     read: { title: 'Candidate A’s report is ready', body: 'D.R.I.V.E. scores with verbatim quotes, questions for the interview, English measured apart.', action: 'Open the report' },
     columns: ['Candidate', 'Simulation', 'Report', 'Interview', 'Consistency', 'Candidate feedback'],
     simulation: { 'not-started': 'Not started', 'in-progress': 'In progress', completed: 'Finished' },
@@ -35,6 +38,8 @@ const copy = {
     qualityNote: 'о самих интервью, не о кандидатах',
     next: 'Следующий шаг',
     wait: { title: 'Кандидат A ещё не прошёл симуляцию', body: 'Отчёт появится, как только кандидат закончит.' },
+    preparing: { title: 'Отчёт по кандидату A готовится', body: 'Симуляция закончена, идёт оценка. Страница обновится сама.' },
+    failed: { title: 'Оценка кандидата A не удалась', body: 'Симуляция сохранена. На странице отчёта — подробности, админ может запустить оценку заново.', action: 'Открыть страницу отчёта' },
     read: { title: 'Отчёт по кандидату A готов', body: 'Баллы D.R.I.V.E. с дословными цитатами, вопросы для интервью, английский отдельно.', action: 'Открыть отчёт' },
     columns: ['Кандидат', 'Симуляция', 'Отчёт', 'Интервью', 'Сверка', 'Отзыв кандидату'],
     simulation: { 'not-started': 'Не начата', 'in-progress': 'Идёт', completed: 'Пройдена' },
@@ -50,7 +55,7 @@ const copy = {
 export default function CommissionHome() {
   const { locale } = useStaffLocale();
   const text = copy[locale];
-  const { candidates } = useHomeProgress();
+  const { candidates, apiError } = useHomeProgress();
   const a = candidates.A;
   const all = Object.values(candidates);
 
@@ -72,6 +77,8 @@ export default function CommissionHome() {
         <h1 className="text-balance-tight text-2xl font-extrabold sm:text-3xl">{text.title}</h1>
         <p className="max-w-3xl text-sm text-text-secondary">{text.lede}</p>
       </header>
+
+      <ApiUnavailable error={apiError} />
 
       <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-panel border border-border-subtle bg-border-subtle lg:grid-cols-4">
         {tiles.map((tile) => {
@@ -96,12 +103,16 @@ export default function CommissionHome() {
 
       {a.assessmentReady ? (
         <NextStep label={text.next} title={text.read.title} body={text.read.body} href="/commission/simulation-report" action={text.read.action} />
+      ) : a.assessment === 'failed' ? (
+        <NextStep label={text.next} title={text.failed.title} body={text.failed.body} href="/commission/simulation-report" action={text.failed.action} />
       ) : (
         <section className="flex flex-wrap items-center justify-between gap-4 rounded-panel border border-border-subtle bg-bg-elevated p-5">
           <div className="flex max-w-2xl flex-col gap-1">
             <p className="font-mono text-[0.6rem] tracking-[0.14em] text-text-muted uppercase">{text.next}</p>
-            <h2 className="text-base font-bold text-text-primary">{text.wait.title}</h2>
-            <p className="text-sm text-text-secondary">{text.wait.body}</p>
+            <h2 className="text-base font-bold text-text-primary">
+              {a.simulation === 'completed' ? text.preparing.title : text.wait.title}
+            </h2>
+            <p className="text-sm text-text-secondary">{a.simulation === 'completed' ? text.preparing.body : text.wait.body}</p>
           </div>
         </section>
       )}

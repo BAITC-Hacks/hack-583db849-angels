@@ -6,6 +6,7 @@ import { SeedPending } from '../../../components/home/SeedPending';
 import { StatusPill } from '../../../components/home/StatusPill';
 import type { CandidateProgress } from '../../../lib/demo/world';
 import { useHomeProgress } from '../../../lib/home/useHomeProgress';
+import { ApiUnavailable } from '../../../components/home/ApiUnavailable';
 import { useStaffLocale } from '../../../lib/i18n/StaffLocaleProvider';
 
 const copy = {
@@ -65,7 +66,7 @@ function nextFor(a: CandidateProgress) {
 export default function InterviewerHome() {
   const { locale } = useStaffLocale();
   const text = copy[locale];
-  const { candidates } = useHomeProgress();
+  const { candidates, apiError } = useHomeProgress();
   const a = candidates.A;
   const next = nextFor(a);
   const step = text.steps[next.key];
@@ -77,6 +78,8 @@ export default function InterviewerHome() {
         <h1 className="text-balance-tight text-2xl font-extrabold sm:text-3xl">{text.title}</h1>
         <p className="max-w-3xl text-sm text-text-secondary">{text.lede}</p>
       </header>
+
+      <ApiUnavailable error={apiError} />
 
       <NextStep label={text.next} title={step.title} body={step.body} href={next.href} action={step.action} />
 
