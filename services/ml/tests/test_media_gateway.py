@@ -8,7 +8,12 @@ import pytest
 from services.ml.app.config import Settings
 from services.ml.app.gateway.budget import GatewayBudget
 from services.ml.app.gateway.config import Provider, TaskName, load_models_configuration
-from services.ml.app.gateway.errors import GatewayBudgetError, GatewayProviderError, GatewayReplayError
+from services.ml.app.gateway.errors import (
+    GatewayBudgetError,
+    GatewayConfigurationError,
+    GatewayProviderError,
+    GatewayReplayError,
+)
 from services.ml.app.gateway.media import (
     FileMediaCassetteStore,
     InMemoryMediaCache,
@@ -48,6 +53,20 @@ def speech_request(text: str = "Hello") -> MediaRequest:
         content_type="text/plain; charset=utf-8",
         parameters={"voice": "aura-2-thalia-en"},
         estimated_units=Decimal(len(text)) / Decimal(1000),
+    )
+
+
+def interview_request() -> MediaRequest:
+    return MediaRequest(
+        task=TaskName.TRANSCRIPTION,
+        operation="transcribe",
+        content=b"synthetic-interview-webm",
+        content_type="audio/webm",
+        parameters={
+            "language": "en", "speakers": 2,
+            "purpose": "interview", "diarize_model": "latest",
+        },
+        estimated_units=Decimal(60),
     )
 
 
@@ -189,6 +208,54 @@ def test_media_budget_refuses_before_the_provider_call(tmp_path: Path) -> None:
     assert provider.calls == []
 
 
+def test_interview_budget_covers_sixty_minutes_and_fallback(tmp_path: Path) -> None:
+    provider = FakeProvider(fail_models={"nova-3"})
+    service, usage, _ = gateway(tmp_path, provider)
+
+    result = asyncio.run(service.execute(interview_request()))
+
+    assert result.model == "nova-2"
+    assert [call.model for call in provider.calls] == ["nova-3", "nova-2"]
+    assert asyncio.run(usage.records())[0].actual_usd == Decimal("0.2580")
+
+
+def test_interview_both_models_failing_is_provider_unavailable(tmp_path: Path) -> None:
+    provider = FakeProvider(fail_models={"nova-3", "nova-2"})
+    service, _, _ = gateway(tmp_path, provider)
+
+    with pytest.raises(GatewayProviderError, match="Deepgram provider failed"):
+        asyncio.run(service.execute(interview_request()))
+
+    assert [call.model for call in provider.calls] == ["nova-3", "nova-2"]
+
+
+def test_interview_global_cap_blocks_provider_before_call(tmp_path: Path) -> None:
+    provider = FakeProvider()
+    service, _, _ = gateway(tmp_path, provider, cap="0.29")
+
+    with pytest.raises(GatewayBudgetError, match="global"):
+        asyncio.run(service.execute(interview_request()))
+
+    assert provider.calls == []
+
+
+def test_interview_diarizer_option_is_part_of_replay_key(tmp_path: Path) -> None:
+    store = FileMediaCassetteStore(tmp_path)
+    first = interview_request()
+    changed = MediaRequest(
+        task=first.task,
+        operation=first.operation,
+        content=first.content,
+        content_type=first.content_type,
+        parameters={**first.parameters, "diarize_model": "v2"},
+        estimated_units=first.estimated_units,
+    )
+
+    assert store.path_for(first, Provider.DEEPGRAM, "nova-3") != store.path_for(
+        changed, Provider.DEEPGRAM, "nova-3"
+    )
+
+
 class FakeHttpResponse:
     def __init__(self, content: bytes, request_id: str = "request-id") -> None:
         self._content = content
@@ -232,6 +299,65 @@ def test_deepgram_transcription_adapter_sends_audio_and_reads_duration() -> None
     assert seen[0][0].data == b"synthetic-webm"
     assert seen[0][0].get_header("Authorization") == "Token synthetic-key"
     assert "model=nova-3" in seen[0][0].full_url
+    assert "diarize=false" in seen[0][0].full_url
+
+
+def test_deepgram_interview_adapter_requests_diarized_utterances() -> None:
+    seen = []
+    body = json.dumps({"metadata": {"duration": 186}, "results": {}}).encode()
+
+    def opener(request, timeout):
+        seen.append(request)
+        return FakeHttpResponse(body)
+
+    provider = DeepgramProvider("synthetic-key", opener=opener)
+    request = interview_request()
+    asyncio.run(provider.execute(MediaProviderRequest(
+        task=request.task, operation=request.operation, model="nova-3",
+        content=request.content, content_type=request.content_type,
+        parameters=request.parameters, estimated_units=request.estimated_units,
+    )))
+
+    assert len(seen) == 1
+    assert "diarize_model=latest" in seen[0].full_url
+    assert "utterances=true" in seen[0].full_url
+    assert "diarize=true" not in seen[0].full_url
+    assert seen[0].data == request.content
+
+
+def test_deepgram_nova_2_fallback_uses_legacy_diarization_only() -> None:
+    seen = []
+    body = json.dumps({"metadata": {"duration": 186}, "results": {}}).encode()
+
+    def opener(request, timeout):
+        seen.append(request)
+        return FakeHttpResponse(body)
+
+    provider = DeepgramProvider("synthetic-key", opener=opener)
+    request = interview_request()
+    asyncio.run(provider.execute(MediaProviderRequest(
+        task=request.task, operation=request.operation, model="nova-2",
+        content=request.content, content_type=request.content_type,
+        parameters=request.parameters, estimated_units=request.estimated_units,
+    )))
+
+    assert len(seen) == 1
+    assert "model=nova-2" in seen[0].full_url
+    assert "diarize=true" in seen[0].full_url
+    assert "diarize_model=" not in seen[0].full_url
+    assert "utterances=true" in seen[0].full_url
+
+
+def test_deepgram_rejects_interview_without_keyed_diarizer() -> None:
+    provider = DeepgramProvider("synthetic-key", opener=lambda *_: pytest.fail("called"))
+    request = interview_request()
+    with pytest.raises(GatewayConfigurationError, match="diarization"):
+        asyncio.run(provider.execute(MediaProviderRequest(
+            task=request.task, operation=request.operation, model="nova-3",
+            content=request.content, content_type=request.content_type,
+            parameters={"language": "en", "speakers": 2, "purpose": "interview"},
+            estimated_units=request.estimated_units,
+        )))
 
 
 def test_deepgram_speech_adapter_returns_binary_audio() -> None:

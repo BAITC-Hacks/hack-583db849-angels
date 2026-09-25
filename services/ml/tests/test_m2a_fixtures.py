@@ -118,7 +118,7 @@ def test_all_committed_cassette_envelopes_and_outputs_validate() -> None:
     actor_files = list((CASSETTES / "simulation_actor").glob("*.json"))
     transcription_files = list((CASSETTES / "transcription").glob("*.json"))
     speech_files = list((CASSETTES / "speech").glob("*.json"))
-    assert (len(actor_files), len(transcription_files), len(speech_files)) == (15, 14, 13)
+    assert (len(actor_files), len(transcription_files), len(speech_files)) == (15, 15, 13)
 
     for path in actor_files:
         envelope = CassetteEnvelope.model_validate_json(path.read_text(encoding="utf-8"))
@@ -137,7 +137,8 @@ def test_all_committed_cassette_envelopes_and_outputs_validate() -> None:
             assert content.startswith((b"ID3", b"\xff"))
         else:
             assert envelope.media_type == "application/json"
-            assert json.loads(content)["results"]["channels"]
+            results = json.loads(content)["results"]
+            assert results.get("channels") or results.get("utterances")
 
 
 def test_candidate_audio_is_not_stored_in_transcription_cassettes() -> None:

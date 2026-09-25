@@ -36,7 +36,6 @@ def example(filename: str) -> object:
 @pytest.mark.parametrize(
     ("path", "request_name", "response_name"),
     [
-        ("/internal/v1/transcribe", "transcribe.request.json", "transcribe.response.json"),
         (
             "/internal/v1/consistency",
             "consistency-before.request.json",
@@ -51,11 +50,6 @@ def example(filename: str) -> object:
             "/internal/v1/surprise-question",
             "surprise-question.request.json",
             "surprise-question.response.json",
-        ),
-        (
-            "/internal/v1/interview/draft",
-            "interview-draft.request.json",
-            "interview-draft.response.json",
         ),
         (
             "/internal/v1/quality-check",
