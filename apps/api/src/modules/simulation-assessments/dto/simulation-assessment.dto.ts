@@ -26,7 +26,7 @@ class AssessmentEvidenceDto {
   @ApiProperty() quote!: string;
 }
 
-class AssessmentDriveScoreDto {
+export class AssessmentDriveScoreDto {
   @ApiProperty({ enum: ['D', 'R', 'I', 'V', 'E'] }) competency!: Competency;
   @ApiProperty({ type: Number, enum: [0, 1, 2, 3, 4], nullable: true }) score!: 0 | 1 | 2 | 3 | 4 | null;
   @ApiProperty({ type: String, enum: ['low', 'medium', 'high'], nullable: true }) confidence!: 'low' | 'medium' | 'high' | null;

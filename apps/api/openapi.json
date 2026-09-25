@@ -619,6 +619,238 @@
         ]
       }
     },
+    "/v1/interviews": {
+      "post": {
+        "operationId": "InterviewsController_create",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateInterviewDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InterviewDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "interviews"
+        ]
+      }
+    },
+    "/v1/interviews/{interviewId}/recording": {
+      "post": {
+        "operationId": "InterviewsController_recording",
+        "parameters": [
+          {
+            "name": "interviewId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/InterviewRecordingDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InterviewDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "interviews"
+        ]
+      }
+    },
+    "/v1/interviews/{interviewId}": {
+      "get": {
+        "operationId": "InterviewsController_get",
+        "parameters": [
+          {
+            "name": "interviewId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InterviewDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "interviews"
+        ]
+      }
+    },
+    "/v1/interviews/{interviewId}/interviewer-scores": {
+      "post": {
+        "operationId": "InterviewsController_scores",
+        "parameters": [
+          {
+            "name": "interviewId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveInterviewerScoresDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InterviewerScoresSavedDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "interviews"
+        ]
+      }
+    },
+    "/v1/interviews/{interviewId}/assessment-draft": {
+      "post": {
+        "operationId": "InterviewsController_createDraft",
+        "parameters": [
+          {
+            "name": "interviewId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssessmentDraftDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "interviews"
+        ]
+      },
+      "get": {
+        "operationId": "InterviewsController_draft",
+        "parameters": [
+          {
+            "name": "interviewId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssessmentDraftDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "interviews"
+        ]
+      }
+    },
     "/v1/quality-checks/interview": {
       "post": {
         "operationId": "QualityGuardController_interview",
@@ -2436,6 +2668,342 @@
           "strengths",
           "growth",
           "nextTime"
+        ]
+      },
+      "PlatformTurnDto": {
+        "type": "object",
+        "properties": {
+          "speaker": {
+            "type": "string",
+            "enum": [
+              "interviewer",
+              "candidate"
+            ]
+          },
+          "text": {
+            "type": "string"
+          },
+          "startSec": {
+            "type": "number"
+          },
+          "endSec": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "speaker",
+          "text",
+          "startSec",
+          "endSec"
+        ]
+      },
+      "CreateInterviewDto": {
+        "type": "object",
+        "properties": {
+          "candidateId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "heldAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "interviewerRef": {
+            "type": "string",
+            "description": "A pseudonym for the interviewer, such as `interviewer-2`; never a name.",
+            "example": "interviewer-2"
+          },
+          "transcript": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlatformTurnDto"
+            }
+          },
+          "transcriptSource": {
+            "type": "string",
+            "enum": [
+              "platform"
+            ]
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "candidateId",
+          "heldAt"
+        ]
+      },
+      "InterviewTurnDto": {
+        "type": "object",
+        "properties": {
+          "turnId": {
+            "type": "string"
+          },
+          "speaker": {
+            "type": "string",
+            "enum": [
+              "interviewer",
+              "candidate"
+            ]
+          },
+          "text": {
+            "type": "string"
+          },
+          "startSec": {
+            "type": "number"
+          },
+          "endSec": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "turnId",
+          "speaker",
+          "text",
+          "startSec",
+          "endSec"
+        ]
+      },
+      "InterviewNoteDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "text"
+        ]
+      },
+      "InterviewerScoresDto": {
+        "type": "object",
+        "properties": {
+          "D": {
+            "type": "number",
+            "enum": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ],
+            "nullable": true
+          },
+          "R": {
+            "type": "number",
+            "enum": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ],
+            "nullable": true
+          },
+          "I": {
+            "type": "number",
+            "enum": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ],
+            "nullable": true
+          },
+          "V": {
+            "type": "number",
+            "enum": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ],
+            "nullable": true
+          },
+          "E": {
+            "type": "number",
+            "enum": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ],
+            "nullable": true
+          }
+        },
+        "required": [
+          "D",
+          "R",
+          "I",
+          "V",
+          "E"
+        ]
+      },
+      "InterviewDto": {
+        "type": "object",
+        "properties": {
+          "interviewId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "candidateId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "candidateLabel": {
+            "type": "string"
+          },
+          "interviewerRef": {
+            "type": "string",
+            "nullable": true
+          },
+          "heldAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "transcriptStatus": {
+            "type": "string",
+            "enum": [
+              "none",
+              "transcribing",
+              "ready",
+              "failed"
+            ]
+          },
+          "transcriptSource": {
+            "type": "string",
+            "enum": [
+              "platform",
+              "recording"
+            ],
+            "nullable": true
+          },
+          "transcript": {
+            "nullable": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InterviewTurnDto"
+            }
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InterviewNoteDto"
+            }
+          },
+          "interviewerScores": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InterviewerScoresDto"
+              }
+            ]
+          },
+          "scoredAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "required": [
+          "interviewId",
+          "candidateId",
+          "candidateLabel",
+          "interviewerRef",
+          "heldAt",
+          "transcriptStatus",
+          "transcriptSource",
+          "transcript",
+          "notes",
+          "interviewerScores",
+          "scoredAt"
+        ]
+      },
+      "InterviewRecordingDto": {
+        "type": "object",
+        "properties": {
+          "audio": {
+            "type": "string",
+            "format": "binary",
+            "description": "webm, ogg or wav, up to 60 minutes"
+          },
+          "consent": {
+            "type": "string",
+            "enum": [
+              "true"
+            ]
+          }
+        },
+        "required": [
+          "audio",
+          "consent"
+        ]
+      },
+      "SaveInterviewerScoresDto": {
+        "type": "object",
+        "properties": {
+          "scores": {
+            "$ref": "#/components/schemas/InterviewerScoresDto"
+          }
+        },
+        "required": [
+          "scores"
+        ]
+      },
+      "InterviewerScoresSavedDto": {
+        "type": "object",
+        "properties": {
+          "interviewId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "scores": {
+            "$ref": "#/components/schemas/InterviewerScoresDto"
+          },
+          "savedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "interviewId",
+          "scores",
+          "savedAt"
+        ]
+      },
+      "AssessmentDraftDto": {
+        "type": "object",
+        "properties": {
+          "interviewId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "scores": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssessmentDriveScoreDto"
+            }
+          }
+        },
+        "required": [
+          "interviewId",
+          "createdAt",
+          "scores"
         ]
       },
       "InterviewCheckDto": {

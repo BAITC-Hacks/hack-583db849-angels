@@ -25,6 +25,14 @@ const candidateWithSimulationSelect = {
   accommodation: { select: { textMode: true, reason: true } },
   briefs: { orderBy: { createdAt: 'desc' }, take: 1, select: { id: true, status: true } },
   surprise: { select: { id: true, status: true, answerDeadline: true } },
+  interviews: {
+    orderBy: { createdAt: 'desc' },
+    take: 1,
+    select: {
+      id: true, transcriptStatus: true, interviewerScore: { select: { id: true } },
+      drafts: { where: { status: 'ready' }, take: 1, select: { id: true } },
+    },
+  },
 } as const satisfies Prisma.CandidateSelect;
 
 type SafeCandidate = Prisma.CandidateGetPayload<{ select: typeof candidateSelect }>;
@@ -91,6 +99,7 @@ export class CandidatesService {
     const simulation = candidate.simulations[0];
     const assessment = candidate.assessments[0];
     const brief = candidate.briefs[0];
+    const interview = candidate.interviews[0];
     const progress: CandidateProgressDto = {
       candidateId: candidate.id,
       label: candidate.label,
@@ -101,7 +110,12 @@ export class CandidatesService {
         ending: simulation.ending as 'completed' | 'stopped' | null,
       } : null,
       assessment: assessment ? { assessmentId: assessment.id, status: assessment.status as 'pending' | 'ready' | 'failed' } : null,
-      interview: null,
+      interview: interview ? {
+        interviewId: interview.id,
+        transcriptStatus: interview.transcriptStatus as 'none' | 'transcribing' | 'ready' | 'failed',
+        scoresSaved: Boolean(interview.interviewerScore),
+        draftReady: interview.drafts.length > 0,
+      } : null,
       surprise: candidate.surprise ? { surpriseId: candidate.surprise.id, status: surpriseStatus(candidate.surprise) } : null,
       consistency: { before: null, after: null },
       accommodation: candidate.accommodation
