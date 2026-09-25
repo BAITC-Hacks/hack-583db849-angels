@@ -63,6 +63,8 @@ describe('where each candidate is, for the staff homes', () => {
       [{ ...list.items[0], progress: { ...list.items[0].progress!, simulation, assessment, brief } }] as WireCandidate[];
     expect(somethingPending(at(null, null, { briefId: null, status: 'pending' }))).toBe(true);
     expect(somethingPending(at(null, null, { briefId: 'b', status: 'failed' }))).toBe(false);
+    const waitingForAfter = [{ ...list.items[0], progress: { ...list.items[0].progress!, simulation: null, assessment: null, brief: null, consistency: { before: 'ready', after: 'pending' } } }] as WireCandidate[];
+    expect(somethingPending(waitingForAfter)).toBe(true);
     expect(somethingPending(at({ simulationId: 's', status: 'active', ending: null }, null))).toBe(true);
     expect(somethingPending(at(null, { assessmentId: 'a', status: 'pending' }))).toBe(true);
     expect(somethingPending(at({ simulationId: 's', status: 'completed', ending: 'completed' }, { assessmentId: 'a', status: 'ready' }))).toBe(false);

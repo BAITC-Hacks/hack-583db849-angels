@@ -73,8 +73,9 @@ function harness({ duration = 900, transcribeFails = false, silent = false } = {
     delete: jest.fn().mockResolvedValue(undefined),
   };
   const audit = { record: jest.fn().mockResolvedValue(undefined) };
-  const service = new InterviewsService(prisma as never, gateway as never, audio as never, new ToLlmViewService(), audit as never);
-  return { service, gateway, audio, audit, drafts, current: () => interview as Row };
+  const consistency = { startAfter: jest.fn().mockResolvedValue(undefined) };
+  const service = new InterviewsService(prisma as never, gateway as never, audio as never, new ToLlmViewService(), audit as never, consistency as never);
+  return { service, gateway, audio, audit, consistency, drafts, current: () => interview as Row };
 }
 
 const settle = () => new Promise((resolve) => setTimeout(resolve, 0));
@@ -170,7 +171,7 @@ describe('InterviewsService', () => {
   });
 
   it('makes the draft by itself once the scores and the transcript both exist, and never sends the scores', async () => {
-    const { service, gateway } = harness();
+    const { service, gateway, consistency } = harness();
     await service.create({ candidateId, heldAt: '2026-09-26T09:30:00Z', notes: ['Ada Example paused before answering.'] }, 'interviewer');
     await service.saveScores('interview-1', scores, 'interviewer');
     await settle();
@@ -184,6 +185,8 @@ describe('InterviewsService', () => {
     await settle();
 
     expect(gateway.interviewDraft).toHaveBeenCalledTimes(1);
+    // The after-interview consistency starts at the same moment.
+    expect(consistency.startAfter).toHaveBeenCalledWith('interview-1');
     const sent = gateway.interviewDraft.mock.calls[0][0];
     expect(Object.keys(sent).sort()).toEqual(['candidateId', 'notes', 'transcript']);
     expect(JSON.stringify(sent)).not.toMatch(/Ada Example|"D":3|interviewerScore/);
