@@ -186,7 +186,7 @@ One question about the candidate's own application, one attempt, 90 seconds, on 
 | `POST` | `/v1/surprise-questions/:surpriseId/start` | ✱ | `200 SurpriseQuestion` with the question, `startedAt` and a **server** `answerDeadline` | `409 ALREADY_STARTED` |
 | `POST` | `/v1/surprise-questions/:surpriseId/answer` | ✱ | `202 SurpriseQuestion` with `status: "transcribing"`; multipart `video` (webm or mp4, up to 50 MB), `consentVideo=true`, `consentProcessing=true` | `400 CONSENT_REQUIRED`, `409 DEADLINE_PASSED`, `409 ALREADY_ANSWERED`, `413` |
 | `GET` | `/v1/surprise-questions/:surpriseId` | | `200 SurpriseQuestion` — fields by role | `404` |
-| `GET` | `/v1/surprise-questions/:surpriseId/video` | | `200 video/webm`, streamed | `403` for `platform`, `404` |
+| `GET` | `/v1/surprise-questions/:surpriseId/video` | | `200 video/webm`, streamed; `206` for a `Range` | `403` for `platform`, `404`, `416` outside the file |
 
 - **The question is written by the ML service** from the candidate's application when the surprise is created, and **revealed only by `start`**.
 - **One attempt, held by the server:** a second `start` answers `409 ALREADY_STARTED`, and an answer after `answerDeadline` + 15 s answers `409 DEADLINE_PASSED`.
@@ -203,7 +203,7 @@ The remote stage of inVision's selection opens with a video presentation (the br
 | --- | --- | --- | --- | --- |
 | `POST` | `/v1/presentations` | ✱ | `202 Presentation` with `status: "transcribing"`; multipart `video` (webm or mp4, up to 100 MB), `candidateId`, `consentVideo=true`, `consentProcessing=true` | `400 CONSENT_REQUIRED`, `400 VIDEO_TOO_SHORT` under 60 s, `413` over 3 minutes or 100 MB, `404` candidate, `409 PRESENTATION_EXISTS` |
 | `GET` | `/v1/presentations/:presentationId` | | `200 Presentation` — fields by role | `404` |
-| `GET` | `/v1/presentations/:presentationId/video` | | `200 video/webm` or `video/mp4`, streamed | `403` for `platform`, `404` |
+| `GET` | `/v1/presentations/:presentationId/video` | | `200 video/webm` or `video/mp4`, streamed; `206` for a `Range` | `403` for `platform`, `404`, `416` outside the file |
 
 - **The prompt** is the same for everyone, in English: *"In one to three minutes, in English: why inVision U, and one time you led other people — what you did, and what came of it."* It is in every `Presentation`.
 - **One submission.** A second one answers `409 PRESENTATION_EXISTS` with `details.presentationId`. There is nothing to replace: the video is final once sent.
