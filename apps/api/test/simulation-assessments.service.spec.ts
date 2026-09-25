@@ -50,8 +50,9 @@ function harness(status: 'active' | 'completed' = 'completed') {
     },
   };
   const audit = { record: jest.fn().mockResolvedValue({}) };
-  const service = new SimulationAssessmentsService(prisma as never, gateway as never, new ToLlmViewService(), audit as never);
-  return { service, gateway, prisma, audit, simulation, stored: () => row };
+  const briefs = { startFor: jest.fn().mockResolvedValue(undefined) };
+  const service = new SimulationAssessmentsService(prisma as never, gateway as never, new ToLlmViewService(), audit as never, briefs as never);
+  return { service, gateway, prisma, audit, briefs, simulation, stored: () => row };
 }
 
 describe('SimulationAssessmentsService', () => {
@@ -95,6 +96,8 @@ describe('SimulationAssessmentsService', () => {
     await fixture.service.startAutomatically(simulationId);
     await fixture.service.startAutomatically(simulationId);
     expect(fixture.gateway.simulationAssessment).toHaveBeenCalledTimes(1);
+    // The brief is made again with the English the simulation measured (#12).
+    expect(fixture.briefs.startFor).toHaveBeenCalledWith(candidateId, expect.objectContaining({ cefrEstimate: expect.anything() }));
     expect(fixture.gateway.simulationAssessment).toHaveBeenCalledWith({
       candidateId, scenarioId: 'conflict-resolution', mode: 'voice',
       turns: [{ turnId: 'turn_01', speaker: 'candidate', text: '[redacted] will listen',

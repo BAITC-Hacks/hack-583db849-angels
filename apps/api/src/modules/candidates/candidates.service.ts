@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 
 import { ApiRole } from '../../auth/roles';
+import { BriefsService } from '../briefs/briefs.service';
 import { PrismaService } from '../../database/prisma.service';
 import { CreateCandidateDto } from './create-candidate.dto';
 import { CandidateDto, CandidateProgressDto } from './dto/candidate.dto';
@@ -21,6 +22,7 @@ const candidateWithSimulationSelect = {
     select: { id: true, status: true },
   },
   accommodation: { select: { textMode: true, reason: true } },
+  briefs: { orderBy: { createdAt: 'desc' }, take: 1, select: { id: true, status: true } },
 } as const satisfies Prisma.CandidateSelect;
 
 type SafeCandidate = Prisma.CandidateGetPayload<{ select: typeof candidateSelect }>;
@@ -28,7 +30,7 @@ type CandidateWithSimulation = Prisma.CandidateGetPayload<{ select: typeof candi
 
 @Injectable()
 export class CandidatesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService, private readonly briefs: BriefsService) {}
 
   async upsert(input: CreateCandidateDto, demoLabel?: string): Promise<CandidateDto> {
     const profile = input.profile as unknown as Prisma.InputJsonValue;
@@ -44,6 +46,8 @@ export class CandidatesService {
       update: { label, profile, application, test, englishCertificate },
       select: candidateSelect,
     });
+    // The brief is made as soon as the candidate is here; nobody has to ask for it (#12).
+    void this.briefs.startFor(candidate.id);
     return this.toDto(candidate);
   }
 
@@ -84,10 +88,11 @@ export class CandidatesService {
   private toProgress(candidate: CandidateWithSimulation, role: ApiRole): CandidateProgressDto {
     const simulation = candidate.simulations[0];
     const assessment = candidate.assessments[0];
+    const brief = candidate.briefs[0];
     const progress: CandidateProgressDto = {
       candidateId: candidate.id,
       label: candidate.label,
-      brief: null,
+      brief: brief ? { briefId: brief.id, status: brief.status as 'pending' | 'ready' | 'failed' } : null,
       simulation: simulation ? {
         simulationId: simulation.id,
         status: simulation.status,

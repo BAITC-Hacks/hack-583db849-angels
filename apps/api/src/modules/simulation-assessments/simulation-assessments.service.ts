@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client';
 
 import { AI_GATEWAY, AiGateway } from '../../ai-client/ai-gateway.port';
 import type { components } from '../../ai-client/schema';
+import { BriefsService } from '../briefs/briefs.service';
 import { PrismaService } from '../../database/prisma.service';
 import { ToLlmViewService } from '../../privacy/to-llm-view.service';
 import { AuditService } from '../audit/audit.service';
@@ -31,6 +32,7 @@ export class SimulationAssessmentsService {
     @Inject(AI_GATEWAY) private readonly gateway: AiGateway,
     private readonly privacy: ToLlmViewService,
     private readonly audit: AuditService,
+    private readonly briefs: BriefsService,
   ) {}
 
   async startAutomatically(simulationId: string): Promise<void> {
@@ -183,6 +185,8 @@ export class SimulationAssessmentsService {
         action: 'assessment.ready', targetType: 'assessment', targetId: assessmentId,
         candidateId: simulation.candidateId, actorRole: undefined,
       });
+      // The brief is made again, now with the English the simulation measured (#12).
+      void this.briefs.startFor(simulation.candidateId, result.english);
     } catch (error) {
       await this.prisma.assessment.update({
         where: { id: assessmentId },
