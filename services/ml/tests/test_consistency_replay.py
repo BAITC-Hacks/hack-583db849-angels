@@ -104,3 +104,18 @@ def test_fixture_inputs_are_synthetic_and_do_not_include_scores(candidate: str) 
         assert "profile" not in raw["candidate"]
         assert "interviewerScores" not in raw
         assert "apiKey" not in json.dumps(raw)
+
+
+def test_a_empty_before_items_replays_m1_fallback(tmp_path: Path) -> None:
+    http = _client(tmp_path)
+    _, request = _inputs("a")
+    payload = request.model_dump(mode="json")
+    payload["beforeItems"] = []
+
+    response = http.post("/internal/v1/consistency", json=payload, headers=TOKEN)
+
+    assert response.status_code == 200
+    result = ConsistencyResult.model_validate(response.json())
+    assert [item.itemId for item in result.items] == ["c_01"]
+    assert [item.status for item in result.items] == ["confirmed"]
+    assert result.items[0].claim.evidence[0].quote == "C2"

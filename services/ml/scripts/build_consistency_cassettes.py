@@ -148,6 +148,16 @@ async def build() -> None:
         after = await service.prepare(after_input)
         if len(after.items) < len(after_input.beforeItems):
             raise RuntimeError("synthetic output lost a saved consistency item")
+        if candidate == "a":
+            # Legacy callers may omit beforeItems; the service reconstructs
+            # them through M1 and still uses a request-keyed C cassette.
+            empty_after = after_input.model_copy(update={"beforeItems": []})
+            provider.output = ConsistencyResult(items=[
+                authored_proposal("a", after_input).items[0],
+            ])
+            fallback = await service.prepare(empty_after)
+            if [item.status for item in fallback.items] != ["confirmed"]:
+                raise RuntimeError("empty-before fallback changed unexpectedly")
 
 
 if __name__ == "__main__":
