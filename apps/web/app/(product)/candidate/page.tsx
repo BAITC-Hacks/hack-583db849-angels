@@ -4,11 +4,9 @@ import { ArrowRightIcon, CheckCircleIcon, ClockIcon } from '@heroicons/react/24/
 import { useMutation } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
 import { candidateByCode, useCandidates } from '../../../lib/api/candidates';
 import { api, ApiError, unwrap } from '../../../lib/api/client';
 import { errorText } from '../../../lib/api/errors';
-import { record } from '../../../lib/demo/world';
 
 /**
  * The candidate's home: the simulation to play and, afterwards, the feedback.
@@ -19,17 +17,12 @@ import { record } from '../../../lib/demo/world';
  */
 export default function CandidateHome() {
   const router = useRouter();
-  const candidates = useCandidates({ poll: true });
+  const candidates = useCandidates({ poll: 'while-pending' });
   const me = candidateByCode(candidates.data, 'A');
   const progress = me?.progress;
   const simulation = progress?.simulation ?? null;
   const assessment = progress?.assessment ?? null;
   const feedbackReady = assessment?.status === 'ready' && Boolean(assessment.assessmentId);
-
-  // The other roles' homes still read the demo world until they move to the API (#23).
-  useEffect(() => {
-    if (feedbackReady) record('assessment-ready', 'A', { assessmentReady: true });
-  }, [feedbackReady]);
 
   const start = useMutation({
     mutationFn: async (candidateId: string) =>

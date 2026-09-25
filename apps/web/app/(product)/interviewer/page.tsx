@@ -4,7 +4,8 @@ import Link from 'next/link';
 import { NextStep } from '../../../components/home/NextStep';
 import { SeedPending } from '../../../components/home/SeedPending';
 import { StatusPill } from '../../../components/home/StatusPill';
-import { useWorld, type CandidateProgress } from '../../../lib/demo/world';
+import type { CandidateProgress } from '../../../lib/demo/world';
+import { useHomeProgress } from '../../../lib/home/useHomeProgress';
 import { useStaffLocale } from '../../../lib/i18n/StaffLocaleProvider';
 
 const copy = {
@@ -64,8 +65,8 @@ function nextFor(a: CandidateProgress) {
 export default function InterviewerHome() {
   const { locale } = useStaffLocale();
   const text = copy[locale];
-  const world = useWorld();
-  const a = world.candidates.A;
+  const { candidates } = useHomeProgress();
+  const a = candidates.A;
   const next = nextFor(a);
   const step = text.steps[next.key];
 
@@ -92,7 +93,7 @@ export default function InterviewerHome() {
           </thead>
           <tbody className="divide-y divide-border-subtle">
             {(['A', 'B', 'C'] as const).map((code) => {
-              const c = world.candidates[code];
+              const c = candidates[code];
               return (
                 <tr key={code} className={c.hasData ? '' : 'opacity-60'}>
                   <td className="px-4 py-3 font-semibold text-text-primary">
