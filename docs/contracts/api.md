@@ -61,12 +61,15 @@ The browser never holds an API key. The web calls a Next.js route on its own ser
 | M5 quality checks | — | — | yes | yes |
 | S surprise question — create, start, answer, status | yes ² | read | read | yes |
 | S surprise answer — transcript and video | — | yes | yes | yes |
+| P video presentation — submit, status | yes ³ | read | read | yes |
+| P video presentation — transcript and video | — | yes | yes | yes |
 | Admin overview, audit events | — | — | — | yes |
 | Demo: recorded session | — | — | yes | yes |
 | Demo: reset | — | — | — | yes |
 
 ¹ `progress` is filtered by role: `platform` gets no `brief` and no `interview` and never a score; `interviewer` gets no `assessment` — they score blind.
 ² `platform` sees the question only after `start`, and never the competency it targets, the transcript or the video.
+³ `platform` sends the presentation and sees its status, and never the transcript or the video.
 
 `API_KEYS` gets a fourth pair, for example `change-me-platform:platform`.
 
@@ -183,7 +186,7 @@ One question about the candidate's own application, one attempt, 90 seconds, on 
 | `POST` | `/v1/surprise-questions/:surpriseId/start` | ✱ | `200 SurpriseQuestion` with the question, `startedAt` and a **server** `answerDeadline` | `409 ALREADY_STARTED` |
 | `POST` | `/v1/surprise-questions/:surpriseId/answer` | ✱ | `202 SurpriseQuestion` with `status: "transcribing"`; multipart `video` (webm or mp4, up to 50 MB), `consentVideo=true`, `consentProcessing=true` | `400 CONSENT_REQUIRED`, `409 DEADLINE_PASSED`, `409 ALREADY_ANSWERED`, `413` |
 | `GET` | `/v1/surprise-questions/:surpriseId` | | `200 SurpriseQuestion` — fields by role | `404` |
-| `GET` | `/v1/surprise-questions/:surpriseId/video` | | `200 video/webm`, streamed | `403` for `platform`, `404` |
+| `GET` | `/v1/surprise-questions/:surpriseId/video` | | `200 video/webm`, streamed; `206` for a `Range` | `403` for `platform`, `404`, `416` outside the file |
 
 - **The question is written by the ML service** from the candidate's application when the surprise is created, and **revealed only by `start`**.
 - **One attempt, held by the server:** a second `start` answers `409 ALREADY_STARTED`, and an answer after `answerDeadline` + 15 s answers `409 DEADLINE_PASSED`.
@@ -191,6 +194,22 @@ One question about the candidate's own application, one attempt, 90 seconds, on 
 - **Every video view is an audit event.** The video is deleted on demo reset and 30 days after the decision.
 - **The decision date comes from inVision.** The commission decides in inVision's own system; the platform sends only its date with `PUT /v1/candidates/:id/decision-date`. An hourly sweep deletes every video whose candidate was decided 30 days ago or more (`VIDEO_RETENTION_DAYS`) and writes `surprise.video.deleted`. The transcript stays, and `videoAvailable` turns `false`.
 - **Once the answer is transcribed,** you create a new brief and send the question and the segments in `BriefRequest.surpriseAnswer` (`ml.md`, rule 6c), so its quotes can cite `surprise_answer`.
+
+### P — the video presentation
+
+The remote stage of inVision's selection opens with a video presentation (the brief, page 7). The candidate records it in the browser or uploads a file, watches it, and sends it once.
+
+| Method | Path | Idem. | Success | Errors |
+| --- | --- | --- | --- | --- |
+| `POST` | `/v1/presentations` | ✱ | `202 Presentation` with `status: "transcribing"`; multipart `video` (webm or mp4, up to 100 MB), `candidateId`, `consentVideo=true`, `consentProcessing=true` | `400 CONSENT_REQUIRED`, `400 VIDEO_TOO_SHORT` under 60 s, `413` over 3 minutes or 100 MB, `404` candidate, `409 PRESENTATION_EXISTS` |
+| `GET` | `/v1/presentations/:presentationId` | | `200 Presentation` — fields by role | `404` |
+| `GET` | `/v1/presentations/:presentationId/video` | | `200 video/webm` or `video/mp4`, streamed; `206` for a `Range` | `403` for `platform`, `404`, `416` outside the file |
+
+- **The prompt** is the same for everyone, in English: *"In one to three minutes, in English: why inVision U, and one time you led other people — what you did, and what came of it."* It is in every `Presentation`.
+- **One submission.** A second one answers `409 PRESENTATION_EXISTS` with `details.presentationId`. There is nothing to replace: the video is final once sent.
+- **The video never reaches a model.** As with the surprise answer: the audio is cut out (`ffmpeg`), transcribed with one speaker into segments `pseg_01`, `pseg_02`, …, and deleted. The video stays for staff only; every view is an audit event.
+- **Once transcribed,** you make a new brief. Its `sources.presentation` carries the transcript for staff to read beside it; a brief quotes it as `source: "presentation"` once `BriefRequest.presentation` is in the ML service (`ml.md`, rule 6d).
+- **Deleted** on demo reset and `VIDEO_RETENTION_DAYS` after the decision date, like the surprise video; the transcript stays.
 
 ### Admin and demo
 
@@ -226,7 +245,7 @@ type Competency = 'D' | 'R' | 'I' | 'V' | 'E';
 type Score = 0 | 1 | 2 | 3 | 4 | null;           // null: not enough verified evidence
 
 interface Evidence {
-  source: 'application_field' | 'test_item' | 'simulation_turn' | 'interview_turn' | 'interview_note' | 'surprise_answer';
+  source: 'application_field' | 'test_item' | 'simulation_turn' | 'interview_turn' | 'interview_note' | 'surprise_answer' | 'presentation';
   sourceId: string;
   quote: string;                                  // verbatim; never translated
 }
@@ -262,6 +281,7 @@ interface CandidateProgress {                     // filtered by role, see the R
     draftReady: boolean;
   } | null;
   surprise: { surpriseId: string; status: SurpriseStatus } | null;
+  presentation: { presentationId: string; status: 'transcribing' | 'ready' | 'failed' } | null;
   consistency: { before: StepStatus | null; after: StepStatus | 'locked' | null };
   accommodation: { textMode: boolean; reason: string } | null;  // staff only; null until set, and always for platform
 }
@@ -428,6 +448,18 @@ interface AssessmentDraft {
 
 type SurpriseStatus = 'ready' | 'started' | 'transcribing' | 'answered' | 'expired' | 'failed';
 
+interface Presentation {
+  presentationId: string;
+  candidateId: string;
+  status: 'transcribing' | 'ready' | 'failed';
+  prompt: string;
+  durationSec: number;
+  submittedAt: string;
+  // staff only — absent for platform:
+  segments?: { segmentId: string; text: string; startSec: number; endSec: number }[] | null;   // pseg_01, …
+  videoAvailable?: boolean;
+}
+
 interface SurpriseSegment {
   segmentId: string;                              // sseg_01, sseg_02, …
   text: string;                                   // verbatim, never translated
@@ -468,7 +500,8 @@ interface AdminOverview {
 type AuditAction =
   | 'candidate.created' | 'brief.ready' | 'simulation.started' | 'simulation.completed' | 'simulation.stopped'
   | 'assessment.ready' | 'interview.created' | 'recording.uploaded' | 'transcript.ready' | 'scores.saved'
-  | 'draft.created' | 'surprise.started' | 'surprise.answered' | 'surprise.video.viewed' | 'surprise.video.deleted' | 'demo.reset';
+  | 'draft.created' | 'surprise.started' | 'surprise.answered' | 'surprise.video.viewed' | 'surprise.video.deleted'
+  | 'presentation.submitted' | 'presentation.video.viewed' | 'presentation.video.deleted' | 'demo.reset';
 
 interface AuditEvent {
   eventId: string;
@@ -533,7 +566,10 @@ interface QualitySignal {
 | `ALREADY_STARTED` | 409 | the surprise question was already revealed |
 | `ALREADY_ANSWERED` | 409 | a second answer to the surprise question |
 | `DEADLINE_PASSED` | 409 | the surprise answer arrived after the deadline plus 15 seconds |
-| `PAYLOAD_TOO_LARGE` | 413 | audio over 60 minutes or video over 50 MB |
+| `PAYLOAD_TOO_LARGE` | 413 | audio over 60 minutes, a surprise video over 50 MB, a presentation over 3 minutes or 100 MB |
+| `VIDEO_TOO_SHORT` | 400 | a presentation under 60 seconds |
+| `PRESENTATION_EXISTS` | 409 | a second presentation for the same candidate |
+| `RANGE_NOT_SATISFIABLE` | 416 | a video `Range` that starts past the end of the file |
 | `AI_INVALID_OUTPUT` | 502 | the ML service failed schema or evidence checks after its one retry |
 | `AI_UNAVAILABLE` | 503 | the ML service is down |
 | `AI_BUDGET_EXCEEDED` | 503 | the gateway refused: `BUDGET_USD_CAP` reached |

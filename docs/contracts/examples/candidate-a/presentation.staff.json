@@ -1,0 +1,47 @@
+{
+  "presentationId": "7d1e4b52-3c0a-4f6e-9a8b-2f5c6d7e8a91",
+  "candidateId": "00000000-0000-4000-8000-00000000000a",
+  "status": "ready",
+  "prompt": "In one to three minutes, in English: why inVision U, and one time you led other people — what you did, and what came of it.",
+  "durationSec": 84,
+  "submittedAt": "2026-09-26T09:12:00Z",
+  "segments": [
+    {
+      "segmentId": "pseg_01",
+      "text": "I want to study at inVision U because I like building things that other people actually use, and I want to learn to do it at a bigger scale.",
+      "startSec": 0.4,
+      "endSec": 9.8
+    },
+    {
+      "segmentId": "pseg_02",
+      "text": "Last spring our school robotics team had three weeks left before the regional competition and the robot still could not climb the ramp.",
+      "startSec": 10.3,
+      "endSec": 19.6
+    },
+    {
+      "segmentId": "pseg_03",
+      "text": "I split the team into two groups, one on the drive system and one on the software, and we met every evening for fifteen minutes to check progress.",
+      "startSec": 20.1,
+      "endSec": 31.2
+    },
+    {
+      "segmentId": "pseg_04",
+      "text": "When the new motor arrived broken, I called the supplier myself and we borrowed a motor from another school until the replacement came.",
+      "startSec": 31.8,
+      "endSec": 42.5
+    },
+    {
+      "segmentId": "pseg_05",
+      "text": "We finished fourth out of eighteen teams. It was not first, but the robot climbed the ramp every time, and two younger students joined the team after that.",
+      "startSec": 43.0,
+      "endSec": 56.9
+    },
+    {
+      "segmentId": "pseg_06",
+      "text": "What I learned is that a clear plan with short check-ins works better than long meetings, and that is how I would like to work at inVision U.",
+      "startSec": 57.4,
+      "endSec": 70.8
+    }
+  ],
+  "videoAvailable": true
+}
