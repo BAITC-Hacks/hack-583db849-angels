@@ -36,7 +36,7 @@ function harness({ duration = 95 as number | null, transcribeFails = false } = {
     saveVideo: jest.fn().mockResolvedValue('presentations/candidate/video.webm'),
     durationSeconds: jest.fn().mockResolvedValue(duration),
     extractAudio: jest.fn().mockResolvedValue('presentations/candidate/audio.wav'),
-    open: jest.fn().mockResolvedValue({ stream: Buffer.from('v'), type: 'video/webm', length: 1 }),
+    open: jest.fn().mockResolvedValue({ path: '/synthetic/video.webm', type: 'video/webm', size: 1000 }),
     delete: jest.fn().mockResolvedValue(undefined),
   };
   const briefs = { startFor: jest.fn().mockResolvedValue(undefined) };
@@ -107,5 +107,20 @@ describe('PresentationsService', () => {
     await expect(service.video('presentation-1', 'platform')).rejects.toMatchObject({ status: 403 });
     await service.video('presentation-1', 'commission');
     expect(audit.record).toHaveBeenLastCalledWith(expect.objectContaining({ action: 'presentation.video.viewed', actorRole: 'commission' }));
+  });
+
+  it('writes one audit line per viewing, not one per range the player asks for', async () => {
+    const { service, audit } = harness();
+    await service.submit(fields, video, 'platform');
+    await settle();
+    const views = () => audit.record.mock.calls.filter(([event]: [{ action: string }]) => event.action === 'presentation.video.viewed').length;
+    // Safari: a two-byte probe, then the file from the start, then the rest as it plays.
+    await service.video('presentation-1', 'interviewer', 'bytes=0-1');
+    await service.video('presentation-1', 'interviewer', 'bytes=0-999');
+    await service.video('presentation-1', 'interviewer', 'bytes=500-');
+    expect(views()).toBe(1);
+    // Chrome, watched again from the start.
+    await service.video('presentation-1', 'interviewer', 'bytes=0-');
+    expect(views()).toBe(2);
   });
 });

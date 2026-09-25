@@ -1,10 +1,11 @@
 import {
-  BadRequestException, ConflictException, ForbiddenException, HttpException, HttpStatus, Inject, Injectable, Logger, NotFoundException, StreamableFile,
+  BadRequestException, ConflictException, ForbiddenException, HttpException, HttpStatus, Inject, Injectable, Logger, NotFoundException,
 } from '@nestjs/common';
 import { Presentation, Prisma } from '@prisma/client';
 
 import { AI_GATEWAY, AiGateway } from '../../ai-client/ai-gateway.port';
 import { ApiRole } from '../../auth/roles';
+import { countsAsView, type VideoFile } from '../../media/video-range';
 import { PrismaService } from '../../database/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { BriefsService } from '../briefs/briefs.service';
@@ -87,14 +88,16 @@ export class PresentationsService {
     return this.toDto(await this.find(presentationId), role);
   }
 
-  /** Staff only, and every view is written to the audit log. */
-  async video(presentationId: string, role: ApiRole): Promise<StreamableFile> {
+  /** Staff only, and every view is written to the audit log; `range` is the player's `Range` header. */
+  async video(presentationId: string, role: ApiRole, range?: string): Promise<VideoFile> {
     if (role === 'platform') throw new ForbiddenException({ code: 'FORBIDDEN', message: 'This role does not see the video.' });
     const row = await this.find(presentationId);
     if (!row.videoRef) throw new NotFoundException({ code: 'NOT_FOUND', message: 'There is no video for this presentation.' });
     const file = await this.media.open(row.videoRef);
-    await this.audit.record({ action: 'presentation.video.viewed', targetType: 'presentation', targetId: presentationId, candidateId: row.candidateId, actorRole: role });
-    return new StreamableFile(file.stream, { type: file.type, length: file.length });
+    if (countsAsView(range, file.size)) {
+      await this.audit.record({ action: 'presentation.video.viewed', targetType: 'presentation', targetId: presentationId, candidateId: row.candidateId, actorRole: role });
+    }
+    return file;
   }
 
   private async transcribe(presentationId: string, candidateId: string, videoRef: string): Promise<void> {
