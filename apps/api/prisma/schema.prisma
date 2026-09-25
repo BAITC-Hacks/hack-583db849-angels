@@ -45,6 +45,7 @@ model Candidate {
   interviews         Interview[]
   auditEvents        AuditEvent[]
   briefs             Brief[]
+  surprise           SurpriseQuestion?
 }
 
 model Simulation {
@@ -173,4 +174,23 @@ model Brief {
   candidate   Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
 
   @@index([candidateId, createdAt])
+}
+
+/// S: one unexpected question about the candidate's own application, one attempt, 90 seconds on camera.
+/// The question is written by ML when it is created and revealed only by `start`. The video stays on disk
+/// for staff only (`videoRef`); only the transcript of its audio ever reaches a model.
+model SurpriseQuestion {
+  id             String    @id @default(uuid()) @db.Uuid
+  candidateId    String    @unique @db.Uuid
+  status         String    @default("ready") // ready | started | transcribing | answered | expired | failed
+  question       String
+  competency     String
+  why            String
+  answerSeconds  Int       @default(90)
+  startedAt      DateTime?
+  answerDeadline DateTime?
+  videoRef       String?
+  segments       Json?
+  createdAt      DateTime  @default(now())
+  candidate      Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
 }

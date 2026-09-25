@@ -15,10 +15,11 @@ import { QualityGuardModule } from './modules/quality-guard/quality-guard.module
 import { SimulationAssessmentsModule } from './modules/simulation-assessments/simulation-assessments.module';
 import { SimulationsModule } from './modules/simulations/simulations.module';
 import { ScenariosModule } from './modules/scenarios/scenarios.module';
+import { SurpriseModule } from './modules/surprise/surprise.module';
 import { ApiExceptionFilter } from './api-exception.filter';
 
 @Module({
-  imports: [AuthModule, DatabaseModule, IdempotencyModule, PrivacyModule, AiClientModule, AuditModule, CandidatesModule, ScenariosModule, BriefsModule, SimulationsModule, SimulationAssessmentsModule, InterviewsModule, QualityGuardModule],
+  imports: [AuthModule, DatabaseModule, IdempotencyModule, PrivacyModule, AiClientModule, AuditModule, CandidatesModule, ScenariosModule, BriefsModule, SimulationsModule, SimulationAssessmentsModule, InterviewsModule, QualityGuardModule, SurpriseModule],
   controllers: [HealthController],
   providers: [{ provide: APP_FILTER, useClass: ApiExceptionFilter }],
 })

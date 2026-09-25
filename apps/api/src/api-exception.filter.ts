@@ -28,6 +28,7 @@ export class ApiExceptionFilter implements ExceptionFilter {
     if (status === HttpStatus.UNAUTHORIZED) return 'UNAUTHORIZED';
     if (status === HttpStatus.FORBIDDEN) return 'FORBIDDEN';
     if (status === HttpStatus.NOT_FOUND) return 'NOT_FOUND';
+    if (status === HttpStatus.PAYLOAD_TOO_LARGE) return 'PAYLOAD_TOO_LARGE';
     return 'INTERNAL_ERROR';
   }
 }
