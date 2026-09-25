@@ -127,6 +127,27 @@ describe('SimulationsService', () => {
     });
   });
 
+  it('spreads 100 candidates over the ready scenarios so the counts differ by at most one', async () => {
+    const pool = ['s1', 's2', 's3', 's4', 's5', 's6', 's7'].map((id) => scenario(id));
+    const counts: Record<string, number> = {};
+    for (let created = 0; created < 100; created += 1) {
+      // Each create reads the pool from ML and the counts from the database, as they stand after the ones before.
+      const fixture = harness({ scenarios: [...pool, scenario('draft', 'draft')], counts: { ...counts } });
+      const { scenario: chosen } = await fixture.service.create(candidateId, 'platform');
+      counts[chosen.scenarioId] = (counts[chosen.scenarioId] ?? 0) + 1;
+    }
+    const assigned = pool.map((item) => counts[item.scenarioId] ?? 0);
+    expect(assigned.reduce((sum, count) => sum + count, 0)).toBe(100);
+    expect(Math.max(...assigned) - Math.min(...assigned)).toBeLessThanOrEqual(1);
+    expect(counts).not.toHaveProperty('draft');
+  });
+
+  it('assigns a scenario that has just become ready, with no restart', async () => {
+    const fixture = harness({ scenarios: [scenario('s1'), scenario('s2'), scenario('newly-ready')], counts: { s1: 5, s2: 5 } });
+    expect((await fixture.service.create(candidateId, 'platform')).scenario.scenarioId).toBe('newly-ready');
+    expect(fixture.gateway.scenarios).toHaveBeenCalledTimes(1);
+  });
+
   it('forbids text without an accommodation and sends every candidate turn with state and no profile', async () => {
     const voice = harness();
     const voiceId = (await voice.service.create(candidateId, 'platform')).simulationId;
