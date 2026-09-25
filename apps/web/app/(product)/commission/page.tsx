@@ -5,7 +5,7 @@ import { AccommodationControl } from '../../../components/home/AccommodationCont
 import { NextStep } from '../../../components/home/NextStep';
 import { SeedPending } from '../../../components/home/SeedPending';
 import { StatusPill } from '../../../components/home/StatusPill';
-import { completeWithRecordedSession, useWorld } from '../../../lib/demo/world';
+import { useWorld } from '../../../lib/demo/world';
 import { previewCalibrationCheck, previewInterviewCheck } from '../../../lib/quality/preview';
 import { useStaffLocale } from '../../../lib/i18n/StaffLocaleProvider';
 
@@ -17,7 +17,7 @@ const copy = {
     tiles: { simulations: 'Simulations finished', reports: 'Reports ready', interviews: 'Interviews scored', quality: 'Quality signals' },
     qualityNote: 'about the interviews, not the candidates',
     next: 'Next step',
-    wait: { title: 'Candidate A has not finished the simulation', body: 'The report appears as soon as the candidate finishes. For the demo you can use candidate A’s recorded session.', action: 'Use the recorded session' },
+    wait: { title: 'Candidate A has not finished the simulation', body: 'The report appears as soon as the candidate finishes.' },
     read: { title: 'Candidate A’s report is ready', body: 'D.R.I.V.E. scores with verbatim quotes, questions for the interview, English measured apart.', action: 'Open the report' },
     columns: ['Candidate', 'Simulation', 'Report', 'Interview', 'Consistency', 'Candidate feedback'],
     simulation: { 'not-started': 'Not started', 'in-progress': 'In progress', completed: 'Finished' },
@@ -34,7 +34,7 @@ const copy = {
     tiles: { simulations: 'Симуляций пройдено', reports: 'Отчётов готово', interviews: 'Интервью оценено', quality: 'Сигналов качества' },
     qualityNote: 'о самих интервью, не о кандидатах',
     next: 'Следующий шаг',
-    wait: { title: 'Кандидат A ещё не прошёл симуляцию', body: 'Отчёт появится, как только кандидат закончит. Для демо можно взять записанную сессию кандидата A.', action: 'Взять записанную сессию' },
+    wait: { title: 'Кандидат A ещё не прошёл симуляцию', body: 'Отчёт появится, как только кандидат закончит.' },
     read: { title: 'Отчёт по кандидату A готов', body: 'Баллы D.R.I.V.E. с дословными цитатами, вопросы для интервью, английский отдельно.', action: 'Открыть отчёт' },
     columns: ['Кандидат', 'Симуляция', 'Отчёт', 'Интервью', 'Сверка', 'Отзыв кандидату'],
     simulation: { 'not-started': 'Не начата', 'in-progress': 'Идёт', completed: 'Пройдена' },
@@ -103,13 +103,6 @@ export default function CommissionHome() {
             <h2 className="text-base font-bold text-text-primary">{text.wait.title}</h2>
             <p className="text-sm text-text-secondary">{text.wait.body}</p>
           </div>
-          <button
-            type="button"
-            onClick={() => completeWithRecordedSession('A')}
-            className="inline-flex items-center rounded-control border border-border-strong px-4 py-2.5 text-sm font-semibold text-text-primary transition-colors hover:bg-bg-surface"
-          >
-            {text.wait.action}
-          </button>
         </section>
       )}
 

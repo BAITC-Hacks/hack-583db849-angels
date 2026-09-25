@@ -783,6 +783,21 @@
           "after"
         ]
       },
+      "AccommodationProgressDto": {
+        "type": "object",
+        "properties": {
+          "textMode": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "textMode",
+          "reason"
+        ]
+      },
       "CandidateProgressDto": {
         "type": "object",
         "properties": {
@@ -834,6 +849,14 @@
           },
           "consistency": {
             "$ref": "#/components/schemas/ConsistencyProgressDto"
+          },
+          "accommodation": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AccommodationProgressDto"
+              }
+            ]
           }
         },
         "required": [
@@ -844,7 +867,8 @@
           "assessment",
           "interview",
           "surprise",
-          "consistency"
+          "consistency",
+          "accommodation"
         ]
       },
       "CandidateDto": {
