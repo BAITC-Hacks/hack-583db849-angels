@@ -17,6 +17,7 @@ import { InterviewsService } from '../src/modules/interviews/interviews.service'
 import { ConsistencyService } from '../src/modules/consistency/consistency.service';
 import { AdminService } from '../src/modules/admin/admin.service';
 import { RetentionService } from '../src/modules/retention/retention.service';
+import { PresentationsService } from '../src/modules/presentations/presentations.service';
 
 const briefs = {
   startFor: jest.fn().mockResolvedValue(undefined),
@@ -72,6 +73,12 @@ const retention = {
   sweep: jest.fn(),
 };
 
+const presentations = {
+  submit: jest.fn().mockResolvedValue({ presentationId: 'p', status: 'transcribing' }),
+  get: jest.fn().mockResolvedValue({ presentationId: 'p', status: 'ready' }),
+  video: jest.fn().mockImplementation(() => new StreamableFile(Buffer.from('synthetic video'), { type: 'video/webm' })),
+};
+
 describe('PR 1 contract routes', () => {
   let app: INestApplication;
   const candidateId = '00000000-0000-4000-8000-00000000000a';
@@ -122,6 +129,8 @@ describe('PR 1 contract routes', () => {
       .useValue(admin)
       .overrideProvider(RetentionService)
       .useValue(retention)
+      .overrideProvider(PresentationsService)
+      .useValue(presentations)
       .overrideProvider(PrismaService)
       .useValue({
         candidate: {
@@ -179,7 +188,7 @@ describe('PR 1 contract routes', () => {
     expect(found.body).toEqual(created.body);
     expect(listed.body.items[0]).toEqual({ ...created.body, progress: {
       candidateId, label: 'Candidate A', brief: null, simulation: null, assessment: null,
-      interview: null, surprise: null, consistency: { before: null, after: null }, accommodation: null,
+      interview: null, surprise: null, presentation: null, consistency: { before: null, after: null }, accommodation: null,
     } });
     expect(progress.body.assessment).toBeNull();
     expect(JSON.stringify([created.body, listed.body, found.body, progress.body])).not.toContain('Synthetic Person');
@@ -291,6 +300,18 @@ describe('PR 1 contract routes', () => {
     await request(server).put(path).set('X-API-Key', 'platform-key').send({ decidedAt: 'soon' }).expect(400);
     // The outcome has no field to travel in.
     await request(server).put(path).set('X-API-Key', 'platform-key').send({ decidedAt: '2026-09-01T09:00:00Z', decision: 'admit' }).expect(400);
+  });
+
+  it('lets the candidate channel send the presentation, and keeps its video for staff', async () => {
+    const server = app.getHttpServer();
+    const presentationId = '6f1c2a0e-0000-4000-8000-00000000a009';
+    await request(server).post('/v1/presentations').set('X-API-Key', 'platform-key')
+      .field('candidateId', candidateId).field('consentVideo', 'true').field('consentProcessing', 'true')
+      .attach('video', Buffer.from('synthetic'), 'presentation.webm').expect(202);
+    await request(server).post('/v1/presentations').set('X-API-Key', 'interviewer-key').field('candidateId', candidateId).expect(403);
+    await request(server).get(`/v1/presentations/${presentationId}`).set('X-API-Key', 'platform-key').expect(200);
+    await request(server).get(`/v1/presentations/${presentationId}/video`).set('X-API-Key', 'platform-key').expect(403);
+    await request(server).get(`/v1/presentations/${presentationId}/video`).set('X-API-Key', 'commission-key').expect(200);
   });
 
   it('answers 404, not 500, for an id that is not a UUID', async () => {

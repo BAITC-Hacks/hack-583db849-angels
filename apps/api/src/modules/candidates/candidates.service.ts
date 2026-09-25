@@ -25,6 +25,7 @@ const candidateWithSimulationSelect = {
   accommodation: { select: { textMode: true, reason: true } },
   briefs: { orderBy: { createdAt: 'desc' }, take: 1, select: { id: true, status: true } },
   surprise: { select: { id: true, status: true, answerDeadline: true } },
+  presentation: { select: { id: true, status: true } },
   interviews: {
     orderBy: { createdAt: 'desc' },
     take: 1,
@@ -118,6 +119,9 @@ export class CandidatesService {
         draftReady: interview.drafts.length > 0,
       } : null,
       surprise: candidate.surprise ? { surpriseId: candidate.surprise.id, status: surpriseStatus(candidate.surprise) } : null,
+      presentation: candidate.presentation
+        ? { presentationId: candidate.presentation.id, status: candidate.presentation.status as 'transcribing' | 'ready' | 'failed' }
+        : null,
       consistency: {
         before: brief ? (brief.status as 'pending' | 'ready' | 'failed') : null,
         // The after stage reads the interview, so it stays locked until the interviewer has scored blind.

@@ -9,6 +9,7 @@ import { candidateSnapshot, snapshotSelect } from '../../privacy/candidate-snaps
 import { LlmView, ToLlmViewService } from '../../privacy/to-llm-view.service';
 import { readSeed, seedLetter } from '../../seed-files';
 import { AuditService } from '../audit/audit.service';
+import { PRESENTATION_PROMPT } from '../presentations/presentation.dto';
 import { BriefDto } from './dto/brief.dto';
 
 type BriefResult = components['schemas']['BriefResult'];
@@ -19,6 +20,7 @@ type SurpriseSegment = NonNullable<BriefDto['sources']['surpriseAnswer']>['segme
 const candidateSelect = {
   id: true, ...snapshotSelect,
   surprise: { select: { id: true, status: true, question: true, segments: true } },
+  presentation: { select: { id: true, status: true, segments: true } },
 } as const satisfies Prisma.CandidateSelect;
 type BriefCandidate = Prisma.CandidateGetPayload<{ select: typeof candidateSelect }>;
 
@@ -122,6 +124,12 @@ export class BriefsService {
     return (assessment?.result as { english?: EnglishMetrics } | null)?.english ?? null;
   }
 
+  /** The transcribed video presentation, for staff to read beside the brief, once there is one. */
+  private presentationSource(presentation: BriefCandidate['presentation']): BriefDto['sources']['presentation'] {
+    if (!presentation || presentation.status !== 'ready' || !Array.isArray(presentation.segments)) return null;
+    return { presentationId: presentation.id, prompt: PRESENTATION_PROMPT, segments: presentation.segments as unknown as SurpriseSegment[] };
+  }
+
   /** The transcribed surprise answer, for staff to read beside the brief, once there is one. */
   private surpriseSource(surprise: BriefCandidate['surprise']): BriefDto['sources']['surpriseAnswer'] {
     if (!surprise || surprise.status !== 'answered' || !Array.isArray(surprise.segments)) return null;
@@ -157,6 +165,7 @@ export class BriefsService {
         application: view.application.answers.filter((answer) => fields.has(answer.fieldId)),
         test: view.test.answers.filter((answer) => items.has(answer.itemId)),
         surpriseAnswer: this.surpriseSource(candidate.surprise),
+        presentation: this.presentationSource(candidate.presentation),
       },
     };
   }

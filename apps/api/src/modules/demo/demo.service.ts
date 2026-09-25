@@ -16,7 +16,7 @@ import { CandidateProgressDto } from '../candidates/dto/candidate.dto';
 import { SimulationAssessmentsService } from '../simulation-assessments/simulation-assessments.service';
 
 /** Everything recorded or uploaded during a demo, under UPLOADS_DIR. */
-const UPLOAD_FOLDERS = ['surprise', 'interviews', 'character', 'turns'];
+const UPLOAD_FOLDERS = ['surprise', 'presentations', 'interviews', 'character', 'turns'];
 
 interface RecordedTurn {
   speaker: 'candidate' | 'character';
@@ -43,7 +43,7 @@ export class DemoService {
 
   /**
    * Starts the demo over: every simulation, assessment, interview, surprise
-   * question, quality check and the recordings on disk go, and A, B and C
+   * question, presentation, quality check and the recordings on disk go, and A, B and C
    * are seeded again. The audit log stays — it is the record of what happened.
    */
   async reset(role: ApiRole): Promise<void> {
@@ -55,6 +55,7 @@ export class DemoService {
       this.prisma.interviewerScore.deleteMany(),
       this.prisma.interview.deleteMany(),
       this.prisma.surpriseQuestion.deleteMany(),
+      this.prisma.presentation.deleteMany(),
       this.prisma.assessment.deleteMany(),
       this.prisma.simulationTurn.deleteMany(),
       this.prisma.simulation.deleteMany(),

@@ -8,10 +8,26 @@ import { promisify } from 'node:util';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
+import { audioDurationSeconds } from '../../media/audio-duration';
+
 const execFileAsync = promisify(execFile);
 
 export const videoTypes = { webm: 'video/webm', mp4: 'video/mp4' } as const;
 export type VideoExtension = keyof typeof videoTypes;
+
+/**
+ * The container, read from the file's first bytes rather than its declared
+ * type: a browser labels a recording `video/webm;codecs=vp8,opus`, and the
+ * comma in it is not a valid header value, so the declared type cannot be
+ * relied on. mp4 and a phone's mov both start with `ftyp`.
+ */
+export function videoContainer(video: Buffer | undefined): VideoExtension | null {
+  const head = video?.subarray(0, 12);
+  if (!head || head.length < 12) return null;
+  if (head.readUInt32BE(0) === 0x1a45dfa3) return 'webm';
+  if (head.toString('latin1', 4, 8) === 'ftyp') return 'mp4';
+  return null;
+}
 
 /**
  * The surprise answer on disk, under `UPLOADS_DIR/surprise/<id>/`. The video
@@ -26,8 +42,9 @@ export class SurpriseMediaService {
     this.root = resolve(config.get<string>('UPLOADS_DIR', '/data/uploads'));
   }
 
-  async saveVideo(surpriseId: string, extension: VideoExtension, video: Buffer): Promise<string> {
-    const videoRef = join('surprise', surpriseId, `${randomUUID()}.${extension}`);
+  /** Under `UPLOADS_DIR/<folder>/<id>/`: `surprise` for the surprise answer, `presentations` for the presentation. */
+  async saveVideo(id: string, extension: VideoExtension, video: Buffer, folder: 'surprise' | 'presentations' = 'surprise'): Promise<string> {
+    const videoRef = join(folder, id, `${randomUUID()}.${extension}`);
     const file = this.absolute(videoRef);
     await mkdir(dirname(file), { recursive: true });
     await writeFile(file, video, { flag: 'wx' });
@@ -41,6 +58,11 @@ export class SurpriseMediaService {
       '-v', 'error', '-i', this.absolute(videoRef), '-vn', '-ac', '1', '-ar', '16000', '-y', this.absolute(audioRef),
     ], { timeout: 60_000, maxBuffer: 64 * 1024 });
     return audioRef;
+  }
+
+  /** How long the recording is, or null when it cannot be read as one. */
+  durationSeconds(videoRef: string): Promise<number | null> {
+    return audioDurationSeconds(this.absolute(videoRef));
   }
 
   async open(videoRef: string): Promise<{ stream: ReadStream; type: string; length: number }> {
