@@ -1,0 +1,12 @@
+{
+  "input_tokens": 180,
+  "model": "gpt-6-sol",
+  "output_tokens": 220,
+  "provider": "openai",
+  "recorded_at": "2026-09-25T00:00:00Z",
+  "request_hash": "51f9462660178b26230a0c720548cd38807c84fa27594012a35032152373c473",
+  "request_id": "synthetic-m4-draft",
+  "response": "{\"scores\":[{\"competency\":\"D\",\"score\":2,\"confidence\":\"medium\",\"rationale\":\"Synthetic model claim; the service replaces this with a verified citation.\",\"evidence\":[{\"source\":\"interview_turn\",\"sourceId\":\"iturn_12\",\"quote\":\"We cut scope and move on.\"}]},{\"competency\":\"R\",\"score\":3,\"confidence\":\"medium\",\"rationale\":\"Synthetic model claim; the service replaces this with a verified citation.\",\"evidence\":[{\"source\":\"interview_turn\",\"sourceId\":\"iturn_14\",\"quote\":\"I would add a 24-hour limit for reviews so nobody is blocked.\"}]},{\"competency\":\"I\",\"score\":null,\"confidence\":null,\"rationale\":null,\"evidence\":[]},{\"competency\":\"V\",\"score\":2,\"confidence\":\"low\",\"rationale\":\"Synthetic model claim; the service replaces this with a verified citation.\",\"evidence\":[{\"source\":\"interview_turn\",\"sourceId\":\"iturn_10\",\"quote\":\"I felt bad, but rules are rules, so I told the teacher.\"}]},{\"competency\":\"E\",\"score\":4,\"confidence\":\"high\",\"rationale\":\"Synthetic model claim; the service replaces this with a verified citation.\",\"evidence\":[{\"source\":\"interview_turn\",\"sourceId\":\"iturn_02\",\"quote\":\"I made a plan straight away: owners, a deadline and a full run on Thursday.\"}]}]}",
+  "task": "interview_draft",
+  "version": 1
+}
