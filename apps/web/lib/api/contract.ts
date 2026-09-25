@@ -31,6 +31,8 @@ export interface WireTurn {
   text: string;
   startedAt: string;
   endedAt: string;
+  /** Candidate turns in API responses (docs/SPEC.md, Turn). */
+  recognitionConfidence?: number | null;
 }
 
 export interface WireEnglishMetrics {

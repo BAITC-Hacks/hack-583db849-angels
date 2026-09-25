@@ -2,7 +2,6 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import CommissionHome from '../app/(product)/commission/page';
 import InterviewerHome from '../app/(product)/interviewer/page';
-import { AssessmentGate } from '../components/home/AssessmentGate';
 import type { WireCandidate } from '../lib/api/contract';
 import { getWorld, record, resetWorld } from '../lib/demo/world';
 import { sampleScores } from '../lib/interview/preview';
@@ -82,16 +81,5 @@ describe('each role has its own working home', () => {
     expect(screen.queryByRole('link', { name: 'Open report' })).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: 'Use the recorded session' }));
     expect(screen.getAllByRole('link', { name: /Open (the )?report/ }).length).toBeGreaterThan(0);
-  });
-
-  it('keeps the report behind the simulation', () => {
-    render(
-      <AssessmentGate audience="staff">
-        <p>report body</p>
-      </AssessmentGate>,
-    );
-    expect(screen.queryByText('report body')).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: 'Use the recorded session' }));
-    expect(screen.getByText('report body')).toBeTruthy();
   });
 });

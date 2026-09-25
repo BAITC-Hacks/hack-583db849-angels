@@ -95,7 +95,7 @@ export default function CommissionHome() {
       </dl>
 
       {a.assessmentReady ? (
-        <NextStep label={text.next} title={text.read.title} body={text.read.body} href="/commission/simulation-report/preview" action={text.read.action} />
+        <NextStep label={text.next} title={text.read.title} body={text.read.body} href="/commission/simulation-report" action={text.read.action} />
       ) : (
         <section className="flex flex-wrap items-center justify-between gap-4 rounded-panel border border-border-subtle bg-bg-elevated p-5">
           <div className="flex max-w-2xl flex-col gap-1">
@@ -141,7 +141,7 @@ export default function CommissionHome() {
                       </td>
                       <td className="px-4 py-3">
                         {c.assessmentReady ? (
-                          <Link href="/commission/simulation-report/preview" className="text-sm font-semibold text-brand-ink hover:underline">
+                          <Link href="/commission/simulation-report" className="text-sm font-semibold text-brand-ink hover:underline">
                             {text.report.open}
                           </Link>
                         ) : (
@@ -167,7 +167,7 @@ export default function CommissionHome() {
                       </td>
                       <td className="px-4 py-3">
                         {c.assessmentReady ? (
-                          <Link href="/feedback/preview" className="text-sm font-semibold text-brand-ink hover:underline">
+                          <Link href="/feedback" className="text-sm font-semibold text-brand-ink hover:underline">
                             {text.feedback.open}
                           </Link>
                         ) : (
