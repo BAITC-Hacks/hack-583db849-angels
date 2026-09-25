@@ -140,4 +140,38 @@ describe('PR 1 contract routes', () => {
     await request(app.getHttpServer()).put(path).set('X-API-Key', 'commission-key').send(body).expect(200)
       .expect(contractExample('accommodation.json'));
   });
+  it('serves the assessment example to commission and admin, but not blind or platform roles', async () => {
+    const id = '6f1c2a0e-0000-4000-8000-00000000a003';
+    const path = `/v1/simulation-assessments/${id}`;
+    await request(app.getHttpServer()).get(path).expect(401);
+    await request(app.getHttpServer()).get(path).set('X-API-Key', 'platform-key').expect(403);
+    await request(app.getHttpServer()).get(path).set('X-API-Key', 'interviewer-key').expect(403);
+    await request(app.getHttpServer()).get(path).set('X-API-Key', 'commission-key').expect(200)
+      .expect(contractExample('assessment.json'));
+    await request(app.getHttpServer()).get(path).set('X-API-Key', 'admin-key').expect(200)
+      .expect(contractExample('assessment.json'));
+  });
+
+  it('accepts only admin assessment re-runs and validates the simulation id', async () => {
+    const path = '/v1/simulation-assessments';
+    const simulationId = '6f1c2a0e-0000-4000-8000-00000000a002';
+    await request(app.getHttpServer()).post(path).set('X-API-Key', 'commission-key')
+      .send({ simulationId }).expect(403);
+    await request(app.getHttpServer()).post(path).set('X-API-Key', 'admin-key')
+      .send({ simulationId: 'invalid' }).expect(400);
+    await request(app.getHttpServer()).post(path).set('X-API-Key', 'admin-key')
+      .send({ simulationId }).expect(201).expect(contractExample('assessment.json'));
+  });
+
+  it('serves score-free candidate feedback to every authenticated role', async () => {
+    const path = '/v1/simulation-assessments/6f1c2a0e-0000-4000-8000-00000000a003/candidate-feedback';
+    await request(app.getHttpServer()).get(path).expect(401);
+    for (const key of ['platform-key', 'interviewer-key', 'commission-key', 'admin-key']) {
+      const response = await request(app.getHttpServer()).get(path).set('X-API-Key', key).expect(200);
+      expect(response.body).toEqual(contractExample('candidate-feedback.json'));
+      expect(response.body).not.toHaveProperty('scores');
+      expect(response.body).not.toHaveProperty('english');
+    }
+  });
+
 });
