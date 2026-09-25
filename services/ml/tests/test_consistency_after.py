@@ -12,7 +12,7 @@ from services.ml.app.modules.consistency import (
     ConsistencyGenerator, ConsistencyService, reconcile_after_items,
 )
 from services.ml.app.schemas.contracts import (
-    BriefResult, ConsistencyRequest, ConsistencyResult, Evidence,
+    BriefResult, ConsistencyRequest, ConsistencyResult, Evidence, Metric,
 )
 
 
@@ -228,6 +228,50 @@ def test_after_keeps_discrepancy_when_interview_repeats_conflicting_account() ->
     assert result.items[1].observation.evidence[0].sourceId == "iturn_02"
     assert result.items[1].observation.text.endswith(account)
     assert result.items[1].askInInterview is None
+
+
+@pytest.mark.parametrize("measured", [False, True])
+@pytest.mark.parametrize("proposed_status", ["confirmed", "resolved", "discrepancy"])
+def test_interview_transcript_alone_cannot_set_english_status(
+    measured: bool, proposed_status: str,
+) -> None:
+    request, proposed = example()
+    if not measured:
+        request.simulationEnglish = None
+        request.beforeItems[0].observation.metric = None
+        request.beforeItems[0].status = "unverified"
+    original = request.beforeItems[0].model_copy(deep=True)
+    proposed.items[0].observation.metric = None
+    proposed.items[0].observation.evidence = [Evidence(
+        source="interview_turn", sourceId="iturn_02",
+        quote=request.interviewTranscript[1].text,
+    )]
+    proposed.items[0].status = proposed_status
+    service, _ = _service(proposed)
+
+    result = asyncio.run(service.prepare(request))
+
+    assert reconcile_after_items(request.beforeItems, proposed).items[0].status == original.status
+    assert result.items[0].status == original.status
+    assert result.items[0].observation == original.observation
+    assert result.items[0].claim == original.claim
+
+
+def test_speaking_rate_cannot_confirm_a_cefr_claim() -> None:
+    request, proposed = example()
+    original = request.beforeItems[0].model_copy(deep=True)
+    proposed.items[0].observation.metric = Metric(
+        name="wordsPerMinute", value=request.simulationEnglish.wordsPerMinute,
+        source="simulation",
+    )
+    proposed.items[0].status = "confirmed"
+    service, _ = _service(proposed)
+
+    result = asyncio.run(service.prepare(request))
+
+    assert reconcile_after_items(request.beforeItems, proposed).items[0].status == original.status
+    assert result.items[0].status == original.status
+    assert result.items[0].observation == original.observation
 
 
 def test_tampered_saved_quote_is_rejected_before_model_call() -> None:

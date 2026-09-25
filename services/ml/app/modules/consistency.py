@@ -232,6 +232,11 @@ _ITEM_ID = re.compile(r"^c_(\d{2,})$")
 def _after_status(original: ConsistencyItem, proposed: ConsistencyItem) -> str:
     """A changed conclusion needs a new candidate observation or supplied metric."""
 
+    if original.topic == "english" and (
+        proposed.observation.metric is None
+        or proposed.observation.metric.name != "cefrEstimate"
+    ):
+        return original.status if original.status in _AFTER_STATUSES else "unverified"
     if proposed.status not in {"confirmed", "resolved"}:
         return proposed.status
     has_candidate_observation = any(
@@ -379,19 +384,27 @@ def _ground_after(
                 "whatToDo": "Ask the candidate to clarify the cited difference.",
             }))
             continue
-        if original.topic == "english" and item.observation.metric is not None:
-            metric = item.observation.metric
-            level = english_claim(BriefRequest(
-                candidate=request.candidate, simulationEnglish=request.simulationEnglish,
-            ))
-            observation_text = f"The simulation measured {metric.value}; review the self-rating separately from leadership."
-            if level is not None and level[0] == "C2" and metric.value == "B2":
-                observation_text = (
-                    "The simulation measured B2, and nothing in the interview points higher; "
-                    "the C2 self-rating is not supported."
-                )
-            observation = Observation(text=observation_text, evidence=[], metric=metric)
-            status = item.status
+        if original.topic == "english":
+            if (
+                item.observation.metric is not None
+                and item.observation.metric.name == "cefrEstimate"
+            ):
+                metric = item.observation.metric
+                level = english_claim(BriefRequest(
+                    candidate=request.candidate, simulationEnglish=request.simulationEnglish,
+                ))
+                observation_text = f"The simulation measured {metric.value}; review the self-rating separately from leadership."
+                if level is not None and level[0] == "C2" and metric.value == "B2":
+                    observation_text = (
+                        "The simulation measured B2, and nothing in the interview points higher; "
+                        "the C2 self-rating is not supported."
+                    )
+                observation = Observation(text=observation_text, evidence=[], metric=metric)
+                status = item.status
+            else:
+                # A transcript quote or another metric is not a measured English level.
+                observation = original.observation
+                status = original.status if original.status in _AFTER_STATUSES else "unverified"
         elif interview_quote := next(
             (e for e in observation_evidence if e.source == "interview_turn"), None,
         ):
