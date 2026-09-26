@@ -1,6 +1,6 @@
 'use client';
 
-import { VideoCameraIcon } from '@heroicons/react/24/outline';
+import { CheckCircleIcon, VideoCameraIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { errorText } from '../../lib/api/errors';
@@ -55,7 +55,7 @@ export function CandidateCall({ slotId }: { slotId: string }) {
   }
   if (!slot.data) return <p className="text-sm text-text-secondary">Loading…</p>;
   const data = slot.data;
-  const when = `${formatDay(data.startsAt, 'en')}, ${formatTime(data.startsAt, 'en')}–${formatTime(data.endsAt, 'en')} (Almaty time)`;
+  const when = `${formatDay(data.startsAt, 'en')}, ${formatTime(data.startsAt, 'en')}–${formatTime(data.endsAt, 'en')} (UTC+5)`;
   const started = now >= Date.parse(data.startsAt);
   const notice = started
     ? `The interviewer will be with you in a moment. They have ${countdown(Date.parse(data.waitUntil) - now)} left to join.`
@@ -74,6 +74,32 @@ export function CandidateCall({ slotId }: { slotId: string }) {
         <Link href="/candidate/interview" className="w-fit text-sm font-semibold text-brand-ink hover:underline">
           Book another day
         </Link>
+      </section>
+    );
+  }
+
+  // Both came, and the candidate has left the call — or it is simply over: the interview has taken place.
+  const held = (room.state === 'ended' && Boolean(data.interviewerJoinedAt)) || data.status === 'done';
+  if (held) {
+    return (
+      <section className="flex flex-col items-center gap-3 rounded-panel border border-border-subtle bg-bg-surface p-8 text-center">
+        <CheckCircleIcon aria-hidden="true" className="h-8 w-8 text-brand-ink" />
+        <h2 className="text-xl font-bold text-text-primary">Your interview is complete — well done</h2>
+        <p className="max-w-lg text-sm text-text-secondary">
+          Thank you for talking with us. The admissions team now reads everything you have shared — your application,
+          the simulation, your presentation and this conversation — together. People make every decision.
+        </p>
+        <p className="max-w-lg text-sm text-text-secondary">
+          inVision U will write to you about the next step. There is nothing else you need to do.
+        </p>
+        <Link href="/candidate" className="mt-2 text-sm font-semibold text-brand-ink hover:underline">
+          Back to your home
+        </Link>
+        {data.status === 'live' ? (
+          <button type="button" onClick={() => void enter()} className="text-[0.8rem] text-text-muted underline-offset-2 hover:underline">
+            Left by mistake? Join again
+          </button>
+        ) : null}
       </section>
     );
   }
