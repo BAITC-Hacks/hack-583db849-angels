@@ -132,7 +132,11 @@ afterEach(() => {
 });
 
 describe('the interviewer’s schedule', () => {
-  it('adds a time typed in Almaty time, as the demo’s interviewer', async () => {
+  // Monday 28 September, 09:00 in Almaty.
+  const MONDAY_9AM = new Date('2026-09-28T04:00:00Z');
+
+  it('adds a time by clicking an empty half hour on the week, in Almaty time', async () => {
+    vi.useFakeTimers({ now: MONDAY_9AM, shouldAdvanceTime: true });
     const calls = mockApi({
       'GET /api/v1/interview-slots': () => json({ items: [] }),
       'POST /api/v1/interview-slots': () => json(slotIn(60 * 24, { status: 'open', candidateId: null, candidateLabel: null }), 201),
@@ -142,9 +146,9 @@ describe('the interviewer’s schedule', () => {
         <InterviewerSchedule />
       </DemoRoleProvider>,
     );
-    fireEvent.change(await screen.findByLabelText('Date'), { target: { value: '2026-09-29' } });
-    fireEvent.change(screen.getByLabelText('Start'), { target: { value: '10:00' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Add' }));
+    // Earlier today has passed: it cannot be offered.
+    expect(screen.queryByRole('button', { name: /^Add Mon.*28.*, 08:00$/ })).toBeNull();
+    fireEvent.click(await screen.findByRole('button', { name: /^Add Tue.*29.*, 10:00$/ }));
 
     await waitFor(() => expect(posts(calls, '/api/v1/interview-slots')).toHaveLength(1));
     const post = posts(calls, '/api/v1/interview-slots')[0];
@@ -153,7 +157,23 @@ describe('the interviewer’s schedule', () => {
     expect(post.headers.get('Idempotency-Key')).toBeTruthy();
   });
 
+  it('moves between weeks', async () => {
+    vi.useFakeTimers({ now: MONDAY_9AM, shouldAdvanceTime: true });
+    mockApi({ 'GET /api/v1/interview-slots': () => json({ items: [] }) });
+    withQuery(
+      <DemoRoleProvider role="interviewer">
+        <InterviewerSchedule />
+      </DemoRoleProvider>,
+    );
+    expect(await screen.findByText(/^Sep 28 – Oct 4, 2026$/)).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Next week' }));
+    expect(screen.getByText(/^Oct 5 – Oct 11, 2026$/)).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'This week' }));
+    expect(screen.getByText(/^Sep 28 – Oct 4, 2026$/)).toBeTruthy();
+  });
+
   it('opens the call ten minutes before the start, not earlier, and says why a time was refused', async () => {
+    vi.useFakeTimers({ now: MONDAY_9AM, shouldAdvanceTime: true });
     mockApi({
       'GET /api/v1/interview-slots': () =>
         json({ items: [slotIn(5, { slotId: 'slot-soon' }), slotIn(120, { slotId: 'slot-later' }), slotIn(180, { slotId: 'slot-free', status: 'open', candidateId: null, candidateLabel: null })] }),
@@ -168,10 +188,14 @@ describe('the interviewer’s schedule', () => {
     expect(join.getAttribute('href')).toBe('/interviewer/schedule/call/slot-soon');
     expect(screen.getAllByRole('link', { name: 'Join the call' })).toHaveLength(1);
     expect(screen.getByText(/^Opens at/)).toBeTruthy();
-    // Only a time nobody booked can be removed.
-    expect(screen.getAllByRole('button', { name: 'Remove' })).toHaveLength(1);
 
-    fireEvent.click(screen.getByRole('button', { name: 'Add' }));
+    // Only a time nobody booked can be removed.
+    fireEvent.click(screen.getByRole('button', { name: /, Open, Free$/ }));
+    expect(screen.getByRole('button', { name: 'Remove' })).toBeTruthy();
+    fireEvent.click(screen.getAllByRole('button', { name: /, Booked, Candidate A$/ })[0]);
+    expect(screen.queryByRole('button', { name: 'Remove' })).toBeNull();
+
+    fireEvent.click(screen.getByRole('button', { name: /^Add Mon.*28.*, 18:00$/ }));
     expect(await screen.findByText('You already have a slot at that time.')).toBeTruthy();
   });
 
@@ -182,14 +206,14 @@ describe('the interviewer’s schedule', () => {
         <InterviewerSchedule />
       </DemoRoleProvider>,
     );
-    expect(await screen.findByText('Candidate A')).toBeTruthy();
-    expect(screen.queryByRole('button', { name: 'Add' })).toBeNull();
+    expect((await screen.findAllByText(/Candidate A/)).length).toBeGreaterThan(0);
+    expect(screen.queryAllByRole('button', { name: /^Add / })).toHaveLength(0);
     expect(screen.queryByRole('link', { name: 'Join the call' })).toBeNull();
   });
 });
 
 describe('the candidate booking', () => {
-  it('chooses a time, then books it, and then shows it', async () => {
+  it('chooses a day on the calendar, then a time, books it, and then shows it', async () => {
     let booked = false;
     const open = slotIn(60 * 24, { status: 'open', candidateId: null, candidateLabel: null });
     const calls = mockApi({
@@ -202,7 +226,10 @@ describe('the candidate booking', () => {
     });
     withQuery(<CandidateInterview />);
 
-    const time = await screen.findByRole('button', { name: /^\d\d:\d\d–\d\d:\d\d$/ });
+    // The first day with a time is chosen for the candidate, and marked on the calendar.
+    const day = await screen.findByRole('button', { name: /, 1 time$/ });
+    expect(day.getAttribute('aria-pressed')).toBe('true');
+    const time = screen.getByRole('button', { name: /^\d\d:\d\d–\d\d:\d\d$/ });
     expect(posts(calls, slotPath)).toHaveLength(0);
     fireEvent.click(time);
     expect(time.getAttribute('aria-pressed')).toBe('true');
@@ -226,10 +253,13 @@ describe('the candidate booking', () => {
     withQuery(<CandidateInterview />);
 
     expect(await screen.findByText('Your last interview time closed')).toBeTruthy();
-    const [sameDayTime, nextDayTime] = screen.getAllByRole('button', { name: /^\d\d:\d\d–\d\d:\d\d$/ }) as HTMLButtonElement[];
-    expect(sameDayTime.disabled).toBe(true);
-    expect(nextDayTime.disabled).toBe(false);
-    expect(screen.getByText(/not available after the missed time/)).toBeTruthy();
+    const blocked = screen.getByRole('button', { name: /September 28, not available after the missed time/ }) as HTMLButtonElement;
+    expect(blocked.disabled).toBe(true);
+    const next = screen.getByRole('button', { name: /September 29, 1 time/ });
+    expect(next.getAttribute('aria-pressed')).toBe('true');
+    const [time] = screen.getAllByRole('button', { name: /^\d\d:\d\d–\d\d:\d\d$/ }) as HTMLButtonElement[];
+    expect(time.textContent).toBe('10:00–10:30');
+    expect(time.disabled).toBe(false);
   });
 
   it('is the fifth step on the candidate home', async () => {

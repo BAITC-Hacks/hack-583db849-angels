@@ -48,3 +48,57 @@ export function byDay<T extends { startsAt: string }>(slots: T[]): { day: string
   }
   return [...days.entries()].map(([day, items]) => ({ day, slots: items }));
 }
+
+// Calendar arithmetic. A day is its `YYYY-MM-DD` key in Almaty; adding days to
+// a key is plain date arithmetic, so it runs in UTC where no clock changes.
+const DAY_MS = 24 * 60 * 60 * 1000;
+const OFFSET_MINUTES = 5 * 60;
+
+export function addDays(day: string, days: number): string {
+  return new Date(Date.parse(`${day}T00:00:00Z`) + days * DAY_MS).toISOString().slice(0, 10);
+}
+
+/** 0 for Monday … 6 for Sunday: weeks here start on Monday, as in Kazakhstan. */
+export function weekdayOf(day: string): number {
+  return (new Date(`${day}T00:00:00Z`).getUTCDay() + 6) % 7;
+}
+
+export function weekStart(day: string): string {
+  return addDays(day, -weekdayOf(day));
+}
+
+/** The first of the month a day is in. */
+export function monthStart(day: string): string {
+  return `${day.slice(0, 7)}-01`;
+}
+
+export function addMonths(month: string, months: number): string {
+  const date = new Date(`${month}T00:00:00Z`);
+  date.setUTCMonth(date.getUTCMonth() + months);
+  return date.toISOString().slice(0, 10);
+}
+
+/** Every day shown on a month page: whole weeks, Monday first, including the edges of the months around it. */
+export function monthGrid(month: string): string[] {
+  const first = weekStart(month);
+  const next = addMonths(month, 1);
+  const days: string[] = [];
+  for (let day = first; day < next || weekdayOf(day) !== 0; day = addDays(day, 1)) days.push(day);
+  return days;
+}
+
+/** Minutes since midnight in Almaty. */
+export function minutesInDay(iso: string): number {
+  const minutes = Math.floor(Date.parse(iso) / 60_000) + OFFSET_MINUTES;
+  return ((minutes % 1440) + 1440) % 1440;
+}
+
+/** `HH:MM` for minutes since midnight. */
+export function clockOf(minutes: number): string {
+  return `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`;
+}
+
+/** A calendar day's name, from its key; noon keeps it on the same date in any zone. */
+export function formatDayKey(day: string, locale: string, options: Intl.DateTimeFormatOptions = { weekday: 'long', day: 'numeric', month: 'long' }): string {
+  return new Intl.DateTimeFormat(locale, { timeZone: 'UTC', ...options }).format(new Date(`${day}T12:00:00Z`));
+}
