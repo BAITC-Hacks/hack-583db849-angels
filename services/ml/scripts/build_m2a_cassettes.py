@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 import asyncio
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -30,6 +31,7 @@ from services.ml.app.modules.actor import ScenarioActor
 from services.ml.app.modules.director import ScenarioDirector
 from services.ml.app.modules.matcher import MatchResult
 from services.ml.app.modules.speech import SpeechService
+from services.ml.app.providers.deepgram import DeepgramProvider
 from services.ml.app.modules.transcription import TurnTranscriptionService
 from services.ml.app.scenarios import ROOT_SCENARIOS, ScenarioRepository
 from services.ml.app.schemas.contracts import (
@@ -76,11 +78,17 @@ class SyntheticModelProvider:
 
 
 class SyntheticMediaProvider:
-    def __init__(self, transcripts: dict[str, tuple[str, float]]) -> None:
+    """Transcription from the seed's own text; speech as silence, or as the real voice with --real-speech."""
+
+    def __init__(self, transcripts: dict[str, tuple[str, float]], speech_provider: DeepgramProvider | None = None) -> None:
         self._transcripts = transcripts
         self._speech = (AUDIO / "silence.mp3").read_bytes()
+        self._speech_provider = speech_provider
 
     async def execute(self, request: MediaProviderRequest) -> MediaProviderResponse:
+        if request.operation == "speech" and self._speech_provider is not None:
+            # The character's lines are the seed's own text: a real voice for them costs cents, once.
+            return await self._speech_provider.execute(request)
         if request.operation == "speech":
             return MediaProviderResponse(
                 content=self._speech,
@@ -125,11 +133,17 @@ class SyntheticMediaProvider:
         )
 
 
-async def build() -> None:
+async def build(real_speech: bool = False) -> None:
     sessions = [_load_session(name) for name in ("a", "b", "c")]
     transcripts = _transcript_inventory(sessions)
     configuration = load_models_configuration()
-    media_provider = SyntheticMediaProvider(transcripts)
+    speech_provider = None
+    if real_speech:
+        key = os.environ.get("DEEPGRAM_API_KEY")
+        if not key:
+            raise RuntimeError("--real-speech needs DEEPGRAM_API_KEY")
+        speech_provider = DeepgramProvider(key)
+    media_provider = SyntheticMediaProvider(transcripts, speech_provider)
     media_gateway = MediaGateway(
         mode="record",
         configuration=configuration,
@@ -237,4 +251,6 @@ def _sha256(content: bytes) -> str:
 
 
 if __name__ == "__main__":
-    asyncio.run(build())
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--real-speech", action="store_true", help="voice the character's lines with Deepgram (needs DEEPGRAM_API_KEY)")
+    asyncio.run(build(parser.parse_args().real_speech))
