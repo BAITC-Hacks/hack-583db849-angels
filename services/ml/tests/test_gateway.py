@@ -103,7 +103,7 @@ def test_live_routes_through_the_configured_provider() -> None:
     assert result.replayed is False
     assert result.cached is False
     assert provider.requests[0].model == "gpt-6-sol"
-    assert provider.requests[0].max_tokens == 1800
+    assert provider.requests[0].max_tokens == 4000
 
 
 def test_live_uses_the_fallback_after_a_safe_provider_failure() -> None:
@@ -159,7 +159,7 @@ def test_invalid_output_is_retried_once_and_then_succeeds(caplog) -> None:
     assert result.input_tokens == 24
     assert result.output_tokens == 6
     assert len(provider.requests) == 2
-    assert [item.max_tokens for item in provider.requests] == [1800, 1800]
+    assert [item.max_tokens for item in provider.requests] == [4000, 4000]
     assert "must-not-be-logged" not in caplog.text
     assert "attempt=1 outcome=invalid" in caplog.text
     assert "attempt=2 outcome=valid" in caplog.text

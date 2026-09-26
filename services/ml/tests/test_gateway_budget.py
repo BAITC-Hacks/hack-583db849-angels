@@ -128,10 +128,13 @@ def test_global_cap_reservation_blocks_concurrent_overspend(tmp_path: Path) -> N
     async def scenario() -> None:
         gate = asyncio.Event()
         provider = Provider(gate)
-        service, _ = gateway(tmp_path, provider, cap="0.02")
+        # One brief's reservation (max_tokens at the output price) fits under the cap; two do not.
+        service, _ = gateway(tmp_path, provider, cap="0.05")
         first = asyncio.create_task(service.execute(request()))
-        while provider.calls == 0:
+        while provider.calls == 0 and not first.done():
             await asyncio.sleep(0)
+        # Had the first reservation been refused, the loop above would end here instead of hanging.
+        assert provider.calls == 1, first.exception() if first.done() else None
 
         with pytest.raises(GatewayBudgetError, match="global"):
             await service.execute(request())
