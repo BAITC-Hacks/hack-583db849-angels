@@ -1,14 +1,25 @@
 import type { ActiveCycle, ApplicationDraft, DraftAnswers, FormVersion } from '@invision/stand-client';
 
 /**
- * The approved synthetic seed, exactly as docs/slices/s2-versioned-application-
- * draft-specification.md section 9 and 17 define it: the same cycle and form
- * version identifiers, the same four optional factual questions, and nothing
- * else. No motivation or competency prompt belongs in S2 — those are S3 and S4.
+ * The synthetic form: the four optional factual questions from
+ * docs/slices/s2-versioned-application-draft-specification.md, then the
+ * answers in the applicant's own words that inVision's real form asks for —
+ * why inVision U, leading others, a setback, a community problem — and their
+ * English. The AI layer's brief is built from those (`fieldId` as in
+ * `seed/candidates/<letter>/snapshot.json`); the factual ones and the profile never
+ * reach a model.
  *
  * Everything here lives in memory for the lifetime of the tab. Applicant
  * answers never reach browser storage.
  */
+/** The answers in the applicant's own words: required at submission, and what the brief reads. */
+export const CONTENT_QUESTIONS = [
+  { id: 'motivation', label: 'Why inVision U?' },
+  { id: 'leadership_example', label: 'Describe a time you led others.' },
+  { id: 'setback', label: 'Tell us about something that did not go as planned.' },
+  { id: 'community', label: 'What problem in your community would you like to solve?' },
+] as const;
+
 export const CYCLE_ID = '11111111-1111-4111-8111-111111111111';
 export const FORM_VERSION_ID = '22222222-2222-4222-8222-222222222222';
 
@@ -16,7 +27,7 @@ export const formVersion: FormVersion = {
   id: FORM_VERSION_ID,
   version: 1,
   title: 'Synthetic applicant profile',
-  description: 'Synthetic, non-scoring factual demo form; not official admissions methodology.',
+  description: 'Synthetic demo form: a few facts, four short answers in English, and your English level. Not official admissions methodology.',
   publishedAt: '2026-09-17T12:00:00Z',
   questions: [
     {
@@ -53,6 +64,45 @@ export const formVersion: FormVersion = {
       type: 'TEXT',
       required: false,
       constraints: { maxLength: 160 },
+    },
+    ...CONTENT_QUESTIONS.map(({ id, label }) => ({
+      id,
+      label,
+      helpText: 'In English, in your own words. A few sentences are enough; grammar is not what is looked at.',
+      type: 'TEXTAREA' as const,
+      required: true,
+      constraints: { maxLength: 1500 },
+    })),
+    {
+      id: 'english_self',
+      label: 'How would you rate your English?',
+      type: 'SINGLE_SELECT',
+      required: true,
+      options: [
+        { value: 'A2', label: 'A2 — elementary' },
+        { value: 'B1', label: 'B1 — intermediate' },
+        { value: 'B2', label: 'B2 — upper intermediate' },
+        { value: 'C1', label: 'C1 — advanced' },
+        { value: 'C2', label: 'C2 — proficient' },
+      ],
+    },
+    {
+      id: 'english_certificate',
+      label: 'English certificate, if you have one',
+      type: 'SINGLE_SELECT',
+      required: false,
+      options: [
+        { value: 'IELTS', label: 'IELTS' },
+        { value: 'TOEFL_iBT', label: 'TOEFL iBT' },
+        { value: 'Duolingo', label: 'Duolingo English Test' },
+      ],
+    },
+    {
+      id: 'english_certificate_score',
+      label: 'Certificate score',
+      type: 'TEXT',
+      required: false,
+      constraints: { maxLength: 20 },
     },
   ],
 };

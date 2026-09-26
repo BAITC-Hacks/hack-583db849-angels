@@ -5,6 +5,8 @@ import {
   DEMO_PASSPHRASE,
   MIDWAY_APPLICANT_EMAIL,
   MIDWAY_APPLICANT_ID,
+  READY_APPLICANT_EMAIL,
+  READY_APPLICANT_ID,
 } from './accounts';
 
 /**
@@ -69,7 +71,7 @@ export function writeSessionMarker(userId: string): void {
   // Only the seeded accounts are restorable. Anyone registered inside the tab
   // exists only there, and a marker pointing at them would be a promise the
   // mock cannot keep after a reload.
-  if (userId !== DEMO_APPLICANT_ID && userId !== MIDWAY_APPLICANT_ID) return;
+  if (userId !== DEMO_APPLICANT_ID && userId !== MIDWAY_APPLICANT_ID && userId !== READY_APPLICANT_ID) return;
   try {
     localStorage.setItem(SESSION_MARKER_KEY, userId);
   } catch {
@@ -128,6 +130,8 @@ export {
   DEMO_PASSPHRASE,
   MIDWAY_APPLICANT_EMAIL,
   MIDWAY_APPLICANT_ID,
+  READY_APPLICANT_EMAIL,
+  READY_APPLICANT_ID,
 } from './accounts';
 
 function seedDemoUser() {
@@ -154,6 +158,19 @@ function seedDemoUser() {
     createdAt: new Date().toISOString(),
   };
   users.set(midway.email, midway);
+
+  // Everything filled in and the test done: one click from sending the application to inVision U.
+  const ready: MockUser = {
+    id: READY_APPLICANT_ID,
+    email: READY_APPLICANT_EMAIL,
+    iin: '222222222222',
+    fullName: 'Ready Applicant',
+    birthYear: 2002,
+    password: DEMO_PASSPHRASE,
+    role: 'APPLICANT',
+    createdAt: new Date().toISOString(),
+  };
+  users.set(ready.email, ready);
 }
 
 
