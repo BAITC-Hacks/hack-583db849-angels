@@ -11,7 +11,7 @@
     "wants": "To stop spending evenings on something nobody uses"
   },
   "hiddenMotive": "She thinks the confusing screens are her fault and would rather quit than hear it said.",
-  "voice": "aura-2-helena-en",
+  "voice": "aura-luna-en",
   "matchThreshold": 0.45,
   "expectedMinutes": 7,
   "maxCandidateTurns": 8,

@@ -11,7 +11,7 @@
     "wants": "To delete the post and move on quietly"
   },
   "hiddenMotive": "He copied the date from last year's post without checking, and he is afraid of losing his place in the club.",
-  "voice": "aura-2-hermes-en",
+  "voice": "aura-arcas-en",
   "matchThreshold": 0.45,
   "expectedMinutes": 7,
   "maxCandidateTurns": 8,
