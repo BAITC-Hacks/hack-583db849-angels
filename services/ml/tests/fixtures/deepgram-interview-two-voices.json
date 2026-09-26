@@ -1,0 +1,864 @@
+{
+ "metadata": {
+  "duration": 68.41825
+ },
+ "results": {
+  "utterances": [
+   {
+    "speaker": 0,
+    "transcript": "Thanks for coming in. Tell me about the conflict in the simulation. What did you do first?",
+    "start": 0.0,
+    "end": 4.8,
+    "confidence": 0.9916705,
+    "words": [
+     {
+      "speaker": 0,
+      "confidence": 0.9941406
+     },
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 0.9995117
+     },
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 0.8671875
+     },
+     {
+      "speaker": 0,
+      "confidence": 0.99902344
+     },
+     {
+      "speaker": 0,
+      "confidence": 0.99853516
+     },
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     }
+    ]
+   },
+   {
+    "speaker": 1,
+    "transcript": "I made a plan straight away. Owners, a deadline, and a full run on Thursday. When a demo is closed, speed matters.",
+    "start": 5.92,
+    "end": 12.08,
+    "confidence": 0.96381545,
+    "words": [
+     {
+      "speaker": 1,
+      "confidence": 0.99902344
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 0.98828125
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 0.6586914
+     },
+     {
+      "speaker": 1,
+      "confidence": 0.9763997
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 0.8413086
+     },
+     {
+      "speaker": 1,
+      "confidence": 0.99902344
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 0.91259766
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 0.99902344
+     },
+     {
+      "speaker": 1,
+      "confidence": 0.83154297
+     },
+     {
+      "speaker": 1,
+      "confidence": 0.9980469
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     }
+    ]
+   },
+   {
+    "speaker": 0,
+    "transcript": "You would agree that finishing on time matters most. Right?",
+    "start": 13.375,
+    "end": 16.335,
+    "confidence": 0.9823486,
+    "words": [
+     {
+      "speaker": 0,
+      "confidence": 0.99902344
+     },
+     {
+      "speaker": 0,
+      "confidence": 0.9980469
+     },
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 0.826416
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     }
+    ]
+   },
+   {
+    "speaker": 1,
+    "transcript": "Yes.",
+    "start": 17.295,
+    "end": 18.095,
+    "confidence": 0.9926758,
+    "words": [
+     {
+      "speaker": 1,
+      "confidence": 0.9926758
+     }
+    ]
+   },
+   {
+    "speaker": 1,
+    "transcript": "Finishing on time is what matters for a demo.",
+    "start": 18.335,
+    "end": 20.895,
+    "confidence": 0.9998915,
+    "words": [
+     {
+      "speaker": 1,
+      "confidence": 0.9995117
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 0.9995117
+     }
+    ]
+   },
+   {
+    "speaker": 0,
+    "transcript": "Why did you keep Dana's version?",
+    "start": 21.935,
+    "end": 23.375,
+    "confidence": 0.9992676,
+    "words": [
+     {
+      "speaker": 0,
+      "confidence": 0.99902344
+     },
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 0.9980469
+     },
+     {
+      "speaker": 0,
+      "confidence": 0.99853516
+     }
+    ]
+   },
+   {
+    "speaker": 1,
+    "transcript": "It works, and that is what matters for the demo. Timur can bring his changes in later.",
+    "start": 24.83,
+    "end": 29.869999,
+    "confidence": 0.96003276,
+    "words": [
+     {
+      "speaker": 1,
+      "confidence": 0.9951172
+     },
+     {
+      "speaker": 1,
+      "confidence": 0.89941406
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 0.9975586
+     },
+     {
+      "speaker": 1,
+      "confidence": 0.9199219
+     },
+     {
+      "speaker": 1,
+      "confidence": 0.99121094
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 0.71777344
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 0.99316406
+     },
+     {
+      "speaker": 1,
+      "confidence": 0.8063965
+     }
+    ]
+   },
+   {
+    "speaker": 0,
+    "transcript": "What do your parents do for a living?",
+    "start": 30.83,
+    "end": 32.75,
+    "confidence": 0.99749756,
+    "words": [
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 0.9980469
+     },
+     {
+      "speaker": 0,
+      "confidence": 0.9980469
+     },
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 0.99902344
+     },
+     {
+      "speaker": 0,
+      "confidence": 0.9892578
+     },
+     {
+      "speaker": 0,
+      "confidence": 0.99609375
+     },
+     {
+      "speaker": 0,
+      "confidence": 0.9995117
+     }
+    ]
+   },
+   {
+    "speaker": 1,
+    "transcript": "Sorry. Is that part of the interview?",
+    "start": 33.63,
+    "end": 35.79,
+    "confidence": 0.99166435,
+    "words": [
+     {
+      "speaker": 1,
+      "confidence": 0.9416504
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     }
+    ]
+   },
+   {
+    "speaker": 0,
+    "transcript": "Fair point. Let me move on. Tell me about a time doing the right thing cost you something.",
+    "start": 37.235,
+    "end": 41.954998,
+    "confidence": 0.93962944,
+    "words": [
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 0.99902344
+     },
+     {
+      "speaker": 0,
+      "confidence": 0.4165039
+     },
+     {
+      "speaker": 0,
+      "confidence": 0.9970703
+     },
+     {
+      "speaker": 0,
+      "confidence": 0.9921875
+     },
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 0.99902344
+     },
+     {
+      "speaker": 0,
+      "confidence": 0.5185547
+     },
+     {
+      "speaker": 0,
+      "confidence": 0.99902344
+     },
+     {
+      "speaker": 0,
+      "confidence": 0.99194336
+     }
+    ]
+   },
+   {
+    "speaker": 1,
+    "transcript": "I once reported a classmate who copied homework. I felt bad, but rules are rules, so I told the teacher.",
+    "start": 43.074997,
+    "end": 49.074997,
+    "confidence": 0.972937,
+    "words": [
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 0.99902344
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 0.66748047
+     },
+     {
+      "speaker": 1,
+      "confidence": 0.9975586
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 0.9416504
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 0.8564453
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 0.99658203
+     }
+    ]
+   },
+   {
+    "speaker": 0,
+    "transcript": "The Thursday run fails. What happens next?",
+    "start": 50.63,
+    "end": 53.27,
+    "confidence": 0.93143135,
+    "words": [
+     {
+      "speaker": 0,
+      "confidence": 0.7246094
+     },
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 0.9941406
+     },
+     {
+      "speaker": 0,
+      "confidence": 0.8022461
+     },
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 0.99902344
+     }
+    ]
+   },
+   {
+    "speaker": 1,
+    "transcript": "We cut scope and move on. The analytics screen can wait.",
+    "start": 54.31,
+    "end": 57.83,
+    "confidence": 0.99289775,
+    "words": [
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 0.9970703
+     },
+     {
+      "speaker": 1,
+      "confidence": 0.9970703
+     },
+     {
+      "speaker": 1,
+      "confidence": 0.99902344
+     },
+     {
+      "speaker": 1,
+      "confidence": 0.99902344
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 0.9301758
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 0.9995117
+     }
+    ]
+   },
+   {
+    "speaker": 0,
+    "transcript": "What could go wrong with the new review rule?",
+    "start": 59.29325,
+    "end": 61.45325,
+    "confidence": 0.9446343,
+    "words": [
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 0.99121094
+     },
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 0,
+      "confidence": 0.66308594
+     },
+     {
+      "speaker": 0,
+      "confidence": 0.95703125
+     },
+     {
+      "speaker": 0,
+      "confidence": 0.9941406
+     },
+     {
+      "speaker": 0,
+      "confidence": 0.89624023
+     }
+    ]
+   },
+   {
+    "speaker": 1,
+    "transcript": "Word just gets slower. I would add a twenty four hour limit for reviews so nobody is blocked.",
+    "start": 62.493248,
+    "end": 67.05325,
+    "confidence": 0.9534776,
+    "words": [
+     {
+      "speaker": 1,
+      "confidence": 0.8798828
+     },
+     {
+      "speaker": 1,
+      "confidence": 0.8125
+     },
+     {
+      "speaker": 1,
+      "confidence": 0.83447266
+     },
+     {
+      "speaker": 1,
+      "confidence": 0.9941406
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 0.99902344
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 0.91015625
+     },
+     {
+      "speaker": 1,
+      "confidence": 0.8461914
+     },
+     {
+      "speaker": 1,
+      "confidence": 1.0
+     },
+     {
+      "speaker": 1,
+      "confidence": 0.88720703
+     },
+     {
+      "speaker": 1,
+      "confidence": 0.99902344
+     }
+    ]
+   }
+  ]
+ }
+}
