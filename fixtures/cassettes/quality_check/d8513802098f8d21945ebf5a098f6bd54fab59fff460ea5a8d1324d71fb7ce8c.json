@@ -1,0 +1,12 @@
+{
+  "input_tokens": 1262,
+  "model": "gpt-6-luna",
+  "output_tokens": 822,
+  "provider": "openai",
+  "recorded_at": "2026-09-26T13:17:53.716295Z",
+  "request_hash": "d8513802098f8d21945ebf5a098f6bd54fab59fff460ea5a8d1324d71fb7ce8c",
+  "request_id": "resp_0b60ce1cfb6b52a9006ab7c5fa495c87d1ab204c3b4089abc9",
+  "response": "{\"signals\":[{\"kind\":\"coverage_gap\",\"message\":\"The interview did not meaningfully explore Responsible Innovation, Insightful Vision, Values-Driven Leadership, or Entrepreneurial Execution.\",\"recommendation\":\"Add follow-up questions that probe risks and safeguards for proposed changes, links between context and longer-term goals, values and ethical boundaries in a difficult choice, and how actions are prioritized, assigned, monitored, and reviewed.\",\"competencies\":[\"R\",\"I\",\"V\",\"E\"],\"evidence\":[]}]}",
+  "task": "quality_check",
+  "version": 1
+}

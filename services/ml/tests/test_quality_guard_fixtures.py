@@ -32,17 +32,19 @@ def replay_gateway() -> ModelGateway:
     )
 
 
-def test_quality_cassettes_are_synthetic_and_contain_no_input_transcript() -> None:
+def test_quality_cassettes_contain_no_input_transcript_or_identity() -> None:
+    """Three authored cassettes plant the M5 cases; the rest are the demo's recorded answers."""
     paths = list((CASSETTES / "quality_check").glob("*.json"))
-    assert len(paths) == 3
+    synthetic = 0
     for path in paths:
         envelope = CassetteEnvelope.model_validate_json(path.read_text(encoding="utf-8"))
         assert envelope.request_hash == path.stem
-        assert envelope.request_id == "synthetic-m5-quality"
+        synthetic += envelope.request_id == "synthetic-m5-quality"
         content = path.read_text(encoding="utf-8")
         assert "candidateId" not in content
         assert "Thanks for coming in" not in content
         assert "interviewerRef" not in content
+    assert synthetic == 3
 
 
 def test_planted_interview_replays_with_grounded_questions_offline() -> None:

@@ -1,0 +1,12 @@
+{
+  "input_tokens": 637,
+  "model": "gpt-6-luna",
+  "output_tokens": 139,
+  "provider": "openai",
+  "recorded_at": "2026-09-26T13:17:44.677323Z",
+  "request_hash": "138e5784a6bf8685decd47a935d27f215b779552b488eac44eca190cea4c1a38",
+  "request_id": "resp_03358fb13e9b215c006ab7c5f738b087d1a31ff6cd58058d24",
+  "response": "{\"signals\":[{\"competency\":\"V\",\"message\":\"Values-Driven Leadership scores run 1.5 above the panel across this interviewer's 4 interviews in the period (3.5 against 2.0).\",\"recommendation\":\"Compare recent scores with the rubric and another interviewer to align scoring.\"}]}",
+  "task": "quality_check",
+  "version": 1
+}

@@ -95,7 +95,7 @@ describe('the panel on the API', () => {
     expect(screen.queryByText(/Preview/)).toBeNull();
   });
 
-  it('checks an interviewer’s scale over this month, and says when there is too little history', async () => {
+  it('checks an interviewer’s scale over the last 30 days, and says when there is too little history', async () => {
     let refuse = true;
     const calls = mockApi({
       'GET /api/v1/quality-checks': () => json({ items: [] }),
@@ -113,9 +113,10 @@ describe('the panel on the API', () => {
     expect(await screen.findByText('Scale drift')).toBeTruthy();
 
     const posts = calls.filter((call) => call.method === 'POST');
-    const now = new Date();
-    const from = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString().slice(0, 10);
-    expect(JSON.parse(posts[0].body as string)).toMatchObject({ interviewerRef: 'synthetic-interviewer-a', from });
+    const day = 24 * 60 * 60 * 1000;
+    const from = new Date(Date.now() - 30 * day).toISOString().slice(0, 10);
+    const to = new Date(Date.now() + day).toISOString().slice(0, 10);
+    expect(JSON.parse(posts[0].body as string)).toMatchObject({ interviewerRef: 'synthetic-interviewer-a', from, to });
     expect(posts[1].headers.get('Idempotency-Key')).toBe(posts[0].headers.get('Idempotency-Key'));
   });
 

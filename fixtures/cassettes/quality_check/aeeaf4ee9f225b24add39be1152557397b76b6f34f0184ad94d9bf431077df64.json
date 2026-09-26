@@ -1,0 +1,12 @@
+{
+  "input_tokens": 1379,
+  "model": "gpt-6-luna",
+  "output_tokens": 656,
+  "provider": "openai",
+  "recorded_at": "2026-09-26T13:17:42.758220Z",
+  "request_hash": "aeeaf4ee9f225b24add39be1152557397b76b6f34f0184ad94d9bf431077df64",
+  "request_id": "resp_0a201cffb87b0ba2006ab7c5f1254087d19bcfd9685356b358",
+  "response": "{\"signals\":[]}",
+  "task": "quality_check",
+  "version": 1
+}

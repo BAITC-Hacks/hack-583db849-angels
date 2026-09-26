@@ -58,11 +58,16 @@ function day(iso: string): string {
   return iso.slice(0, 10);
 }
 
-/** This month, as `from` and the first day of the next as `to` — the period a panel usually reviews. */
-function thisMonth(now = new Date()): { from: string; to: string } {
-  const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
-  const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1));
-  return { from: day(start.toISOString()), to: day(end.toISOString()) };
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * The last 30 days, `to` being tomorrow so today's interviews count. A
+ * rolling window, not the calendar month: on the first of a month a month
+ * view would be empty and every scale check would say there is too little
+ * history.
+ */
+function lastThirtyDays(now = new Date()): { from: string; to: string } {
+  return { from: day(new Date(now.getTime() - 30 * DAY_MS).toISOString()), to: day(new Date(now.getTime() + DAY_MS).toISOString()) };
 }
 
 const field = 'rounded-control border border-border-strong bg-bg-surface px-3 py-2 text-sm text-text-primary';
@@ -98,7 +103,7 @@ export function QualityGuardScreen() {
   });
   const latest = latestChecks(checks.data);
   const refs = [...new Set((checks.data ?? []).map((check) => check.interviewerRef).filter((ref): ref is string => Boolean(ref)))];
-  const [period, setPeriod] = useState(thisMonth);
+  const [period, setPeriod] = useState(lastThirtyDays);
   const [interviewerRef, setInterviewerRef] = useState('');
   const ref = interviewerRef || latest.calibration?.interviewerRef || '';
 
