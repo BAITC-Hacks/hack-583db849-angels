@@ -6,9 +6,10 @@ import { useState } from 'react';
 import { candidateByCode, useCandidates } from '../../lib/api/candidates';
 import { errorText } from '../../lib/api/errors';
 import { useBookSlot, useSlots } from '../../lib/slots/queries';
-import { byDay, dayKey, formatDay, formatTime, opensAt } from '../../lib/slots/time';
+import { dayKey, formatDay, formatDayKey, formatTime, monthStart, opensAt } from '../../lib/slots/time';
 import type { InterviewSlot } from '../../lib/slots/types';
 import { useNow } from '../../lib/slots/useNow';
+import { MonthCalendar } from './MonthCalendar';
 
 const action =
   'inline-flex w-fit items-center gap-1.5 rounded-control bg-brand-green px-4 py-2 text-sm font-semibold text-on-brand transition-colors hover:bg-brand-dim disabled:cursor-not-allowed disabled:opacity-50';
@@ -18,9 +19,10 @@ function range(slot: InterviewSlot): string {
 }
 
 /**
- * The candidate books the live interview, in English only. One time at a
- * time; after a missed one, the same day is not offered again — the API says
- * the same, this only shows it before anyone presses a button.
+ * The candidate books the live interview, in English only: a day on the
+ * month calendar, then a time on that day. One time at a time; after a
+ * missed one, the same day is not offered again — the API says the same,
+ * this only shows it before anyone presses a button.
  */
 export function CandidateInterview() {
   const candidates = useCandidates();
@@ -29,6 +31,8 @@ export function CandidateInterview() {
   const book = useBookSlot();
   const now = useNow(5_000);
   const [chosen, setChosen] = useState<string | null>(null);
+  const [pickedDay, setPickedDay] = useState<string | null>(null);
+  const [month, setMonth] = useState<string | null>(null);
 
   if (candidates.isError || slots.isError) {
     return (
@@ -81,8 +85,14 @@ export function CandidateInterview() {
     );
   }
 
-  const days = byDay(open);
-  const chosenSlot = open.find((slot) => slot.slotId === chosen && !blockedDays.has(dayKey(slot.startsAt)));
+  const today = dayKey(new Date(now).toISOString());
+  const counts = new Map<string, number>();
+  for (const slot of open) counts.set(dayKey(slot.startsAt), (counts.get(dayKey(slot.startsAt)) ?? 0) + 1);
+  const availableDays = [...counts.keys()].filter((key) => !blockedDays.has(key) && key >= today).sort();
+  // The first day with a time to choose, until the candidate picks another.
+  const day = pickedDay && availableDays.includes(pickedDay) ? pickedDay : (availableDays[0] ?? null);
+  const dayTimes = day ? open.filter((slot) => dayKey(slot.startsAt) === day) : [];
+  const chosenSlot = dayTimes.find((slot) => slot.slotId === chosen);
   return (
     <div className="flex flex-col gap-5">
       {missed.length > 0 ? (
@@ -97,45 +107,58 @@ export function CandidateInterview() {
         </section>
       ) : null}
 
-      {days.length === 0 ? (
+      {counts.size === 0 ? (
         <p className="rounded-panel border border-dashed border-border-strong p-6 text-sm text-text-secondary">
           No interview times are open yet. New times appear here as soon as the admissions team adds them.
         </p>
       ) : (
-        days.map(({ day, slots: daySlots }) => {
-          const blocked = blockedDays.has(day);
-          return (
-            <section key={day} className="flex flex-col gap-2">
-              <h2 className="text-sm font-semibold text-text-primary">
-                {formatDay(daySlots[0].startsAt, 'en')}
-                {blocked ? <span className="ml-2 font-normal text-text-muted">· not available after the missed time</span> : null}
-              </h2>
-              <ul className="flex flex-wrap gap-2">
-                {daySlots.map((slot) => (
-                  <li key={slot.slotId}>
-                    <button
-                      type="button"
-                      disabled={blocked || book.isPending}
-                      aria-pressed={chosen === slot.slotId}
-                      onClick={() => setChosen(slot.slotId)}
-                      className="rounded-control border border-border-strong px-3 py-2 font-mono text-sm tabular-nums text-text-primary transition-colors hover:border-brand-green hover:bg-bg-elevated disabled:cursor-not-allowed disabled:opacity-40 aria-pressed:border-brand-green aria-pressed:bg-brand-soft"
-                    >
-                      {range(slot)}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          );
-        })
-      )}
-      {chosenSlot ? (
-        <div className="flex flex-wrap items-center gap-3">
-          <button type="button" disabled={book.isPending} onClick={() => book.mutate({ slotId: chosenSlot.slotId, candidateId: me.candidateId })} className={action}>
-            {book.isPending ? 'Booking…' : `Book ${formatDay(chosenSlot.startsAt, 'en')}, ${range(chosenSlot)}`}
-          </button>
+        <div className="grid gap-5 md:grid-cols-[minmax(0,22rem)_1fr]">
+          <MonthCalendar
+            month={month ?? monthStart(day ?? today)}
+            onMonth={setMonth}
+            today={today}
+            counts={counts}
+            blocked={blockedDays}
+            selected={day}
+            onSelect={(key) => {
+              setPickedDay(key);
+              setChosen(null);
+            }}
+          />
+          <section className="flex flex-col gap-3">
+            {day ? (
+              <>
+                <h2 className="text-sm font-semibold text-text-primary">{formatDayKey(day, 'en')}</h2>
+                <p className="text-[0.8rem] text-text-muted">Choose a time. Times are in Almaty time (UTC+5).</p>
+                <ul className="grid grid-cols-[repeat(auto-fill,minmax(8.5rem,1fr))] gap-2">
+                  {dayTimes.map((slot) => (
+                    <li key={slot.slotId}>
+                      <button
+                        type="button"
+                        disabled={book.isPending}
+                        aria-pressed={chosen === slot.slotId}
+                        onClick={() => setChosen(slot.slotId)}
+                        className="w-full rounded-control border border-border-strong px-3 py-2.5 font-mono whitespace-nowrap text-sm tabular-nums text-text-primary transition-colors hover:border-brand-green hover:bg-bg-elevated disabled:cursor-not-allowed disabled:opacity-40 aria-pressed:border-brand-green aria-pressed:bg-brand-soft"
+                      >
+                        {range(slot)}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+                {chosenSlot ? (
+                  <button type="button" disabled={book.isPending} onClick={() => book.mutate({ slotId: chosenSlot.slotId, candidateId: me.candidateId })} className={action}>
+                    {book.isPending ? 'Booking…' : `Book ${formatDay(chosenSlot.startsAt, 'en')}, ${range(chosenSlot)}`}
+                  </button>
+                ) : null}
+              </>
+            ) : (
+              <p className="text-sm text-text-secondary">
+                {blockedDays.size > 0 ? 'The only open times are on the day of the missed time. New days appear here as soon as they are added.' : 'Choose a day with times.'}
+              </p>
+            )}
+          </section>
         </div>
-      ) : null}
+      )}
       <p className="text-[0.8rem] text-text-muted">Almaty time: it is now {formatTime(new Date(now).toISOString(), 'en')} (UTC+5).</p>
       {book.isError ? (
         <p role="alert" className="text-sm font-semibold text-text-primary">
