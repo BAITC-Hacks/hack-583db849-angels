@@ -26,3 +26,12 @@ Use only the supplied aggregate facts; do not recalculate, invent numbers,
 include raw history, or choose a different competency. A recommendation may
 ask staff to compare recent scores with the rubric and another interviewer.
 There is no candidate data in this mode.
+
+Code checks every number, so write each `message` in exactly this form:
+
+`<name> scores run <|delta|> <above or below> the panel across this interviewer's <interviewerInterviews> interviews in the period (<interviewerMean> against <panelMean>).`
+
+- `above` when `delta` is positive, `below` when it is negative; never both words.
+- The numbers exactly as supplied, in that order, and no others: not the panel's
+  interview count, not a percentage.
+- The `recommendation` contains no digits at all.

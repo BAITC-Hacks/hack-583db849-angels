@@ -14,7 +14,7 @@ from ..gateway.config import TaskName
 from ..gateway.errors import GatewayOutputError
 from ..gateway.types import GatewayRequest, GatewayResult
 from ..rubric import DriveRubric, load_drive_rubric
-from ..schemas.contracts import InterviewTurn, QualityCheckRequest, QualitySignal
+from ..schemas.contracts import Competency, Evidence, InterviewTurn, QualityCheckRequest, QualitySignal, SignalKind
 from .model_view import model_interview_turns
 
 
@@ -37,11 +37,24 @@ class QualityPolicy(BaseModel):
     forbiddenOutputWords: list[str] = Field(min_length=1)
 
 
+class ProposedSignal(BaseModel):
+    """One untrusted model suggestion. Every field is required, because
+    OpenAI's strict JSON mode refuses a schema with optional fields; grounding
+    turns the ones it accepts into `QualitySignal`."""
+
+    model_config = ConfigDict(extra="forbid")
+    kind: SignalKind
+    message: str
+    recommendation: str
+    competencies: list[Competency]
+    evidence: list[Evidence]
+
+
 class QuestionProposal(BaseModel):
     """Private schema for untrusted model suggestions, not a wire DTO."""
 
     model_config = ConfigDict(extra="forbid")
-    signals: list[QualitySignal]
+    signals: list[ProposedSignal]
 
 
 class QualityGateway(Protocol):
@@ -130,7 +143,7 @@ class GroundedSignals:
 
 
 def ground_question_signals(
-    proposed: Iterable[QualitySignal],
+    proposed: Iterable[ProposedSignal | QualitySignal],
     turns: Iterable[InterviewTurn],
     policy: QualityPolicy,
 ) -> GroundedSignals:
@@ -154,7 +167,7 @@ def ground_question_signals(
             if not signal.competencies or signal.evidence:
                 dropped += 1
                 continue
-            accepted.append(signal)
+            accepted.append(QualitySignal.model_validate(signal.model_dump()))
             continue
         if signal.competencies or not signal.evidence:
             dropped += 1
@@ -163,5 +176,5 @@ def ground_question_signals(
         if rejected or not evidence:
             dropped += 1
             continue
-        accepted.append(signal.model_copy(update={"evidence": evidence}))
+        accepted.append(QualitySignal.model_validate({**signal.model_dump(), "evidence": [item.model_dump() for item in evidence]}))
     return GroundedSignals(tuple(accepted), submitted, dropped)

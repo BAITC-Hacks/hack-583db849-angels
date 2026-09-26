@@ -4,7 +4,7 @@
   "output_tokens": 120,
   "provider": "openai",
   "recorded_at": "2026-09-26T00:00:00Z",
-  "request_hash": "6dc79fde88a1cf8b66e24821c1639e022d0682515170dcb74a83dd76975fb70d",
+  "request_hash": "416362117bba015683ede0015f3f80b2e1fe8c968add817cfaaa5e7f5f3e5a6e",
   "request_id": "synthetic-m5-quality",
   "response": "{\"signals\":[{\"kind\":\"leading_question\",\"message\":\"The question suggests its own answer.\",\"recommendation\":\"Ask openly: “What mattered most to you in that moment, and why?”\",\"competencies\":[],\"evidence\":[{\"source\":\"interview_turn\",\"sourceId\":\"iturn_03\",\"quote\":\"You would agree that finishing on time matters most, right?\"}]},{\"kind\":\"off_limits_question\",\"message\":\"Family income and background are not assessed and must not be asked about.\",\"recommendation\":\"Remove the question; it cannot inform any D.R.I.V.E. competency.\",\"competencies\":[],\"evidence\":[{\"source\":\"interview_turn\",\"sourceId\":\"iturn_07\",\"quote\":\"What do your parents do for a living?\"}]},{\"kind\":\"coverage_gap\",\"message\":\"No question addressed Values-Driven Leadership or Insightful Vision.\",\"recommendation\":\"Use the brief’s questions for V and I.\",\"competencies\":[\"V\",\"I\"],\"evidence\":[]}]}",
   "task": "quality_check",
