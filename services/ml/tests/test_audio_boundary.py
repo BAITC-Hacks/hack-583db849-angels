@@ -21,7 +21,11 @@ TOKEN = {"X-Internal-Token": "test-internal-token"}
 
 
 class TurnExampleGateway:
+    def __init__(self) -> None:
+        self.requests: list[MediaRequest] = []
+
     async def execute(self, request: MediaRequest) -> MediaGatewayResult:
+        self.requests.append(request)
         expected = json.loads(
             (EXAMPLES / "transcribe-turn.response.json").read_text(encoding="utf-8")
         )
@@ -231,6 +235,90 @@ def test_turn_transcription_uses_the_one_speaker_contract_example(tmp_path: Path
     )
     assert response.status_code == 200
     assert response.json() == expected
+
+
+def test_surprise_transcription_uses_gateway_and_candidate_role(tmp_path: Path) -> None:
+    audio = tmp_path / "surprise" / "answer.ogg"
+    audio.parent.mkdir()
+    audio.write_bytes(b"synthetic-surprise-audio")
+    settings = Settings(
+        ml_internal_token="test-internal-token", uploads_dir=tmp_path,
+        gateway_mode="replay", budget_usd_cap=Decimal("20"), demo_mode=False,
+    )
+    gateway = TurnExampleGateway()
+    response = TestClient(
+        create_app(settings, media_gateway=gateway), raise_server_exceptions=False,
+    ).post(
+        "/internal/v1/transcribe",
+        json={
+            "purpose": "surprise", "audioRef": "surprise/answer.ogg",
+            "language": "en", "speakers": 1,
+        },
+        headers=TOKEN,
+    )
+
+    assert response.status_code == 200
+    assert response.json()["turns"]
+    assert {turn["speaker"] for turn in response.json()["turns"]} == {"candidate"}
+    assert gateway.requests[0].content == b"synthetic-surprise-audio"
+    assert gateway.requests[0].content_type == "audio/ogg"
+    assert gateway.requests[0].parameters == {
+        "language": "en", "speakers": 1, "purpose": "surprise",
+    }
+    assert gateway.requests[0].estimated_units == Decimal("1.5")
+
+
+@pytest.mark.parametrize("failure,expected_code", [
+    ("provider", "AI_UNAVAILABLE"),
+    ("invalid_json", "AI_INVALID_OUTPUT"),
+])
+def test_surprise_transcription_provider_failures_are_safe(
+    tmp_path: Path, failure: str, expected_code: str,
+) -> None:
+    audio = tmp_path / "answer.ogg"
+    audio.write_bytes(b"synthetic-audio")
+
+    class FailingGateway:
+        async def execute(self, request: MediaRequest) -> MediaGatewayResult:
+            assert request.parameters["purpose"] == "surprise"
+            if failure == "provider":
+                raise GatewayProviderError("synthetic secret provider detail")
+            return MediaGatewayResult(
+                content=b"not-json", media_type="application/json",
+                billed_units=Decimal("1"), provider=Provider.DEEPGRAM,
+                model="nova-3", replayed=True, cached=False,
+            )
+
+    settings = Settings(
+        ml_internal_token="test-internal-token", uploads_dir=tmp_path,
+        gateway_mode="replay", budget_usd_cap=Decimal("20"), demo_mode=False,
+    )
+    response = TestClient(
+        create_app(settings, media_gateway=FailingGateway()),
+        raise_server_exceptions=False,
+    ).post("/internal/v1/transcribe", json={
+        "purpose": "surprise", "audioRef": "answer.ogg", "speakers": 1,
+    }, headers=TOKEN)
+    assert response.status_code in {502, 503}
+    assert response.json()["error"]["code"] == expected_code
+    assert "synthetic secret" not in response.text
+
+
+def test_surprise_transcription_rejects_video_before_gateway(tmp_path: Path) -> None:
+    (tmp_path / "answer.mp4").write_bytes(b"synthetic-video")
+    gateway = TurnExampleGateway()
+    settings = Settings(
+        ml_internal_token="test-internal-token", uploads_dir=tmp_path,
+        gateway_mode="replay", budget_usd_cap=Decimal("20"), demo_mode=False,
+    )
+    response = TestClient(
+        create_app(settings, media_gateway=gateway), raise_server_exceptions=False,
+    ).post("/internal/v1/transcribe", json={
+        "purpose": "surprise", "audioRef": "answer.mp4", "speakers": 1,
+    }, headers=TOKEN)
+    assert response.status_code == 502
+    assert response.json()["error"]["code"] == "AI_INVALID_OUTPUT"
+    assert gateway.requests == []
 
 
 def test_interview_transcription_uses_upload_and_returns_two_roles(tmp_path: Path) -> None:
