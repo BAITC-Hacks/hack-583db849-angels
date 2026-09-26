@@ -6,7 +6,7 @@ import { candidateByCode, candidatesKey, useCandidates } from '../../lib/api/can
 import { api, unwrap } from '../../lib/api/client';
 import { errorText } from '../../lib/api/errors';
 import type { WireCandidate } from '../../lib/api/contract';
-import type { CandidateCode } from '../../lib/home/types';
+import { candidateTag, seedCode } from '../../lib/api/mappers/evidence';
 import { useStaffLocale } from '../../lib/i18n/StaffLocaleProvider';
 
 const copy = {
@@ -47,11 +47,12 @@ const copy = {
 export function AccommodationControl() {
   const { locale } = useStaffLocale();
   const text = copy[locale];
-  const [reasons, setReasons] = useState<Partial<Record<CandidateCode, string>>>({});
+  // Keyed by the seed's letter, or a platform applicant's id.
+  const [reasons, setReasons] = useState<Record<string, string>>({});
   const client = useQueryClient();
   const candidates = useCandidates();
   const change = useMutation({
-    mutationFn: async ({ candidateId, textMode, reason }: { code: CandidateCode; candidateId: string; textMode: boolean; reason: string }) =>
+    mutationFn: async ({ candidateId, textMode, reason }: { key: string; candidateId: string; textMode: boolean; reason: string }) =>
       unwrap(
         await api.PUT('/v1/candidates/{candidateId}/accommodations', {
           params: { path: { candidateId } },
@@ -70,9 +71,16 @@ export function AccommodationControl() {
       void client.invalidateQueries({ queryKey: candidatesKey });
     },
   });
-  const set = (code: CandidateCode, candidateId: string | undefined, textMode: boolean, reason: string) => {
-    if (candidateId) change.mutate({ code, candidateId, textMode, reason });
+  const set = (key: string, candidateId: string | undefined, textMode: boolean, reason: string) => {
+    if (candidateId) change.mutate({ key, candidateId, textMode, reason });
   };
+  // A, B and C always have a row; then every applicant the platform sent.
+  const rows = [
+    ...(['A', 'B', 'C'] as const).map((code) => ({ key: code, tag: code, candidate: candidateByCode(candidates.data, code) })),
+    ...(candidates.data ?? [])
+      .filter((candidate) => seedCode(candidate.label) === null)
+      .map((candidate) => ({ key: candidate.candidateId, tag: candidateTag(candidate.label), candidate })),
+  ];
 
   return (
     <section className="flex flex-col gap-3 rounded-panel border border-border-subtle bg-bg-surface p-5">
@@ -82,18 +90,17 @@ export function AccommodationControl() {
       </div>
 
       <ul className="flex flex-col divide-y divide-border-subtle">
-        {(['A', 'B', 'C'] as const).map((code) => {
-          const candidate = candidateByCode(candidates.data, code);
+        {rows.map(({ key: code, tag, candidate }) => {
           const accommodation = candidate?.progress?.accommodation ?? { textMode: false, reason: '' };
           const started = Boolean(candidate?.progress?.simulation);
           const reason = reasons[code] ?? accommodation.reason;
-          const failed = change.isError && change.variables?.code === code ? errorText(change.error, locale) : null;
+          const failed = change.isError && change.variables?.key === code ? errorText(change.error, locale) : null;
           const unavailable = candidates.isError || (candidates.isSuccess && !candidate);
 
           return (
             <li key={code} className="flex flex-wrap items-center gap-3 py-3">
               <span className="w-28 font-semibold text-text-primary">
-                {text.candidate} {code}
+                {text.candidate} {tag}
               </span>
               <span className="font-mono text-[0.62rem] tracking-[0.12em] text-text-muted uppercase">
                 {accommodation.textMode ? text.types : text.speaks}

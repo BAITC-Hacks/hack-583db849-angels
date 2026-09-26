@@ -1,5 +1,6 @@
-import { act, waitFor } from '@testing-library/react';
+import { act, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeAll, describe, expect, it } from 'vitest';
+import { AccommodationControl } from '../components/home/AccommodationControl';
 import type { WireCandidate } from '../lib/api/contract';
 import { useMe } from '../lib/api/candidates';
 import { DEMO_CANDIDATE_COOKIE, setDemoCandidate } from '../lib/demo/currentCandidate';
@@ -8,7 +9,7 @@ import { continueAs, sendApplication } from '../lib/stand/handoff';
 import { DEMO_APPLICANT_ID, READY_APPLICANT_ID } from '../mocks/accounts';
 import { findSubmission, platformSnapshot, readiness } from '../mocks/platformExport';
 import { seedDemoJourney } from '../mocks/seed';
-import { example, hookWithQuery, json, mockApi } from './apiHarness';
+import { example, hookWithQuery, json, mockApi, withQuery } from './apiHarness';
 
 /**
  * The stand and the AI layer, joined: an applicant sends the application on
@@ -96,5 +97,12 @@ describe('the candidate screens and the staff homes', () => {
     expect(row).toMatchObject({ code: null, id: STAND_ID });
     // A label ending in B or C is still not candidate B or C.
     expect(result.current.candidates.A.id).toBe(list.items[0].candidateId);
+  });
+
+  it('let staff give a stand applicant the typing accommodation, like A, B and C', async () => {
+    mockApi({ 'GET /api/v1/candidates': () => json({ items: [...list.items, fromStand] }) });
+    withQuery(<AccommodationControl />);
+    expect(await screen.findByText('Candidate 7773')).toBeTruthy();
+    expect(screen.getByText('Candidate A')).toBeTruthy();
   });
 });
