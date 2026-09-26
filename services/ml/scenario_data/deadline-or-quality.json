@@ -11,7 +11,7 @@
     "wants": "Something live on Monday that she can announce at orientation"
   },
   "hiddenMotive": "She has already put the page's link into the printed orientation booklet.",
-  "voice": "aura-2-selene-en",
+  "voice": "aura-athena-en",
   "matchThreshold": 0.45,
   "expectedMinutes": 7,
   "maxCandidateTurns": 8,
