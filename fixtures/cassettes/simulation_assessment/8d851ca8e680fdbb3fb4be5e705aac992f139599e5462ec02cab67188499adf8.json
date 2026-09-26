@@ -1,0 +1,12 @@
+{
+  "input_tokens": 2258,
+  "model": "gpt-6-luna",
+  "output_tokens": 1059,
+  "provider": "openai",
+  "recorded_at": "2026-09-26T13:24:18.915619Z",
+  "request_hash": "8d851ca8e680fdbb3fb4be5e705aac992f139599e5462ec02cab67188499adf8",
+  "request_id": "resp_0df305ed365e5578006ab7c77a963487d1a47afb187dd05ce7",
+  "response": "{\"scores\":[{\"competency\":\"D\",\"score\":0,\"confidence\":\"high\",\"rationale\":\"After people leave upset, the candidate dismisses the setback rather than taking a recovery step, and later abandons the effort when it rains.\",\"evidence\":[{\"source\":\"simulation_turn\",\"sourceId\":\"turn_06\",\"quote\":\"Whatever, it's their choice. Fewer people is easier anyway.\"},{\"source\":\"simulation_turn\",\"sourceId\":\"turn_14\",\"quote\":\"Forget it, it's raining. Just leave everything where it is.\"}]},{\"competency\":\"R\",\"score\":0,\"confidence\":\"high\",\"rationale\":\"The candidate directs people to handle broken glass and rusty metal without gloves while dismissing the foreseeable safety risk and offering no safeguard.\",\"evidence\":[{\"source\":\"simulation_turn\",\"sourceId\":\"turn_10\",\"quote\":\"It's fine, keep going. Just be careful and pick it up.\"}]},{\"competency\":\"I\",\"score\":null,\"confidence\":null,\"rationale\":null,\"evidence\":[]},{\"competency\":\"V\",\"score\":null,\"confidence\":null,\"rationale\":null,\"evidence\":[]},{\"competency\":\"E\",\"score\":0,\"confidence\":\"high\",\"rationale\":\"The candidate repeatedly disclaims responsibility and does not establish owned, accountable action; they ultimately direct the group to leave the work unfinished.\",\"evidence\":[{\"source\":\"simulation_turn\",\"sourceId\":\"turn_02\",\"quote\":\"Let's just wait for the organiser. It's not our job.\"},{\"source\":\"simulation_turn\",\"sourceId\":\"turn_14\",\"quote\":\"Forget it, it's raining. Just leave everything where it is.\"}]}]}",
+  "task": "simulation_assessment",
+  "version": 1
+}

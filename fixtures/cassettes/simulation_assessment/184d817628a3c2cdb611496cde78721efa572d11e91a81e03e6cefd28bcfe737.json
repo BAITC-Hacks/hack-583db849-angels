@@ -1,0 +1,12 @@
+{
+  "input_tokens": 2161,
+  "model": "gpt-6-sol",
+  "output_tokens": 665,
+  "provider": "openai",
+  "recorded_at": "2026-09-26T08:54:20.180845Z",
+  "request_hash": "184d817628a3c2cdb611496cde78721efa572d11e91a81e03e6cefd28bcfe737",
+  "request_id": "resp_05b25cb53e22ce3b006ab788336ab087d191e057e768f88220",
+  "response": "{\"scores\":[{\"competency\":\"D\",\"score\":2,\"confidence\":\"high\",\"rationale\":\"After the file corruption, the candidate proposes replanning that night together, but does not specify a recovery sequence or progress checks.\",\"evidence\":[{\"source\":\"simulation_turn\",\"sourceId\":\"turn_12\",\"quote\":\"We lost two days, not the film. Let's replan tonight together.\"}]},{\"competency\":\"R\",\"score\":null,\"confidence\":null,\"rationale\":null,\"evidence\":[]},{\"competency\":\"I\",\"score\":2,\"confidence\":\"medium\",\"rationale\":\"The candidate distinguishes the lost editing time from the broader goal of completing the film, but does not identify a root cause or longer-term direction.\",\"evidence\":[{\"source\":\"simulation_turn\",\"sourceId\":\"turn_12\",\"quote\":\"We lost two days, not the film. Let's replan tonight together.\"}]},{\"competency\":\"V\",\"score\":2,\"confidence\":\"medium\",\"rationale\":\"The candidate chooses honesty with the other teammates, but does not explain how to handle its tradeoffs or protect those affected.\",\"evidence\":[{\"source\":\"simulation_turn\",\"sourceId\":\"turn_08\",\"quote\":\"Let's be honest with them and focus on what happens next.\"}]},{\"competency\":\"E\",\"score\":2,\"confidence\":\"medium\",\"rationale\":\"The candidate proposes an immediate replanning meeting and a recurring review of cuts, but leaves priorities and a result check unclear.\",\"evidence\":[{\"source\":\"simulation_turn\",\"sourceId\":\"turn_10\",\"quote\":\"Send me your screen every hour so I can check every cut.\"},{\"source\":\"simulation_turn\",\"sourceId\":\"turn_12\",\"quote\":\"We lost two days, not the film. Let's replan tonight together.\"}]}]}",
+  "task": "simulation_assessment",
+  "version": 1
+}

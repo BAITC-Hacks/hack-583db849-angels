@@ -77,7 +77,8 @@ def test_synthetic_judge_cassettes_are_schema_valid_and_do_not_contain_profile()
     files = list((ROOT / "fixtures/cassettes/simulation_assessment").glob("*.json"))
     # A, B and C, each as the seed transcript and as played by voice. Turn times
     # are not part of the key, and A's two versions say the same, so they share one.
-    assert len(files) == 5
+    # Then the judge's live answers to the 27 walkthroughs of scenarios 2–10 (#22).
+    assert len(files) == 5 + 27
     for path in files:
         text = path.read_text(encoding="utf-8")
         envelope = CassetteEnvelope.model_validate_json(text)

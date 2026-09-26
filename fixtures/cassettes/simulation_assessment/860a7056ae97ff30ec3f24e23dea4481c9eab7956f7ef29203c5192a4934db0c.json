@@ -1,0 +1,12 @@
+{
+  "input_tokens": 2256,
+  "model": "gpt-6-luna",
+  "output_tokens": 747,
+  "provider": "openai",
+  "recorded_at": "2026-09-26T13:23:31.707258Z",
+  "request_hash": "860a7056ae97ff30ec3f24e23dea4481c9eab7956f7ef29203c5192a4934db0c",
+  "request_id": "resp_048645d2ee9993d5006ab7c74e0bac87d1921abeb807aca937",
+  "response": "{\"scores\":[{\"competency\":\"D\",\"score\":0,\"confidence\":\"high\",\"rationale\":\"The candidate responds to setbacks by abandoning the goal and repeats that response when the room falls through, without proposing a recovery process.\",\"evidence\":[{\"source\":\"simulation_turn\",\"sourceId\":\"turn_02\",\"quote\":\"If the money is gone, the workshop is gone. Let's just call it off.\"},{\"source\":\"simulation_turn\",\"sourceId\":\"turn_14\",\"quote\":\"That's it, we cancel. I told you this wouldn't work.\"}]},{\"competency\":\"R\",\"score\":null,\"confidence\":null,\"rationale\":null,\"evidence\":[]},{\"competency\":\"I\",\"score\":0,\"confidence\":\"medium\",\"rationale\":\"The candidate favors keeping every promised element despite the stated funding and capacity constraints, without connecting choices to context or longer-term consequences.\",\"evidence\":[{\"source\":\"simulation_turn\",\"sourceId\":\"turn_08\",\"quote\":\"We promised everything, so we keep everything. Cutting anything would look bad.\"}]},{\"competency\":\"V\",\"score\":0,\"confidence\":\"medium\",\"rationale\":\"The candidate proposes withholding relevant information from people who may not get a place, rather than communicating the decision transparently.\",\"evidence\":[{\"source\":\"simulation_turn\",\"sourceId\":\"turn_10\",\"quote\":\"Let's not tell the others they're out. They'll figure it out.\"}]},{\"competency\":\"E\",\"score\":1,\"confidence\":\"high\",\"rationale\":\"The candidate suggests general effort over the week but gives no priorities, owners, or way to check results.\",\"evidence\":[{\"source\":\"simulation_turn\",\"sourceId\":\"turn_12\",\"quote\":\"Let's all try our best this week and see how it goes.\"}]}]}",
+  "task": "simulation_assessment",
+  "version": 1
+}

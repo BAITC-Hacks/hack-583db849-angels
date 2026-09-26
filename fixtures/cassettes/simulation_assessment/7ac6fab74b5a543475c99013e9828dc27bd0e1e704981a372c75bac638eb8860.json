@@ -1,0 +1,12 @@
+{
+  "input_tokens": 2225,
+  "model": "gpt-6-luna",
+  "output_tokens": 1047,
+  "provider": "openai",
+  "recorded_at": "2026-09-26T13:22:39.075655Z",
+  "request_hash": "7ac6fab74b5a543475c99013e9828dc27bd0e1e704981a372c75bac638eb8860",
+  "request_id": "resp_0c7f11b60e4c4ce4006ab7c717988c87d1bf121551799cc69f",
+  "response": "{\"scores\":[{\"competency\":\"D\",\"score\":1,\"confidence\":\"high\",\"rationale\":\"After the trial produced confusion, the candidate proposed cancellation but gave no recovery steps or follow-through plan.\",\"evidence\":[{\"source\":\"simulation_turn\",\"sourceId\":\"turn_14\",\"quote\":\"I knew it wouldn't work. Let's cancel the trial.\"}]},{\"competency\":\"R\",\"score\":0,\"confidence\":\"high\",\"rationale\":\"The candidate dismissed risk and proposed switching all sessions at once without a safeguard, despite the stated concern about prior harm to parent trust.\",\"evidence\":[{\"source\":\"simulation_turn\",\"sourceId\":\"turn_08\",\"quote\":\"I don't see any risks. It'll be fine.\"},{\"source\":\"simulation_turn\",\"sourceId\":\"turn_12\",\"quote\":\"No point testing. Let's switch all sessions at once.\"}]},{\"competency\":\"I\",\"score\":0,\"confidence\":\"medium\",\"rationale\":\"The candidate relied on personal experience and proposed a full switch without addressing the stated context of parent trust, prior problems, or staff capacity.\",\"evidence\":[{\"source\":\"simulation_turn\",\"sourceId\":\"turn_04\",\"quote\":\"I just know it works. It worked for me when I was little.\"},{\"source\":\"simulation_turn\",\"sourceId\":\"turn_12\",\"quote\":\"No point testing. Let's switch all sessions at once.\"}]},{\"competency\":\"V\",\"score\":null,\"confidence\":null,\"rationale\":null,\"evidence\":[]},{\"competency\":\"E\",\"score\":0,\"confidence\":\"high\",\"rationale\":\"The candidate did not take ownership of the work and proposed a broad change without actionable steps, owners, or a result check.\",\"evidence\":[{\"source\":\"simulation_turn\",\"sourceId\":\"turn_10\",\"quote\":\"You're the coordinator. That's your job, not mine.\"},{\"source\":\"simulation_turn\",\"sourceId\":\"turn_12\",\"quote\":\"No point testing. Let's switch all sessions at once.\"}]}]}",
+  "task": "simulation_assessment",
+  "version": 1
+}
