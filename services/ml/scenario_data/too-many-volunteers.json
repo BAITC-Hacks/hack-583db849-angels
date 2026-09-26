@@ -11,7 +11,7 @@
     "wants": "To actually clean the park instead of standing around"
   },
   "hiddenMotive": "Last year she organised a club event that fell apart, and she is afraid to take charge again, though she would help someone who does.",
-  "voice": "aura-2-phoebe-en",
+  "voice": "aura-asteria-en",
   "matchThreshold": 0.45,
   "expectedMinutes": 7,
   "maxCandidateTurns": 8,
