@@ -101,26 +101,27 @@ def test_live_media_uses_provider_and_records_metered_cost(tmp_path: Path) -> No
 
     assert result.content == b"synthetic-mp3"
     assert result.media_type == "audio/mpeg"
-    assert [call.model for call in provider.calls] == ["aura-2-thalia-en"]
+    assert [call.model for call in provider.calls] == ["aura-asteria-en"]
     assert records[0].metered_unit == "thousand_characters"
     assert records[0].metered_units == Decimal("0.005")
-    assert records[0].actual_usd == Decimal("0.000150")
+    # Aura 1: $0.015 per thousand characters.
+    assert records[0].actual_usd == Decimal("0.000075")
     stored = usage.path.read_text(encoding="utf-8")
     assert "Hello" not in stored
     assert "synthetic-mp3" not in stored
 
 
 def test_media_uses_the_fallback_model_after_provider_failure(tmp_path: Path) -> None:
-    provider = FakeProvider(fail_models={"aura-2-thalia-en"})
+    provider = FakeProvider(fail_models={"aura-asteria-en"})
     service, _, _ = gateway(tmp_path, provider)
 
     result = asyncio.run(service.execute(speech_request()))
 
     assert [call.model for call in provider.calls] == [
-        "aura-2-thalia-en",
         "aura-asteria-en",
+        "aura-2-thalia-en",
     ]
-    assert result.model == "aura-asteria-en"
+    assert result.model == "aura-2-thalia-en"
 
 
 def test_recorded_media_replays_and_caches_without_provider(tmp_path: Path) -> None:
