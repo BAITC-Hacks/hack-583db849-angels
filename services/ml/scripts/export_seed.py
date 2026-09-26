@@ -329,6 +329,9 @@ def export_seed() -> None:
         )
 
     history = []
+    # The demo panel has one planted V drift; other dimensions stay comparable.
+    vision_scale = (4, 4, 3, 2, 2, 2)
+    relationship_scale = (2, 3, 4, 2, 3, 4)
     for index in range(6):
         history.append(
             {
@@ -336,12 +339,20 @@ def export_seed() -> None:
                 "interviewerRef": "synthetic-interviewer-a" if index < 3 else "synthetic-interviewer-b",
                 "heldAt": f"2026-09-{10 + index:02d}T09:00:00Z",
                 "scores": [
-                    {"competency": code, "score": min(4, 1 + ((index + offset) % 4))}
+                    {"competency": code, "score": (
+                        vision_scale[index] if code == "V"
+                        else relationship_scale[index] if code == "R"
+                        else min(4, 1 + ((index + offset) % 4))
+                    )}
                     for offset, code in enumerate("DRIVE")
                 ],
             }
         )
     write(ROOT / "seed" / "quality-history.json", history)
+    write(
+        ROOT / "seed" / "quality-interview-transcript.json",
+        json.loads((EXAMPLES / "quality-check-interview.request.json").read_text(encoding="utf-8"))["transcript"],
+    )
 
 
 if __name__ == "__main__":
