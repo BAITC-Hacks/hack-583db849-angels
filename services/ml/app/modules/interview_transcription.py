@@ -108,7 +108,7 @@ def _map_turns(provider: _DeepgramInterview) -> TranscribeResult:
             or item.end <= item.start
             or item.end > provider.metadata.duration + 0.1
             or item.start < previous_start
-            or any(word.speaker != item.speaker for word in item.words)
+            or not _words_agree_with_speaker(item)
         ):
             raise GatewayOutputError("interview transcription timing or speaker is invalid")
         previous_start = item.start
@@ -124,3 +124,17 @@ def _map_turns(provider: _DeepgramInterview) -> TranscribeResult:
             confidence=confidence,
         ))
     return TranscribeResult(turns=turns, durationSec=provider.metadata.duration)
+
+
+# Deepgram also labels every word, and at a turn boundary a word or two often
+# carries the other speaker ("…matters most. Right?"). That is noise; an
+# utterance whose words mostly belong to someone else is not, and still fails.
+_MAX_OTHER_SPEAKER_WORDS = 0.2
+
+
+def _words_agree_with_speaker(item: _Utterance) -> bool:
+    if not item.words:
+        return True
+    other = sum(1 for word in item.words if word.speaker != item.speaker)
+    return other / len(item.words) <= _MAX_OTHER_SPEAKER_WORDS
+
