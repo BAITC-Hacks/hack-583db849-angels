@@ -75,10 +75,11 @@ def test_changed_spoken_session_or_transcript_is_rejected(tmp_path: Path) -> Non
 
 def test_synthetic_judge_cassettes_are_schema_valid_and_do_not_contain_profile() -> None:
     files = list((ROOT / "fixtures/cassettes/simulation_assessment").glob("*.json"))
-    # A, B and C, each as the seed transcript and as played by voice. Turn times
-    # are not part of the key, and A's two versions say the same, so they share one.
-    # Then the judge's live answers to the 27 walkthroughs of scenarios 2–10 (#22).
-    assert len(files) == 5 + 27
+    # A, B and C, each as the seed transcript and as played by voice, are authored.
+    # Turn times are not part of the key, and A's two versions say the same, so they
+    # share one. The rest are the judge's live answers to the bench walkthroughs (#22, #25).
+    authored = [path for path in files if CassetteEnvelope.model_validate_json(path.read_text(encoding="utf-8")).request_id.startswith("synthetic")]
+    assert len(authored) == 5
     for path in files:
         text = path.read_text(encoding="utf-8")
         envelope = CassetteEnvelope.model_validate_json(text)

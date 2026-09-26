@@ -1,0 +1,12 @@
+{
+  "input_tokens": 2222,
+  "model": "gpt-6-sol",
+  "output_tokens": 765,
+  "provider": "openai",
+  "recorded_at": "2026-09-26T15:48:25.692679Z",
+  "request_hash": "3d8c3bb8b7cbc3d66987c5d98d6213ad8b6ef22aedd87416c2950dfc87a49d0b",
+  "request_id": "resp_0a42873c49f17688006ab7e9401f3887d1ad4f586ed16a073e",
+  "response": "{\"scores\":[{\"competency\":\"D\",\"score\":0,\"confidence\":\"high\",\"rationale\":\"Responds to the setback by ending the effort without reflection or a recovery process.\",\"evidence\":[{\"source\":\"simulation_turn\",\"sourceId\":\"turn_02\",\"quote\":\"Honestly, I agree. It failed, let's stop.\"}]},{\"competency\":\"R\",\"score\":null,\"confidence\":null,\"rationale\":null,\"evidence\":[]},{\"competency\":\"I\",\"score\":1,\"confidence\":\"medium\",\"rationale\":\"Expresses hope for growth but does not connect that goal to the reported confusion or explain how the proposed approach would address it.\",\"evidence\":[{\"source\":\"simulation_turn\",\"sourceId\":\"turn_04\",\"quote\":\"The design is confusing, that's the problem.\"},{\"source\":\"simulation_turn\",\"sourceId\":\"turn_08\",\"quote\":\"Let's just keep it running and see. Maybe it grows by itself.\"}]},{\"competency\":\"V\",\"score\":0,\"confidence\":\"high\",\"rationale\":\"Insists that teammates remain involved despite their stated exam commitments, disregarding their ability to step back.\",\"evidence\":[{\"source\":\"simulation_turn\",\"sourceId\":\"turn_10\",\"quote\":\"Everyone has to stay. Exams are no excuse.\"}]},{\"competency\":\"E\",\"score\":0,\"confidence\":\"high\",\"rationale\":\"When asked what happens this week and who will do it, gives no actionable step or owner.\",\"evidence\":[{\"source\":\"simulation_turn\",\"sourceId\":\"turn_12\",\"quote\":\"Let's all do what we can.\"}]}]}",
+  "task": "simulation_assessment",
+  "version": 1
+}
