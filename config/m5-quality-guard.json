@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "driftSignalAbsDelta": 1.0,
+  "minimumGroupObservations": 3,
+  "forbiddenOutputWords": [
+    "candidate", "applicant", "student", "she", "he", "her", "him",
+    "his", "hers", "they", "them", "their", "personality", "suitable",
+    "admit", "admission", "reject", "accept", "rank", "ranking",
+    "pass", "fail", "hire", "verdict", "decision"
+  ]
+}
