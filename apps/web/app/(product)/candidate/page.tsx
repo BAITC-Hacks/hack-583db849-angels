@@ -8,6 +8,10 @@ import { candidateByCode, useCandidates } from '../../../lib/api/candidates';
 import { api, ApiError, unwrap } from '../../../lib/api/client';
 import { errorText } from '../../../lib/api/errors';
 import { useCreateSurprise } from '../../../lib/surprise/queries';
+import { ApplicationProgress } from '../../../components/home/ApplicationProgress';
+
+// A step card; "Go to this step" lands on it with room for the sticky header.
+const card = 'flex scroll-mt-24 flex-col gap-3 rounded-panel border border-border-subtle bg-bg-surface p-5 target:ring-2 target:ring-brand-green';
 
 const stepAction =
   'mt-auto inline-flex w-fit items-center gap-1.5 rounded-control border border-border-strong px-4 py-2.5 text-sm font-semibold text-text-primary transition-colors hover:bg-bg-elevated';
@@ -86,6 +90,8 @@ export default function CandidateHome() {
         </p>
       </header>
 
+      {me ? <ApplicationProgress progress={progress} /> : null}
+
       {candidates.isError ? (
         <p role="alert" className="text-sm text-text-primary">
           {errorText(candidates.error)}
@@ -93,7 +99,7 @@ export default function CandidateHome() {
       ) : null}
 
       <section className="grid gap-4 md:grid-cols-2">
-        <article className="flex flex-col gap-3 rounded-panel border border-border-subtle bg-bg-surface p-5">
+        <article id="step-simulation" className={card}>
           <p className="font-mono text-[0.6rem] tracking-[0.14em] text-text-muted uppercase">Step 1 · the simulation</p>
           <p className="flex items-center gap-2 text-sm font-semibold text-text-primary">
             {simulation?.status === 'completed' ? (
@@ -131,7 +137,7 @@ export default function CandidateHome() {
           ) : null}
         </article>
 
-        <article className="flex flex-col gap-3 rounded-panel border border-border-subtle bg-bg-surface p-5">
+        <article id="step-feedback" className={card}>
           <p className="font-mono text-[0.6rem] tracking-[0.14em] text-text-muted uppercase">Step 2 · your feedback</p>
           <p className="flex items-center gap-2 text-sm font-semibold text-text-primary">
             {feedbackReady ? (
@@ -152,7 +158,7 @@ export default function CandidateHome() {
             </Link>
           ) : null}
         </article>
-        <article className="flex flex-col gap-3 rounded-panel border border-border-subtle bg-bg-surface p-5">
+        <article id="step-question" className={card}>
           <p className="font-mono text-[0.6rem] tracking-[0.14em] text-text-muted uppercase">Step 3 · a short question</p>
           <p className="flex items-center gap-2 text-sm font-semibold text-text-primary">
             <ClockIcon aria-hidden="true" className="h-4 w-4 text-text-muted" />
@@ -191,7 +197,7 @@ export default function CandidateHome() {
             </p>
           ) : null}
         </article>
-        <article className="flex flex-col gap-3 rounded-panel border border-border-subtle bg-bg-surface p-5">
+        <article id="step-presentation" className={card}>
           <p className="font-mono text-[0.6rem] tracking-[0.14em] text-text-muted uppercase">Step 4 · your presentation</p>
           <p className="flex items-center gap-2 text-sm font-semibold text-text-primary">
             <ClockIcon aria-hidden="true" className="h-4 w-4 text-text-muted" />
@@ -213,7 +219,7 @@ export default function CandidateHome() {
             </Link>
           )}
         </article>
-        <article className="flex flex-col gap-3 rounded-panel border border-border-subtle bg-bg-surface p-5">
+        <article id="step-interview" className={card}>
           <p className="font-mono text-[0.6rem] tracking-[0.14em] text-text-muted uppercase">Step 5 · your interview</p>
           <p className="flex items-center gap-2 text-sm font-semibold text-text-primary">
             <ClockIcon aria-hidden="true" className="h-4 w-4 text-text-muted" />
