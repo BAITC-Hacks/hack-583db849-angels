@@ -1,0 +1,54 @@
+{
+  "items": [
+    {
+      "itemId": "c_01",
+      "topic": "english",
+      "claim": {
+        "text": "Self-rated English as C1.",
+        "evidence": [
+          {
+            "source": "application_field",
+            "sourceId": "english_self",
+            "quote": "C1"
+          }
+        ]
+      },
+      "observation": {
+        "text": "No simulation English estimate is available yet. The supplied IELTS overall band indicatively maps to B2; the certificate has not been verified.",
+        "evidence": [],
+        "metric": null
+      },
+      "status": "unverified",
+      "whatToDo": "Review the cited evidence with the candidate before drawing a conclusion.",
+      "askInInterview": null
+    },
+    {
+      "itemId": "c_02",
+      "topic": "other",
+      "claim": {
+        "text": "The application response says: I prefer to make decisions independently and usually do not ask for advice.",
+        "evidence": [
+          {
+            "source": "application_field",
+            "sourceId": "motivation",
+            "quote": "I prefer to make decisions independently and usually do not ask for advice."
+          }
+        ]
+      },
+      "observation": {
+        "text": "The candidate said in the interview: I let the team decide. I did not want to push my own idea.",
+        "evidence": [
+          {
+            "source": "interview_turn",
+            "sourceId": "iturn_02",
+            "quote": "I let the team decide. I did not want to push my own idea."
+          }
+        ],
+        "metric": null
+      },
+      "status": "discrepancy",
+      "whatToDo": "Ask the candidate to clarify the cited difference.",
+      "askInInterview": null
+    }
+  ]
+}
