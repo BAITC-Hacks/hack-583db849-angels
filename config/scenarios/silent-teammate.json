@@ -11,7 +11,7 @@
     "wants": "Not to be embarrassed in front of the team"
   },
   "hiddenMotive": "He said he knew the editing software well, but he doesn't, and he has been stuck on it for a week. He would rather go silent than admit it.",
-  "voice": "aura-2-arcas-en",
+  "voice": "aura-helios-en",
   "matchThreshold": 0.45,
   "expectedMinutes": 7,
   "maxCandidateTurns": 8,
