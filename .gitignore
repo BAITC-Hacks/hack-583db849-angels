@@ -40,3 +40,6 @@ __pycache__/
 .vscode/*
 !.vscode/extensions.json
 BACKEND_F0_PLAN.local.md
+
+# The quality bench logs its model calls here on every run.
+fixtures/usage/
