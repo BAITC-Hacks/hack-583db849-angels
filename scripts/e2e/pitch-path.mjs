@@ -223,11 +223,12 @@ await step('an applicant the platform sends becomes a candidate, with a brief st
     test: { answers: [{ itemId: 'block_01', response: 'Most like me: I take the part of the work nobody has claimed.' }] },
   };
   arrived = (await call('platform', 'POST', '/candidates', snapshot, { expect: [201] })).data;
-  const listed = (await call('interviewer', 'GET', '/candidates?include=progress', undefined, { expect: [200] })).data.items.find((item) => item.candidateId === arrived.candidateId);
+  const listed = (await call('interviewer', 'GET', '/candidates', undefined, { expect: [200] })).data.items.find((item) => item.candidateId === arrived.candidateId);
   if (!listed) throw new Error('the new candidate is not listed');
   if (/^Candidate [ABC]$/.test(listed.label)) throw new Error(`the new candidate is labelled as a seed: ${listed.label}`);
-  if (!listed.progress?.brief) throw new Error('no brief was started');
-  return `${listed.label}, brief ${listed.progress.brief.status}`;
+  // The API starts the brief on its own, just after it answers: wait for it rather than race it.
+  const brief = await until('the brief to start', async () => (await progress(arrived.candidateId)).brief, 15);
+  return `${listed.label}, brief ${brief.status}`;
 });
 await step('a demo reset takes them away, and keeps A, B and C', async () => {
   await call('admin', 'POST', '/demo/reset', undefined, { expect: [204] });
