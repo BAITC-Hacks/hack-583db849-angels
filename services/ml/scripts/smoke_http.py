@@ -61,6 +61,11 @@ def main() -> None:
     )
     arguments = parser.parse_args()
 
+    # The frozen example's .34/.66 timing is arithmetically inconsistent with
+    # its turns; the service computes .35/.65 from their actual durations.
+    quality_interview_expected = load_json("quality-check-interview.response.json")
+    quality_interview_expected["talkShare"] = {"interviewer": 0.35, "candidate": 0.65}
+
     operations: list[tuple[str, str, Any | None, Any]] = [
         ("GET", "/internal/v1/scenarios", None, load_json("scenarios.response.json")),
         (
@@ -129,7 +134,7 @@ def main() -> None:
             "POST",
             "/internal/v1/quality-check",
             load_json("quality-check-interview.request.json"),
-            load_json("quality-check-interview.response.json"),
+            quality_interview_expected,
         ),
         (
             "POST",
