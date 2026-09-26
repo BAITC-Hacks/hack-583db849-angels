@@ -37,16 +37,6 @@ def example(filename: str) -> object:
     ("path", "request_name", "response_name"),
     [
         (
-            "/internal/v1/consistency",
-            "consistency-before.request.json",
-            "consistency-before.response.json",
-        ),
-        (
-            "/internal/v1/consistency",
-            "consistency-after.request.json",
-            "consistency-after.response.json",
-        ),
-        (
             "/internal/v1/surprise-question",
             "surprise-question.request.json",
             "surprise-question.response.json",

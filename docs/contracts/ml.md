@@ -121,7 +121,7 @@ Each of these is visible on a screen, and a mistake here shows up in the demo.
    - `EnglishMetrics` is computed by code;
    - grammar never moves a D.R.I.V.E. score;
    - the simulation is spoken, so every measure exists; only an accommodated text simulation has `wordsPerMinute` and `fillerRate` as `null`.
-7a. **Consistency compares, it does not judge.** Each item pairs what the candidate claimed (with its quote) with what was observed (a quote or a measured value, such as `cefrEstimate: "B2"` from the simulation), gives a status and a recommendation for people. It never says anything about admitting anyone. `after` reads the interview transcript and is only requested once the interviewer's scores are saved.
+7a. **Consistency compares, it does not judge.** Each item pairs what the candidate claimed (with its quote) with what was observed (a quote or a measured value, such as `cefrEstimate: "B2"` from the simulation), gives a status and a recommendation for people. It never says anything about admitting anyone. `after` reads the interview transcript and is only requested once the interviewer's scores are saved. The API sends the saved brief's consistency items in `beforeItems` for `after`: return each exactly once, in the same order, with unchanged `itemId`, `topic`, and `claim`; update only `observation`, `status`, and `whatToDo`, and set `askInInterview` to `null`. Append genuinely new, sourced contradictions after them with the next `c_` id. Check these invariants in code. If `beforeItems` is empty, use the same before-stage algorithm as the brief. A nonempty `beforeItems` list is invalid for `stage: "before"`. A metric's `source` names where it was actually measured; an interview transcript alone does not provide an English CEFR measurement.
 7b. **The brief covers three topics beyond D.R.I.V.E.:** what the candidate knows about inVision U, how good their English is, and whether the motivation is serious. At least one question per focus.
 8. **Every competency left at `null` gets a live-interview question** in `interviewQuestions`. The report's test expects it.
 9. **No personal data.**
@@ -555,6 +555,13 @@ class ConsistencyRequest(Strict):
     simulationEnglish: EnglishMetrics | None = None
     simulationTurns: list[Turn] = []
     interviewTranscript: list[InterviewTurn] = []   # after only; never the interviewer's scores
+    beforeItems: list[ConsistencyItem] = []        # after only; saved BriefResult.consistency
+
+    @model_validator(mode="after")
+    def before_items_are_only_for_after(self) -> "ConsistencyRequest":
+        if self.stage == "before" and self.beforeItems:
+            raise ValueError("beforeItems is only allowed for the after stage")
+        return self
 
 
 class ConsistencyResult(Strict):
