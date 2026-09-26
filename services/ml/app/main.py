@@ -24,6 +24,9 @@ from .metrics.languagetool import LocalLanguageTool
 from .modules.director import ScenarioDirector
 from .modules.interview_transcription import InterviewTranscriptionService
 from .modules.interview_draft import InterviewDraftGenerator, InterviewDraftService
+from .modules.quality_calibration import CalibrationWording
+from .modules.quality_check import QualityCheckService
+from .modules.quality_guard import InterviewQuestionAnalyzer
 from .modules.matcher import LazyLocalMatcher
 from .modules.simulation import SimulationService
 from .modules.speech import SpeechService
@@ -41,6 +44,7 @@ def create_app(
     brief_service: BriefService | None = None,
     consistency_service: ConsistencyService | None = None,
     draft_service: InterviewDraftService | None = None,
+    quality_service: QualityCheckService | None = None,
 ) -> FastAPI:
     resolved = settings or load_settings()
     app = FastAPI(title="AI Leader ID ML API", version="1.0.0")
@@ -75,6 +79,10 @@ def create_app(
     resolved_draft_service = draft_service or InterviewDraftService(
         InterviewDraftGenerator(resolved_model_gateway)
     )
+    resolved_quality_service = quality_service or QualityCheckService(
+        InterviewQuestionAnalyzer(resolved_model_gateway),
+        CalibrationWording(resolved_model_gateway),
+    )
 
     @app.get(
         "/internal/v1/health",
@@ -106,6 +114,7 @@ def create_app(
             authenticate, usage_store, resolved.gateway_mode, resolved.budget_usd_cap,
             resolved_draft_service,
             resolved_consistency_service,
+            resolved_quality_service,
         )
     )
     return app
