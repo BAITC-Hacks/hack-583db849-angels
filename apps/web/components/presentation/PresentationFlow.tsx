@@ -191,7 +191,7 @@ export function PresentationFlow({
         ) : (
           <div className="overflow-hidden rounded-control bg-bg-elevated">
             {/* A mirror before anything is recorded; the recording starts only on the button. */}
-            <video ref={mirror} muted autoPlay playsInline className="aspect-video w-full object-cover" />
+            <video ref={mirror} muted autoPlay playsInline style={{ transform: 'scaleX(-1)' }} className="aspect-video w-full object-cover" />
           </div>
         )}
 
