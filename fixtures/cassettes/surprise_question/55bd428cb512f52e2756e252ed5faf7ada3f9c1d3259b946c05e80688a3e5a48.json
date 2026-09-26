@@ -1,0 +1,12 @@
+{
+  "input_tokens": 777,
+  "model": "gpt-6-luna",
+  "output_tokens": 453,
+  "provider": "openai",
+  "recorded_at": "2026-09-26T14:48:36.025683Z",
+  "request_hash": "55bd428cb512f52e2756e252ed5faf7ada3f9c1d3259b946c05e80688a3e5a48",
+  "request_id": "resp_036b8d27b4e3a885006ab7db403ee487d1a0ed2e1cee16d096",
+  "response": "{\"question\":\"You wrote that you rebuilt the robot arm overnight. How did your team decide what to fix first, and what would you do differently now?\",\"competency\":\"D\",\"why\":\"The setback answer mentions rebuilding the arm and keeping spare parts, but gives little detail about the team’s decisions or learning.\",\"sourceFieldId\":\"setback\"}",
+  "task": "surprise_question",
+  "version": 1
+}

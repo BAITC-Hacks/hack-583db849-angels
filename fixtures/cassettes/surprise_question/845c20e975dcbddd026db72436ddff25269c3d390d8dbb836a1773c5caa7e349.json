@@ -1,0 +1,12 @@
+{
+  "input_tokens": 725,
+  "model": "gpt-6-luna",
+  "output_tokens": 314,
+  "provider": "openai",
+  "recorded_at": "2026-09-26T14:48:42.757412Z",
+  "request_hash": "845c20e975dcbddd026db72436ddff25269c3d390d8dbb836a1773c5caa7e349",
+  "request_id": "resp_0c9c4a339974c305006ab7db4784dc87d1a748dc980dc0f9d8",
+  "response": "{\"question\":\"You wrote that you do not remember who planned each part of the class event. What would you do differently next time to understand and support each person’s contribution?\",\"competency\":\"V\",\"why\":\"The class event answer gives little detail about people’s roles or the candidate’s actions, so this asks how they would support the group next time.\",\"sourceFieldId\":\"leadership_example\"}",
+  "task": "surprise_question",
+  "version": 1
+}
