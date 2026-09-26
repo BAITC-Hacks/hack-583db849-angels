@@ -10,7 +10,8 @@
  * E2E_KEY_COMMISSION and E2E_KEY_ADMIN for another stack.
  *
  * For each of A, B and C: the brief, the simulation from its recording and
- * the report, the candidate's feedback without a score, the interview with
+ * the report, the candidate's feedback without a score, a surprise question
+ * written from their own application, the interview with
  * the draft locked until the blind scores, the consistency after the
  * interview, the interview's quality check — and the commission's
  * calibration after each. Then an applicant arrives from the platform (the
@@ -102,6 +103,7 @@ console.log(`Pitch path against ${API}${MEDIA ? ', with media' : ''}`);
 await call('admin', 'POST', '/demo/reset', undefined, { expect: [204] });
 await calibrate('after the reset');
 const list = (await call('admin', 'GET', '/candidates?include=progress', undefined, { expect: [200] })).data.items;
+const questions = {};
 
 for (const letter of ['a', 'b', 'c']) {
   const candidate = list.find((item) => item.label === `Candidate ${letter.toUpperCase()}`);
@@ -130,10 +132,18 @@ for (const letter of ['a', 'b', 'c']) {
     return report.scores.map((s) => `${s.competency}${s.score ?? '·'}`).join(' ');
   });
 
-  if (media('answer.webm')) {
+  let surpriseId;
+  await step('surprise question, written from the candidate’s own application', async () => {
+    surpriseId = (await call('platform', 'POST', '/surprise-questions', { candidateId: id }, { expect: [201] })).data.surpriseId;
+    const started = (await call('platform', 'POST', `/surprise-questions/${surpriseId}/start`, undefined, { expect: [200, 201] })).data;
+    if (!started.question || started.question.split(/\s+/).length > 40) throw new Error(`not a question to answer in 90 seconds: ${started.question}`);
+    questions[letter] = started.question;
+    return started.question.split(/\s+/).length + ' words';
+  });
+
+  if (media('answer.webm') && surpriseId) {
     await step('surprise question, answered on video', async () => {
-      const created = (await call('platform', 'POST', '/surprise-questions', { candidateId: id }, { expect: [201] })).data;
-      await call('platform', 'POST', `/surprise-questions/${created.surpriseId}/start`, undefined, { expect: [200, 201] });
+      const created = { surpriseId };
       const form = new FormData();
       form.append('consentVideo', 'true');
       form.append('consentProcessing', 'true');
@@ -198,6 +208,10 @@ for (const letter of ['a', 'b', 'c']) {
 
   await calibrate(`after ${letter.toUpperCase()}`);
 }
+
+await step('each of A, B and C has a question of their own', async () => {
+  if (new Set(Object.values(questions)).size !== 3) throw new Error(`the questions repeat: ${JSON.stringify(questions)}`);
+});
 
 console.log('The stand’s hand-over');
 let arrived;
