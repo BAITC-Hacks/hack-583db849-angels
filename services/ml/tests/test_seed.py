@@ -5,6 +5,7 @@ import re
 from services.ml.app.schemas.contracts import (
     AssessmentResult,
     BriefResult,
+    ConsistencyResult,
     DraftResult,
     InterviewNote,
     InterviewTurn,
@@ -41,9 +42,11 @@ def test_every_candidate_has_the_complete_seed_layout_and_valid_shapes() -> None
             "m2a-session.json",
             "interview-transcript.json",
             "expected-interview-draft.json",
+            "expected-consistency-after.json",
         }
         assert {path.name for path in directory.iterdir()} == expected
         BriefResult.model_validate(load(directory / "expected-brief.json"))
+        ConsistencyResult.model_validate(load(directory / "expected-consistency-after.json"))
         AssessmentResult.model_validate(load(directory / "expected-assessment.json"))
         for item in load(directory / "transcript.json"):
             Turn.model_validate(item)
