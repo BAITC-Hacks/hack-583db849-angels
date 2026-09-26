@@ -132,7 +132,15 @@ def run_bench(
         demo_mode=False,
         usage_log_path=ROOT / "fixtures" / "usage" / "bench.jsonl",
     )
-    client = TestClient(create_app(settings), raise_server_exceptions=False)
+    # One event loop for every case. Without the context manager each request
+    # runs in a new loop, the OpenAI client made in the first one fails in the
+    # next, and the gateway quietly falls back to the second model: a live run
+    # would judge the first case with gpt-6-sol and the rest with gpt-6-luna.
+    with TestClient(create_app(settings), raise_server_exceptions=False) as client:
+        return _judge_cases(client, cases, scenario_id, mode)
+
+
+def _judge_cases(client: TestClient, cases: list[Path], scenario_id: str, mode: str) -> dict[str, object]:
     scores_checked = 0
     quotes_checked = 0
     for case in cases:

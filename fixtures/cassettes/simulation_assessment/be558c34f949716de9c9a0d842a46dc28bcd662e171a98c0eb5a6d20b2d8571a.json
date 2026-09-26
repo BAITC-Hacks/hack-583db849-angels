@@ -1,0 +1,12 @@
+{
+  "input_tokens": 2280,
+  "model": "gpt-6-sol",
+  "output_tokens": 806,
+  "provider": "openai",
+  "recorded_at": "2026-09-26T15:51:58.015948Z",
+  "request_hash": "be558c34f949716de9c9a0d842a46dc28bcd662e171a98c0eb5a6d20b2d8571a",
+  "request_id": "resp_09aa33f8f568525d006ab7ea1436e887d1b06e4965ab735ca7",
+  "response": "{\"scores\":[{\"competency\":\"D\",\"score\":0,\"confidence\":\"medium\",\"rationale\":\"When parents' complaints put the plan in question, the candidate dismisses the setback rather than reflecting or proposing recovery.\",\"evidence\":[{\"source\":\"simulation_turn\",\"sourceId\":\"turn_14\",\"quote\":\"It's our club, not theirs. They'll get over it.\"}]},{\"competency\":\"R\",\"score\":0,\"confidence\":\"high\",\"rationale\":\"The candidate pushes the change and dismisses a foreseeable concern from affected parents without a safeguard or accountability.\",\"evidence\":[{\"source\":\"simulation_turn\",\"sourceId\":\"turn_08\",\"quote\":\"Let's just become the coding club and drop reading.\"},{\"source\":\"simulation_turn\",\"sourceId\":\"turn_14\",\"quote\":\"It's our club, not theirs. They'll get over it.\"}]},{\"competency\":\"I\",\"score\":0,\"confidence\":\"high\",\"rationale\":\"The candidate treats funding as the deciding factor and drops the club's existing purpose without addressing the stated context or consequences.\",\"evidence\":[{\"source\":\"simulation_turn\",\"sourceId\":\"turn_04\",\"quote\":\"Honestly, whatever gets funded is fine. Money is money.\"},{\"source\":\"simulation_turn\",\"sourceId\":\"turn_08\",\"quote\":\"Let's just become the coding club and drop reading.\"}]},{\"competency\":\"V\",\"score\":0,\"confidence\":\"high\",\"rationale\":\"The candidate explicitly plans to withhold a material part of the proposed arrangement from volunteers.\",\"evidence\":[{\"source\":\"simulation_turn\",\"sourceId\":\"turn_10\",\"quote\":\"I'll tell the volunteers about the money but not the logo part.\"}]},{\"competency\":\"E\",\"score\":1,\"confidence\":\"high\",\"rationale\":\"The candidate identifies contract-related activity but supplies no priorities, review process, or way to check the result.\",\"evidence\":[{\"source\":\"simulation_turn\",\"sourceId\":\"turn_02\",\"quote\":\"Yes, we'll take it! Send the contract.\"},{\"source\":\"simulation_turn\",\"sourceId\":\"turn_12\",\"quote\":\"Just tell me where to sign. I don't need to read it.\"}]}]}",
+  "task": "simulation_assessment",
+  "version": 1
+}

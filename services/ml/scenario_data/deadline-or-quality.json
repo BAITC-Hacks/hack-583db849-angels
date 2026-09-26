@@ -1,6 +1,6 @@
 {
   "scenarioId": "deadline-or-quality",
-  "status": "draft",
+  "status": "ready",
   "title": "Ship something weak, or ask for more time",
   "situation": "Your team of three promised the university's first-year office a simple web page that answers new students' common questions. It is due to go live on Monday, before orientation week. It is Friday evening: the page works, but half the answers have not been checked, and the search often shows the wrong result. Aliya, the office's student coordinator who asked for the page, calls to confirm the launch.",
   "yourRole": "You lead the team that builds the page.",

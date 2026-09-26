@@ -1,0 +1,12 @@
+{
+  "note": "Frozen for the pitch (#25). A prompt is part of every recorded answer's key: change one, re-record its answers, then update this file.",
+  "prompts": {
+    "c-consistency.md": "63e53f9fcadc0447a42d5634079116995b1540c542727e92bc8d2b782b44778f",
+    "m1-brief.md": "7b848a110e5f79a4774849637a36f85f8d9fdbce7f86c58b5a63bc0f06ca19c1",
+    "m3-judge.md": "b4e01641febba265d1c67d910d175df4be09ae0e2ce137b2f4bb84aa5f08156f",
+    "m4-interview-draft.md": "5b3e883322f27e658167bb2e99dc2364cfc5a209eb89fd9847ddccf85f7f2849",
+    "m5-quality-guard.md": "f01ff5449b6b7f0ed11ad67d2e8625c09c4a9c8e13f47470f06c21913be46eff",
+    "simulation-actor.md": "3119e06cff80f8473c791c0a092d106d773f874a9796bc7f5633495ad1f47333",
+    "surprise-question.md": "cd308982e9f2389e613b2f90eccf4728aac2a8e847d0f9c55584ccfbf3ec3752"
+  }
+}

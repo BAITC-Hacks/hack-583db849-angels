@@ -62,8 +62,8 @@
       "provider": "openai",
       "model": "gpt-6-sol",
       "fallback_model": "gpt-6-luna",
-      "max_tokens": 1800,
-      "request_cost_limit_usd": 0.05,
+      "max_tokens": 4000,
+      "request_cost_limit_usd": 0.06,
       "cache_ttl_seconds": 604800,
       "demo_seed_available": true
     },
