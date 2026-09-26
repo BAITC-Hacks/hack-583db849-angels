@@ -147,6 +147,18 @@ def test_bad_calibration_wording_retries_once() -> None:
     assert [item.payload["attempt"] for item in gateway.requests] == [1, 2]
 
 
+def test_model_cannot_swap_computed_number_roles() -> None:
+    request = example("quality-check-calibration.request.json")
+    _, selected, _ = compute_drift(request, POLICY)
+    gateway = FakeGateway(
+        wording("Values scores run 2.3 above the panel across 10 interviews (1.1 against 3.4)."),
+        wording("Values scores run 1.1 above the panel across 5 interviews (2.3 against 3.4)."),
+    )
+    with pytest.raises(GatewayOutputError):
+        asyncio.run(CalibrationWording(gateway).write(selected))
+    assert [item.payload["attempt"] for item in gateway.requests] == [1, 2]
+
+
 def test_no_selected_drift_makes_no_model_call() -> None:
     gateway = FakeGateway()
     assert asyncio.run(CalibrationWording(gateway).write([])) == []

@@ -184,7 +184,7 @@ class CalibrationWording:
                 if not (
                     safe_process_text(text.message, self._policy)
                     and safe_process_text(text.recommendation, self._policy)
-                    and _numbers_match(text.message + " " + text.recommendation, item)
+                    and numbers_match_computed_drift(text.message, text.recommendation, item)
                 ):
                     break
                 accepted.append(QualitySignal(
@@ -197,10 +197,35 @@ class CalibrationWording:
         raise GatewayOutputError("calibration wording was invalid")
 
 
-def _numbers_match(text: str, facts: dict) -> bool:
-    allowed = {
-        Decimal(str(facts[key])) for key in (
-            "interviewerMean", "panelMean", "delta", "interviewerInterviews", "panelInterviews",
-        )
-    }
-    return all(Decimal(value) in allowed for value in _NUMBER.findall(text))
+def numbers_match_computed_drift(message: str, recommendation: str, facts: dict) -> bool:
+    """Bind each model-written number to its computed role, not just its value."""
+
+    if _NUMBER.search(recommendation):
+        return False
+    numbers = [Decimal(value) for value in _NUMBER.findall(message)]
+    if not numbers:
+        return True
+
+    difference = Decimal(str(facts["delta"]))
+    interviewer = Decimal(str(facts["interviewerMean"]))
+    panel = Decimal(str(facts["panelMean"]))
+    count = Decimal(str(facts["interviewerInterviews"]))
+    expected = (
+        [abs(difference), interviewer, panel],
+        [abs(difference), count, interviewer, panel],
+    )
+    if numbers not in expected:
+        return False
+    direction = "above" if difference > 0 else "below"
+    if not re.search(rf"\b{direction}\b", message, re.IGNORECASE):
+        return False
+    opposite = "below" if difference > 0 else "above"
+    if re.search(rf"\b{opposite}\b", message, re.IGNORECASE):
+        return False
+    means = re.search(
+        r"\(\s*(-?\d+(?:\.\d+)?)\s+against\s+(-?\d+(?:\.\d+)?)\s*\)",
+        message, re.IGNORECASE,
+    )
+    return means is not None and (
+        Decimal(means.group(1)), Decimal(means.group(2))
+    ) == (interviewer, panel)

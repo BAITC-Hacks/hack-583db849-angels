@@ -29,7 +29,7 @@ def test_default_bench_checks_real_route_on_replay() -> None:
 
 @pytest.mark.parametrize("damage", [
     "missing_question", "invented_quote", "candidate_claim", "empty_recommendation",
-    "changed_drift", "unselected_signal",
+    "changed_drift", "unselected_signal", "false_calibration_text",
 ])
 def test_bench_rejects_invalid_reports(monkeypatch: pytest.MonkeyPatch, damage: str) -> None:
     interview = result("quality-check-interview.response.json")
@@ -47,6 +47,10 @@ def test_bench_rejects_invalid_reports(monkeypatch: pytest.MonkeyPatch, damage: 
         calibration["drift"][3]["delta"] = 2.0
     elif damage == "unselected_signal":
         calibration["signals"].append(deepcopy(calibration["signals"][0]))
+    elif damage == "false_calibration_text":
+        calibration["signals"][0]["message"] = (
+            "Values scores run 2.3 above the panel (1.1 against 3.4)."
+        )
 
     def fake_post(_client, request):
         raw = interview if request.kind == "interview" else calibration

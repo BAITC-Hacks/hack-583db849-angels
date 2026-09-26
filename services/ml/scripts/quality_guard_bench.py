@@ -20,7 +20,9 @@ if str(ROOT) not in sys.path:
 from services.ml.app.config import Settings
 from services.ml.app.evidence import verify_evidence
 from services.ml.app.main import create_app
-from services.ml.app.modules.quality_calibration import compute_drift, talk_share
+from services.ml.app.modules.quality_calibration import (
+    compute_drift, numbers_match_computed_drift, talk_share,
+)
 from services.ml.app.modules.quality_guard import interviewer_sources, load_quality_policy, safe_process_text
 from services.ml.app.providers.openai import OpenAIProvider
 from services.ml.app.schemas.contracts import QualityCheckRequest, QualityCheckResult
@@ -82,10 +84,11 @@ def bench(
     assert [signal.competencies for signal in calibration_result.signals] == [
         [item["competency"]] for item in selected
     ]
-    for signal in calibration_result.signals:
+    for signal, item in zip(calibration_result.signals, selected, strict=True):
         assert signal.kind == "scale_drift" and not signal.evidence
         assert safe_process_text(signal.message, policy)
         assert safe_process_text(signal.recommendation, policy)
+        assert numbers_match_computed_drift(signal.message, signal.recommendation, item)
     if planted:
         assert [item.kind for item in interview_result.signals] == [
             "leading_question", "off_limits_question", "coverage_gap",
