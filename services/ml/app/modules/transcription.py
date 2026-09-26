@@ -68,9 +68,11 @@ class TurnTranscriptionService:
                     "speakers": request.speakers,
                     "purpose": request.purpose,
                 },
-                # API accepts at most 60 seconds for an M2 turn. Reserving one full
-                # minute keeps the pre-call budget conservative without decoding.
-                estimated_units=Decimal(1),
+                # The API permits 60-second M2 turns and 90-second surprise
+                # answers. Reserve the full allowance before decoding audio.
+                estimated_units=(
+                    Decimal("1.5") if request.purpose == "surprise" else Decimal(1)
+                ),
             )
         )
         try:
