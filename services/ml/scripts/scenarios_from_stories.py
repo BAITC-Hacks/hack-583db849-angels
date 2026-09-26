@@ -24,6 +24,8 @@ from services.ml.app.schemas.contracts import ScenarioConfig
 
 STORIES = ROOT / "docs" / "scenarios"
 CONFIGS = ROOT / "config" / "scenarios"
+# The ML service ships its own copy; a test keeps the two identical.
+PACKAGED = ROOT / "services" / "ml" / "scenario_data"
 
 # A distinct Deepgram Aura voice per character, chosen by the story's description. Aura 1:
 # the speech task's model, because it answers in about a second where Aura 2 takes four.
@@ -142,7 +144,8 @@ def main() -> None:
     for path in sorted(STORIES.glob("[0-9][0-9]-*.md")):
         config = story_to_config(path, voice_index)
         target = CONFIGS / f"{config['scenarioId']}.json"
-        target.write_text(json.dumps(config, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        for directory in (CONFIGS, PACKAGED):
+            (directory / target.name).write_text(json.dumps(config, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
         print(f"{target.relative_to(ROOT)}: {config['status']}, {len(config['beats'])} beats, voice {config['voice']}")
 
 
