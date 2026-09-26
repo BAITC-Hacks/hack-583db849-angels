@@ -11,7 +11,7 @@
     "wants": "To keep the team's chance of winning and not look careless"
   },
   "hiddenMotive": "He promised the club's mentor a prize-winning project and believes that admitting the gap means he let everyone down.",
-  "voice": "aura-2-apollo-en",
+  "voice": "aura-perseus-en",
   "matchThreshold": 0.45,
   "expectedMinutes": 7,
   "maxCandidateTurns": 8,
