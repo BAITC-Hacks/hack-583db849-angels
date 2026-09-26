@@ -13,7 +13,8 @@ export function turnAudioUrl(simulationId: string, turnId: string): string {
   return `/v1/simulations/${encodeURIComponent(simulationId)}/turns/${encodeURIComponent(turnId)}/audio`;
 }
 
-function speak(text: string): void {
+/** The browser's own voice: the fallback when the recorded one cannot play. */
+export function speakAloud(text: string): void {
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = 'en-US';
@@ -24,9 +25,9 @@ function speak(text: string): void {
 export function playCharacterLine(apiUrl: string | null, text: string): void {
   if (typeof window === 'undefined') return;
   if (!apiUrl || typeof Audio === 'undefined') {
-    speak(text);
+    speakAloud(text);
     return;
   }
   const audio = new Audio(characterAudioSrc(apiUrl));
-  audio.play().catch(() => speak(text));
+  audio.play().catch(() => speakAloud(text));
 }

@@ -18,7 +18,9 @@ const copy = {
     eyebrow: 'Video interview',
     title: 'Schedule',
     lede: 'Add times you can interview. A candidate books one; the call opens 10 minutes before it, and each side waits at most 5 minutes after the start. A missed time is rebooked on another day.',
-    almaty: 'All times are Almaty time.',
+    now: (time: string) => `Almaty time: it is now ${time} (UTC+5).`,
+    removing: 'Removing — this takes a few seconds…',
+    removed: 'The time is removed. The list catches up in a few seconds.',
     add: 'Add a time',
     date: 'Date',
     time: 'Start',
@@ -42,7 +44,9 @@ const copy = {
     eyebrow: 'Видеоинтервью',
     title: 'Расписание',
     lede: 'Добавьте время, когда можете провести интервью. Кандидат бронирует одно; звонок открывается за 10 минут, и каждая сторона ждёт не больше 5 минут после начала. Пропущенное время бронируют заново на другой день.',
-    almaty: 'Всё время — алматинское.',
+    now: (time: string) => `Время по Алматы: сейчас ${time} (UTC+5).`,
+    removing: 'Убираем — это займёт несколько секунд…',
+    removed: 'Время убрано. Список обновится через несколько секунд.',
     add: 'Добавить время',
     date: 'Дата',
     time: 'Начало',
@@ -96,6 +100,9 @@ export function InterviewerSchedule() {
   const [date, setDate] = useState(tomorrow);
   const [time, setTime] = useState('10:00');
   const [duration, setDuration] = useState(30);
+  // A removed time leaves the list at once; the server's list confirms it on the next read.
+  const [removed, setRemoved] = useState<string[]>([]);
+  const clock = useNow(15_000);
   const canEdit = role === 'interviewer' || role === 'admin';
 
   const add = (startsAt: string) => create.mutate({ startsAt, interviewerRef: DEMO_INTERVIEWER_REF, durationMin: duration });
@@ -156,7 +163,7 @@ export function InterviewerSchedule() {
             </button>
             <span className="text-text-muted">{text.soonNote}</span>
           </div>
-          <p className="text-[0.75rem] text-text-muted">{text.almaty}</p>
+          <p className="text-[0.75rem] text-text-muted">{text.now(formatTime(new Date(clock).toISOString(), locale))}</p>
           {create.isError ? (
             <p role="alert" className="text-sm text-status-low">
               {errorText(create.error, locale)}
@@ -165,6 +172,11 @@ export function InterviewerSchedule() {
         </section>
       ) : null}
 
+      {remove.isSuccess ? (
+        <p role="status" className="text-sm text-text-secondary">
+          {text.removed}
+        </p>
+      ) : null}
       {slots.isError ? (
         <p role="alert" className="text-sm text-text-primary">
           {errorText(slots.error, locale)}
@@ -172,12 +184,19 @@ export function InterviewerSchedule() {
       ) : slots.data && slots.data.length === 0 ? (
         <p className="text-sm text-text-secondary">{text.empty}</p>
       ) : (
-        byDay(slots.data ?? []).map(({ day, slots: daySlots }) => (
+        byDay((slots.data ?? []).filter((slot) => !removed.includes(slot.slotId))).map(({ day, slots: daySlots }) => (
           <section key={day} className="flex flex-col gap-2">
             <h2 className="text-sm font-semibold text-text-primary">{formatDay(daySlots[0].startsAt, locale)}</h2>
             <ul className="divide-y divide-border-subtle rounded-panel border border-border-subtle bg-bg-surface">
               {daySlots.map((slot) => (
-                <SlotRow key={slot.slotId} slot={slot} locale={locale} canEdit={canEdit} onRemove={() => remove.mutate(slot.slotId)} />
+                <SlotRow
+                  key={slot.slotId}
+                  slot={slot}
+                  locale={locale}
+                  canEdit={canEdit}
+                  removing={remove.isPending && remove.variables === slot.slotId}
+                  onRemove={() => remove.mutate(slot.slotId, { onSuccess: () => setRemoved((ids) => [...ids, slot.slotId]) })}
+                />
               ))}
             </ul>
           </section>
@@ -192,7 +211,19 @@ export function InterviewerSchedule() {
   );
 }
 
-function SlotRow({ slot, locale, canEdit, onRemove }: { slot: InterviewSlot; locale: StaffLocale; canEdit: boolean; onRemove: () => void }) {
+function SlotRow({
+  slot,
+  locale,
+  canEdit,
+  removing,
+  onRemove,
+}: {
+  slot: InterviewSlot;
+  locale: StaffLocale;
+  canEdit: boolean;
+  removing: boolean;
+  onRemove: () => void;
+}) {
   const text = copy[locale];
   const now = useNow(5_000);
   const joinable = canEdit && (slot.status === 'booked' || slot.status === 'waiting' || slot.status === 'live' || slot.status === 'done');
@@ -227,7 +258,11 @@ function SlotRow({ slot, locale, canEdit, onRemove }: { slot: InterviewSlot; loc
             <span className="font-normal text-text-muted">{text.opensAt(formatTime(new Date(opensAt(slot.startsAt)).toISOString(), locale))}</span>
           )
         ) : null}
-        {canEdit && slot.status === 'open' ? (
+        {removing ? (
+          <span className="font-normal text-text-muted" role="status">
+            {text.removing}
+          </span>
+        ) : canEdit && slot.status === 'open' ? (
           <button type="button" onClick={onRemove} className="inline-flex items-center gap-1 text-text-muted hover:text-status-low">
             <TrashIcon aria-hidden="true" className="h-4 w-4" />
             {text.remove}

@@ -186,7 +186,7 @@ export function SurpriseFlow({
         <h2 className="text-sm font-semibold text-text-primary">Camera and microphone</h2>
         <div className="overflow-hidden rounded-control bg-bg-elevated">
           {/* Nothing here is recorded: it is a mirror, so you can see yourself before you begin. */}
-          <video ref={videoElement} muted autoPlay playsInline className="aspect-video w-full object-cover" />
+          <video ref={videoElement} muted autoPlay playsInline style={{ transform: 'scaleX(-1)' }} className="aspect-video w-full object-cover" />
         </div>
         {recorder.stream ? (
           <p className="font-mono text-[0.68rem] text-text-muted">

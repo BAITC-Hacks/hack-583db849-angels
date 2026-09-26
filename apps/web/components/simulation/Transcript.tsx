@@ -8,19 +8,22 @@ import type { SimulationTurn } from '../../lib/simulation/types';
  * The conversation as it happens. Each turn carries its id in the DOM so the
  * commission report can link a quote straight back to it later.
  *
- * The character's lines play out loud as they arrive; a browser may block that,
- * so each one can be played again. The captions are always there.
+ * The character's lines appear word by word as they are said (useSpokenLines);
+ * each one can be played again afterwards. The captions are always there.
  */
 export function Transcript({
   turns,
   characterName,
   replying,
   onListen,
+  speaking = null,
 }: {
   turns: SimulationTurn[];
   characterName: string;
   replying: boolean;
   onListen?: (turnId: string) => void;
+  /** The line being said now: only its first words are shown, as they are spoken. */
+  speaking?: { turnId: string; words: number } | null;
 }) {
   const end = useRef<HTMLDivElement>(null);
   const mounted = useRef(false);
@@ -33,17 +36,19 @@ export function Transcript({
       return;
     }
     end.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
-  }, [turns.length, replying]);
+  }, [turns.length, replying, speaking?.words]);
 
   return (
     <div role="log" aria-live="polite" aria-label="Conversation" className="flex flex-col gap-4">
       {turns.map((turn) => {
         const mine = turn.speaker === 'candidate';
+        const saying = speaking?.turnId === turn.turnId;
+        const words = saying ? turn.text.split(/\s+/).filter(Boolean) : [];
         return (
           <div key={turn.turnId} id={turn.turnId} className={`flex flex-col gap-1 ${mine ? 'items-end' : 'items-start'}`}>
             <span className="flex items-center gap-2 font-mono text-[0.58rem] tracking-[0.12em] text-text-muted uppercase">
               {mine ? 'You' : characterName}
-              {!mine && onListen ? (
+              {!mine && onListen && !saying ? (
                 <button
                   type="button"
                   onClick={() => onListen(turn.turnId)}
@@ -61,7 +66,14 @@ export function Transcript({
                   : 'border border-border-subtle bg-bg-surface text-text-primary'
               }`}
             >
-              {turn.text}
+              {saying ? (
+                <span aria-busy="true">
+                  {words.slice(0, speaking!.words).join(' ')}
+                  {speaking!.words < words.length ? <span className="ml-0.5 inline-block h-3.5 w-1 animate-pulse bg-text-muted align-middle" aria-hidden="true" /> : null}
+                </span>
+              ) : (
+                turn.text
+              )}
             </p>
           </div>
         );

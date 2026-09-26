@@ -23,7 +23,9 @@ export function VideoTile({ track, label, mirror = false, className = '' }: { tr
       autoPlay
       playsInline
       muted
-      className={`h-full w-full bg-[#131313] object-cover ${mirror ? '-scale-x-100' : ''} ${track ? '' : 'invisible'} ${className}`}
+      // Your own picture reads like a mirror, as in every call app; an inline transform survives the player's own styles.
+      style={mirror ? { transform: 'scaleX(-1)' } : undefined}
+      className={`h-full w-full bg-[#131313] object-cover ${track ? '' : 'invisible'} ${className}`}
     />
   );
 }
