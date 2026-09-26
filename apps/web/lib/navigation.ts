@@ -25,12 +25,10 @@ export interface NavItem {
   icon: ComponentType<SVGProps<SVGSVGElement>>;
   label: Copy<string>;
   roles: DemoRole[];
-  /** Absent while the item's slice has not landed; the item then shows as locked. */
-  href?: string;
+  href: string;
   /** Paths that count as this item when they differ from `href`. */
   match?: string;
-  /** The screen runs on scripted preview data until its API lands. */
-  preview?: boolean;
+  /** The AI module the screen belongs to (docs/SPEC.md). */
   module?: 'M1' | 'M2' | 'M3' | 'M4' | 'M5';
 }
 

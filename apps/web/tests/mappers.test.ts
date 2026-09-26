@@ -15,7 +15,7 @@ import { toCandidateFeedback, toSimulationReport } from '../lib/api/mappers/asse
 import { toScreenProgress, toScreenProgressList } from '../lib/api/mappers/candidates';
 import { toAssessmentDraft, toInterviewRecord } from '../lib/api/mappers/interview';
 import { appendTurn, toScenarioBrief, toSimulationState } from '../lib/api/mappers/simulation';
-import { previewScenario } from '../lib/simulation/previewScenario';
+import { exampleScenario } from './fixtures/exampleScenario';
 
 /**
  * The golden test of the data layer: every example in the contract, put
@@ -118,7 +118,7 @@ describe('the simulation', () => {
   const created = example<WireSimulation>('simulation-created.json');
 
   it('gives the screen the scenario it already shows', () => {
-    expect(toScenarioBrief(created)).toEqual(previewScenario);
+    expect(toScenarioBrief(created)).toEqual(exampleScenario);
   });
 
   it('starts with the character speaking first and nothing else', () => {

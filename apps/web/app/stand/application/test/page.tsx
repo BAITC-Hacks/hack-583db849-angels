@@ -206,7 +206,7 @@ function TestScreen() {
 
         {state.kind === 'forbidden' ? (
           <StateCard eyebrow="Access" title="This area is for applicants only">
-            <p>Your account does not submit an application. The commission, interviewer and methodology screens arrive in later slices of the product.</p>
+            <p>Your account does not submit an application. Staff work in the AI layer: briefs, interviews and the commission’s review are there.</p>
           </StateCard>
         ) : null}
 
