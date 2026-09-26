@@ -25,6 +25,7 @@ def client(tmp_path: Path) -> TestClient:
         gateway_mode="replay",
         budget_usd_cap=Decimal("20"),
         demo_mode=False,
+        usage_log_path=tmp_path / "usage.jsonl",
     )
     return TestClient(create_app(settings), raise_server_exceptions=False)
 
@@ -43,7 +44,7 @@ def example(filename: str) -> object:
         ),
     ],
 )
-def test_extended_post_stubs_return_the_frozen_examples(
+def test_surprise_question_replay_matches_the_frozen_example(
     client: TestClient,
     path: str,
     request_name: str,

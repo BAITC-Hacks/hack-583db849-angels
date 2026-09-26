@@ -1,0 +1,12 @@
+{
+  "input_tokens": 120,
+  "model": "gpt-6-luna",
+  "output_tokens": 60,
+  "provider": "openai",
+  "recorded_at": "2026-09-26T00:00:00Z",
+  "request_hash": "3dc02c15d4823a11b27c9fa5d7f458e4480584b7a59123ef88d661e63cb7103a",
+  "request_id": "synthetic-surprise-question",
+  "response": "{\"question\":\"You were listed as leader of a class event. If the group stalled, what specific step would you take to clarify who owned each part?\",\"competency\":\"E\",\"why\":\"The event example leaves coordination unclear; this asks for a concrete execution step.\",\"fieldId\":\"leadership_example\",\"sourceQuote\":\"I was listed as the leader of a class event.\"}",
+  "task": "surprise_question",
+  "version": 1
+}
