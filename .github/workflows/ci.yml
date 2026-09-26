@@ -142,3 +142,64 @@ jobs:
       - if: steps.part.outputs.present == 'true'
         working-directory: services/ml
         run: python -m pytest -q
+
+  e2e:
+    name: e2e
+    runs-on: ubuntu-latest
+    needs: [api, ml]
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: invision
+          POSTGRES_PASSWORD: invision
+          POSTGRES_DB: invision
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U invision"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      # The pitch path, as the demo runs it: seed shortcuts on, every model answer replayed, no keys.
+      DEMO_MODE: "true"
+      GATEWAY_MODE: replay
+      DATABASE_URL: postgresql://invision:invision@localhost:5432/invision
+      ML_INTERNAL_TOKEN: e2e-internal-token
+      API_KEYS: local-platform:platform,local-interviewer:interviewer,local-commission:commission,local-admin:admin
+      UPLOADS_DIR: /tmp/e2e/uploads
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: ffmpeg, for the interview recording's length
+        run: sudo apt-get update -q && sudo apt-get install -y -q ffmpeg
+      - run: pnpm install --frozen-lockfile
+      - run: python -m pip install -r services/ml/requirements.txt
+      - name: Build the API and migrate
+        working-directory: apps/api
+        run: |
+          pnpm run build
+          pnpm exec prisma migrate deploy
+      - name: Start ML and the API
+        run: |
+          mkdir -p /tmp/e2e/uploads
+          PYTHONPATH="$PWD:$PWD/services/ml" BUDGET_USD_CAP=1 USAGE_LOG_PATH=/tmp/e2e/usage.jsonl \
+            nohup python -m uvicorn services.ml.main:app --host 127.0.0.1 --port 8000 > /tmp/e2e/ml.log 2>&1 &
+          (cd apps/api && ML_SERVICE_URL=http://127.0.0.1:8000 PORT=3001 nohup node dist/main.js > /tmp/e2e/api.log 2>&1 &)
+          for i in $(seq 1 60); do
+            curl -sf http://127.0.0.1:3001/v1/health >/dev/null && curl -sf -H "X-Internal-Token: $ML_INTERNAL_TOKEN" http://127.0.0.1:8000/internal/v1/health >/dev/null && exit 0
+            sleep 2
+          done
+          echo "The stack did not come up"; tail -50 /tmp/e2e/ml.log /tmp/e2e/api.log; exit 1
+      - name: Walk the pitch path
+        run: API=http://127.0.0.1:3001/v1 node scripts/e2e/pitch-path.mjs
+      - if: failure()
+        run: tail -100 /tmp/e2e/ml.log /tmp/e2e/api.log
