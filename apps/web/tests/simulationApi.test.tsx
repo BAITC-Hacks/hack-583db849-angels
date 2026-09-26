@@ -62,7 +62,7 @@ describe('the simulation on the API', () => {
     expect(result.current.state.turns).toHaveLength(1);
   });
 
-  it('sends a spoken turn as audio, shows what was heard and plays the reply', async () => {
+  it('sends a spoken turn as audio and shows what was heard; the screen speaks the reply in turn', async () => {
     const calls = simulationRoutes([() => json(turn)]);
     const { result } = hookWithQuery(() => useSimulation(id));
     await waitFor(() => expect(result.current.status).toBe('ready'));
@@ -77,7 +77,8 @@ describe('the simulation on the API', () => {
     expect((sent.body as FormData).get('audio')).toBeInstanceOf(Blob);
     expect(sent.headers.get('idempotency-key')).toMatch(/^[0-9a-f-]{36}$/);
     expect(result.current.state.turns[1].text).toBe(turn.candidateTurn!.text);
-    expect(played).toEqual([`/api${turn.characterAudioUrl}`]);
+    // useSpokenLines voices it once the line before has ended, not the moment it arrives.
+    expect(played).toEqual([]);
   });
 
   it('asks to record again when nothing was recognised, and keeps the transcript as it was', async () => {
