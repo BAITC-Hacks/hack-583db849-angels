@@ -4,6 +4,7 @@ import re
 
 import pytest
 
+from services.ml.app.metrics.languagetool import LocalLanguageTool
 from services.ml.app.modules.assessment_text import ensure_safe_feedback
 from services.ml.app.scenarios import ROOT_SCENARIOS, ScenarioRepository
 from services.ml.app.schemas.contracts import AssessmentResult, Turn
@@ -54,10 +55,14 @@ def test_a_bench_case_is_the_story_word_for_word_and_passes_its_own_gate(story: 
     assert rebuilt.model_dump(mode="json") == load(folder / "expected-assessment.json")
 
 
-def test_the_bench_takes_a_draft_and_refuses_it_without_a_recorded_judge_answer() -> None:
+def test_the_bench_keeps_a_draft_whose_judge_misses_the_reference() -> None:
+    # The judge's live answers for resource-crisis are recorded (#22); on its
+    # medium walkthrough it leaves I without a score where the story expects 2.
     scenario = ScenarioRepository.load(ROOT_SCENARIOS).get("resource-crisis")
     assert scenario is not None and scenario.status == "draft"
-    with pytest.raises(BenchFailure, match="HTTP 503"):
+    if not LocalLanguageTool()._jar.is_file():
+        pytest.skip("HTTP bench needs the bundled offline LanguageTool image")
+    with pytest.raises(BenchFailure, match="I is outside the reference band"):
         run_bench(scenario_id="resource-crisis")
 
 

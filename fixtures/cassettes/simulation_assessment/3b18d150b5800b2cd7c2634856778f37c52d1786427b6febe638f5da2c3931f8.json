@@ -1,0 +1,12 @@
+{
+  "input_tokens": 2222,
+  "model": "gpt-6-luna",
+  "output_tokens": 789,
+  "provider": "openai",
+  "recorded_at": "2026-09-26T13:23:52.289258Z",
+  "request_hash": "3b18d150b5800b2cd7c2634856778f37c52d1786427b6febe638f5da2c3931f8",
+  "request_id": "resp_0fedff6086f9c9df006ab7c762a74087d193ce9ec1dfc1246c",
+  "response": "{\"scores\":[{\"competency\":\"D\",\"score\":0,\"confidence\":\"high\",\"rationale\":\"After the project file was corrupted and editing time was lost, the candidate abandoned the goal rather than outlining a recovery process.\",\"evidence\":[{\"source\":\"simulation_turn\",\"sourceId\":\"turn_14\",\"quote\":\"Then it's over. There's no point now.\"}]},{\"competency\":\"R\",\"score\":null,\"confidence\":null,\"rationale\":null,\"evidence\":[]},{\"competency\":\"I\",\"score\":0,\"confidence\":\"medium\",\"rationale\":\"The candidate proposed a surface-level reduction and submitting whatever remained, without connecting the choice to the stated constraints or considering its consequences.\",\"evidence\":[{\"source\":\"simulation_turn\",\"sourceId\":\"turn_08\",\"quote\":\"Let's just make it shorter and simpler. We'll submit whatever we have.\"}]},{\"competency\":\"V\",\"score\":0,\"confidence\":\"high\",\"rationale\":\"The candidate proposed deceiving the other teammates about the plan rather than communicating the situation honestly.\",\"evidence\":[{\"source\":\"simulation_turn\",\"sourceId\":\"turn_10\",\"quote\":\"Let's not tell them anything. We'll pretend it was always the plan.\"}]},{\"competency\":\"E\",\"score\":1,\"confidence\":\"high\",\"rationale\":\"The candidate suggested broad activity but gave no priorities, owners, deadlines, or way to check progress.\",\"evidence\":[{\"source\":\"simulation_turn\",\"sourceId\":\"turn_12\",\"quote\":\"Let's just keep in touch. We'll get it done somehow.\"}]}]}",
+  "task": "simulation_assessment",
+  "version": 1
+}
