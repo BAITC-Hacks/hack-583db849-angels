@@ -11,7 +11,7 @@
     "wants": "The club to keep working the way pupils and parents have come to trust"
   },
   "hiddenMotive": "Last year another volunteer's new idea fell apart, and Ilyas had to apologise to the parents. He is afraid of going through that again.",
-  "voice": "aura-2-orion-en",
+  "voice": "aura-orion-en",
   "matchThreshold": 0.45,
   "expectedMinutes": 7,
   "maxCandidateTurns": 8,

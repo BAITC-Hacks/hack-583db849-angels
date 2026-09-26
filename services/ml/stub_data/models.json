@@ -123,8 +123,8 @@
     },
     "speech": {
       "provider": "deepgram",
-      "model": "aura-2-thalia-en",
-      "fallback_model": "aura-asteria-en",
+      "model": "aura-asteria-en",
+      "fallback_model": "aura-2-thalia-en",
       "max_tokens": 256,
       "request_cost_limit_usd": 0.02,
       "cache_ttl_seconds": 604800,
