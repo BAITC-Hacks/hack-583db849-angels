@@ -157,7 +157,7 @@ def test_judge_invalid_json_gets_one_gateway_retry_with_bounded_tokens() -> None
     result = asyncio.run(SimulationJudge(gateway).judge(request()))
     assert all(score.score == 2 for score in result)
     assert len(provider.requests) == 2
-    assert [call.max_tokens for call in provider.requests] == [1800, 1800]
+    assert [call.max_tokens for call in provider.requests] == [4000, 4000]
 
 
 def test_judge_two_invalid_json_outputs_fail_without_third_call() -> None:
