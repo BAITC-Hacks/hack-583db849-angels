@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
 import { contractExample } from '../src/contract-example';
 import { ConsistencyService } from '../src/modules/consistency/consistency.service';
 import { ToLlmViewService } from '../src/privacy/to-llm-view.service';
@@ -10,10 +13,10 @@ const transcript = [
   { turnId: 'iturn_02', speaker: 'candidate', text: 'Ada Example fixed the arm overnight.', startSec: 4, endSec: 9 },
 ];
 
-function harness({ scores = true, transcriptStatus = 'ready', briefReady = true, mlFails = false } = {}) {
+function harness({ scores = true, transcriptStatus = 'ready', briefReady = true, mlFails = false, demo = false, spoken = transcript as unknown[] } = {}) {
   const reports: { id: string; status: string; result: unknown; interviewId: string; createdAt: Date }[] = [];
   const interview = {
-    id: 'interview-1', candidateId, transcriptStatus, transcript, interviewerScore: scores ? { id: 'scores-1' } : null,
+    id: 'interview-1', candidateId, transcriptStatus, transcript: spoken, interviewerScore: scores ? { id: 'scores-1' } : null,
     candidate: {
       id: candidateId, externalId: 'inv-2026-demo-a', profile: { fullName: 'Ada Example' },
       application: { answers: [{ fieldId: 'english_self', question: 'Your English?', answer: 'C2, says Ada Example.' }] },
@@ -49,7 +52,8 @@ function harness({ scores = true, transcriptStatus = 'ready', briefReady = true,
     },
   };
   const gateway = { consistency: mlFails ? jest.fn().mockRejectedValue(new Error('AI_UNAVAILABLE')) : jest.fn().mockResolvedValue(after) };
-  const service = new ConsistencyService(prisma as never, gateway as never, new ToLlmViewService());
+  const config = { get: (key: string) => (key === 'DEMO_MODE' ? String(demo) : undefined) };
+  const service = new ConsistencyService(prisma as never, gateway as never, new ToLlmViewService(), config as never);
   return { service, gateway, reports };
 }
 
@@ -95,5 +99,19 @@ describe('ConsistencyService', () => {
     const { service, reports } = harness({ mlFails: true });
     await expect(service.startAfter('interview-1')).resolves.toBeUndefined();
     expect(reports).toEqual([expect.objectContaining({ status: 'failed' })]);
+  });
+
+  it('sends the brief’s own items, so the after stage updates them in place', async () => {
+    const { service, gateway } = harness();
+    await service.startAfter('interview-1');
+    expect(gateway.consistency.mock.calls[0][0].beforeItems).toEqual(brief.consistency);
+  });
+
+  it('in DEMO_MODE gives a seed candidate’s own interview the seed’s after stage, with no model call', async () => {
+    const seed = (name: string) => JSON.parse(readFileSync(resolve(__dirname, '../../../seed/candidates/a', name), 'utf8'));
+    const { service, gateway, reports } = harness({ demo: true, spoken: seed('interview-transcript.json') });
+    await service.startAfter('interview-1');
+    expect(gateway.consistency).not.toHaveBeenCalled();
+    expect(reports[0]).toMatchObject({ status: 'ready', result: seed('expected-consistency-after.json') });
   });
 });
