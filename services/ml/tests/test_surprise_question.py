@@ -94,6 +94,7 @@ def test_forty_word_boundary_and_forbidden_topics() -> None:
         "Your robot broke. What health issue affected you?",
         "Your robot broke. Which school and region are you from?",
         "Your robot broke. What is your email address?",
+        "Your robot broke. Should we admit you?",
     ):
         assert not safe_surprise_proposal(proposal(question=question), sources)
 
@@ -102,6 +103,7 @@ def test_forty_word_boundary_and_forbidden_topics() -> None:
     {"fieldId": "missing"},
     {"sourceQuote": "The robot won the final."},
     {"sourceQuote": "our robot broke two days before the final."},
+    {"sourceQuote": "robot", "question": "What would you do if your robot broke?"},
     {"question": "How do you lead a team?"},
     {"question": "Robot broke? What happened next?"},
     {"question": "Robot broke. Tell me about [redacted]?"},

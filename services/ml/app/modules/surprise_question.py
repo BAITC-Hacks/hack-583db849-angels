@@ -30,7 +30,8 @@ _FORBIDDEN = re.compile(
     r"sibling|siblings|health|medical|illness|disability|mental|money|income|"
     r"salary|financial|finances|tuition|funding|religion|ethnicity|gender|"
     r"birthday|birthplace|hometown|region|school|address|phone|email|iin|"
-    r"photo|appearance|married|marriage)\b",
+    r"photo|appearance|married|marriage|admission|admit|accept|reject|rank|"
+    r"score|grade)\b",
     re.IGNORECASE,
 )
 _CONTACT = re.compile(r"(?:\b[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}\b|\b\d{7,}\b)")
@@ -122,4 +123,4 @@ def safe_surprise_proposal(proposed: SurpriseProposal, sources: dict[str, str]) 
         if len(token) >= 4 and token.lower() not in _STOPWORDS
     }
     question_tokens = {token.lower() for token in _WORDS.findall(question)}
-    return bool(anchor) and len(anchor & question_tokens) >= min(2, len(anchor))
+    return len(anchor) >= 2 and len(anchor & question_tokens) >= 2
