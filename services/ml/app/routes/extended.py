@@ -1,4 +1,4 @@
-"""Internal consistency, draft, and remaining demo JSON operations."""
+"""Internal consistency, draft, quality, and remaining demo JSON operations."""
 
 from __future__ import annotations
 
@@ -12,6 +12,7 @@ from ..examples import load_example
 from ..gateway.usage import FileUsageStore
 from ..modules.interview_draft import InterviewDraftService
 from ..modules.consistency import ConsistencyService
+from ..modules.quality_check import QualityCheckService
 from ..schemas.contracts import (
     ConsistencyRequest,
     ConsistencyResult,
@@ -33,6 +34,7 @@ def extended_router(
     cap_usd: Decimal,
     draft_service: InterviewDraftService,
     consistency_service: ConsistencyService,
+    quality_service: QualityCheckService,
 ) -> APIRouter:
     router = APIRouter(prefix="/internal/v1", dependencies=[Depends(authenticate)])
 
@@ -55,7 +57,6 @@ def extended_router(
 
     @router.post("/quality-check", response_model=QualityCheckResult)
     async def quality_check(request: QualityCheckRequest) -> QualityCheckResult:
-        filename = f"quality-check-{request.kind}.response.json"
-        return load_example(filename, QualityCheckResult)
+        return await quality_service.prepare(request)
 
     return router
