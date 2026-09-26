@@ -4,7 +4,8 @@ import { useQuery } from '@tanstack/react-query';
 import type { CandidateCode } from '../home/types';
 import { api, unwrap } from './client';
 import type { WireCandidate } from './contract';
-import { codeFromLabel } from './mappers/evidence';
+import { seedCode } from './mappers/evidence';
+import { useDemoCandidateId } from '../demo/currentCandidate';
 
 export const candidatesKey = ['candidates'] as const;
 
@@ -46,5 +47,16 @@ export function candidateById(candidates: WireCandidate[] | undefined, candidate
 }
 
 export function candidateByCode(candidates: WireCandidate[] | undefined, code: CandidateCode): WireCandidate | undefined {
-  return candidates?.find((candidate) => codeFromLabel(candidate.label) === code);
+  return candidates?.find((candidate) => seedCode(candidate.label) === code);
+}
+
+/**
+ * The candidate the candidate screens belong to: the one the demo cookie names
+ * (an applicant the stand sent, or one the presenter picked), else candidate A.
+ */
+export function useMe(options: { poll?: boolean | 'while-pending' } = {}) {
+  const candidates = useCandidates(options);
+  const chosen = useDemoCandidateId();
+  const me = (chosen ? candidateById(candidates.data, chosen) : undefined) ?? candidateByCode(candidates.data, 'A');
+  return { candidates, me };
 }

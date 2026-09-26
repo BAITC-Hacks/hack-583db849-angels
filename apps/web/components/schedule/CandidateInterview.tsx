@@ -3,7 +3,7 @@
 import { ArrowRightIcon, CalendarDaysIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { useState } from 'react';
-import { candidateByCode, useCandidates } from '../../lib/api/candidates';
+import { useMe } from '../../lib/api/candidates';
 import { errorText } from '../../lib/api/errors';
 import { useBookSlot, useSlots } from '../../lib/slots/queries';
 import { dayKey, formatDay, formatDayKey, formatTime, monthStart, opensAt } from '../../lib/slots/time';
@@ -25,8 +25,7 @@ function range(slot: InterviewSlot): string {
  * this only shows it before anyone presses a button.
  */
 export function CandidateInterview() {
-  const candidates = useCandidates();
-  const me = candidateByCode(candidates.data, 'A');
+  const { candidates, me } = useMe();
   const slots = useSlots({ open: true, candidateId: me?.candidateId }, { enabled: Boolean(me) });
   const book = useBookSlot();
   const now = useNow(5_000);

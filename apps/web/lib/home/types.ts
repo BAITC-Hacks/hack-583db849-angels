@@ -5,7 +5,10 @@ export type TranscriptStatus = 'none' | 'transcribing' | 'ready';
 
 /** Where one candidate is, as the staff homes show it — all of it from the API but the "read" mark. */
 export interface CandidateProgress {
-  code: CandidateCode;
+  /** A, B or C for the seeded candidates; `null` for an applicant the platform sent. */
+  code: CandidateCode | null;
+  /** What the screens print after "Candidate": the letter, or the platform applicant's tag. */
+  tag: string;
   id: string;
   /** Anything to show yet: a brief, or a simulation started. */
   hasData: boolean;
@@ -15,6 +18,8 @@ export interface CandidateProgress {
   briefViewed: boolean;
   simulation: SimulationStatus;
   assessmentReady: boolean;
+  /** The latest assessment, for links straight to its report; `null` until there is one. */
+  assessmentId?: string | null;
   /** Shown so a failed assessment is not mistaken for one not started. */
   assessment?: 'pending' | 'ready' | 'failed' | null;
   /** The latest interview; `null` until the interviewer starts one. */

@@ -31,3 +31,14 @@ export function codeFromLabel(label: string): 'A' | 'B' | 'C' {
   const letter = label.trim().slice(-1).toUpperCase();
   return letter === 'B' || letter === 'C' ? letter : 'A';
 }
+
+/** A, B or C for the seeded candidates — "Candidate A" exactly — and `null` for anyone the platform sent. */
+export function seedCode(label: string): 'A' | 'B' | 'C' | null {
+  const match = /^Candidate ([ABC])$/.exec(label.trim());
+  return match ? (match[1] as 'A' | 'B' | 'C') : null;
+}
+
+/** What a screen prints after "Candidate": the seed's letter, or the tag the API gave a platform applicant. */
+export function candidateTag(label: string): string {
+  return label.trim().replace(/^Candidate\s+/, '');
+}

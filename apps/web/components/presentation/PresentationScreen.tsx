@@ -1,6 +1,6 @@
 'use client';
 
-import { candidateByCode, useCandidates } from '../../lib/api/candidates';
+import { useMe } from '../../lib/api/candidates';
 import { errorText } from '../../lib/api/errors';
 import { useSubmitPresentation } from '../../lib/presentation/queries';
 import { PresentationFlow } from './PresentationFlow';
@@ -11,9 +11,8 @@ import { PresentationFlow } from './PresentationFlow';
  * reads the transcript: it only learns that the presentation arrived.
  */
 export function PresentationScreen() {
-  const candidates = useCandidates();
+  const { candidates, me } = useMe();
   const submit = useSubmitPresentation();
-  const me = candidateByCode(candidates.data, 'A');
 
   if (candidates.isError) {
     return (

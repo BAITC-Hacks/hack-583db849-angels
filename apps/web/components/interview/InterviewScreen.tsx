@@ -67,7 +67,7 @@ export function InterviewScreen({ state }: { state: Interview }) {
         <header className="flex flex-col gap-2">
           <p className="font-mono text-[0.62rem] tracking-[0.14em] text-text-muted uppercase">{text.eyebrow}</p>
           <h1 className="text-balance-tight text-2xl font-extrabold sm:text-3xl">
-            {text.candidate} {interview.candidate.code}
+            {text.candidate} {interview.candidate.tag}
           </h1>
           <p className="text-sm text-text-secondary">
             {text.held}: {held} UTC

@@ -4,7 +4,7 @@ import { ArrowRightIcon, CheckCircleIcon, ClockIcon } from '@heroicons/react/24/
 import { useMutation } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { candidateByCode, useCandidates } from '../../../lib/api/candidates';
+import { useMe } from '../../../lib/api/candidates';
 import { api, ApiError, unwrap } from '../../../lib/api/client';
 import { errorText } from '../../../lib/api/errors';
 import { useCreateSurprise } from '../../../lib/surprise/queries';
@@ -25,8 +25,7 @@ const stepAction =
  */
 export default function CandidateHome() {
   const router = useRouter();
-  const candidates = useCandidates({ poll: 'while-pending' });
-  const me = candidateByCode(candidates.data, 'A');
+  const { candidates, me } = useMe({ poll: 'while-pending' });
   const progress = me?.progress;
   const simulation = progress?.simulation ?? null;
   const assessment = progress?.assessment ?? null;

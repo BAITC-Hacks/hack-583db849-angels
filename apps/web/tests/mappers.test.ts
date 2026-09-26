@@ -102,7 +102,7 @@ describe('the interview', () => {
 
   it('is what the interview screen renders', () => {
     const record = toInterviewRecord(interview as never);
-    expect(record.view).toEqual({ interviewId: interview.interviewId, candidate: { id: interview.candidateId, code: 'A' }, heldAt: interview.heldAt });
+    expect(record.view).toEqual({ interviewId: interview.interviewId, candidate: { id: interview.candidateId, code: 'A', tag: 'A' }, heldAt: interview.heldAt });
     expect(record.transcript.map((turn) => turn.turnId)).toEqual(interview.transcript.map((turn) => turn.turnId));
     expect(record).toMatchObject({ transcriptStatus: 'ready', savedScores: null });
   });
@@ -150,11 +150,13 @@ describe('a candidate on a home screen', () => {
     const progress = toScreenProgress(example<WireCandidateProgress>('candidate-progress.commission.json'));
     expect(progress).toEqual({
       code: 'A',
+      tag: 'A',
       id: '00000000-0000-4000-8000-00000000000a',
       hasData: true,
       briefViewed: true,
       simulation: 'completed',
       assessmentReady: true,
+      assessmentId: '6f1c2a0e-0000-4000-8000-00000000a003',
       interviewId: '6f1c2a0e-0000-4000-8000-00000000a004',
       transcript: 'ready',
       scoresSaved: true,

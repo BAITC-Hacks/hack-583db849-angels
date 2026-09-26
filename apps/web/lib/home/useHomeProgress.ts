@@ -1,6 +1,8 @@
 'use client';
 
 import { candidateByCode, useCandidates } from '../api/candidates';
+import type { WireCandidateProgress } from '../api/contract';
+import { seedCode } from '../api/mappers/evidence';
 import { toScreenProgress } from '../api/mappers/candidates';
 import { useViewedBriefs } from '../brief/viewed';
 import type { CandidateCode, CandidateProgress } from './types';
@@ -9,13 +11,15 @@ const codes: CandidateCode[] = ['A', 'B', 'C'];
 
 export interface HomeProgress {
   candidates: Record<CandidateCode, CandidateProgress>;
+  /** Every candidate to list: A, B and C first, then each applicant the platform sent, oldest first. */
+  rows: CandidateProgress[];
   /** The API could not be read; every step shows as not started. */
   apiError: unknown;
 }
 
 function notStarted(code: CandidateCode): CandidateProgress {
   return {
-    code, id: '', hasData: false, brief: null, briefViewed: false, simulation: 'not-started', assessmentReady: false,
+    code, tag: code, id: '', hasData: false, brief: null, briefViewed: false, simulation: 'not-started', assessmentReady: false,
     assessment: null, interviewId: null, transcript: 'none', scoresSaved: false, draftReady: false,
   };
 }
@@ -30,24 +34,27 @@ export function useHomeProgress(): HomeProgress {
   const viewed = useViewedBriefs();
   const api = useCandidates({ poll: 'while-pending' });
 
+  const fromWire = (progress: WireCandidateProgress): CandidateProgress => {
+    const fromApi = toScreenProgress(progress);
+    const brief = progress.brief?.status;
+    return {
+      ...fromApi,
+      brief: brief === 'pending' || brief === 'ready' || brief === 'failed' ? brief : null,
+      briefViewed: viewed.has(fromApi.id),
+      assessment: (progress.assessment?.status as CandidateProgress['assessment']) ?? null,
+    };
+  };
+
   const candidates = Object.fromEntries(
     codes.map((code) => {
       const progress = candidateByCode(api.data, code)?.progress;
-      if (!progress) return [code, notStarted(code)];
-      const fromApi = toScreenProgress(progress);
-      const brief = progress.brief?.status;
-      return [
-        code,
-        {
-          ...fromApi,
-          code,
-          brief: brief === 'pending' || brief === 'ready' || brief === 'failed' ? brief : null,
-          briefViewed: viewed.has(fromApi.id),
-          assessment: (progress.assessment?.status as CandidateProgress['assessment']) ?? null,
-        },
-      ];
+      return [code, progress ? { ...fromWire(progress), code } : notStarted(code)];
     }),
   ) as Record<CandidateCode, CandidateProgress>;
 
-  return { candidates, apiError: api.isError ? api.error : null };
+  const sent = (api.data ?? [])
+    .filter((candidate) => seedCode(candidate.label) === null && candidate.progress)
+    .map((candidate) => fromWire(candidate.progress as WireCandidateProgress));
+
+  return { candidates, rows: [...codes.map((code) => candidates[code]), ...sent], apiError: api.isError ? api.error : null };
 }

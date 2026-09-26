@@ -9,6 +9,7 @@ import { activeItemId, navFor, sectionLabel, type NavItem, type NavSection } fro
 import { homeFor, isStaff, type DemoRole } from '../../lib/roles';
 import { ThemeToggle } from '../ui/ThemeToggle';
 import { LanguageSwitch } from './LanguageSwitch';
+import { CandidatePicker } from './CandidatePicker';
 import { RoleSwitcher } from './RoleSwitcher';
 
 const copy = {
@@ -127,6 +128,7 @@ export function Sidebar({
       </Link>
 
       <RoleSwitcher role={role} onChange={onRoleChange} locale={shown} collapsed={collapsed} />
+      {role === 'candidate' ? <CandidatePicker collapsed={collapsed} /> : null}
 
       <nav aria-label="Main" className="flex flex-1 flex-col gap-4 overflow-y-auto">
         {sections.map((section) => {

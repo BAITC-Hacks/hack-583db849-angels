@@ -1,7 +1,7 @@
 import type { components } from '@invision/api-client';
 import type { Score } from '../../../components/evidence/ScoreMeter';
 import type { AssessmentDraft, InterviewRecord } from '../../interview/types';
-import { codeFromLabel, toCompetencyScore } from './evidence';
+import { candidateTag, codeFromLabel, toCompetencyScore } from './evidence';
 
 type WireInterview = components['schemas']['InterviewDto'];
 type WireDraft = components['schemas']['AssessmentDraftDto'];
@@ -11,7 +11,7 @@ export function toInterviewRecord(interview: WireInterview): InterviewRecord {
   return {
     view: {
       interviewId: interview.interviewId,
-      candidate: { id: interview.candidateId, code: codeFromLabel(interview.candidateLabel) },
+      candidate: { id: interview.candidateId, code: codeFromLabel(interview.candidateLabel), tag: candidateTag(interview.candidateLabel) },
       heldAt: interview.heldAt,
     },
     transcriptStatus: interview.transcriptStatus,

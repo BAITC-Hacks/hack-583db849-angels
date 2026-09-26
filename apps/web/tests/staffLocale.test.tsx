@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { EvidenceQuote } from '../components/evidence/EvidenceQuote';
 import { ScoreMeter } from '../components/evidence/ScoreMeter';
 import { Sidebar } from '../components/shell/Sidebar';
+import { withQuery } from './apiHarness';
 import { StaffLocaleProvider } from '../lib/i18n/StaffLocaleProvider';
 
 vi.mock('next/navigation', () => ({
@@ -37,7 +38,8 @@ describe('staff screens in Russian', () => {
   });
 
   it('keeps a candidate in English, with no language switch at all', () => {
-    render(<Sidebar role="candidate" onRoleChange={noop} locale="ru" onLocaleChange={noop} collapsed={false} />);
+    // The candidate role also shows whose screens these are, from the API: the query needs its client.
+    withQuery(<Sidebar role="candidate" onRoleChange={noop} locale="ru" onLocaleChange={noop} collapsed={false} />);
     expect(screen.getByText('My simulation')).toBeTruthy();
     expect(screen.getByText('Workspace')).toBeTruthy();
     expect(screen.queryByRole('radiogroup')).toBeNull();
