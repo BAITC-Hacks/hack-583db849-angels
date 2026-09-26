@@ -25,12 +25,13 @@ from services.ml.app.schemas.contracts import ScenarioConfig
 STORIES = ROOT / "docs" / "scenarios"
 CONFIGS = ROOT / "config" / "scenarios"
 
-# A distinct Deepgram Aura 2 voice per character, chosen by the story's description.
+# A distinct Deepgram Aura voice per character, chosen by the story's description. Aura 1:
+# the speech task's model, because it answers in about a second where Aura 2 takes four.
 VOICES = {
-    "female, energetic": ["aura-2-andromeda-en", "aura-2-aurora-en", "aura-2-phoebe-en"],
-    "female, calm": ["aura-2-helena-en", "aura-2-selene-en"],
-    "male, energetic": ["aura-2-apollo-en", "aura-2-hermes-en"],
-    "male, calm": ["aura-2-orion-en", "aura-2-arcas-en"],
+    "female, energetic": ["aura-stella-en", "aura-hera-en", "aura-asteria-en"],
+    "female, calm": ["aura-luna-en", "aura-athena-en"],
+    "male, energetic": ["aura-perseus-en", "aura-arcas-en"],
+    "male, calm": ["aura-orion-en", "aura-helios-en"],
 }
 # The fallback of every beat, as in the first scenario: anything the matcher cannot place.
 FALLBACK = {"answerTypeId": "other", "description": "Anything else", "examples": ["...", "ok", "hmm"]}

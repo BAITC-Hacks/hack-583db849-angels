@@ -11,7 +11,7 @@
     "wants": "To cancel before the team owes money it cannot pay"
   },
   "hiddenMotive": "She approved the budget without a backup plan and is afraid the team will blame her for the gap.",
-  "voice": "aura-2-andromeda-en",
+  "voice": "aura-stella-en",
   "matchThreshold": 0.45,
   "expectedMinutes": 7,
   "maxCandidateTurns": 8,

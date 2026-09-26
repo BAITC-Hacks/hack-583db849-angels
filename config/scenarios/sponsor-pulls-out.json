@@ -11,7 +11,7 @@
     "wants": "A visible kids' coding project she can show her boss"
   },
   "hiddenMotive": "Her boss has already announced the coding club inside the shop. She needs a yes to save face, and would accept a smaller deal if it still looks good.",
-  "voice": "aura-2-aurora-en",
+  "voice": "aura-hera-en",
   "matchThreshold": 0.45,
   "expectedMinutes": 7,
   "maxCandidateTurns": 8,
