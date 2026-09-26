@@ -1,0 +1,26 @@
+{
+  "items": [
+    {
+      "itemId": "c_01",
+      "topic": "english",
+      "claim": {
+        "text": "Self-rated English as B2.",
+        "evidence": [
+          {
+            "source": "application_field",
+            "sourceId": "english_self",
+            "quote": "B2"
+          }
+        ]
+      },
+      "observation": {
+        "text": "No simulation English estimate is available yet.",
+        "evidence": [],
+        "metric": null
+      },
+      "status": "unverified",
+      "whatToDo": "Review the cited evidence with the candidate before drawing a conclusion.",
+      "askInInterview": null
+    }
+  ]
+}

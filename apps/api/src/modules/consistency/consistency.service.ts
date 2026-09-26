@@ -1,4 +1,5 @@
 import { ConflictException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Prisma } from '@prisma/client';
 
 import { AI_GATEWAY, AiGateway } from '../../ai-client/ai-gateway.port';
@@ -6,11 +7,13 @@ import type { components } from '../../ai-client/schema';
 import { PrismaService } from '../../database/prisma.service';
 import { candidateSnapshot, snapshotSelect } from '../../privacy/candidate-snapshot';
 import { ToLlmViewService } from '../../privacy/to-llm-view.service';
+import { readSeed, seedLetter } from '../../seed-files';
 import { ConsistencyReportDto } from './dto/consistency.dto';
 
 type ConsistencyResult = components['schemas']['ConsistencyResult'];
 type EnglishMetrics = components['schemas']['EnglishMetrics'];
 type InterviewTurn = components['schemas']['InterviewTurn'];
+type ConsistencyItem = components['schemas']['ConsistencyItem'];
 
 @Injectable()
 export class ConsistencyService {
@@ -20,6 +23,7 @@ export class ConsistencyService {
     private readonly prisma: PrismaService,
     @Inject(AI_GATEWAY) private readonly gateway: AiGateway,
     private readonly privacy: ToLlmViewService,
+    private readonly config: ConfigService,
   ) {}
 
   /** Before the interview: the latest ready brief's own consistency block — no separate call. */
@@ -76,7 +80,7 @@ export class ConsistencyService {
 
       const profile = interview.candidate.profile as Record<string, unknown>;
       const redact = (text: string) => this.privacy.redactText(profile, text);
-      const [simulation, assessment] = await Promise.all([
+      const [simulation, assessment, brief] = await Promise.all([
         this.prisma.simulation.findFirst({
           where: { candidateId: interview.candidateId, status: 'completed' },
           orderBy: { createdAt: 'desc' },
@@ -85,13 +89,18 @@ export class ConsistencyService {
         this.prisma.assessment.findFirst({
           where: { candidateId: interview.candidateId, status: 'ready' }, orderBy: { createdAt: 'desc' }, select: { result: true },
         }),
+        // The brief's own items: the after stage updates them in place rather than starting again.
+        this.prisma.brief.findFirst({
+          where: { candidateId: interview.candidateId, status: 'ready' }, orderBy: { createdAt: 'desc' }, select: { result: true },
+        }),
       ]);
+      const transcript = interview.transcript as unknown as InterviewTurn[];
 
       const pending = await this.prisma.consistencyReport.create({
         data: { candidateId: interview.candidateId, interviewId, status: 'pending' }, select: { id: true },
       });
       try {
-        const result = await this.gateway.consistency({
+        const result = await this.seededAfter(interview.candidate.externalId, transcript) ?? await this.gateway.consistency({
           stage: 'after',
           candidate: this.privacy.toLlmView(interview.candidateId, candidateSnapshot(interview.candidate)),
           simulationEnglish: (assessment?.result as { english?: EnglishMetrics } | null)?.english ?? null,
@@ -102,7 +111,8 @@ export class ConsistencyService {
             startedAt: (turn.startedAt ?? turn.createdAt).toISOString(),
             endedAt: (turn.endedAt ?? turn.createdAt).toISOString(),
           })),
-          interviewTranscript: (interview.transcript as unknown as InterviewTurn[]).map((turn) => ({ ...turn, text: redact(turn.text) })),
+          interviewTranscript: transcript.map((turn) => ({ ...turn, text: redact(turn.text) })),
+          beforeItems: (brief?.result as { consistency?: ConsistencyItem[] } | null)?.consistency ?? [],
         });
         await this.prisma.consistencyReport.update({ where: { id: pending.id }, data: { status: 'ready', result: result as unknown as Prisma.InputJsonValue } });
       } catch (error) {
@@ -112,6 +122,19 @@ export class ConsistencyService {
     } catch (error) {
       this.logger.error(`Consistency after interview ${interviewId} failed: ${error instanceof Error ? error.message : String(error)}`);
     }
+  }
+
+  /**
+   * In `DEMO_MODE`, A, B and C's own interview gets the seed's after stage,
+   * with no model call — the rule the brief, the report and the draft follow.
+   */
+  private async seededAfter(externalId: string, transcript: InterviewTurn[]): Promise<ConsistencyResult | null> {
+    const letter = seedLetter(externalId);
+    if (!letter || this.config.get<string>('DEMO_MODE') !== 'true') return null;
+    const seeded = await readSeed<InterviewTurn[]>('candidates', letter, 'interview-transcript.json').catch(() => null);
+    const same = seeded !== null && seeded.length === transcript.length &&
+      seeded.every((turn, index) => turn.speaker === transcript[index].speaker && turn.text === transcript[index].text);
+    return same ? readSeed<ConsistencyResult>('candidates', letter, 'expected-consistency-after.json') : null;
   }
 
   private notFound(): never {
