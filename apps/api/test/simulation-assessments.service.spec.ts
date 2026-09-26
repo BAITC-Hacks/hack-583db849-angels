@@ -1,7 +1,7 @@
 import { HttpException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 
-import { contractExample } from '../src/contract-example';
+import { contractExample } from './contract-example';
 import { SimulationAssessmentsService } from '../src/modules/simulation-assessments/simulation-assessments.service';
 import { ToLlmViewService } from '../src/privacy/to-llm-view.service';
 import { readSeed } from '../src/seed-files';

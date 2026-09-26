@@ -1,5 +1,5 @@
 import { CandidateAiService } from '../src/ai-client/candidate-ai.service';
-import { contractExample } from '../src/contract-example';
+import { contractExample } from './contract-example';
 import { BriefsService } from '../src/modules/briefs/briefs.service';
 import { ToLlmViewService } from '../src/privacy/to-llm-view.service';
 

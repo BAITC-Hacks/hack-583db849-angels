@@ -1,6 +1,6 @@
 import { CandidatesService } from '../src/modules/candidates/candidates.service';
 import { Prisma } from '@prisma/client';
-import { contractExample } from '../src/contract-example';
+import { contractExample } from './contract-example';
 import { CandidateProgressDto } from '../src/modules/candidates/dto/candidate.dto';
 import { filterProgressForRole } from '../src/modules/candidates/filter-progress-for-role';
 

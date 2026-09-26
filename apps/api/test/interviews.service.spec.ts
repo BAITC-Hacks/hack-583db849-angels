@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-import { contractExample } from '../src/contract-example';
+import { contractExample } from './contract-example';
 import { InterviewsService } from '../src/modules/interviews/interviews.service';
 import { ToLlmViewService } from '../src/privacy/to-llm-view.service';
 
