@@ -118,7 +118,12 @@ def test_all_committed_cassette_envelopes_and_outputs_validate() -> None:
     actor_files = list((CASSETTES / "simulation_actor").glob("*.json"))
     transcription_files = list((CASSETTES / "transcription").glob("*.json"))
     speech_files = list((CASSETTES / "speech").glob("*.json"))
-    assert (len(actor_files), len(transcription_files), len(speech_files)) == (15, 15, 13)
+    # The m2a turns and the m4 interview are authored; the demo videos' answers are recorded live.
+    turn_transcripts = [
+        path for path in transcription_files
+        if MediaCassetteEnvelope.model_validate_json(path.read_text(encoding="utf-8")).request_id.startswith("synthetic-")
+    ]
+    assert (len(actor_files), len(turn_transcripts), len(speech_files)) == (15, 15, 13)
 
     for path in actor_files:
         envelope = CassetteEnvelope.model_validate_json(path.read_text(encoding="utf-8"))

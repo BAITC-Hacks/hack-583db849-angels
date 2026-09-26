@@ -9,7 +9,7 @@ from fastapi import APIRouter, Depends, Response
 
 from ..audio import resolve_audio_ref
 from ..errors import ServiceError
-from ..examples import load_example
+from ..modules.answer_transcription import AnswerTranscriptionService
 from ..modules.interview_transcription import InterviewTranscriptionService
 from ..modules.speech import SpeechService
 from ..modules.transcription import TurnTranscriptionService
@@ -22,6 +22,7 @@ def audio_router(
     turn_transcription: TurnTranscriptionService,
     interview_transcription: InterviewTranscriptionService,
     speech_service: SpeechService,
+    answer_transcription: AnswerTranscriptionService,
 ) -> APIRouter:
     router = APIRouter(prefix="/internal/v1", dependencies=[Depends(authenticate)])
 
@@ -40,7 +41,8 @@ def audio_router(
             return await turn_transcription.transcribe(request, audio_path)
         if request.purpose == "interview":
             return await interview_transcription.transcribe(request, audio_path)
-        return load_example("transcribe.response.json", TranscribeResult)
+        # The surprise answer, and the video presentation that uses the same purpose.
+        return await answer_transcription.transcribe(request, audio_path)
 
     @router.post(
         "/speech",

@@ -23,6 +23,7 @@ from .modules.judge import SimulationJudge
 from .metrics.languagetool import LocalLanguageTool
 from .modules.director import ScenarioDirector
 from .modules.interview_transcription import InterviewTranscriptionService
+from .modules.answer_transcription import AnswerTranscriptionService
 from .modules.interview_draft import InterviewDraftGenerator, InterviewDraftService
 from .modules.quality_calibration import CalibrationWording
 from .modules.quality_check import QualityCheckService
@@ -58,6 +59,7 @@ def create_app(
     resolved_media_gateway = media_gateway or create_media_gateway(resolved, models)
     turn_transcription = TurnTranscriptionService(resolved_media_gateway)
     interview_transcription = InterviewTranscriptionService(resolved_media_gateway)
+    answer_transcription = AnswerTranscriptionService(resolved_media_gateway)
     speech_service = SpeechService(resolved_media_gateway, scenario_repository)
     resolved_model_gateway = model_gateway or LazyModelGateway(
         lambda: create_gateway(resolved, models)
@@ -110,6 +112,7 @@ def create_app(
             turn_transcription,
             interview_transcription,
             speech_service,
+            answer_transcription,
         )
     )
     app.include_router(
