@@ -30,6 +30,7 @@ from .modules.quality_guard import InterviewQuestionAnalyzer
 from .modules.matcher import LazyLocalMatcher
 from .modules.simulation import SimulationService
 from .modules.speech import SpeechService
+from .modules.surprise_question import SurpriseQuestionService
 from .modules.transcription import TurnTranscriptionService
 from .scenarios import load_scenario_repository
 
@@ -45,6 +46,7 @@ def create_app(
     consistency_service: ConsistencyService | None = None,
     draft_service: InterviewDraftService | None = None,
     quality_service: QualityCheckService | None = None,
+    surprise_service: SurpriseQuestionService | None = None,
 ) -> FastAPI:
     resolved = settings or load_settings()
     app = FastAPI(title="AI Leader ID ML API", version="1.0.0")
@@ -83,6 +85,9 @@ def create_app(
         InterviewQuestionAnalyzer(resolved_model_gateway),
         CalibrationWording(resolved_model_gateway),
     )
+    resolved_surprise_service = surprise_service or SurpriseQuestionService(
+        resolved_model_gateway
+    )
 
     @app.get(
         "/internal/v1/health",
@@ -115,6 +120,7 @@ def create_app(
             resolved_draft_service,
             resolved_consistency_service,
             resolved_quality_service,
+            resolved_surprise_service,
         )
     )
     return app

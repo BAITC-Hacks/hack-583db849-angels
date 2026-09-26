@@ -2,6 +2,9 @@ import json
 from pathlib import Path
 import re
 
+from services.ml.app.modules.surprise_question import (
+    SurpriseProposal, safe_surprise_proposal,
+)
 from services.ml.app.schemas.contracts import (
     AssessmentResult,
     BriefResult,
@@ -43,8 +46,15 @@ def test_every_candidate_has_the_complete_seed_layout_and_valid_shapes() -> None
             "interview-transcript.json",
             "expected-interview-draft.json",
             "expected-consistency-after.json",
+            "surprise-question-proposal.json",
         }
         assert {path.name for path in directory.iterdir()} == expected
+        surprise = SurpriseProposal.model_validate(load(directory / "surprise-question-proposal.json"))
+        snapshot = load(directory / "snapshot.json")
+        assert safe_surprise_proposal(surprise, {
+            item["fieldId"]: item["answer"]
+            for item in snapshot["application"]["answers"]
+        })
         BriefResult.model_validate(load(directory / "expected-brief.json"))
         ConsistencyResult.model_validate(load(directory / "expected-consistency-after.json"))
         AssessmentResult.model_validate(load(directory / "expected-assessment.json"))

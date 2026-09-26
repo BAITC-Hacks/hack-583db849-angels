@@ -1,0 +1,12 @@
+{
+  "input_tokens": 120,
+  "model": "gpt-6-luna",
+  "output_tokens": 60,
+  "provider": "openai",
+  "recorded_at": "2026-09-26T00:00:00Z",
+  "request_hash": "1aaa43a076f3afa6eddd191415466fa9d7cdc9f81744390ba7fb9a5d17c8c433",
+  "request_id": "synthetic-surprise-question",
+  "response": "{\"question\":\"Beginners left your debate club after the first month. If the new mentoring groups still struggled, what would you test next with those members?\",\"competency\":\"I\",\"why\":\"The mentoring plan addressed a need; this asks how the idea would be tested and revised.\",\"fieldId\":\"leadership_example\",\"sourceQuote\":\"beginners left after the first month\"}",
+  "task": "surprise_question",
+  "version": 1
+}

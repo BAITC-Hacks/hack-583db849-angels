@@ -1,0 +1,12 @@
+{
+  "input_tokens": 120,
+  "model": "gpt-6-luna",
+  "output_tokens": 60,
+  "provider": "openai",
+  "recorded_at": "2026-09-26T00:00:00Z",
+  "request_hash": "f7277f6f58c83a1b7a9025bc505cc906e7dd2a8821e81694dda7b1269a8607d6",
+  "request_id": "synthetic-surprise-question",
+  "response": "{\"question\":\"Your robot broke two days before the final. If you could go back, what would you do differently for the team, not the robot?\",\"competency\":\"D\",\"why\":\"The setback story is about the machine; this asks about the people.\",\"fieldId\":\"setback\",\"sourceQuote\":\"Our robot broke two days before the final.\"}",
+  "task": "surprise_question",
+  "version": 1
+}

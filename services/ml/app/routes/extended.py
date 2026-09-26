@@ -8,11 +8,11 @@ from decimal import Decimal
 from fastapi import APIRouter, Depends
 
 from ..config import GatewayMode
-from ..examples import load_example
 from ..gateway.usage import FileUsageStore
 from ..modules.interview_draft import InterviewDraftService
 from ..modules.consistency import ConsistencyService
 from ..modules.quality_check import QualityCheckService
+from ..modules.surprise_question import SurpriseQuestionService
 from ..schemas.contracts import (
     ConsistencyRequest,
     ConsistencyResult,
@@ -35,6 +35,7 @@ def extended_router(
     draft_service: InterviewDraftService,
     consistency_service: ConsistencyService,
     quality_service: QualityCheckService,
+    surprise_service: SurpriseQuestionService,
 ) -> APIRouter:
     router = APIRouter(prefix="/internal/v1", dependencies=[Depends(authenticate)])
 
@@ -44,8 +45,7 @@ def extended_router(
 
     @router.post("/surprise-question", response_model=SurpriseResult)
     async def surprise_question(request: SurpriseRequest) -> SurpriseResult:
-        del request
-        return load_example("surprise-question.response.json", SurpriseResult)
+        return await surprise_service.prepare(request)
 
     @router.get("/usage", response_model=Usage)
     async def usage() -> Usage:
