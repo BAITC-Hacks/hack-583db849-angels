@@ -14,6 +14,7 @@ import { useApiErrorText } from '../../lib/stand/errorPresentation';
 import { useApplicantHome } from '../../lib/application/useApplicantHome';
 import { useAuth } from '../../lib/auth/AuthContext';
 import { formatDate } from '../../lib/format';
+import { findSubmission } from '../../mocks/platformExport';
 
 /**
  * What to do next, said plainly, by looking at what has actually happened.
@@ -24,7 +25,7 @@ import { formatDate } from '../../lib/format';
  * own action, and a stage nobody has built yet says so instead of offering a
  * button that leads nowhere.
  */
-function NextStep({ state }: { state: Extract<ReturnType<typeof useApplicantHome>['state'], { kind: 'continue' }> }) {
+function NextStep({ state }: { state: Extract<ReturnType<typeof useApplicantHome>['state'], { kind: 'continue' }> & { submitted: boolean } }) {
   const { cycle, draft, test } = state;
 
   const total = cycle.formVersion.questions.length;
@@ -32,7 +33,7 @@ function NextStep({ state }: { state: Extract<ReturnType<typeof useApplicantHome
   const formDone = total > 0 && answered === total;
   const testDone = test?.status === 'COMPLETED';
 
-  const open = (href: '/stand/application' | '/stand/application/test', label: string, primary: boolean) => (
+  const open = (href: '/stand/application' | '/stand/application/test' | '/stand/application/submit', label: string, primary: boolean) => (
     <Link
       key={href + label}
       href={href}
@@ -52,15 +53,32 @@ function NextStep({ state }: { state: Extract<ReturnType<typeof useApplicantHome
     </Link>
   );
 
+  if (state.submitted) {
+    return (
+      <StateCard
+        eyebrow="Next step"
+        title="Your application is sent"
+        action={open('/stand/application/submit', 'Continue to your inVision U steps', true)}
+      >
+        <p>inVision U has your answers. The simulation, a short question, your video and the interview are next.</p>
+      </StateCard>
+    );
+  }
+
   if (testDone && test) {
     return (
       <StateCard
         eyebrow="Next step"
         title="The test is done"
-        action={open('/stand/application', 'Open the application', false)}
+        action={
+          <>
+            {open('/stand/application/submit', 'Send the application', true)}
+            {open('/stand/application', 'Open the application', false)}
+          </>
+        }
       >
         <p>
-          {`Every block is closed: ${test.answeredBlocks} answered, ${test.timedOutBlocks} timed out. Video comes next; that part is not built yet.`}
+          {`Every block is closed: ${test.answeredBlocks} answered, ${test.timedOutBlocks} timed out. Sending the application is the last step here.`}
         </p>
       </StateCard>
     );
@@ -240,6 +258,7 @@ export function ApplicantHome() {
               draft={state.draft}
               test={state.test}
               email={user?.email}
+              submitted={Boolean(user && findSubmission(user.id))}
             />
           ) : null}
 
@@ -259,7 +278,7 @@ export function ApplicantHome() {
             </StateCard>
           ) : null}
 
-          {state.kind === 'continue' ? <NextStep state={state} /> : null}
+          {state.kind === 'continue' ? <NextStep state={{ ...state, submitted: Boolean(user && findSubmission(user.id)) }} /> : null}
 
           {state.kind === 'continue' ? (
             <ApplicationDetails cycle={state.cycle} draft={state.draft} test={state.test} />

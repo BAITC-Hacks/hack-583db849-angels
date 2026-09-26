@@ -18,8 +18,8 @@ const stages: Stage[] = [
   { id: 'account', title: 'Account', href: '/stand/profile' },
   { id: 'application', title: 'Application', href: '/stand/application' },
   { id: 'test', title: 'Test', href: '/stand/application/test' },
-  { id: 'video', title: 'Video', locked: true },
-  { id: 'submit', title: 'Submission', locked: true },
+  // The video comes after submission now, in inVision U's own steps.
+  { id: 'submit', title: 'Submission', href: '/stand/application/submit' },
 ];
 
 export interface JourneyProgress {
@@ -78,6 +78,7 @@ export function JourneyRail({ progress }: { progress?: JourneyProgress }) {
       if (pathname === '/stand/application/test') return 'current';
       return test?.complete ? 'done' : 'available';
     }
+    if (stage.id === 'submit' && pathname === '/stand/application/submit') return 'current';
     return 'available';
   }
 
@@ -95,7 +96,7 @@ export function JourneyRail({ progress }: { progress?: JourneyProgress }) {
       if (test.complete) return 'Finished';
       return `${test.done} of ${test.total}`;
     }
-    return 'Later';
+    return stage.id === 'submit' ? 'Last step' : 'Later';
   }
 
   return (
