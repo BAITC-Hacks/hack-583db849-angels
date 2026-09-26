@@ -1,0 +1,12 @@
+{
+  "input_tokens": 746,
+  "model": "gpt-6-luna",
+  "output_tokens": 229,
+  "provider": "openai",
+  "recorded_at": "2026-09-26T14:48:09.252705Z",
+  "request_hash": "b03d39819c7052de86e7bf68c2109c5844b50cddeb77f5d949402d1e7cc3823b",
+  "request_id": "resp_0f3f6bae4edf7116006ab7db26505887d1b034700168827abf",
+  "response": "{\"question\":\"You wrote that each clean-up team had a leader and a street list. How did you choose the leaders?\",\"competency\":\"V\",\"why\":\"The clean-up example explains the plan but not how the volunteer leaders were chosen.\",\"sourceFieldId\":\"leadership_example\"}",
+  "task": "surprise_question",
+  "version": 1
+}

@@ -33,28 +33,6 @@ def example(filename: str) -> object:
     return json.loads((EXAMPLES / filename).read_text(encoding="utf-8"))
 
 
-@pytest.mark.parametrize(
-    ("path", "request_name", "response_name"),
-    [
-        (
-            "/internal/v1/surprise-question",
-            "surprise-question.request.json",
-            "surprise-question.response.json",
-        ),
-    ],
-)
-def test_extended_post_stubs_return_the_frozen_examples(
-    client: TestClient,
-    path: str,
-    request_name: str,
-    response_name: str,
-) -> None:
-    response = client.post(path, json=example(request_name), headers=TOKEN)
-
-    assert response.status_code == 200
-    assert response.json() == example(response_name)
-
-
 def test_empty_usage_log_returns_zero_counts(client: TestClient) -> None:
     response = client.get("/internal/v1/usage", headers=TOKEN)
 

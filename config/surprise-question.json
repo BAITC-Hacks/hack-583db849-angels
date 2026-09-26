@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "maxWords": 40,
+  "forbiddenTopics": [
+    "famil(y|ies)", "parents?", "mother", "father", "mum", "mom", "dad", "brothers?", "sisters?", "siblings?", "relatives?",
+    "husband", "wife", "married", "marriage", "divorce", "your children", "girlfriend", "boyfriend", "relationships?",
+    "health", "illness", "sick", "disease", "disabilit(y|ies)", "disabled", "medical", "hospital", "therapy", "mental health",
+    "depress(ed|ion)", "anxiety",
+    "money", "income", "salary", "wages?", "poverty", "debts?", "loans?",
+    "religio(n|us)", "faith", "church", "mosque", "pray(er|ing)?",
+    "ethnic(ity)?", "nationality", "race", "gender", "how old", "your age", "birthday",
+    "where (do )?you live", "your address", "your phone", "your e-?mail",
+    "admission", "be admitted", "get into inVision", "other candidates", "better than other"
+  ]
+}
