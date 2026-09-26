@@ -407,6 +407,13 @@ class ConsistencyRequest(Strict):
     simulationEnglish: EnglishMetrics | None = None
     simulationTurns: list[Turn] = []
     interviewTranscript: list[InterviewTurn] = []
+    beforeItems: list[ConsistencyItem] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def before_items_are_only_for_after(self) -> "ConsistencyRequest":
+        if self.stage == "before" and self.beforeItems:
+            raise ValueError("beforeItems is only allowed for the after stage")
+        return self
 
 
 class ConsistencyResult(Strict):

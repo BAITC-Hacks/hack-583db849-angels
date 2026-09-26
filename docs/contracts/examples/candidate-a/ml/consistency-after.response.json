@@ -14,12 +14,12 @@
         ]
       },
       "observation": {
-        "text": "The simulation and the interview both measured B2; the C2 self-rating is not supported.",
+        "text": "The simulation measured B2, and nothing in the interview points higher; the C2 self-rating is not supported.",
         "evidence": [],
         "metric": {
           "name": "cefrEstimate",
           "value": "B2",
-          "source": "interview"
+          "source": "simulation"
         }
       },
       "status": "confirmed",
