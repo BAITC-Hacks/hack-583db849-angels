@@ -105,6 +105,22 @@ def test_insufficient_group_observations_do_not_signal() -> None:
     assert selected == []
 
 
+def test_just_below_threshold_does_not_signal() -> None:
+    request = example("quality-check-calibration.request.json")
+    history = []
+    for item in request.history:
+        if item.interviewerRef == request.interviewerRef:
+            scores = [
+                score.model_copy(update={"score": 3}) if score.competency == "V" else score
+                for score in item.scores
+            ]
+            item = item.model_copy(update={"scores": scores})
+        history.append(item)
+    rows, selected, _ = compute_drift(request.model_copy(update={"history": history}), POLICY)
+    assert next(row.delta for row in rows if row.competency == "V") == 0.7
+    assert selected == []
+
+
 def test_calibration_model_receives_aggregates_only() -> None:
     request = example("quality-check-calibration.request.json")
     _, selected, _ = compute_drift(request, POLICY)
