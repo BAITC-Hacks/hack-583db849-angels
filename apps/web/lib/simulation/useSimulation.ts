@@ -75,8 +75,8 @@ export function useSimulation(simulationId: string): Simulation {
     mutationFn: ({ input, idempotencyKey }: { input: TurnInput; idempotencyKey: string }) =>
       postTurn(simulationId, input, idempotencyKey),
     onSuccess: (result) => {
+      // The screen speaks the reply, word by word, once it is its turn (useSpokenLines).
       client.setQueryData<WireSimulation>(key, (current) => (current ? applyTurnResult(current, result) : current));
-      playCharacterLine(result.characterAudioUrl, result.characterTurn.text);
       void client.invalidateQueries({ queryKey: candidatesKey });
     },
   });

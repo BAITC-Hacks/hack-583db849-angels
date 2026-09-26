@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeftIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon, PlayIcon, SpeakerWaveIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { Composer } from '../../../../components/simulation/Composer';
@@ -9,7 +9,11 @@ import { ScenarioPanel } from '../../../../components/simulation/ScenarioPanel';
 import { StopControl } from '../../../../components/simulation/StopControl';
 import { Transcript } from '../../../../components/simulation/Transcript';
 import { VoiceComposer } from '../../../../components/simulation/VoiceComposer';
+import { Button } from '../../../../components/ui/Button';
 import { useSimulation } from '../../../../lib/simulation/useSimulation';
+import { useSpokenLines } from '../../../../lib/simulation/useSpokenLines';
+
+type Simulation = ReturnType<typeof useSimulation>;
 
 /**
  * M2: the candidate leads a work situation in English, turn by turn, out loud.
@@ -24,9 +28,8 @@ import { useSimulation } from '../../../../lib/simulation/useSimulation';
  */
 export default function SimulationPage() {
   const { sessionId } = useParams<{ sessionId: string }>();
-  const { scenario, state, status, loadError, inputMode, turnError, canRetry, send, sendVoice, retry, stop, listen } =
-    useSimulation(sessionId);
-  const finished = state.stage === 'finished';
+  const simulation = useSimulation(sessionId);
+  const { scenario, status, loadError } = simulation;
 
   if (status !== 'ready' || !scenario) {
     return (
@@ -49,13 +52,35 @@ export default function SimulationPage() {
     );
   }
 
+  return <SimulationRoom sessionId={sessionId} simulation={simulation} scenario={scenario} />;
+}
+
+/**
+ * Mounted once the simulation has loaded, so it knows whether the conversation
+ * is already under way: a reload goes straight back to it, a fresh one waits
+ * for Start. The click also lets the browser play the character's voice.
+ */
+function SimulationRoom({
+  sessionId,
+  simulation,
+  scenario,
+}: {
+  sessionId: string;
+  simulation: Simulation;
+  scenario: NonNullable<Simulation['scenario']>;
+}) {
+  const { state, inputMode, turnError, canRetry, send, sendVoice, retry, stop, listen } = simulation;
+  const finished = state.stage === 'finished';
+  const { started, start, speaking, visible } = useSpokenLines(sessionId, state.turns, state.candidateTurns > 0 || finished);
+  const name = scenario.character.name;
+
   return (
     <div lang="en" className="flex min-h-screen flex-col bg-bg-base">
       <header className="sticky top-0 z-30 border-b border-border-subtle bg-bg-base/85 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3">
           <span className="hidden min-w-0 truncate text-sm font-semibold text-text-primary md:inline">{scenario.title}</span>
           <div className="ml-auto flex items-center gap-3">
-            <ElapsedTime running={!finished} />
+            <ElapsedTime running={started && !finished} />
             {finished ? null : <StopControl onStop={stop} />}
           </div>
         </div>
@@ -66,28 +91,53 @@ export default function SimulationPage() {
         <h1 className="order-first text-balance-tight text-xl font-extrabold md:hidden">{scenario.title}</h1>
 
         <section className="flex min-h-0 flex-col gap-4">
-
-          <div className="flex-1">
-            <Transcript turns={state.turns} characterName={scenario.character.name} replying={state.replying} onListen={listen} />
-          </div>
-
-          {finished ? (
-            <div className="rounded-panel border border-border-subtle bg-bg-surface p-5">
-              <p className="text-sm font-semibold text-text-primary">
-                {state.ending === 'stopped' ? 'You ended the simulation.' : 'The scenario is complete.'}
-              </p>
+          {!started ? (
+            <div className="rounded-panel border border-border-subtle bg-bg-surface p-6">
+              <p className="text-base font-semibold text-text-primary">Ready when you are</p>
               <p className="mt-1 text-sm text-text-secondary">
-                Thank you. The conversation is saved exactly as it happened. Your developmental feedback — written
-                notes, no scores — will be ready after the review.
+                Read the situation first. {name} speaks first; then it is your turn — press and hold the microphone,
+                speak, and release.
               </p>
-              <Link
-                href="/candidate"
-                className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-ink hover:underline"
-              >
-                <ArrowLeftIcon aria-hidden="true" className="h-3.5 w-3.5" />
-                Back to your home
-              </Link>
+              <p className="mt-3 inline-flex items-center gap-1.5 text-sm text-text-muted">
+                <SpeakerWaveIcon aria-hidden="true" className="h-4 w-4" />
+                Turn your sound on. Every line is also written on screen.
+              </p>
+              <Button type="button" onClick={start} className="mt-5">
+                <PlayIcon aria-hidden="true" className="h-4 w-4" />
+                Start the conversation
+              </Button>
             </div>
+          ) : (
+            <div className="flex-1">
+              <Transcript
+                turns={visible}
+                characterName={name}
+                replying={state.replying}
+                onListen={listen}
+                speaking={speaking}
+              />
+            </div>
+          )}
+
+          {!started ? null : finished ? (
+            speaking ? null : (
+              <div className="rounded-panel border border-border-subtle bg-bg-surface p-5">
+                <p className="text-sm font-semibold text-text-primary">
+                  {state.ending === 'stopped' ? 'You ended the simulation.' : 'The scenario is complete.'}
+                </p>
+                <p className="mt-1 text-sm text-text-secondary">
+                  Thank you. The conversation is saved exactly as it happened. Your developmental feedback — written
+                  notes, no scores — will be ready after the review.
+                </p>
+                <Link
+                  href="/candidate"
+                  className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-ink hover:underline"
+                >
+                  <ArrowLeftIcon aria-hidden="true" className="h-3.5 w-3.5" />
+                  Back to your home
+                </Link>
+              </div>
+            )
           ) : (
             <div className="sticky bottom-4 flex flex-col gap-2">
               {turnError ? (
@@ -100,10 +150,11 @@ export default function SimulationPage() {
                   ) : null}
                 </p>
               ) : null}
+              {/* The candidate answers once the character has finished speaking. */}
               {inputMode === 'text' ? (
-                <Composer disabled={finished} waiting={state.replying} onSend={send} />
+                <Composer disabled={finished} waiting={state.replying || speaking !== null} onSend={send} />
               ) : (
-                <VoiceComposer disabled={finished} waiting={state.replying} onSend={sendVoice} />
+                <VoiceComposer disabled={finished} waiting={state.replying || speaking !== null} onSend={sendVoice} />
               )}
             </div>
           )}
