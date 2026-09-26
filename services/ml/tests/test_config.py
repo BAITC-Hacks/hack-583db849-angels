@@ -33,3 +33,13 @@ def test_settings_hide_the_internal_token_from_repr() -> None:
 def test_settings_reject_invalid_values(environment: dict[str, str], message: str) -> None:
     with pytest.raises(ValueError, match=message):
         load_settings(environment)
+
+
+def test_speech_and_transcription_can_run_in_their_own_mode() -> None:
+    assert load_settings({}).media_mode == "replay"
+    assert load_settings({"GATEWAY_MODE": "live"}).media_mode == "live"
+    mixed = load_settings({"GATEWAY_MODE": "replay", "MEDIA_GATEWAY_MODE": "live"})
+    assert (mixed.gateway_mode, mixed.media_mode) == ("replay", "live")
+    assert load_settings({"MEDIA_GATEWAY_MODE": " "}).media_mode == "replay"
+    with pytest.raises(ValueError, match="MEDIA_GATEWAY_MODE"):
+        load_settings({"MEDIA_GATEWAY_MODE": "sometimes"})

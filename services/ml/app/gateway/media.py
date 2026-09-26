@@ -401,11 +401,11 @@ def create_media_gateway(
     provider_factories: Mapping[Provider, MediaProviderFactory] | None = None,
 ) -> MediaGateway:
     providers: dict[Provider, MediaProvider] = {}
-    if settings.gateway_mode != "replay":
+    if settings.media_mode != "replay":
         factories = dict(provider_factories or _default_media_provider_factories())
         providers = {provider: factory() for provider, factory in factories.items()}
     return MediaGateway(
-        mode=settings.gateway_mode,
+        mode=settings.media_mode,
         configuration=configuration,
         providers=providers,
         cassettes=cassettes or FileMediaCassetteStore(DEFAULT_CASSETTES_ROOT),
