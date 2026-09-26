@@ -73,7 +73,7 @@ export function SimulationReportView({ report, surprise }: { report: SimulationR
       <header className="flex flex-col gap-3">
         <p className="font-mono text-[0.62rem] tracking-[0.14em] text-text-muted uppercase">{text.eyebrow}</p>
         <h1 className="text-balance-tight text-2xl font-extrabold sm:text-3xl">
-          {text.candidate} {report.candidate.code}
+          {text.candidate} {report.candidate.tag}
         </h1>
         <dl className="flex flex-wrap gap-x-6 gap-y-2">
           {meta.map((item) => (
@@ -115,7 +115,7 @@ export function SimulationReportView({ report, surprise }: { report: SimulationR
         </div>
 
         <div className="lg:sticky lg:top-6">
-          <ReportTranscript turns={report.turns} characterName={report.characterName} candidateCode={report.candidate.code} />
+          <ReportTranscript turns={report.turns} characterName={report.characterName} candidateCode={report.candidate.tag} />
         </div>
       </div>
     </main>

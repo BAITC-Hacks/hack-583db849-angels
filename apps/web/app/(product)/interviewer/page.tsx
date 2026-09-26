@@ -81,7 +81,7 @@ function nextFor(a: CandidateProgress) {
 export default function InterviewerHome() {
   const { locale } = useStaffLocale();
   const text = copy[locale];
-  const { candidates, apiError } = useHomeProgress();
+  const { candidates, rows, apiError } = useHomeProgress();
   const a = candidates.A;
   const next = nextFor(a);
   const step = text.steps[next.key];
@@ -110,12 +110,11 @@ export default function InterviewerHome() {
             </tr>
           </thead>
           <tbody className="divide-y divide-border-subtle">
-            {(['A', 'B', 'C'] as const).map((code) => {
-              const c = candidates[code];
+            {rows.map((c) => {
               return (
-                <tr key={code} className={c.hasData ? '' : 'opacity-60'}>
+                <tr key={c.code ?? c.id} className={c.hasData ? '' : 'opacity-60'}>
                   <td className="px-4 py-3 font-semibold text-text-primary">
-                    {text.candidate} {code}
+                    {text.candidate} {c.tag}
                   </td>
                   {c.hasData ? (
                     <>

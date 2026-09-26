@@ -50,7 +50,7 @@ describe('DemoService', () => {
       qualityCheck: table('qualityCheck'), consistencyReport: table('consistencyReport'), interviewDraft: table('interviewDraft'),
       interviewerScore: table('interviewerScore'), interview: table('interview'), surpriseQuestion: table('surpriseQuestion'),
       assessment: table('assessment'), simulationTurn: table('simulationTurn'), accommodation: table('accommodation'), presentation: table('presentation'), interviewSlot: table('interviewSlot'),
-      candidate: { findUnique: jest.fn().mockResolvedValue({ id: candidateId, externalId }) },
+      candidate: { ...table('candidate'), findUnique: jest.fn().mockResolvedValue({ id: candidateId, externalId }) },
       simulation: { ...table('simulation'), findUnique: jest.fn().mockResolvedValue(existing), create: jest.fn().mockResolvedValue({ id: 'simulation-1' }) },
     };
     const gateway = { scenarios: jest.fn().mockResolvedValue([{ scenarioId: 'conflict-resolution', title: 'A teammate is about to walk away', status: 'ready' }]) };
@@ -69,10 +69,12 @@ describe('DemoService', () => {
   });
 
   it('drops everything the demo made, keeps the audit log, and seeds A, B and C again', async () => {
-    const { service, deleted, audit, seed } = harness();
+    const { service, prisma, deleted, audit, seed } = harness();
     await service.reset('admin');
     expect(deleted).toEqual(expect.arrayContaining(['simulation', 'assessment', 'interview', 'surpriseQuestion', 'presentation', 'interviewSlot', 'qualityCheck', 'consistencyReport']));
     expect(deleted).not.toContain('auditEvent');
+    // Applicants the stand sent go; A, B and C stay and are seeded again.
+    expect(prisma.candidate.deleteMany).toHaveBeenCalledWith({ where: { externalId: { notIn: ['inv-2026-demo-a', 'inv-2026-demo-b', 'inv-2026-demo-c'] } } });
     expect(audit.record).toHaveBeenCalledWith(expect.objectContaining({ action: 'demo.reset', actorRole: 'admin' }));
     expect(seed.seed).toHaveBeenCalled();
   });

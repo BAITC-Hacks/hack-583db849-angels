@@ -55,7 +55,7 @@ const copy = {
 export default function CommissionHome() {
   const { locale } = useStaffLocale();
   const text = copy[locale];
-  const { candidates, apiError } = useHomeProgress();
+  const { candidates, rows, apiError } = useHomeProgress();
   const a = candidates.A;
   const all = Object.values(candidates);
 
@@ -132,12 +132,12 @@ export default function CommissionHome() {
             </tr>
           </thead>
           <tbody className="divide-y divide-border-subtle">
-            {(['A', 'B', 'C'] as const).map((code) => {
-              const c = candidates[code];
+            {rows.map((c) => {
+              const report = c.assessmentId ? `/commission/simulation-report/${c.assessmentId}` : '/commission/simulation-report';
               return (
-                <tr key={code} className={c.hasData ? '' : 'opacity-60'}>
+                <tr key={c.code ?? c.id} className={c.hasData ? '' : 'opacity-60'}>
                   <td className="px-4 py-3 font-semibold text-text-primary">
-                    {text.candidate} {code}
+                    {text.candidate} {c.tag}
                   </td>
                   {c.hasData ? (
                     <>
@@ -148,13 +148,13 @@ export default function CommissionHome() {
                       </td>
                       <td className="px-4 py-3">
                         {c.assessmentReady ? (
-                          <Link href="/commission/simulation-report" className="text-sm font-semibold text-brand-ink hover:underline">
+                          <Link href={report} className="text-sm font-semibold text-brand-ink hover:underline">
                             {text.report.open}
                           </Link>
                         ) : c.assessment === 'pending' ? (
                           <StatusPill tone="active">{text.report.pending}</StatusPill>
                         ) : c.assessment === 'failed' ? (
-                          <Link href="/commission/simulation-report" className="text-sm text-status-flag hover:underline">
+                          <Link href={report} className="text-sm text-status-flag hover:underline">
                             {text.report.failed}
                           </Link>
                         ) : (
@@ -180,7 +180,7 @@ export default function CommissionHome() {
                       </td>
                       <td className="px-4 py-3">
                         {c.assessmentReady ? (
-                          <Link href="/feedback" className="text-sm font-semibold text-brand-ink hover:underline">
+                          <Link href={c.assessmentId ? `/feedback/${c.assessmentId}` : '/feedback'} className="text-sm font-semibold text-brand-ink hover:underline">
                             {text.feedback.open}
                           </Link>
                         ) : (

@@ -8,7 +8,7 @@ import { Prisma } from '@prisma/client';
 import { AI_GATEWAY, AiGateway } from '../../ai-client/ai-gateway.port';
 import { ApiRole } from '../../auth/roles';
 import { PrismaService } from '../../database/prisma.service';
-import { readSeed, seedLetter } from '../../seed-files';
+import { readSeed, SEED_EXTERNAL_IDS, seedLetter } from '../../seed-files';
 import { AuditService } from '../audit/audit.service';
 import { CandidatesService } from '../candidates/candidates.service';
 import { DemoSeedService } from '../candidates/demo-seed.service';
@@ -44,7 +44,8 @@ export class DemoService {
   /**
    * Starts the demo over: every simulation, assessment, interview, surprise
    * question, presentation, interview slot, quality check and the recordings on disk go, and A, B and C
-   * are seeded again. The audit log stays — it is the record of what happened.
+   * are seeded again. Applicants the stand sent go too, with everything they
+   * made. The audit log stays — it is the record of what happened.
    */
   async reset(role: ApiRole): Promise<void> {
     this.demoOnly();
@@ -61,6 +62,7 @@ export class DemoService {
       this.prisma.simulationTurn.deleteMany(),
       this.prisma.simulation.deleteMany(),
       this.prisma.accommodation.deleteMany(),
+      this.prisma.candidate.deleteMany({ where: { externalId: { notIn: SEED_EXTERNAL_IDS } } }),
     ]);
     const root = resolve(this.config.get<string>('UPLOADS_DIR', '/data/uploads'));
     await Promise.all(UPLOAD_FOLDERS.map((folder) => rm(resolve(root, folder), { recursive: true, force: true })));

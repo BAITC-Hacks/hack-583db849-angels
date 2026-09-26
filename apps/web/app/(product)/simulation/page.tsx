@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { candidateByCode, useCandidates } from '../../../lib/api/candidates';
+import { useMe } from '../../../lib/api/candidates';
 import { errorText } from '../../../lib/api/errors';
 
 /**
@@ -11,8 +11,8 @@ import { errorText } from '../../../lib/api/errors';
  */
 export default function MySimulation() {
   const router = useRouter();
-  const candidates = useCandidates();
-  const simulationId = candidateByCode(candidates.data, 'A')?.progress?.simulation?.simulationId ?? null;
+  const { candidates, me } = useMe();
+  const simulationId = me?.progress?.simulation?.simulationId ?? null;
 
   useEffect(() => {
     if (candidates.isSuccess) router.replace(simulationId ? `/simulation/${simulationId}` : '/candidate');

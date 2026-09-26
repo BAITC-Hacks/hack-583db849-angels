@@ -1,7 +1,7 @@
 import type { CandidateFeedback, SimulationReport } from '../../report/types';
 import type { SimulationTurn } from '../../simulation/types';
 import type { WireAssessment, WireCandidateFeedback, WireTurn } from '../contract';
-import { codeFromLabel, toCompetencyScore } from './evidence';
+import { candidateTag, codeFromLabel, toCompetencyScore } from './evidence';
 
 function toTurn(turn: WireTurn): SimulationTurn {
   const base = { turnId: turn.turnId, speaker: turn.speaker, text: turn.text };
@@ -16,7 +16,7 @@ function toTurn(turn: WireTurn): SimulationTurn {
 export function toSimulationReport(assessment: WireAssessment): SimulationReport {
   return {
     assessmentId: assessment.assessmentId,
-    candidate: { id: assessment.candidateId, code: codeFromLabel(assessment.candidateLabel) },
+    candidate: { id: assessment.candidateId, code: codeFromLabel(assessment.candidateLabel), tag: candidateTag(assessment.candidateLabel) },
     scenarioTitle: assessment.simulation.scenarioTitle,
     characterName: assessment.simulation.characterName,
     mode: assessment.simulation.mode,

@@ -35,11 +35,14 @@ export function StatusLedger({
   draft,
   test,
   email,
+  submitted = false,
 }: {
   cycle: ActiveCycle;
   draft: ApplicationDraft | null;
   test: TestAttemptSummary | null | undefined;
   email?: string;
+  /** Sent to inVision U from the submission step. */
+  submitted?: boolean;
 }) {
   const answered = draft ? Object.keys(draft.answers).length : 0;
   const total = cycle.formVersion.questions.length;
@@ -89,8 +92,13 @@ export function StatusLedger({
           ]
         : ['one attempt, the server counts each block'],
     },
-    { id: 'video', title: 'Video', state: 'later', status: 'Later', facts: ['opens after the test'] },
-    { id: 'submit', title: 'Submission', state: 'later', status: 'Later', facts: ['submitted once, after the video'] },
+    {
+      id: 'submit',
+      title: 'Submission',
+      state: submitted ? 'done' : testDone ? 'current' : 'later',
+      status: submitted ? 'Sent' : testDone ? 'Ready to send' : 'Later',
+      facts: [submitted ? 'sent to inVision U; the next steps are theirs' : 'sent once, after the test'],
+    },
   ];
 
   return (

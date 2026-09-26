@@ -4,7 +4,7 @@ import { HomeSwitch } from '../../components/applicant/HomeSwitch';
 import { DotField } from '../../components/ui/DotField';
 import { Logo } from '../../components/ui/Logo';
 import { ThemeToggle } from '../../components/ui/ThemeToggle';
-import { DEMO_APPLICANT_EMAIL, DEMO_PASSPHRASE, MIDWAY_APPLICANT_EMAIL } from '../../mocks/accounts';
+import { DEMO_APPLICANT_EMAIL, DEMO_PASSPHRASE, MIDWAY_APPLICANT_EMAIL, READY_APPLICANT_EMAIL } from '../../mocks/accounts';
 
 /**
  * The entrance to the stand: screens that play inVision's own platform —
@@ -51,11 +51,12 @@ export default function StandPage() {
             </Link>
           </div>
 
-          <dl className="grid max-w-2xl gap-px overflow-hidden rounded-panel border border-border-subtle bg-border-subtle sm:grid-cols-3">
+          <dl className="grid max-w-3xl gap-px overflow-hidden rounded-panel border border-border-subtle bg-border-subtle sm:grid-cols-2 lg:grid-cols-4">
             {[
               { label: 'First visit', value: DEMO_APPLICANT_EMAIL },
               { label: 'Halfway through', value: MIDWAY_APPLICANT_EMAIL },
-              { label: 'Passphrase for both', value: DEMO_PASSPHRASE },
+              { label: 'Ready to send', value: READY_APPLICANT_EMAIL },
+              { label: 'Passphrase for all', value: DEMO_PASSPHRASE },
             ].map((row) => (
               <div key={row.label} className="flex flex-col gap-1 bg-bg-surface px-4 py-3">
                 <dt className="font-mono text-[0.58rem] tracking-[0.12em] text-text-muted uppercase">{row.label}</dt>

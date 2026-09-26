@@ -19,7 +19,8 @@ export interface InterviewTurn {
 
 export interface InterviewView {
   interviewId: string;
-  candidate: { id: string; code: 'A' | 'B' | 'C' };
+  /** `code` is the seed's letter; `tag` is what the screen prints — the letter, or a platform applicant's tag. */
+  candidate: { id: string; code: 'A' | 'B' | 'C'; tag: string };
   heldAt: string;
 }
 

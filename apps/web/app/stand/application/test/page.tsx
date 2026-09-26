@@ -178,7 +178,12 @@ function TestScreen() {
                 <dd className="mt-0.5 font-mono tabular-nums">{state.attempt.timedOutBlocks}</dd>
               </div>
             </dl>
-            <p className="mt-4 text-sm text-text-muted">Video comes next. That part is not built yet.</p>
+            <p className="mt-4 text-sm">
+              <Link href="/stand/application/submit" className="font-semibold text-brand-ink hover:underline">
+                Send the application
+              </Link>{' '}
+              — the last step here.
+            </p>
           </StateCard>
         ) : null}
 

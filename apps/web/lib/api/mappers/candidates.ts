@@ -1,6 +1,6 @@
 import type { CandidateProgress as ScreenProgress } from '../../home/types';
 import type { WireCandidate, WireCandidateProgress } from '../contract';
-import { codeFromLabel } from './evidence';
+import { candidateTag, seedCode } from './evidence';
 
 const simulationStage = {
   not_started: 'not-started',
@@ -23,12 +23,15 @@ export function toScreenProgress(progress: WireCandidateProgress): ScreenProgres
   const simulation = progress.simulation?.status ?? 'not_started';
 
   return {
-    code: codeFromLabel(progress.label),
+    code: seedCode(progress.label),
+    tag: candidateTag(progress.label),
     id: progress.candidateId,
-    hasData: briefReady || simulation !== 'not_started',
+    // A brief at all — even one still being written, or one that failed — is something to show.
+    hasData: Boolean(progress.brief) || simulation !== 'not_started',
     briefViewed: briefReady,
     simulation: simulationStage[simulation],
     assessmentReady: progress.assessment?.status === 'ready',
+    assessmentId: progress.assessment?.assessmentId ?? null,
     interviewId: interview?.interviewId ?? null,
     transcript: interview?.transcriptStatus === 'ready' ? 'ready' : interview?.transcriptStatus === 'transcribing' ? 'transcribing' : 'none',
     scoresSaved: interview?.scoresSaved ?? false,
