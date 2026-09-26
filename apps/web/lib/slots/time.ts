@@ -4,6 +4,8 @@
  * (`INTERVIEW_TIME_ZONE`). Kazakhstan has one zone, UTC+5, all year.
  */
 export const INTERVIEW_TIME_ZONE = 'Asia/Almaty';
+/** How the zone is written next to a time: the offset, which reads the same in every language. */
+export const ZONE_LABEL = 'UTC+5';
 const OFFSET = '+05:00';
 
 /** The call opens this long before the start; the API holds the same rule. */

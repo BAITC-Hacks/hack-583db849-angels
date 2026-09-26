@@ -49,16 +49,29 @@ const copy = {
   },
 };
 
-type Tab = 'questions' | 'notes' | 'scores';
+export type SidebarTab = 'questions' | 'notes' | 'scores';
 
 /**
  * What the interviewer has beside the call: the brief's questions, notes as
  * they go, and their own blind scores. The draft is not here — it opens on
  * the interview page after the scores are saved, as everywhere.
  */
-export function CallSidebar({ interviewId, candidateId }: { interviewId: string; candidateId: string }) {
+export function CallSidebar({
+  interviewId,
+  candidateId,
+  tab: shownTab,
+  onTab,
+}: {
+  interviewId: string;
+  candidateId: string;
+  /** Held by the call screen, which opens the scores once the call is over. */
+  tab?: SidebarTab;
+  onTab?: (tab: SidebarTab) => void;
+}) {
   const text = copy[useStaffLocale().locale];
-  const [tab, setTab] = useState<Tab>('questions');
+  const [ownTab, setOwnTab] = useState<SidebarTab>('questions');
+  const tab = shownTab ?? ownTab;
+  const setTab = onTab ?? setOwnTab;
   const record = useInterviewRecord(interviewId);
 
   return (
