@@ -1,6 +1,6 @@
 'use client';
 
-import { VideoCameraIcon } from '@heroicons/react/24/outline';
+import { CheckCircleIcon, VideoCameraIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { useState } from 'react';
 import { errorText } from '../../lib/api/errors';
@@ -10,18 +10,20 @@ import { useJoinCall, useSlot } from '../../lib/slots/queries';
 import { countdown, formatDay, formatTime } from '../../lib/slots/time';
 import { useNow } from '../../lib/slots/useNow';
 import { CallRecordingPanel } from './CallRecordingPanel';
-import { CallSidebar } from './CallSidebar';
+import { CallSidebar, type SidebarTab } from './CallSidebar';
 import { CallStage } from './CallStage';
 
 const copy = {
   en: {
     eyebrow: 'Video interview',
-    almaty: 'Almaty time',
     join: 'Join the call',
     joining: 'Joining…',
     rejoin: 'Join again',
     failed: 'Could not connect to the call. Check the connection and try again.',
     ended: 'You have left the call.',
+    doneTitle: 'The call is over. Now score it.',
+    doneLede: 'Set your own scores while the conversation is fresh — blind: the AI draft opens only after they are saved.',
+    toScores: 'Go to the scores',
     openInterview: 'Open the interview page',
     back: 'Back to the schedule',
     missed: (who: string) => `This slot is missed: ${who} within 5 minutes of the start.`,
@@ -41,12 +43,14 @@ const copy = {
   },
   ru: {
     eyebrow: 'Видеоинтервью',
-    almaty: 'время Алматы',
     join: 'Войти в звонок',
     joining: 'Подключаемся…',
     rejoin: 'Войти снова',
     failed: 'Не удалось подключиться к звонку. Проверьте связь и попробуйте ещё раз.',
     ended: 'Вы вышли из звонка.',
+    doneTitle: 'Звонок завершён. Поставьте оценку.',
+    doneLede: 'Поставьте свои баллы, пока разговор свежий в памяти — вслепую: черновик ИИ откроется только после них.',
+    toScores: 'Перейти к баллам',
     openInterview: 'Открыть страницу интервью',
     back: 'К расписанию',
     missed: (who: string) => `Слот пропущен: ${who} в течение 5 минут после начала.`,
@@ -79,6 +83,8 @@ export function InterviewerCall({ slotId }: { slotId: string }) {
   const room = useCallRoom();
   const now = useNow();
   const [interviewId, setInterviewId] = useState<string | null>(null);
+  // Null until the interviewer picks a tab: questions during the call, the scores once it is over.
+  const [pickedTab, setPickedTab] = useState<SidebarTab | null>(null);
 
   async function enter() {
     const access = await join.mutateAsync({}).catch(() => null);
@@ -103,6 +109,8 @@ export function InterviewerCall({ slotId }: { slotId: string }) {
   const started = now >= Date.parse(data.startsAt);
   const notice = started ? text.waiting(countdown(Date.parse(data.waitUntil) - now)) : text.waitingStart(formatTime(data.startsAt, locale));
   const currentInterview = interviewId ?? data.interviewId;
+  const callOver = (room.state === 'ended' || data.status === 'done') && Boolean(data.candidateJoinedAt);
+  const tab = pickedTab ?? (callOver ? 'scores' : 'questions');
 
   return (
     <main className="mx-auto flex max-w-7xl flex-col gap-5 px-5 py-8">
@@ -110,7 +118,7 @@ export function InterviewerCall({ slotId }: { slotId: string }) {
         <p className="font-mono text-[0.62rem] tracking-[0.14em] text-text-muted uppercase">{text.eyebrow}</p>
         <h1 className="text-balance-tight text-2xl font-extrabold sm:text-3xl">{data.candidateLabel ?? '—'}</h1>
         <p className="text-sm text-text-secondary">
-          {formatDay(data.startsAt, locale)}, {time} ({text.almaty})
+          {formatDay(data.startsAt, locale)}, {time} (UTC+5)
         </p>
       </header>
 
@@ -124,6 +132,21 @@ export function InterviewerCall({ slotId }: { slotId: string }) {
             <section className="flex flex-col gap-3 rounded-panel border border-border-subtle bg-bg-surface p-5">
               {data.status === 'missed' ? (
                 <p className="text-sm text-text-primary">{text.missed(text.who[data.missedBy ?? 'both'])}</p>
+              ) : callOver ? (
+                <div className="flex flex-col gap-2">
+                  <p className="flex items-center gap-2 text-base font-bold text-text-primary">
+                    <CheckCircleIcon aria-hidden="true" className="h-5 w-5 text-brand-ink" />
+                    {text.doneTitle}
+                  </p>
+                  <p className="text-sm text-text-secondary">{text.doneLede}</p>
+                  <button
+                    type="button"
+                    onClick={() => setPickedTab('scores')}
+                    className="w-fit rounded-control bg-brand-green px-4 py-2 text-sm font-semibold text-on-brand hover:bg-brand-dim"
+                  >
+                    {text.toScores}
+                  </button>
+                </div>
               ) : (
                 <>
                   {room.state === 'ended' ? <p className="text-sm text-text-secondary">{text.ended}</p> : null}
@@ -166,7 +189,7 @@ export function InterviewerCall({ slotId }: { slotId: string }) {
         </div>
         {currentInterview && data.candidateId ? (
           <div className="lg:sticky lg:top-6">
-            <CallSidebar interviewId={currentInterview} candidateId={data.candidateId} />
+            <CallSidebar interviewId={currentInterview} candidateId={data.candidateId} tab={tab} onTab={setPickedTab} />
           </div>
         ) : null}
       </div>

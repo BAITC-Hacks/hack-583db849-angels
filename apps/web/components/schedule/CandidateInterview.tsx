@@ -66,7 +66,7 @@ export function CandidateInterview() {
           {formatDay(current.startsAt, 'en')}, {range(current)}
         </p>
         <p className="text-sm text-text-secondary">
-          Almaty time, on video, in English, about {current.durationMin} minutes. The call opens 10 minutes before the start, and
+          Almaty time (UTC+5), on video, in English, about {current.durationMin} minutes. The call opens 10 minutes before the start, and
           each side waits at most 5 minutes after it.
         </p>
         {canJoin ? (
@@ -136,7 +136,7 @@ export function CandidateInterview() {
           </button>
         </div>
       ) : null}
-      <p className="text-[0.8rem] text-text-muted">Times are in Almaty time.</p>
+      <p className="text-[0.8rem] text-text-muted">Almaty time: it is now {formatTime(new Date(now).toISOString(), 'en')} (UTC+5).</p>
       {book.isError ? (
         <p role="alert" className="text-sm font-semibold text-text-primary">
           {errorText(book.error)}
