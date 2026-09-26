@@ -1,0 +1,12 @@
+{
+  "input_tokens": 180,
+  "model": "gpt-6-luna",
+  "output_tokens": 120,
+  "provider": "openai",
+  "recorded_at": "2026-09-26T00:00:00Z",
+  "request_hash": "038bb73d65d8a335f875c1930e7c383c90cd0cf1e8551cea9b0fffa6e77c1933",
+  "request_id": "synthetic-m5-quality",
+  "response": "{\"signals\":[{\"competency\":\"V\",\"message\":\"Values scores run 1.1 above the panel across this interviewer's 5 interviews in the period (3.4 against 2.3).\",\"recommendation\":\"Score two recent Values answers again against the rubric's indicators, with another interviewer.\"}]}",
+  "task": "quality_check",
+  "version": 1
+}

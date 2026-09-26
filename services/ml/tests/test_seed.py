@@ -156,3 +156,25 @@ def test_quality_history_is_synthetic_scored_interview_data_without_verdicts() -
     assert "synthetic" in text
     assert "verdict" not in text
     assert "candidate" not in text
+    assert [item["interviewerRef"] for item in history] == [
+        "synthetic-interviewer-a", "synthetic-interviewer-a", "synthetic-interviewer-a",
+        "synthetic-interviewer-b", "synthetic-interviewer-b", "synthetic-interviewer-b",
+    ]
+    by_group = {
+        group: [next(score["score"] for score in item["scores"] if score["competency"] == "V")
+                for item in history if item["interviewerRef"] == group]
+        for group in ("synthetic-interviewer-a", "synthetic-interviewer-b")
+    }
+    assert by_group == {
+        "synthetic-interviewer-a": [4, 4, 3],
+        "synthetic-interviewer-b": [2, 2, 2],
+    }
+
+
+def test_quality_interview_seed_preserves_the_frozen_example_turns() -> None:
+    example = load(ROOT / "docs/contracts/examples/candidate-a/ml/quality-check-interview.request.json")
+    turns = load(SEED / "quality-interview-transcript.json")
+    assert turns == example["transcript"]
+    assert [turn["turnId"] for turn in turns] == [f"iturn_{index:02d}" for index in range(1, 15)]
+    for turn in turns:
+        InterviewTurn.model_validate(turn)
