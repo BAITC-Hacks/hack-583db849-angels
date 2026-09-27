@@ -4,13 +4,16 @@ Read this before changing anything in this repository. It applies to every codin
 
 ## What this project is
 
-AI Leader ID is an AI layer **around the admissions interview** at inVision U. inVision already has registration, the application form, the test, the video interview, candidate statuses and commission decisions. We build what they do not have, and it plugs into their system through a JSON API:
+AI Leader ID is an AI layer **around the admissions interview** at inVision U. inVision already has registration, the application form, the test, candidate statuses and commission decisions. We build what they do not have, and it plugs into their system through a JSON API:
 
 - **M1** — a brief for the interviewer before the meeting;
 - **M2** — a spoken leadership role-play in English (the simulator);
 - **M3** — a judge that scores the simulation transcript with quotes;
 - **M4** — a post-interview draft, released only after the interviewer's own scores;
-- **M5** — Calibration & Question Quality Guard for the interview process.
+- **M5** — Calibration & Question Quality Guard for the interview process;
+- **C** — consistency: what the candidate claimed against what was measured, before and after the interview;
+- **S**, **P**, **V** — the candidate's surprise question, video presentation and scheduled video interview (LiveKit), whose transcripts feed the modules above;
+- **L** — follow-up questions suggested beside the video call (in progress, #134–#136).
 
 The sign-in, application and test screens in `apps/web` are a **demo stand** that plays the part of inVision's platform. They are not the product. Do not rebuild or extend them beyond what a task explicitly asks.
 
@@ -54,18 +57,25 @@ If a task seems to require breaking one of these, stop and ask.
 ## Where things live
 
 ```
-apps/web/            Next.js — candidate screens English only; staff screens English or Russian
-apps/api/            NestJS — public API, storage, access rules, toLLMView, audit
-services/ml/         FastAPI — gateway, M1–M5 logic, evidence check, English metrics
-config/              rubric.drive.json, models.json, scenarios/*.json, prompts/*.md
-seed/                synthetic candidates A, B, C and their expected results
-fixtures/cassettes/  recorded model and speech responses for replay
-docs/PLAN.md         the plan
+apps/web/               Next.js — candidate screens English only; staff screens English or Russian;
+                        /stand is the demo stand, on MSW mocks
+apps/api/               NestJS — public API, storage, access rules, toLLMView, audit, video retention
+services/ml/            FastAPI — gateway, M1–M5, C and S logic, evidence check, English metrics
+packages/api-client/    typed client for apps/api, generated from apps/api/openapi.json, not committed
+packages/stand-client/  the stand's frozen client — never regenerated
+config/                 rubric.drive.json, models.json, scenarios/*.json, prompts/*.md, prompts.lock.json
+seed/                   synthetic candidates A, B, C, their expected results, the M5 history
+fixtures/cassettes/     recorded model and speech responses for replay
+fixtures/bench/         reference walkthroughs for the scenario quality bench
+fixtures/audio/         synthetic audio, generated — never a real voice
+scripts/e2e/            pitch-path.mjs — the whole pitch path through the public API
+deploy/                 Caddyfile for the server; docker-compose.server.yml sits at the root
+docs/                   PLAN.md, SPEC.md, contracts/, DEPLOY.md, scenarios/
 ```
 
 Backend code goes only in `apps/api`, ML code only in `services/ml`. No model logic in the API, no storage or access rules in the ML service.
 
-Prompts live in `config/prompts/*.md`, never as strings in code. Scenarios, the rubric and model choices live in `config/`, never hard-coded.
+Prompts live in `config/prompts/*.md`, never as strings in code; the ML service carries packaged copies in `services/ml/stub_data/prompts/`. Scenarios, the rubric and model choices live in `config/`, never hard-coded.
 
 ## Model calls
 
@@ -73,7 +83,7 @@ Prompts live in `config/prompts/*.md`, never as strings in code. Scenarios, the 
 - **The API reaches the ML service only through `ai-client`, and sends only what `toLLMView()` returns.** Never build an ML request from a raw candidate record.
 - **Model output is JSON validated against a schema.** On invalid output: one retry, then a clear error.
 - **`max_tokens` is always set.** A character's line in the simulator is at most 60 words.
-- **Send text to models, not audio.** Audio goes to speech recognition only.
+- **Send text to models, not audio or video.** Audio goes to speech recognition only. A video is kept for staff to watch; the API cuts its audio out for transcription and deletes that audio afterwards.
 - **Contracts are generated, not written by hand.** No handwritten copies of wire types, no untyped `fetch` to our own endpoints.
 
 ## Money and the network
@@ -84,6 +94,8 @@ The whole API budget is about $20.
 - **Never make live calls in a loop, in tests or in CI.** Live calls happen only when a human asks for them, on a key with its own spending limit.
 - **Never commit `.env` or a key.** This repository is public, and push protection will refuse a key anyway.
 - Everything on the demo path must run with `GATEWAY_MODE=replay` and no network: the pitch cannot depend on the venue's Wi-Fi.
+- **The prompts are frozen.** A prompt's text is part of every recorded answer's key, so `config/prompts.lock.json` holds each prompt's hash and a test fails when one changes. Change a prompt only when the task asks for it, and re-record its cassettes in the same pull request.
+- `MEDIA_GATEWAY_MODE=live` with `GATEWAY_MODE=replay` runs speech and transcription live while model answers replay. It needs only the Deepgram key.
 
 ## Data
 
@@ -94,8 +106,10 @@ The whole API budget is about $20.
 
 ## Scope
 
-- **M2 and M3 are built as one complete, provable product.** M1, M4 and M5 stay thin but real. Do not gold-plate the thin modules.
+- **M2 and M3 are built as one complete, provable product.** M1, M4, M5, C, S, P and V stay thin but real. Do not gold-plate the thin modules.
 - **M2 works by voice.** Text input exists only for a candidate whose accommodation staff switched on, and paste is blocked there too. The mini-ML picks the story branch; it never scores.
+- **Only `ready` scenarios reach candidates.** A scenario becomes `ready` only by passing the quality bench (`services/ml/scripts/quality_bench.py`); never flip the status by hand.
+- **The pitch path must stay green.** `scripts/e2e/pitch-path.mjs` walks it for A, B and C in CI; a change that breaks it is not mergeable.
 
 ## Do not
 
@@ -121,28 +135,32 @@ Every rule the server enforces has a test, written in the same pull request as t
 - the personal-data boundary on both sides: `toLLMView()` drops and redacts in NestJS, and the ML service rejects a request carrying a profile field;
 - the M4 `409`, for generating **and** for reading the draft before the interviewer's scores exist;
 - API key roles (`401`, `403`) and `Idempotency-Key` reuse;
-- the evidence check: an invented quote is dropped and the score becomes `null`.
+- the evidence check: an invented quote is dropped and the score becomes `null`;
+- media: an uploaded recording's audio is gone after transcription, a video is refused to `platform`, and every view writes an audit event.
 
 A server rule without a test is not done.
 
 ## Checks before a pull request
 
-Run the checks for every part you touched before handing the work over, and report what you ran and what passed. Once the foundation slice lands, these are:
+Run the checks for every part you touched before handing the work over, and report what you ran and what passed. Do not claim a check passed unless you actually ran it.
 
-| Part | Checks |
+| Part | Commands, from the repository root |
 | --- | --- |
-| `apps/web`, `apps/api` | lint, typecheck, tests, build |
-| `services/ml` | `pytest`, all on replay |
-| everything | the CI secret scan |
+| `apps/web` | `pnpm --filter @invision/web lint`, `typecheck`, `test`, `build` |
+| `apps/api` | `pnpm --filter @invision/api lint`, `typecheck`, `test`, `build` |
+| `services/ml` | `cd services/ml && python -m pytest -q` — on replay, after `pip install -r requirements-dev.txt` |
+| everything | the CI secret scan (gitleaks) and the `e2e` job |
 
-The exact commands will be listed here when the foundation slice (F0) is merged. Until then, do not claim a check passed unless you actually ran it.
+Each web and API script generates its types first (the API client, Prisma, the ML client), so nothing generated needs committing.
 
-**If you touched the API, the ML service, the database, Docker or anything between two parts, and `docker-compose.yml` exists**, also run the stack:
+**If you touched the API, the ML service, the database, Docker or anything between two parts**, also run the stack and the pitch path:
 
 ```bash
 docker compose up --build -d
 docker compose ps          # every service up and healthy
-# call each service's health endpoint and the endpoints you changed
+curl -s http://localhost:3000/health && curl -s http://localhost:3001/v1/health
+API=http://localhost:3001/v1 node scripts/e2e/pitch-path.mjs    # ends with "All steps passed."
+# and call the endpoints you changed
 docker compose down
 ```
 
