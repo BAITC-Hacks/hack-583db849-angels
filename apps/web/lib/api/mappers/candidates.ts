@@ -13,9 +13,8 @@ const simulationStage = {
  * interviewer is sent no assessment, `platform` no brief and no score — so a
  * step the caller may not see simply arrives missing, and reads as not started.
  *
- * `briefViewed` is the one thing the server deliberately does not keep
- * (`docs/INTEGRATION.md`, G13): the step follows whether the brief is ready,
- * not whether someone opened it.
+ * `briefViewed` is the one thing the server deliberately does not keep: the
+ * step follows whether the brief is ready, not whether someone opened it.
  */
 export function toScreenProgress(progress: WireCandidateProgress): ScreenProgress {
   const interview = progress.interview;
