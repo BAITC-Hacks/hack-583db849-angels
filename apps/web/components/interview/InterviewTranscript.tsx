@@ -41,7 +41,7 @@ export function InterviewTranscript({
 }: {
   transcript: InterviewTurn[] | null;
   state: TranscriptStatus;
-  onRecorded: (audio: Blob) => void;
+  onRecorded: (audio: Blob, sample?: boolean) => void;
   uploading?: boolean;
   uploadError?: string | null;
 }) {

@@ -148,7 +148,7 @@ The brief's questions cover the five competencies **and** three topics the inter
 | Method | Path | Idem. | Success | Errors |
 | --- | --- | --- | --- | --- |
 | `POST` | `/v1/interviews` | ✱ | `201 Interview`; body `{ candidateId, heldAt, interviewerRef?, transcript?, transcriptSource?, notes? }` | `404` candidate |
-| `POST` | `/v1/interviews/:interviewId/recording` | ✱ | `202 Interview` with `transcriptStatus: "transcribing"`; multipart `audio` (webm, ogg or wav, up to 60 minutes) and `consent=true` | `400 CONSENT_REQUIRED`, `409 TRANSCRIPT_EXISTS`, `413` |
+| `POST` | `/v1/interviews/:interviewId/recording` | ✱ | `202 Interview` with `transcriptStatus: "transcribing"`; multipart `audio` (webm, ogg or wav, up to 60 minutes) and `consent=true`; `sample=true` marks the demo recording, which `DEMO_MODE` answers with A, B or C's seed transcript — a real recording is always transcribed | `400 CONSENT_REQUIRED`, `409 TRANSCRIPT_EXISTS`, `413` |
 | `GET` | `/v1/interviews/:interviewId` | | `200 Interview`, including `transcriptStatus` and `transcript` | `404` |
 | `POST` | `/v1/interviews/:interviewId/interviewer-scores` | ✱ | `201 InterviewerScoresSaved`; body `{ scores }` with **all five** keys | `400` a key missing, `409 SCORES_ALREADY_SAVED` |
 | `POST` | `/v1/interviews/:interviewId/assessment-draft` | ✱ | `201 AssessmentDraft` | **`409 DRAFT_LOCKED`** before the scores, `409 TRANSCRIPT_MISSING` |

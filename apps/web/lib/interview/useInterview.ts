@@ -27,7 +27,8 @@ export interface Interview {
   setScore: (competency: Competency, score: Score) => void;
   save: () => Promise<void>;
   /** The recording, sent with the candidate's consent for transcription. */
-  upload: (audio: Blob) => void;
+  /** `sample` is the demo recording, which DEMO_MODE answers with the seed's transcript. */
+  upload: (audio: Blob, sample?: boolean) => void;
   redoDraft: () => void;
 }
 
@@ -73,7 +74,7 @@ export function useInterviewSession(record: InterviewRecord): Interview {
       if (saved || !complete || saving.isPending) return;
       await saving.mutateAsync(scores as Record<Competency, Score>).catch(() => undefined);
     },
-    upload: (audio) => uploading.mutate({ audio, consent: true }),
+    upload: (audio, sample = false) => uploading.mutate({ audio, consent: true, sample }),
     redoDraft: () => redo.mutate(),
   };
 }

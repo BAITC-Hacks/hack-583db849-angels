@@ -107,7 +107,7 @@ describe('the interview screen on the API', () => {
         this.onstop?.();
       }
     });
-    interviewServer('none');
+    const { calls } = interviewServer('none');
     withQuery(<InterviewLoader interviewId={id} />);
 
     fireEvent.click(await screen.findByRole('button', { name: 'Check the microphone' }));
@@ -124,6 +124,12 @@ describe('the interview screen on the API', () => {
     // The same stream: the browser is not asked a second time.
     expect(getUserMedia).toHaveBeenCalledTimes(1);
     expect(started).toHaveBeenCalled();
+
+    // A real recording is sent unmarked, so it is transcribed — never swapped for the seed.
+    fireEvent.click(screen.getByRole('button', { name: 'Stop and transcribe' }));
+    await waitFor(() => expect(calls.some((call) => call.path.endsWith('/recording'))).toBe(true));
+    const form = calls.find((call) => call.path.endsWith('/recording'))!.body as FormData;
+    expect(form.get('sample')).toBeNull();
   });
 
   it('says how to allow the microphone when the browser blocked it', async () => {
@@ -170,6 +176,8 @@ describe('the interview screen on the API', () => {
     const upload = calls.find((call) => call.path.endsWith('/recording'))!;
     const form = upload.body as FormData;
     expect(form.get('consent')).toBe('true');
+    // Only the demo recording is marked: DEMO_MODE answers it with the seed's interview.
+    expect(form.get('sample')).toBe('true');
     expect((form.get('audio') as Blob).type).toBe('audio/wav');
 
     await act(() => vi.advanceTimersByTimeAsync(3_000));

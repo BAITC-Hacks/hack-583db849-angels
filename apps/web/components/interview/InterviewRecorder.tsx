@@ -49,7 +49,7 @@ function audioType(): string | undefined {
  * nothing is recorded before the consent box is ticked; the demo recording
  * needs the consent too, because it goes through the same upload.
  */
-export function InterviewRecorder({ onRecorded, disabled = false }: { onRecorded: (audio: Blob) => void; disabled?: boolean }) {
+export function InterviewRecorder({ onRecorded, disabled = false }: { onRecorded: (audio: Blob, sample?: boolean) => void; disabled?: boolean }) {
   const text = useCopy(copy);
   const [consent, setConsent] = useState(false);
   const [microphone, setMicrophone] = useState<Microphone>('unchecked');
@@ -229,7 +229,7 @@ export function InterviewRecorder({ onRecorded, disabled = false }: { onRecorded
 
           <button
             type="button"
-            onClick={() => onRecorded(silentWav())}
+            onClick={() => onRecorded(silentWav(), true)}
             disabled={!consent || disabled}
             className="self-start text-[0.8rem] font-medium text-brand-ink underline-offset-2 hover:underline disabled:cursor-not-allowed disabled:opacity-50"
           >

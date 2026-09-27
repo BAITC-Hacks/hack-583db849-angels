@@ -3593,6 +3593,13 @@
             "enum": [
               "true"
             ]
+          },
+          "sample": {
+            "type": "string",
+            "enum": [
+              "true"
+            ],
+            "description": "The demo recording, not a real one. In DEMO_MODE, A, B and C's seed transcript stands in for it; a real recording is always transcribed."
           }
         },
         "required": [
