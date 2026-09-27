@@ -69,6 +69,23 @@ describe('MlHttpAdapter', () => {
     await expect(drafted.clone().json()).resolves.toEqual(draft);
   });
 
+  it('transcribes one candidate speaker and sends a bounded follow-up request', async () => {
+    const fetchImplementation = jest.fn()
+      .mockResolvedValueOnce(new Response(JSON.stringify({ turns: [], durationSec: 0 }), { status: 200, headers: { 'Content-Type': 'application/json' } }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ suggestions: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+    const adapter = new MlHttpAdapter(config, fetchImplementation);
+    await adapter.transcribeFollowUp('interviews/id/clip.webm');
+    const body = { candidate: { candidateId: 'c', application: { answers: [] }, test: { answers: [] } }, plannedQuestions: [], question: null,
+      answer: [{ segmentId: 'fseg_01', text: 'I planned it.', startSec: 0, endSec: 4 }], earlier: [] };
+    await expect(adapter.followUp(body)).resolves.toEqual({ suggestions: [] });
+    const [transcribe] = fetchImplementation.mock.calls[0] as [Request];
+    await expect(transcribe.clone().json()).resolves.toMatchObject({ purpose: 'follow_up', speakers: 1, audioRef: 'interviews/id/clip.webm' });
+    const [followUp] = fetchImplementation.mock.calls[1] as [Request];
+    expect(new URL(followUp.url).pathname).toBe('/internal/v1/interview/follow-up');
+    expect(followUp.signal).toBeDefined();
+    await expect(followUp.clone().json()).resolves.toEqual(body);
+  });
+
   it('posts a consistency request to ML as it is', async () => {
     const fetchImplementation = jest.fn().mockResolvedValue(new Response(JSON.stringify({ items: [] }), {
       status: 200, headers: { 'Content-Type': 'application/json' },

@@ -414,6 +414,49 @@
         ]
       }
     },
+    "/internal/v1/interview/follow-up": {
+      "post": {
+        "summary": "Interview Follow Up",
+        "operationId": "interview_follow_up_internal_v1_interview_follow_up_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FollowUpRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FollowUpResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
     "/internal/v1/interview/draft": {
       "post": {
         "summary": "Interview Draft",
@@ -1244,6 +1287,42 @@
         ],
         "title": "DriveScore"
       },
+      "EarlierSuggestion": {
+        "properties": {
+          "question": {
+            "type": "string",
+            "title": "Question"
+          },
+          "competency": {
+            "type": "string",
+            "enum": [
+              "D",
+              "R",
+              "I",
+              "V",
+              "E"
+            ],
+            "title": "Competency"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "asked",
+              "dismissed"
+            ],
+            "title": "Status"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "question",
+          "competency",
+          "status"
+        ],
+        "title": "EarlierSuggestion"
+      },
       "EnglishCertificate": {
         "properties": {
           "type": {
@@ -1354,7 +1433,9 @@
               "simulation_turn",
               "interview_turn",
               "interview_note",
-              "surprise_answer"
+              "surprise_answer",
+              "presentation",
+              "follow_up_answer"
             ],
             "title": "Source"
           },
@@ -1376,6 +1457,153 @@
           "quote"
         ],
         "title": "Evidence"
+      },
+      "FollowUpRequest": {
+        "properties": {
+          "candidate": {
+            "$ref": "#/components/schemas/CandidateView"
+          },
+          "plannedQuestions": {
+            "items": {
+              "$ref": "#/components/schemas/PlannedQuestion"
+            },
+            "type": "array",
+            "title": "Plannedquestions",
+            "default": []
+          },
+          "question": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Question"
+          },
+          "answer": {
+            "items": {
+              "$ref": "#/components/schemas/FollowUpSegment"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Answer"
+          },
+          "earlier": {
+            "items": {
+              "$ref": "#/components/schemas/EarlierSuggestion"
+            },
+            "type": "array",
+            "title": "Earlier",
+            "default": []
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "candidate",
+          "answer"
+        ],
+        "title": "FollowUpRequest"
+      },
+      "FollowUpResult": {
+        "properties": {
+          "suggestions": {
+            "items": {
+              "$ref": "#/components/schemas/FollowUpSuggestion"
+            },
+            "type": "array",
+            "maxItems": 2,
+            "title": "Suggestions"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "suggestions"
+        ],
+        "title": "FollowUpResult"
+      },
+      "FollowUpSegment": {
+        "properties": {
+          "segmentId": {
+            "type": "string",
+            "pattern": "^fseg_\\d{2,}$",
+            "title": "Segmentid"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "startSec": {
+            "type": "number",
+            "title": "Startsec"
+          },
+          "endSec": {
+            "type": "number",
+            "title": "Endsec"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "segmentId",
+          "text",
+          "startSec",
+          "endSec"
+        ],
+        "title": "FollowUpSegment"
+      },
+      "FollowUpSuggestion": {
+        "properties": {
+          "question": {
+            "type": "string",
+            "title": "Question"
+          },
+          "competency": {
+            "type": "string",
+            "enum": [
+              "D",
+              "R",
+              "I",
+              "V",
+              "E"
+            ],
+            "title": "Competency"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "mismatch",
+              "vague",
+              "no_evidence"
+            ],
+            "title": "Reason"
+          },
+          "why": {
+            "type": "string",
+            "title": "Why"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/Evidence"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Evidence"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "question",
+          "competency",
+          "reason",
+          "why",
+          "evidence"
+        ],
+        "title": "FollowUpSuggestion"
       },
       "HTTPValidationError": {
         "properties": {
@@ -1570,6 +1798,25 @@
           "metric"
         ],
         "title": "Observation"
+      },
+      "PlannedQuestion": {
+        "properties": {
+          "focus": {
+            "type": "string",
+            "title": "Focus"
+          },
+          "question": {
+            "type": "string",
+            "title": "Question"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "focus",
+          "question"
+        ],
+        "title": "PlannedQuestion"
       },
       "QualityCheckRequest": {
         "properties": {
@@ -2005,7 +2252,9 @@
             "enum": [
               "interview",
               "surprise",
-              "turn"
+              "turn",
+              "presentation",
+              "follow_up"
             ],
             "title": "Purpose"
           },

@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "maxWords": 30,
+  "leadingPatterns": [
+    "don't you think", "wouldn't you agree", "isn't it true", "surely",
+    "obviously", "you must agree", "you would agree", "isn't that right",
+    "right\\?$", "correct\\?$", "wouldn't it be better"
+  ],
+  "judgmentWords": [
+    "lie", "lying", "liar", "dishonest", "weak", "poor", "fail", "failed",
+    "failure", "score", "admit", "reject", "evasive", "untrustworthy",
+    "incompetent", "lazy", "unfit", "bad candidate", "good candidate"
+  ]
+}

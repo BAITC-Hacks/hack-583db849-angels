@@ -103,6 +103,15 @@
       "cache_ttl_seconds": 604800,
       "demo_seed_available": true
     },
+    "interview_follow_up": {
+      "provider": "openai",
+      "model": "gpt-6-luna",
+      "fallback_model": "gpt-6-sol",
+      "max_tokens": 400,
+      "request_cost_limit_usd": 0.01,
+      "cache_ttl_seconds": 604800,
+      "demo_seed_available": true
+    },
     "quality_check": {
       "provider": "openai",
       "model": "gpt-6-luna",

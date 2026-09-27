@@ -1,0 +1,11 @@
+{
+  "suggestions": [
+    {
+      "question": "What did you do when you realised the others had not been asked?",
+      "competency": "V",
+      "reason": "no_evidence",
+      "why": "The answer says the others were not asked, but gives no example of how their views were considered afterward.",
+      "evidence": [{"source": "follow_up_answer", "sourceId": "fseg_02", "quote": "I did not ask the others how the change affected them."}]
+    }
+  ]
+}

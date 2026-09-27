@@ -35,6 +35,7 @@ class TaskName(str, Enum):
     INTERVIEW_DRAFT = "interview_draft"
     CONSISTENCY = "consistency"
     SURPRISE_QUESTION = "surprise_question"
+    INTERVIEW_FOLLOW_UP = "interview_follow_up"
     QUALITY_CHECK = "quality_check"
     TRANSCRIPTION = "transcription"
     SPEECH = "speech"

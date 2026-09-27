@@ -12,7 +12,7 @@ export type Confidence = 'low' | 'medium' | 'high';
 export type Score = 0 | 1 | 2 | 3 | 4 | null;
 
 export interface WireEvidence {
-  source: 'application_field' | 'test_item' | 'simulation_turn' | 'interview_turn' | 'interview_note' | 'surprise_answer';
+  source: 'application_field' | 'test_item' | 'simulation_turn' | 'interview_turn' | 'interview_note' | 'surprise_answer' | 'presentation' | 'follow_up_answer';
   sourceId: string;
   quote: string;
 }

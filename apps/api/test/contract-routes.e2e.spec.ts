@@ -18,6 +18,7 @@ import { SimulationAssessmentsService } from '../src/modules/simulation-assessme
 import { SurpriseService } from '../src/modules/surprise/surprise.service';
 import { QualityGuardService } from '../src/modules/quality-guard/quality-guard.service';
 import { InterviewsService } from '../src/modules/interviews/interviews.service';
+import { FollowUpsService } from '../src/modules/interviews/follow-ups.service';
 import { ConsistencyService } from '../src/modules/consistency/consistency.service';
 import { AdminService } from '../src/modules/admin/admin.service';
 import { RetentionService } from '../src/modules/retention/retention.service';
@@ -62,6 +63,12 @@ const interviews = {
   createDraft: jest.fn().mockImplementation(() => contractExample('assessment-draft.json')),
   getDraft: jest.fn().mockImplementation(() => contractExample('assessment-draft.json')),
   saveNotes: jest.fn().mockImplementation(() => contractExample('interview.json')),
+};
+
+const followUps = {
+  create: jest.fn().mockImplementation(() => contractExample('follow-up.json')),
+  list: jest.fn().mockImplementation(() => ({ items: [contractExample('follow-up.json')] })),
+  mark: jest.fn().mockImplementation(() => contractExample('follow-up.json')),
 };
 
 const consistency = {
@@ -144,6 +151,8 @@ describe('PR 1 contract routes', () => {
       .useValue(quality)
       .overrideProvider(InterviewsService)
       .useValue(interviews)
+      .overrideProvider(FollowUpsService)
+      .useValue(followUps)
       .overrideProvider(ConsistencyService)
       .useValue(consistency)
       .overrideProvider(AdminService)
@@ -382,6 +391,22 @@ describe('PR 1 contract routes', () => {
     expect(interviews.saveNotes).toHaveBeenLastCalledWith(interviewId, ['Asked about the robotics team.']);
     await request(server).put(`/v1/interviews/${interviewId}/notes`).set('X-API-Key', 'commission-key').send({ notes: [] }).expect(403);
     await request(server).put(`/v1/interviews/${interviewId}/notes`).set('X-API-Key', 'interviewer-key').send({ notes: 'one string' }).expect(400);
+  });
+
+  it('lets staff request and mark follow-ups in a call, never the candidate channel', async () => {
+    const server = app.getHttpServer();
+    const interviewId = '6f1c2a0e-0000-4000-8000-00000000a004';
+    const followUpId = '6f1c2a0e-0000-4000-8000-00000000a136';
+    const path = `/v1/interviews/${interviewId}/follow-ups`;
+    await request(server).get(path).set('X-API-Key', 'platform-key').expect(403);
+    await request(server).post(path).set('X-API-Key', 'platform-key').field('sample', 'true').expect(403);
+    const made = await request(server).post(path).set('X-API-Key', 'interviewer-key').field('sample', 'true').expect(201);
+    expect(made.body.followUpId).toBe(followUpId);
+    expect(followUps.create).toHaveBeenLastCalledWith(interviewId, undefined, undefined, true, 'interviewer');
+    await request(server).get(path).set('X-API-Key', 'commission-key').expect(200);
+    await request(server).put(`${path}/${followUpId}/suggestions/fs_01`).set('X-API-Key', 'interviewer-key').send({ status: 'asked' }).expect(200);
+    expect(followUps.mark).toHaveBeenLastCalledWith(interviewId, followUpId, 'fs_01', 'asked', 'interviewer');
+    await request(server).put(`${path}/${followUpId}/suggestions/fs_01`).set('X-API-Key', 'commission-key').send({ status: 'asked' }).expect(403);
   });
 
   it('answers 404, not 500, for an id that is not a UUID', async () => {

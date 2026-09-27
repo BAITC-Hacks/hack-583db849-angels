@@ -34,14 +34,14 @@ def audio_router(
     async def transcribe(request: TranscribeRequest) -> TranscribeResult:
         if request.purpose == "interview" and request.speakers != 2:
             raise ServiceError(status_code=422, code="VALIDATION_ERROR", message="Request validation failed.")
-        if request.purpose in {"turn", "surprise"} and request.speakers != 1:
+        if request.purpose in {"turn", "surprise", "presentation", "follow_up"} and request.speakers != 1:
             raise ServiceError(status_code=422, code="VALIDATION_ERROR", message="Request validation failed.")
         audio_path = resolve_audio_ref(request.audioRef, uploads_dir)
         if request.purpose == "turn" and request.speakers == 1:
             return await turn_transcription.transcribe(request, audio_path)
         if request.purpose == "interview":
             return await interview_transcription.transcribe(request, audio_path)
-        # The surprise answer, and the video presentation that uses the same purpose.
+        # One-speaker surprise, presentation, and follow-up answers use timed segments.
         return await answer_transcription.transcribe(request, audio_path)
 
     @router.post(

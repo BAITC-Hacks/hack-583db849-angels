@@ -1,0 +1,12 @@
+{
+  "input_tokens": 0,
+  "model": "gpt-6-luna",
+  "output_tokens": 0,
+  "provider": "openai",
+  "recorded_at": "2026-09-27T18:07:45.212758Z",
+  "request_hash": "e3842709a73a13b2c695087faa1bc05d002e28ffc4d39351ab7d8fe595b4622e",
+  "request_id": "synthetic-follow-up",
+  "response": "{\"suggestions\": [{\"question\": \"What changed between the application and this account of the project?\", \"competency\": \"D\", \"reason\": \"mismatch\", \"why\": \"The answer describes a disrupted project, while the application says no important project went wrong.\", \"evidence\": [{\"source\": \"follow_up_answer\", \"sourceId\": \"fseg_01\", \"quote\": \"Our first project collapsed when we lost the venue\"}, {\"source\": \"application_field\", \"sourceId\": \"setback\", \"quote\": \"Nothing important has gone wrong in my projects.\"}]}]}",
+  "task": "interview_follow_up",
+  "version": 1
+}

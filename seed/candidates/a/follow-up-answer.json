@@ -1,0 +1,7 @@
+{
+  "question": "Your application response says, \"I organised a weekend clean-up with twelve volunteers and split them into three teams. Each team had a leader and a list of streets. We finished by two and collected forty bags.\" Describe a time fairness changed your plan. What did you choose?",
+  "segments": [
+    {"segmentId": "fseg_01", "text": "I kept the original plan so we could finish on time.", "startSec": 0.5, "endSec": 4.6},
+    {"segmentId": "fseg_02", "text": "It worked, but I did not ask the others how the change affected them.", "startSec": 4.8, "endSec": 10.2}
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "turns": [
+    {
+      "speaker": "candidate",
+      "text": "I kept the original plan so we could finish on time.",
+      "startSec": 0.5,
+      "endSec": 4.6
+    },
+    {
+      "speaker": "candidate",
+      "text": "It worked, but I did not ask the others how the change affected them.",
+      "startSec": 4.8,
+      "endSec": 10.2
+    }
+  ],
+  "durationSec": 10.2
+}

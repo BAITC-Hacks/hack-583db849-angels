@@ -1,0 +1,12 @@
+{
+  "input_tokens": 0,
+  "model": "gpt-6-luna",
+  "output_tokens": 0,
+  "provider": "openai",
+  "recorded_at": "2026-09-27T18:07:45.209683Z",
+  "request_hash": "4b2d2ec8873126be5cbad01de751b578ca35eb1bb0547956e1db9472935c86ff",
+  "request_id": "synthetic-follow-up",
+  "response": "{\"suggestions\": [{\"question\": \"What did you do when you realised the others had not been asked?\", \"competency\": \"V\", \"reason\": \"no_evidence\", \"why\": \"The answer says the others were not asked, but gives no example of how their views were considered afterward.\", \"evidence\": [{\"source\": \"follow_up_answer\", \"sourceId\": \"fseg_02\", \"quote\": \"I did not ask the others how the change affected them.\"}]}]}",
+  "task": "interview_follow_up",
+  "version": 1
+}

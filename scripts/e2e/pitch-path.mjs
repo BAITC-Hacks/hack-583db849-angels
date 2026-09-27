@@ -165,8 +165,40 @@ for (const letter of ['a', 'b', 'c']) {
   }
 
   let interviewId;
+  if (letter === 'a') {
+    await step('consented call suggests a grounded follow-up', async () => {
+      const startsAt = new Date(Date.now() + 2 * 60_000).toISOString();
+      const slot = (await call('interviewer', 'POST', '/interview-slots', {
+        startsAt, interviewerRef: 'synthetic-interviewer-a', durationMin: 30,
+      }, { expect: [201] })).data;
+      await call('platform', 'POST', `/interview-slots/${slot.slotId}/booking`, { candidateId: id }, { expect: [200] });
+      await call('platform', 'POST', `/interview-slots/${slot.slotId}/join`, { consentRecording: true }, { expect: [200] });
+      const access = (await call('interviewer', 'POST', `/interview-slots/${slot.slotId}/join`, {}, { expect: [200] })).data;
+      interviewId = access.interviewId;
+      if (!interviewId) throw new Error('the call has no interview');
+      const form = new FormData();
+      form.append('sample', 'true');
+      const followUp = (await call('interviewer', 'POST', `/interviews/${interviewId}/follow-ups`, undefined, { form, expect: [201] })).data;
+      const expected = seed('a', 'expected-follow-up.json').suggestions[0];
+      const suggestion = followUp.suggestions[0];
+      if (!suggestion || suggestion.reason !== expected.reason || suggestion.competency !== expected.competency) {
+        throw new Error('the replayed follow-up differs from the seed');
+      }
+      for (const evidence of suggestion.evidence) {
+        if (evidence.source !== 'follow_up_answer' || !followUp.answer.some((segment) =>
+          segment.segmentId === evidence.sourceId && segment.text.includes(evidence.quote))) {
+          throw new Error('the follow-up quote is not verbatim');
+        }
+      }
+      const saved = (await call('commission', 'GET', `/interviews/${interviewId}/follow-ups`, undefined, { expect: [200] })).data.items;
+      if (saved[0]?.followUpId !== followUp.followUpId) throw new Error('the suggestion was not saved');
+      await call('interviewer', 'PUT', `/interviews/${interviewId}/follow-ups/${followUp.followUpId}/suggestions/${suggestion.suggestionId}`,
+        { status: 'asked' }, { expect: [200] });
+      return `${suggestion.competency}: ${suggestion.reason}`;
+    });
+  }
   await step('interview recorded, transcribed as the seed', async () => {
-    interviewId = (await call('interviewer', 'POST', '/interviews', { candidateId: id, heldAt: new Date().toISOString(), interviewerRef: 'synthetic-interviewer-a' }, { expect: [201] })).data.interviewId;
+    interviewId ??= (await call('interviewer', 'POST', '/interviews', { candidateId: id, heldAt: new Date().toISOString(), interviewerRef: 'synthetic-interviewer-a' }, { expect: [201] })).data.interviewId;
     const form = new FormData();
     form.append('consent', 'true');
     // The demo recording: in DEMO_MODE it stands for the seed's interview.

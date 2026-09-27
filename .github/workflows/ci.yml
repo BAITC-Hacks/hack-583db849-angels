@@ -169,6 +169,10 @@ jobs:
       ML_INTERNAL_TOKEN: e2e-internal-token
       API_KEYS: local-platform:platform,local-interviewer:interviewer,local-commission:commission,local-admin:admin
       UPLOADS_DIR: /tmp/e2e/uploads
+      # The API signs a token locally; the e2e job never connects to LiveKit.
+      LIVEKIT_URL: wss://synthetic.invalid
+      LIVEKIT_API_KEY: APIsynthetic
+      LIVEKIT_API_SECRET: synthetic-secret
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4

@@ -25,6 +25,7 @@ from .modules.director import ScenarioDirector
 from .modules.interview_transcription import InterviewTranscriptionService
 from .modules.answer_transcription import AnswerTranscriptionService
 from .modules.interview_draft import InterviewDraftGenerator, InterviewDraftService
+from .modules.follow_up import FollowUpWriter
 from .modules.quality_calibration import CalibrationWording
 from .modules.quality_check import QualityCheckService
 from .modules.surprise import SurpriseQuestionWriter
@@ -48,6 +49,7 @@ def create_app(
     draft_service: InterviewDraftService | None = None,
     quality_service: QualityCheckService | None = None,
     surprise_writer: SurpriseQuestionWriter | None = None,
+    follow_up_writer: FollowUpWriter | None = None,
 ) -> FastAPI:
     resolved = settings or load_settings()
     app = FastAPI(title="AI Leader ID ML API", version="1.0.0")
@@ -88,6 +90,7 @@ def create_app(
         CalibrationWording(resolved_model_gateway),
     )
     resolved_surprise_writer = surprise_writer or SurpriseQuestionWriter(resolved_model_gateway)
+    resolved_follow_up_writer = follow_up_writer or FollowUpWriter(resolved_model_gateway)
 
     @app.get(
         "/internal/v1/health",
@@ -122,6 +125,7 @@ def create_app(
             resolved_consistency_service,
             resolved_quality_service,
             resolved_surprise_writer,
+            resolved_follow_up_writer,
         )
     )
     return app

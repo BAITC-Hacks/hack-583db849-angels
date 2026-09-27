@@ -38,12 +38,13 @@ Every request carries `X-Internal-Token`. Responses are the result object itself
 | `POST` | `/internal/v1/simulation/turn` | `TurnRequest` → `TurnResult` | `ml/simulation-turn.*` |
 | `POST` | `/internal/v1/simulation/assessment` | `AssessmentRequest` → `AssessmentResult` | `ml/simulation-assessment.*` |
 | `POST` | `/internal/v1/brief` | `BriefRequest` → `BriefResult` | `ml/brief.*` |
-| `POST` | `/internal/v1/transcribe` | `TranscribeRequest` → `TranscribeResult` | `ml/transcribe.*` (interview), `ml/transcribe-turn.*` (spoken turn) |
+| `POST` | `/internal/v1/transcribe` | `TranscribeRequest` → `TranscribeResult` | `ml/transcribe.*` (interview), `ml/transcribe-turn.*` (spoken turn), `ml/transcribe-follow-up.*` (L) |
 | `POST` | `/internal/v1/speech` | `SpeechRequest` → `audio/mpeg` | |
 | `POST` | `/internal/v1/consistency` | `ConsistencyRequest` → `ConsistencyResult` (C) | `ml/consistency-*.json` |
 | `POST` | `/internal/v1/surprise-question` | `SurpriseRequest` → `SurpriseResult` (S) | `ml/surprise-question.*` |
 | `GET` | `/internal/v1/usage` | → `Usage` | `ml/usage.response.json` |
 | `POST` | `/internal/v1/interview/draft` | `DraftRequest` → `DraftResult` | `ml/interview-draft.*` |
+| `POST` | `/internal/v1/interview/follow-up` | `FollowUpRequest` → `FollowUpResult` (L) | `ml/interview-follow-up.*` |
 | `POST` | `/internal/v1/quality-check` | `QualityCheckRequest` → `QualityCheckResult` (M5) | `ml/quality-check-*.json` |
 
 **Consistency, two stages.** `api` calls `consistency` only with `stage: "after"`. The before stage comes inside `brief` as `BriefResult.consistency` — write it once, as one module, and use it in both.
@@ -108,7 +109,7 @@ Each of these is visible on a screen, and a mistake here shows up in the demo.
    - Evidence comes only from **candidate** turns (`interview_turn`) or notes. The interviewer's turns are context, not evidence.
    - `DraftRequest` has no field for the scores, and `extra="forbid"` rejects them. A draft that saw them could anchor to them in reverse; the comparison is done after, by the web.
 6a. **Transcription goes through the gateway,** like every Deepgram call:
-   - for an interview (`speakers: 2`) the speaker who asks the first question is `interviewer`; for a surprise answer or a voice turn (`speakers: 1`) every turn is `candidate`;
+   - for an interview (`speakers: 2`) the speaker who asks the first question is `interviewer`; for a surprise answer, voice turn, presentation or follow-up (`speakers: 1`) every turn is `candidate`;
    - the audio is never sent to an LLM — only the resulting text is. For the surprise answer you receive the audio track only, never the video;
    - `api` deletes the audio once the transcript is stored, so you work from the file reference you were given and keep no copy.
 6b. **The surprise question** is about the candidate's own application, answerable in 90 seconds without preparation, in plain English, and never touches personal life, family, health, money or anything on the `profile` list. You return the competency it targets and why — staff see them, the candidate never does.
@@ -117,6 +118,11 @@ Each of these is visible on a screen, and a mistake here shows up in the demo.
    - It is evidence like the application and the test: it can back a question, a claim or an observation in `consistency`, or something to clarify. Without `surpriseAnswer` in the request the brief never cites `surprise_answer`.
    - The field is optional, so a request without it is exactly today's request.
 6d. **The brief can quote the video presentation**, the same way: `BriefRequest.presentation` carries the prompt and the segments `pseg_01`, …, and a quote from it is `source: "presentation"` with the segment id, checked verbatim. Its audio comes to `transcribe` with `purpose: "presentation"` and one speaker.
+6e. **Follow-ups in the call (L) are requested, never automatic.** `transcribe` takes `purpose: "follow_up"`, `speakers: 1` and returns candidate turns; `api` numbers them `fseg_01`, …, deletes the audio on success and error, and sends only the text to `interview/follow-up`. `FollowUpRequest.candidate` is `toLLMView()` output; exclude its `candidateId` from the *model* payload so cassettes replay for any candidate. Saved brief questions are context, never evidence. Return 0–2 suggestions; `[]` is valid and must not be padded. Nothing here scores, judges, or feeds the draft.
+   - **Reasons:** `mismatch` means the answer differs from an application or test answer; `vague` means it claims a result without who did what or when; `no_evidence` means it touches a competency with no example yet in the answer or application. English is never a reason.
+   - **Evidence:** every quote is verbatim under `docs/SPEC.md`, section 7. For `follow_up_answer`, `sourceId` must be an `fseg_` id in `answer`; for `application_field` and `test_item`, it must be a sent `fieldId` or `itemId`. `mismatch` needs both a follow-up quote and an application/test quote; `vague` and `no_evidence` need a follow-up quote. Drop a suggestion whose quote fails verification.
+   - **Questions:** each suggestion has exactly one `?` at the end, at most 30 words, in plain English, and must not suggest its own answer. Check `leadingPatterns` and `judgmentWords` in `config/follow-up.json`; check off-limits topics against the existing surprise-question `forbiddenTopics`, never a copied list. The question and `why` describe the answer, never the person. Grammar, accent and vocabulary never cause a suggestion. Drop duplicates of `plannedQuestions` or `earlier` after normalisation.
+   - **Failures:** drop each invalid suggestion. If the model proposed suggestions and all were dropped, retry once, then return `[]`. Invalid JSON gets one retry, then `AI_INVALID_OUTPUT`. Check these rules in code, not only in the prompt.
 7. **English is separate.**
    - `EnglishMetrics` is computed by code;
    - grammar never moves a D.R.I.V.E. score;
@@ -152,7 +158,7 @@ class Strict(BaseModel):
 Competency = Literal["D", "R", "I", "V", "E"]
 Score = Annotated[int, Field(ge=0, le=4)] | None
 Confidence = Literal["low", "medium", "high"]
-SourceKind = Literal["application_field", "test_item", "simulation_turn", "interview_turn", "interview_note", "surprise_answer", "presentation"]
+SourceKind = Literal["application_field", "test_item", "simulation_turn", "interview_turn", "interview_note", "surprise_answer", "presentation", "follow_up_answer"]
 TurnId = Annotated[str, Field(pattern=r"^turn_\d{2,}$")]
 
 
@@ -493,6 +499,49 @@ class BriefResult(Strict):
         return questions
 
 
+# ---- POST /internal/v1/interview/follow-up (L)
+
+class FollowUpSegment(Strict):
+    segmentId: Annotated[str, Field(pattern=r"^fseg_\d{2,}$")]
+    text: str                                   # verbatim, as transcribed; never translated
+    startSec: float
+    endSec: float
+
+
+class PlannedQuestion(Strict):
+    focus: str                                  # as in BriefQuestion.focus
+    question: str
+
+
+class EarlierSuggestion(Strict):
+    question: str
+    competency: Competency
+    status: Literal["open", "asked", "dismissed"]
+
+
+class FollowUpRequest(Strict):
+    candidate: CandidateView
+    plannedQuestions: list[PlannedQuestion] = []   # the saved brief's questions: context, never evidence
+    question: str | None = None                    # what the candidate was answering, if the interviewer picked it
+    answer: Annotated[list[FollowUpSegment], Field(min_length=1)]
+    earlier: list[EarlierSuggestion] = []          # this interview's earlier suggestions
+
+
+FollowUpReason = Literal["mismatch", "vague", "no_evidence"]
+
+
+class FollowUpSuggestion(Strict):
+    question: str
+    competency: Competency
+    reason: FollowUpReason
+    why: str                                       # for the interviewer only
+    evidence: Annotated[list[Evidence], Field(min_length=1)]
+
+
+class FollowUpResult(Strict):
+    suggestions: Annotated[list[FollowUpSuggestion], Field(max_length=2)]   # empty means "nothing to add"
+
+
 # ---- POST /internal/v1/interview/draft
 
 class InterviewNote(Strict):
@@ -519,7 +568,7 @@ class TranscribedTurn(Strict):
 # ---- POST /internal/v1/transcribe
 
 class TranscribeRequest(Strict):
-    purpose: Literal["interview", "surprise", "turn", "presentation"]
+    purpose: Literal["interview", "surprise", "turn", "presentation", "follow_up"]
     audioRef: str                          # where api put the file; api deletes it afterwards
     language: Literal["en"] = "en"
     speakers: Literal[1, 2] = 2

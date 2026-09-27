@@ -68,9 +68,9 @@ class AnswerTranscriptionService:
                     "speakers": request.speakers,
                     "purpose": request.purpose,
                 },
-                # A presentation runs at most three minutes; reserve five before a
-                # live call. The provider's measured duration is what is billed.
-                estimated_units=Decimal(5),
+                # Follow-up clips run at most two minutes; presentations reserve
+                # five. The provider's measured duration is what is billed.
+                estimated_units=Decimal(2) if request.purpose == "follow_up" else Decimal(5),
             )
         )
         if result.media_type != "application/json":

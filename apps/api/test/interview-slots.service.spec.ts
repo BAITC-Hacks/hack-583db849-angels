@@ -75,7 +75,10 @@ function harness({ livekit = true } = {}) {
   };
   const audit = { record: jest.fn().mockResolvedValue(undefined) };
   let interviews = 0;
-  const interviewsService = { create: jest.fn(() => Promise.resolve({ interviewId: `interview-${++interviews}` })) };
+  const interviewsService = {
+    create: jest.fn(() => Promise.resolve({ interviewId: `interview-${++interviews}` })),
+    deleteFollowUps: jest.fn().mockResolvedValue(undefined),
+  };
   const env: Record<string, string> = livekit
     ? { LIVEKIT_URL: 'wss://synthetic.livekit.test', LIVEKIT_API_KEY: 'APIsynthetic', LIVEKIT_API_SECRET: 'synthetic-secret' }
     : {};
@@ -207,6 +210,13 @@ describe('InterviewSlotsService — joining the call', () => {
     await service.join(slot.id, { consentRecording: false }, 'platform');
     expect(slots[0]).toMatchObject({ candidateJoinedAt: now, consentRecording: false });
     expect(actions()).toEqual(['call.joined']);
+  });
+
+  it('deletes follow-ups if the candidate withdraws consent on rejoin', async () => {
+    const { service, put, interviewsService } = harness();
+    const slot = put({ startsAt: inMinutes(5), candidateId, interviewId: 'interview-1', consentRecording: true });
+    await service.join(slot.id, { consentRecording: false }, 'platform');
+    expect(interviewsService.deleteFollowUps).toHaveBeenCalledWith('interview-1');
   });
 
   it('makes the interview when the interviewer first joins, and only once', async () => {

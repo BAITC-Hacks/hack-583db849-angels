@@ -106,6 +106,7 @@ const wireSlot = example<InterviewSlot>('interview-slot.json');
 const access = example<components['schemas']['CallAccessDto']>('call-access.json');
 const wireInterview = example<components['schemas']['InterviewDto']>('interview.json');
 const brief = example<components['schemas']['BriefDto']>('brief.json');
+const sampleFollowUp = example<components['schemas']['FollowUpDto']>('follow-up.json');
 const MINUTE = 60_000;
 
 /** A slot starting `minutes` from now, with whatever else a test needs. */
@@ -288,6 +289,8 @@ describe('the candidate in the call', () => {
     act(() => room.arrive('interviewer'));
     await waitFor(() => expect(screen.queryByText(/will be with you in a moment/)).toBeNull());
     expect(screen.getByLabelText('Interviewer')).toBeTruthy();
+    expect(screen.queryByText('Follow-up')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Listen to the answer' })).toBeNull();
 
     fireEvent.click(screen.getByRole('button', { name: 'Leave' }));
     expect(await screen.findByText(/You have left the call/)).toBeTruthy();
@@ -334,7 +337,8 @@ describe('the interviewer in the call', () => {
     ondataavailable: ((event: { data: Blob }) => void) | null = null;
     onstop: (() => void) | null = null;
     readonly mimeType = 'audio/webm';
-    constructor(readonly stream: unknown) {}
+    static instances: FakeAudioRecorder[] = [];
+    constructor(readonly stream: unknown) { FakeAudioRecorder.instances.push(this); }
     start() {
       this.state = 'recording';
     }
@@ -346,6 +350,7 @@ describe('the interviewer in the call', () => {
   }
 
   function withAudio() {
+    FakeAudioRecorder.instances.length = 0;
     const sources: string[] = [];
     vi.stubGlobal('MediaRecorder', FakeAudioRecorder);
     vi.stubGlobal('MediaStream', class {
@@ -371,6 +376,9 @@ describe('the interviewer in the call', () => {
       'GET /api/v1/candidates': () => json(list),
       [`GET /api/v1/candidates/${candidateId}/brief`]: () => json(brief),
       [`GET ${interviewPath}`]: () => json({ ...wireInterview, interviewId: access.interviewId, notes: [], interviewerScores: null }),
+      [`GET ${interviewPath}/follow-ups`]: () => json({ items: [] }),
+      [`POST ${interviewPath}/follow-ups`]: () => json(sampleFollowUp, 201),
+      [`PUT ${interviewPath}/follow-ups/${sampleFollowUp.followUpId}/suggestions/fs_01`]: () => json({ ...sampleFollowUp, suggestions: [{ ...sampleFollowUp.suggestions[0], status: 'asked' }] }),
       [`PUT ${interviewPath}/notes`]: (call: Call) =>
         json({ ...wireInterview, notes: (JSON.parse(call.body as string).notes as string[]).map((text, index) => ({ id: `note_${index + 1}`, text })) }),
       [`POST ${interviewPath}/recording`]: () => json({ ...wireInterview, transcriptStatus: 'transcribing', transcript: null }, 202),
@@ -413,6 +421,8 @@ describe('the interviewer in the call', () => {
     await joinCall();
     expect(await screen.findByText(/did not agree to recording/)).toBeTruthy();
     expect(screen.queryByRole('button', { name: 'Start recording' })).toBeNull();
+    act(() => livekit.rooms[0].arrive('candidate'));
+    expect(screen.queryByRole('region', { name: 'Follow-up' })).toBeNull();
   });
 
   it('records both voices with consent, and sends them to the interview’s transcription', async () => {
@@ -430,6 +440,115 @@ describe('the interviewer in the call', () => {
     const form = posts(calls, `${interviewPath}/recording`)[0].body as FormData;
     expect(form.get('consent')).toBe('true');
     expect((form.get('audio') as Blob).type).toBe('audio/webm');
+  });
+
+  it('captures only the candidate microphone on request, then sends the question and verbatim evidence', async () => {
+    withAudio();
+    const calls = interviewerServer(slotIn(-1, { candidateJoinedAt: new Date().toISOString(), consentRecording: true }));
+    await joinCall();
+    act(() => livekit.rooms[0].arrive('candidate'));
+    const panel = await screen.findByRole('region', { name: 'Follow-up' });
+    fireEvent.change(within(panel).getByLabelText('Answering:'), { target: { value: brief.questions[0].question } });
+    fireEvent.click(within(panel).getByRole('button', { name: 'Listen to the answer' }));
+    expect(FakeAudioRecorder.instances).toHaveLength(1);
+    expect((FakeAudioRecorder.instances[0].stream as { tracks: { id: string }[] }).tracks.map((track) => track.id)).toEqual(['candidate-mic']);
+    expect(posts(calls, `${interviewPath}/follow-ups`)).toHaveLength(0);
+    // The clip duration is measured by the hook; only a 3+ second answer can be sent.
+    const now = Date.now();
+    vi.spyOn(Date, 'now').mockImplementation(() => now + 5_000);
+    fireEvent.click(within(panel).getByRole('button', { name: /Suggest a follow-up/ }));
+    await waitFor(() => expect(posts(calls, `${interviewPath}/follow-ups`)).toHaveLength(1));
+    const sent = posts(calls, `${interviewPath}/follow-ups`)[0];
+    const body = sent.body as FormData;
+    expect(body.get('question')).toBe(brief.questions[0].question);
+    expect(body.get('sample')).toBeNull();
+    expect((body.get('audio') as Blob).type).toBe('audio/webm');
+    expect(sent.headers.get('Idempotency-Key')).toBeTruthy();
+    expect(await within(panel).findByText(sampleFollowUp.suggestions[0].question)).toBeTruthy();
+    expect(within(panel).getByText(/I did not ask the others how the change affected them/)).toBeTruthy();
+    fireEvent.click(within(panel).getByRole('button', { name: 'Asked' }));
+    await waitFor(() => expect(calls.some((call) => call.method === 'PUT' && call.path.includes('/suggestions/fs_01'))).toBe(true));
+  });
+
+  it('sends sample=true only for the explicit demo answer, never a candidate clip', async () => {
+    const calls = interviewerServer(slotIn(-1, { candidateJoinedAt: new Date().toISOString(), consentRecording: true }));
+    await joinCall();
+    act(() => livekit.rooms[0].arrive('candidate'));
+    const panel = await screen.findByRole('region', { name: 'Follow-up' });
+    fireEvent.click(within(panel).getByRole('button', { name: 'Use the demo answer' }));
+    await waitFor(() => expect(posts(calls, `${interviewPath}/follow-ups`)).toHaveLength(1));
+    const body = posts(calls, `${interviewPath}/follow-ups`)[0].body as FormData;
+    expect(body.get('sample')).toBe('true');
+    expect(body.get('audio')).toBeNull();
+  });
+
+  it('does not send clips shorter than three seconds', async () => {
+    withAudio();
+    const calls = interviewerServer(slotIn(-1, { candidateJoinedAt: new Date().toISOString(), consentRecording: true }));
+    await joinCall();
+    act(() => livekit.rooms[0].arrive('candidate'));
+    const panel = await screen.findByRole('region', { name: 'Follow-up' });
+    fireEvent.click(within(panel).getByRole('button', { name: 'Listen to the answer' }));
+    fireEvent.click(within(panel).getByRole('button', { name: /Suggest a follow-up/ }));
+    expect(await within(panel).findByText('Too short to suggest anything')).toBeTruthy();
+    expect(posts(calls, `${interviewPath}/follow-ups`)).toHaveLength(0);
+  });
+
+  it('offers an automatically stopped two-minute clip for submission', async () => {
+    withAudio();
+    const calls = interviewerServer(slotIn(-1, { candidateJoinedAt: new Date().toISOString(), consentRecording: true }));
+    await joinCall();
+    act(() => livekit.rooms[0].arrive('candidate'));
+    const panel = await screen.findByRole('region', { name: 'Follow-up' });
+    fireEvent.click(within(panel).getByRole('button', { name: 'Listen to the answer' }));
+    const started = Date.now();
+    const clock = vi.spyOn(Date, 'now').mockImplementation(() => started + 120_001);
+    try {
+      fireEvent.click(await within(panel).findByRole('button', { name: 'Suggest from clip' }));
+      await waitFor(() => expect(posts(calls, `${interviewPath}/follow-ups`)).toHaveLength(1));
+      expect((posts(calls, `${interviewPath}/follow-ups`)[0].body as FormData).get('audio')).toBeTruthy();
+    } finally {
+      clock.mockRestore();
+    }
+  });
+
+  it('hides follow-ups after scores are saved and never asks the candidate for them', async () => {
+    const calls = mockApi({
+      [`GET ${slotPath}`]: () => json(slotIn(-1, { candidateJoinedAt: new Date().toISOString(), consentRecording: true })),
+      [`POST ${slotPath}/join`]: () => json(access),
+      'GET /api/v1/candidates': () => json(list),
+      [`GET /api/v1/candidates/${candidateId}/brief`]: () => json(brief),
+      [`GET ${interviewPath}`]: () => json({ ...wireInterview, interviewerScores: { scores: { D: 2, R: 2, I: 2, V: 2, E: 2 } } }),
+    });
+    await joinCall();
+    act(() => livekit.rooms[0].arrive('candidate'));
+    expect(screen.queryByRole('region', { name: 'Follow-up' })).toBeNull();
+    expect(calls.some((call) => call.path.includes('/follow-ups'))).toBe(false);
+  });
+
+  it('shows an empty result and a limit error without interrupting the call', async () => {
+    let count = 0;
+    const calls = interviewerServer(slotIn(-1, { candidateJoinedAt: new Date().toISOString(), consentRecording: true }));
+    const fetchMock = globalThis.fetch;
+    vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const request = input instanceof Request ? input : null;
+      const url = String(request?.url ?? input);
+      if (url.endsWith('/follow-ups') && init?.method === 'POST') {
+        count += 1;
+        if (count === 1) return json({ ...sampleFollowUp, suggestions: [] }, 201);
+        return apiError(429, 'FOLLOW_UP_LIMIT');
+      }
+      return fetchMock(input, init);
+    }));
+    await joinCall();
+    act(() => livekit.rooms[0].arrive('candidate'));
+    const panel = await screen.findByRole('region', { name: 'Follow-up' });
+    fireEvent.click(within(panel).getByRole('button', { name: 'Use the demo answer' }));
+    expect(await within(panel).findByText('Nothing to add — the answer is specific. Carry on with the brief.')).toBeTruthy();
+    fireEvent.click(within(panel).getByRole('button', { name: 'Use the demo answer' }));
+    expect(await within(panel).findByText('The follow-up limit for this interview has been reached.')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Leave' })).toBeTruthy();
+    expect(calls.some((call) => call.path.includes('/recording'))).toBe(false);
   });
 
   it('sends the recording when the interviewer leaves the call mid-recording', async () => {

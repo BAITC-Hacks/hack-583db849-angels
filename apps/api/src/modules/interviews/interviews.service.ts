@@ -116,6 +116,11 @@ export class InterviewsService {
     return this.toDto(await this.find(interviewId));
   }
 
+  /** Candidate rejoined without recording consent: discard this call's answer clips and suggestions. */
+  async deleteFollowUps(interviewId: string): Promise<void> {
+    await this.prisma.interviewFollowUp.deleteMany({ where: { interviewId } });
+  }
+
   /**
    * The interviewer's own scores, blind. All five, each 0–4 or null; fixed
    * once saved, so the comparison with the draft stays honest.

@@ -10,6 +10,7 @@ from fastapi import APIRouter, Depends
 from ..config import GatewayMode
 from ..gateway.usage import FileUsageStore
 from ..modules.interview_draft import InterviewDraftService
+from ..modules.follow_up import FollowUpWriter
 from ..modules.consistency import ConsistencyService
 from ..modules.quality_check import QualityCheckService
 from ..modules.surprise import SurpriseQuestionWriter
@@ -18,6 +19,8 @@ from ..schemas.contracts import (
     ConsistencyResult,
     DraftRequest,
     DraftResult,
+    FollowUpRequest,
+    FollowUpResult,
     QualityCheckRequest,
     QualityCheckResult,
     SurpriseRequest,
@@ -36,6 +39,7 @@ def extended_router(
     consistency_service: ConsistencyService,
     quality_service: QualityCheckService,
     surprise_writer: SurpriseQuestionWriter,
+    follow_up_writer: FollowUpWriter,
 ) -> APIRouter:
     router = APIRouter(prefix="/internal/v1", dependencies=[Depends(authenticate)])
 
@@ -50,6 +54,10 @@ def extended_router(
     @router.get("/usage", response_model=Usage)
     async def usage() -> Usage:
         return await usage_summary(usage_store, gateway_mode, cap_usd)
+
+    @router.post("/interview/follow-up", response_model=FollowUpResult)
+    async def interview_follow_up(request: FollowUpRequest) -> FollowUpResult:
+        return await follow_up_writer.write(request)
 
     @router.post("/interview/draft", response_model=DraftResult)
     async def interview_draft(request: DraftRequest) -> DraftResult:

@@ -5,6 +5,8 @@ import { useState } from 'react';
 import { candidateById, useCandidates } from '../../lib/api/candidates';
 import { errorText } from '../../lib/api/errors';
 import { useBrief } from '../../lib/brief/queries';
+import type { InterviewerBrief } from '../../lib/brief/types';
+import type { CallRoom } from '../../lib/call/useCallRoom';
 import { competencies, competencyOrder } from '../../lib/drive';
 import { useStaffLocale } from '../../lib/i18n/StaffLocaleProvider';
 import { useInterviewRecord } from '../../lib/interview/queries';
@@ -13,6 +15,7 @@ import { useInterviewSession } from '../../lib/interview/useInterview';
 import { useSaveNotes } from '../../lib/slots/queries';
 import { focusName } from '../brief/BriefSections';
 import { ScoreInput } from '../interview/ScoreInput';
+import { FollowUpPanel } from './FollowUpPanel';
 
 const copy = {
   en: {
@@ -59,11 +62,19 @@ export type SidebarTab = 'questions' | 'notes' | 'scores';
 export function CallSidebar({
   interviewId,
   candidateId,
+  room,
+  candidateLabel,
+  consent,
+  candidateJoined,
   tab: shownTab,
   onTab,
 }: {
   interviewId: string;
   candidateId: string;
+  room?: CallRoom;
+  candidateLabel?: string;
+  consent?: boolean;
+  candidateJoined?: boolean;
   /** Held by the call screen, which opens the scores once the call is over. */
   tab?: SidebarTab;
   onTab?: (tab: SidebarTab) => void;
@@ -73,6 +84,8 @@ export function CallSidebar({
   const tab = shownTab ?? ownTab;
   const setTab = onTab ?? setOwnTab;
   const record = useInterviewRecord(interviewId);
+  const candidates = useCandidates();
+  const brief = useBrief(candidateId, candidateById(candidates.data, candidateId)?.progress?.brief);
 
   return (
     <aside className="flex flex-col rounded-panel border border-border-subtle bg-bg-surface lg:max-h-[calc(100vh-6rem)]">
@@ -94,7 +107,10 @@ export function CallSidebar({
       </div>
       {/* All three stay mounted, so scores set but not saved survive a look at the questions. */}
       <div role="tabpanel" hidden={tab !== 'questions'} className="flex-col gap-3 overflow-y-auto p-4 [&:not([hidden])]:flex">
-        <Questions candidateId={candidateId} />
+        {room && candidateJoined && consent && record.data?.savedScores === null ? (
+          <FollowUpPanel room={room} interviewId={interviewId} candidateLabel={candidateLabel ?? ''} brief={brief.data} enabled />
+        ) : null}
+        <Questions brief={brief.data} />
       </div>
       <div role="tabpanel" hidden={tab !== 'notes'} className="flex-col gap-3 overflow-y-auto p-4 [&:not([hidden])]:flex">
         {record.data ? <Notes key={interviewId} record={record.data} /> : null}
@@ -106,16 +122,14 @@ export function CallSidebar({
   );
 }
 
-function Questions({ candidateId }: { candidateId: string }) {
+function Questions({ brief }: { brief?: InterviewerBrief }) {
   const { locale } = useStaffLocale();
   const text = copy[locale];
-  const candidates = useCandidates();
-  const brief = useBrief(candidateId, candidateById(candidates.data, candidateId)?.progress?.brief);
 
-  if (!brief.data) return <p className="text-sm text-text-secondary">{text.noBrief}</p>;
+  if (!brief) return <p className="text-sm text-text-secondary">{text.noBrief}</p>;
   return (
     <ol className="flex flex-col gap-3">
-      {brief.data.questions.map((item) => {
+      {brief.questions.map((item) => {
         const { letter, Icon, name } = focusName(item.focus, locale);
         return (
           <li key={item.question} className="flex gap-2.5">
