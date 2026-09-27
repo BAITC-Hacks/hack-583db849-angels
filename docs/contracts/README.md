@@ -7,9 +7,12 @@ The shapes the web screens already render, written down so the API and the ML se
 | **Aibek** — `apps/api` | [`api.md`](api.md) | the public `/v1` endpoints, DTOs, roles, error codes, which ML call each endpoint makes, the tests the rules need |
 | **Nauryzbek** — `services/ml` | [`ml.md`](ml.md) | the internal `/internal/v1` endpoints, paste-ready Pydantic models, the rules the screens rely on |
 
-[`examples/candidate-a/`](examples/candidate-a/) holds a JSON example of every request and response for candidate A: the public API at the top level, the internal ML API under `ml/`, plus candidate A's `snapshot.json` for the seed. They are generated from the web previews, so they are exactly what the screens show today.
+[`examples/candidate-a/`](examples/candidate-a/) holds a JSON example of every request and response for candidate A: the public API at the top level, the internal ML API under `ml/`, plus candidate A's `snapshot.json` for the seed. They were first written from the screens' previews; the previews are gone (#130), and the examples are now test data for every part:
+- the web's mapper tests run each public example through its mapper;
+- the API's tests read them through `apps/api/test/contract-example.ts`;
+- the ML service's tests and cassette builders read the `ml/` ones.
 
-The step-by-step plan for wiring the web to these endpoints — who, in which order, how to avoid conflicts — is [`docs/INTEGRATION.md`](../INTEGRATION.md).
+`api.md` covers every slice in `main`, including P — the video presentation — and V — the scheduled video interview. Slice L, the follow-ups in the call, is added by #136 PR 1. How a new slice's contract comes first is `CONTRIBUTING.md`, rule 5.
 
 **Checked before this was merged:**
 - every public example satisfies the DTOs in `api.md` under strict TypeScript;

@@ -8,23 +8,28 @@ The product and the plan are in [`PLAN.md`](PLAN.md). This file is the technical
 
 ## 1. Versions
 
-| Tool | Version | Pinned in (F0 adds the file) |
+| Tool | Version | Pinned in |
 | --- | --- | --- |
 | Node.js | 22 | `.nvmrc` |
 | pnpm | 11.20.0 | `packageManager` in the root `package.json` |
 | Python | 3.13 | `.python-version` |
 | PostgreSQL | 16 | `docker-compose.yml` |
+| Java and LanguageTool | 21 and 6.6 | `services/ml/Dockerfile` — the English metrics |
+| Docker Compose | 2.24 or newer, for the server file (`!reset`) | `docker-compose.server.yml` |
 
 ## 2. Services
 
 | Service | Port | Owner | Reachable from |
 | --- | --- | --- | --- |
 | `web` — Next.js | 3000 | Meiyrbek | the browser |
-| `api` — NestJS | 3001 | Aibek | the browser, inVision |
+| `api` — NestJS | 3001 | Aibek, Meiyrbek | `web`'s server and inVision's platform |
 | `ml` — FastAPI | 8000 | Nauryzbek | **`api` only**, over the Compose network |
 | `postgres` | 5432 | Aibek | `api` only |
+| `caddy` — server only | 80, 443 | Aibek | the internet; forwards to `web` |
 
-The ML service is never exposed publicly. Only `api` calls it.
+The ML service is never exposed publicly. Only `api` calls it. On the laptop, Compose publishes `web`, `api` and `postgres` for local work; on the server only `caddy` is published (`docker-compose.server.yml`), so the browser reaches `api` only through `web`.
+
+The video call runs on LiveKit, outside these services: `api` signs the room tokens, and the browsers connect to LiveKit directly.
 
 ## 3. Environment
 
@@ -33,21 +38,30 @@ The ML service is never exposed publicly. Only `api` calls it.
 | Variable | Read by | Meaning |
 | --- | --- | --- |
 | `NEXT_PUBLIC_API_URL` | web | the stand only (inVision's own screens on MSW mocks). Product screens never reach `api` from the browser |
+| `NEXT_PUBLIC_API_MODE` | web | the stand only: `mock` (MSW, the default) or `real` |
 | `API_INTERNAL_URL` | web (server) | where the web server's `/api/v1/*` proxy reaches `api`; in Compose `http://api:3001` |
 | `WEB_API_KEY_PLATFORM`, `WEB_API_KEY_INTERVIEWER`, `WEB_API_KEY_COMMISSION`, `WEB_API_KEY_ADMIN` | web (server) | the key the proxy adds for each demo role; the same values as `API_KEYS`, never `NEXT_PUBLIC_` |
-| `NEXT_PUBLIC_API_MODE` | web | `mock` (MSW) or `real` |
 | `DATABASE_URL` | api | PostgreSQL connection |
-| `API_KEYS` | api | demo clients as `key:role` pairs, comma-separated |
+| `API_KEYS` | api | clients as `key:role` pairs, comma-separated; the roles are `platform`, `interviewer`, `commission`, `admin` |
 | `ML_SERVICE_URL` | api | where `api` reaches `ml` |
+| `VIDEO_RETENTION_DAYS` | api | videos are deleted this many days after the decision date inVision reports; `30` |
+| `LIVEKIT_URL`, `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET` | api | the video call. Empty: joining a call answers `503 VIDEO_UNAVAILABLE`, and everything else still works |
+| `INTERVIEW_TIME_ZONE` | api | the time zone for "another day" after a missed slot; `Asia/Almaty` |
 | `ML_INTERNAL_TOKEN` | api, ml | shared secret on every internal call |
 | `UPLOADS_DIR` | api, ml | one volume both containers mount at this same path (Compose: a named `uploads` volume at `/data/uploads` on `api` and `ml`). `api` saves audio there, sends its path relative to this folder as `audioRef`, and deletes it once the transcript is stored. Without the shared volume the ML service answers `404 AUDIO_NOT_FOUND` |
-| `DEMO_MODE` | api, ml | serve seed results for A, B and C without model calls |
+| `DEMO_MODE` | api, ml | seed A, B and C at start, serve their seed results without model calls, and allow `POST /v1/demo/*` |
 | `OPENAI_API_KEY`, `DEEPGRAM_API_KEY` | ml only | provider keys |
 | `GATEWAY_MODE` | ml | `live`, `record` or `replay` |
+| `MEDIA_GATEWAY_MODE` | ml | the same modes for speech and transcription alone; empty follows `GATEWAY_MODE`. `live` with `GATEWAY_MODE=replay` gives real voices and transcripts with recorded model answers |
 | `BUDGET_USD_CAP` | ml | the gateway refuses everything past this total |
 | `USAGE_LOG_PATH` | ml | where the gateway appends its token and cost log; `GET /internal/v1/usage` reads it |
+| `M2_EMBEDDING_MODEL_PATH`, `M3_LANGUAGETOOL_DIR` | ml, outside Docker only | the MiniLM model and LanguageTool; the image sets both |
+| `DOMAIN` | caddy, server only | the demo's address; Caddy gets its certificate by itself |
+| `POSTGRES_PASSWORD` | postgres and api, server only | the database password; the server file builds `DATABASE_URL` from it |
 
-Provider keys exist only in the ML service's environment. Neither `web` nor `api` ever holds them.
+Provider keys exist only in the ML service's environment. Neither `web` nor `api` ever holds them. LiveKit's key is the one secret `api` holds, and it only signs room tokens.
+
+The laptop's `docker-compose.yml` sets its own values and reads only the `LIVEKIT_*` and `INTERVIEW_TIME_ZONE` variables from `.env`. The server file reads every secret from `.env` and refuses to start without the required ones.
 
 ## 4. Public API conventions
 
@@ -63,20 +77,29 @@ The API inVision calls, served by `api`.
 - **Identifiers** are UUID v4 strings, except turn ids (section 6).
 - **Timestamps** are ISO 8601 in UTC.
 
+### How the web calls the API
+
+```
+browser ──/api/v1/*──▶ web's server (BFF) ──X-API-Key──▶ api:3001 ──X-Internal-Token──▶ ml:8000
+```
+
+The browser never holds a key. `apps/web/app/api/v1/[...path]/route.ts` picks the key for the demo role in the `invision-demo-role` cookie and forwards the request unchanged: method, body (multipart streamed), `Idempotency-Key`, status and response body. No CORS is needed.
+
+| Demo role | Web variable | API role |
+| --- | --- | --- |
+| Candidate | `WEB_API_KEY_PLATFORM` | `platform` |
+| Interviewer | `WEB_API_KEY_INTERVIEWER` | `interviewer` |
+| Commission | `WEB_API_KEY_COMMISSION` | `commission` |
+| Admin | `WEB_API_KEY_ADMIN` | `admin` |
+
 ### Who may call what
 
-| Endpoint group | `platform` | `interviewer` | `commission` | `admin` |
-| --- | --- | --- | --- | --- |
-| Candidates — create, list, progress (filtered by role) | yes | yes | yes | yes |
-| M1 briefs | — | yes | yes | yes |
-| M2 simulations | yes | yes | yes | yes |
-| M3 assessments — read scores | — | — | yes | yes |
-| M3 candidate feedback | yes | yes | yes | yes |
-| M4 interviews, recording, interviewer scores, draft | — | yes | read | yes |
-| M5 quality checks | — | — | yes | yes |
-| S surprise question — create, start, answer | yes | — | — | yes |
-| S surprise answer — transcript and video | — | yes | yes | yes |
-| Admin overview, audit events, demo reset | — | — | — | yes |
+The full table, endpoint group by role, is in [`contracts/api.md`](contracts/api.md), section "Roles". The rules it keeps:
+
+- `platform` — inVision's own system, and the candidate through it — registers candidates, runs the simulation, sends the surprise answer, the presentation and the decision date, books and joins the interview, and reads the feedback. It never reads a score, a brief, a draft, a transcript or a video.
+- `interviewer` reads briefs, runs the interview and scores it, but never reads the simulation's scores.
+- `commission` reads everything about the evidence and runs M5; it cannot write an interview.
+- `admin` sees everything, re-runs the models and resets the demo.
 
 An interviewer never sees the AI's scores: they score blind, and M4 shows the draft only after their own scores are saved. `platform` can never read a score, a brief or a draft, so the candidate cannot reach one through inVision's system. The candidate-feedback endpoint never returns a score, whoever calls it: inVision relays it to the candidate.
 
@@ -86,20 +109,22 @@ The endpoints, DTOs and error codes are in [`contracts/api.md`](contracts/api.md
 
 Called only by `api`. Every request carries `X-Internal-Token: $ML_INTERNAL_TOKEN`; without it — `401`.
 
-| Endpoint | From slice | Purpose |
+| Endpoint | Slice | Purpose |
 | --- | --- | --- |
 | `GET /internal/v1/health` | F0 | liveness |
-| `GET /internal/v1/scenarios`, `/{scenarioId}` | M2a | the public part of a scenario |
-| `POST /internal/v1/simulation/turn` | F0 stub, M2a real | the character's next line for a candidate turn |
-| `POST /internal/v1/simulation/assessment` | F0 stub, M3 real | scores, English metrics, interview questions, candidate feedback |
-| `POST /internal/v1/brief` | F0 stub, M1 real | the interviewer brief |
-| `POST /internal/v1/transcribe` | M2a, M4, S | audio → turns by speaker; video never, audio track only |
-| `POST /internal/v1/speech` | M2a | the character's voice |
-| `POST /internal/v1/consistency` | C | claimed against measured, before and after the interview |
+| `GET /internal/v1/scenarios`, `/{scenarioId}` | M2a | the public part of the `ready` scenarios |
+| `POST /internal/v1/simulation/turn` | M2a | the character's next line and the director's decision for a candidate turn |
+| `POST /internal/v1/simulation/assessment` | M3 | scores, English metrics, interview questions, candidate feedback |
+| `POST /internal/v1/brief` | M1 | the interviewer brief, with the before stage of C |
+| `POST /internal/v1/transcribe` | M2a, M4, S, P | audio → turns by speaker: `purpose` is `turn`, `interview` or `surprise`; one or two speakers. Never video — only its audio track |
+| `POST /internal/v1/speech` | M2a | the character's voice, chosen by `scenarioId` |
+| `POST /internal/v1/consistency` | C | claimed against measured, after the interview |
 | `POST /internal/v1/surprise-question` | S | a question from the candidate's application |
-| `GET /internal/v1/usage` | admin | live and replayed calls, spend and cap |
 | `POST /internal/v1/interview/draft` | M4 | draft from the interview transcript |
 | `POST /internal/v1/quality-check` | M5 | question quality and calibration signals |
+| `GET /internal/v1/usage` | D | live and replayed calls, spend and cap |
+
+Slice L adds `POST /internal/v1/interview/follow-up` and the `follow_up` purpose (#134).
 
 **`api` owns storage and ids; `ml` owns content.** For a simulation turn, `api` assigns the candidate turn's id and sends the whole transcript; `ml` returns the character's line and the director's decision; `api` assigns the character turn's id and stores both.
 
@@ -170,6 +195,7 @@ In `api` responses a candidate turn also carries `recognitionConfidence`: the re
 | `interview_note` | an interview note id |
 | `interview_turn` | a turn of the interview transcript, `iturn_NN` (M4, M5) |
 | `surprise_answer` | a segment of the surprise answer transcript, `sseg_NN` (S) |
+| `presentation` | a segment of the video presentation transcript, `pseg_NN` (P) — in the public contract; the ML service quotes it once it takes `BriefRequest.presentation` (`contracts/ml.md`, rule 6d) |
 
 ### `DriveScore`
 
@@ -203,11 +229,18 @@ Implemented once, in `services/ml/app/evidence/`, and used by every module that 
 ### Seed — `seed/`
 
 ```
-seed/candidates/a/  snapshot.json  expected-brief.json  transcript.json
-                    expected-assessment.json  interview-notes.json  interviewer-scores.json
+seed/candidates/a/  snapshot.json               the application and the test, profile included
+                    expected-brief.json         the brief DEMO_MODE serves
+                    transcript.json             the simulation
+                    m2a-session.json            the same simulation as spoken turns, for the audio fixtures
+                    expected-assessment.json    the M3 report
+                    interview-transcript.json   the demo recording's transcript
+                    interview-notes.json  interviewer-scores.json
+                    expected-interview-draft.json  expected-consistency-after.json
 seed/candidates/b/  …the same files…
 seed/candidates/c/  …the same files…
-seed/quality-history.json   scored interviews for M5 calibration (ScoredInterview[] in contracts/ml.md)
+seed/quality-history.json              scored interviews for M5 calibration (ScoredInterview[] in contracts/ml.md)
+seed/quality-interview-transcript.json the interview M5 checks on the demo path
 ```
 
 Candidates A, B and C have fixed ids, so every part refers to the same person:
@@ -226,8 +259,34 @@ Their `profile` blocks are synthetic, and obviously so.
 fixtures/cassettes/<task>/<sha256>.json
 ```
 
-The key is the SHA-256 of the provider, the model, the prompt file's content and the request body. In `replay` mode a missing cassette is an error — the gateway never falls back to a live call.
+The key is the SHA-256 of the provider, the model, the prompt file's content and the request body. In `replay` mode a missing cassette is an error — the gateway never falls back to a live call. The prompts are frozen: `config/prompts.lock.json` holds each prompt's SHA-256, and an ML test fails when a prompt changes without it.
+
+`MEDIA_GATEWAY_MODE` applies the same rule to speech and transcription on their own.
+
+### Other fixtures and configuration
+
+```
+fixtures/bench/<scenario>/{weak,medium,strong}/   reference walkthroughs for the quality bench
+fixtures/audio/                                   synthetic audio (eSpeak NG), never a real voice
+config/rubric.drive.json  models.json  english_map.json  embedding-model.json
+config/scenarios/<id>.json                        ten scenarios; status "ready" only after the bench
+config/prompts/*.md  prompts.lock.json
+config/m3-feedback.json  m5-quality-guard.json  surprise-question.json   the checks' word lists and limits
+```
 
 ## 9. Where the public contract comes from
 
 NestJS DTOs with `@nestjs/swagger` produce `apps/api/openapi.json`, committed; an API test fails when the file differs from the DTOs. `packages/api-client` is generated from it with `openapi-typescript` before the web's typecheck, tests and build, and is never committed. The web app calls the API only through that client. As with the ML types, an API change that breaks a shape the screens use fails the `web` job on the API pull request itself.
+
+## 10. The end-to-end check
+
+`scripts/e2e/pitch-path.mjs` walks the whole pitch path through the public API only, as `platform`, `interviewer`, `commission` and `admin`:
+
+- for each of A, B and C: the brief, the simulation from its recording, the report, the feedback without a score, a surprise question from the candidate's own application, the interview with the draft locked until the blind scores, the consistency after the interview, the interview's quality check, and a calibration;
+- then an applicant sent by the platform, as the stand does, and a demo reset that removes them and keeps A, B and C.
+
+```bash
+API=http://localhost:3001/v1 node scripts/e2e/pitch-path.mjs      # ends with "All steps passed."
+```
+
+The keys default to the local ones in `docker-compose.yml`; `E2E_KEY_PLATFORM`, `E2E_KEY_INTERVIEWER`, `E2E_KEY_COMMISSION` and `E2E_KEY_ADMIN` set others. `E2E_MEDIA_DIR` adds the surprise answer and the presentation from recordings made on the same stack. The `e2e` job in CI runs it on every pull request, with `DEMO_MODE=true`, `GATEWAY_MODE=replay` and no keys.
