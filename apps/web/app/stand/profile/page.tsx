@@ -1,6 +1,6 @@
 'use client';
 
-import { CheckIcon, LockClosedIcon } from '@heroicons/react/24/outline';
+import { ArrowRightIcon, CheckIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { AppHeader } from '../../../components/applicant/AppHeader';
 import { JourneyRail } from '../../../components/applicant/JourneyRail';
@@ -9,7 +9,11 @@ import { ProtectedRoute } from '../../../components/ProtectedRoute';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { formatDateTime } from '../../../lib/format';
 
-const upcoming = ['Ipsative test', 'Video', 'Submission'];
+const steps = [
+  { title: 'Application', href: '/stand/application' },
+  { title: 'Test', href: '/stand/application/test' },
+  { title: 'Submission', href: '/stand/application/submit' },
+] as const;
 
 function ProfileContent() {
   const { user, accessExpiresAt } = useAuth();
@@ -77,15 +81,15 @@ function ProfileContent() {
               </span>
               <span className="text-sm font-medium text-text-primary">Account created</span>
             </li>
-            {upcoming.map((step) => (
-              <li key={step} className="flex items-center gap-3">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-border-strong text-text-muted">
-                  <LockClosedIcon aria-hidden="true" className="h-3 w-3" />
+            {steps.map((step, index) => (
+              <li key={step.href} className="flex items-center gap-3">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-border-strong font-mono text-[0.65rem] text-text-muted">
+                  {index + 2}
                 </span>
-                <span className="text-sm text-text-muted">{step}</span>
-                <span className="ml-auto font-mono text-[0.6rem] tracking-[0.12em] text-text-muted uppercase">
-                  Later slice
-                </span>
+                <Link href={step.href} className="group inline-flex items-center gap-1.5 text-sm font-medium text-text-primary hover:underline">
+                  {step.title}
+                  <ArrowRightIcon aria-hidden="true" className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
+                </Link>
               </li>
             ))}
           </ol>

@@ -199,6 +199,29 @@ def test_replay_does_not_construct_a_provider(tmp_path: Path) -> None:
         asyncio.run(service.execute(speech_request()))
 
 
+def test_live_speech_can_run_while_model_answers_replay(tmp_path: Path) -> None:
+    settings = Settings(
+        ml_internal_token="synthetic-token",
+        uploads_dir=tmp_path / "uploads",
+        gateway_mode="replay",
+        budget_usd_cap=Decimal("1"),
+        demo_mode=False,
+        usage_log_path=tmp_path / "usage.jsonl",
+        media_gateway_mode="live",
+    )
+    provider = FakeProvider()
+
+    service = create_media_gateway(
+        settings,
+        load_models_configuration(),
+        cassettes=FileMediaCassetteStore(tmp_path / "missing"),
+        provider_factories={Provider.DEEPGRAM: lambda: provider},
+    )
+    asyncio.run(service.execute(speech_request()))
+
+    assert len(provider.calls) == 1
+
+
 def test_media_budget_refuses_before_the_provider_call(tmp_path: Path) -> None:
     provider = FakeProvider()
     service, _, _ = gateway(tmp_path, provider, cap="0.019")

@@ -65,6 +65,9 @@ class DeepgramProvider:
             parameters["utterances"] = "true"
         elif speakers == 1:
             parameters["diarize"] = "false"
+            if request.parameters.get("purpose") == "surprise":
+                # A recorded answer is cut at its pauses into segments the brief can quote.
+                parameters["utterances"] = "true"
         else:
             raise GatewayConfigurationError("unsupported transcription speaker count")
         http_request = Request(

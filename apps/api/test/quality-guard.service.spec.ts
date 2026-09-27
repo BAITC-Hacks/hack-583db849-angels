@@ -1,4 +1,4 @@
-import { contractExample } from '../src/contract-example';
+import { contractExample } from './contract-example';
 import { QualityGuardService } from '../src/modules/quality-guard/quality-guard.service';
 import { ToLlmViewService } from '../src/privacy/to-llm-view.service';
 

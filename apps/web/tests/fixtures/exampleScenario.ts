@@ -1,0 +1,20 @@
+import type { ScenarioBrief } from '../../lib/simulation/types';
+
+/**
+ * The conflict-resolution scenario's brief as the contract example
+ * (`simulation-created.json`) carries it: what the mapper must produce.
+ */
+export const exampleScenario: ScenarioBrief = {
+  title: 'A teammate is about to walk away',
+  situation:
+    'Your team of four is building an app for a city hackathon, and the demo is in three days. Dana wrote most of the backend. Last night Timur rewrote her module without asking, and this morning she says she is out.',
+  yourRole: 'You lead the team.',
+  goal: 'Get to the demo without losing anyone. There is no single right way to do it.',
+  character: {
+    name: 'Dana',
+    role: 'Backend developer on your team',
+    wants: 'To be asked before her work is changed',
+  },
+  expectedMinutes: 8,
+  maxCandidateTurns: 8,
+};

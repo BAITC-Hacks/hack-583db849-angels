@@ -18,6 +18,7 @@ services:
     environment:
       ML_INTERNAL_TOKEN: ${ML_INTERNAL_TOKEN:?set ML_INTERNAL_TOKEN in .env}
       GATEWAY_MODE: ${GATEWAY_MODE:-replay}
+      MEDIA_GATEWAY_MODE: ${MEDIA_GATEWAY_MODE:-}
       BUDGET_USD_CAP: ${BUDGET_USD_CAP:-20}
       DEMO_MODE: ${DEMO_MODE:-true}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}

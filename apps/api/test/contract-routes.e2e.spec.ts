@@ -10,7 +10,7 @@ import { AI_GATEWAY } from '../src/ai-client/ai-gateway.port';
 import { AppModule } from '../src/app.module';
 import { ApiKeyGuard } from '../src/auth/api-key.guard';
 import { RolesGuard } from '../src/auth/roles.guard';
-import { contractExample } from '../src/contract-example';
+import { contractExample } from './contract-example';
 import { PrismaService } from '../src/database/prisma.service';
 import { BriefsService } from '../src/modules/briefs/briefs.service';
 import { SimulationsService } from '../src/modules/simulations/simulations.service';
