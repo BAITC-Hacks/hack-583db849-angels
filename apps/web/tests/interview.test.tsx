@@ -62,6 +62,8 @@ beforeEach(() => push.mockReset());
 afterEach(() => {
   vi.useRealTimers();
   vi.unstubAllGlobals();
+  // jsdom has no microphone; a test that gives it one takes it back.
+  Reflect.deleteProperty(navigator, 'mediaDevices');
 });
 
 describe('comparison', () => {
@@ -78,18 +80,64 @@ describe('comparison', () => {
 });
 
 describe('the interview screen on the API', () => {
-  it('records nothing before the candidate consents, and says so when there is no microphone', async () => {
+  it('asks for the microphone first, and says so when there is none', async () => {
     interviewServer('none');
     withQuery(<InterviewLoader interviewId={id} />);
-    const record = (await screen.findByRole('button', { name: 'Record the interview' })) as HTMLButtonElement;
-    const demo = screen.getByRole('button', { name: 'Use the demo recording' }) as HTMLButtonElement;
-    expect(record.disabled).toBe(true);
-    expect(demo.disabled).toBe(true);
+    const check = await screen.findByRole('button', { name: 'Check the microphone' });
+    // Nothing can be recorded before the microphone is checked and the candidate consents.
+    expect(screen.queryByRole('button', { name: 'Record the interview' })).toBeNull();
+    expect((screen.getByRole('button', { name: 'Use the demo recording' }) as HTMLButtonElement).disabled).toBe(true);
 
+    fireEvent.click(check);
+    expect(await screen.findByText(/microphone is not available/)).toBeTruthy();
+  });
+
+  it('records only once the microphone is ready and the candidate has consented', async () => {
+    const track = { stop: vi.fn() };
+    const getUserMedia = vi.fn(async () => ({ getTracks: () => [track] }) as unknown as MediaStream);
+    Object.defineProperty(navigator, 'mediaDevices', { configurable: true, value: { getUserMedia } });
+    const started = vi.fn();
+    vi.stubGlobal('MediaRecorder', class {
+      static isTypeSupported = () => true;
+      mimeType = 'audio/webm';
+      ondataavailable: ((event: { data: Blob }) => void) | null = null;
+      onstop: (() => void) | null = null;
+      start = started;
+      stop() {
+        this.onstop?.();
+      }
+    });
+    interviewServer('none');
+    withQuery(<InterviewLoader interviewId={id} />);
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Check the microphone' }));
+    expect(await screen.findByText(/microphone is ready/)).toBeTruthy();
+    expect(getUserMedia).toHaveBeenCalledWith({ audio: true });
+    expect(started).not.toHaveBeenCalled();
+
+    const record = screen.getByRole('button', { name: 'Record the interview' }) as HTMLButtonElement;
+    expect(record.disabled).toBe(true);
     fireEvent.click(screen.getByLabelText(/agreed to this interview being recorded/));
     expect(record.disabled).toBe(false);
     fireEvent.click(record);
-    expect(await screen.findByText(/microphone is not available/)).toBeTruthy();
+    expect(await screen.findByText('Recording')).toBeTruthy();
+    // The same stream: the browser is not asked a second time.
+    expect(getUserMedia).toHaveBeenCalledTimes(1);
+    expect(started).toHaveBeenCalled();
+  });
+
+  it('says how to allow the microphone when the browser blocked it', async () => {
+    const getUserMedia = vi.fn(async () => {
+      throw new DOMException('blocked', 'NotAllowedError');
+    });
+    Object.defineProperty(navigator, 'mediaDevices', { configurable: true, value: { getUserMedia } });
+    vi.stubGlobal('MediaRecorder', class { static isTypeSupported = () => true; });
+    interviewServer('none');
+    withQuery(<InterviewLoader interviewId={id} />);
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Check the microphone' }));
+    expect(await screen.findByText(/browser blocked the microphone/)).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Record the interview' })).toBeNull();
   });
 
   it('keeps the draft out of the page and out of the network until the scores are saved', async () => {
