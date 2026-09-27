@@ -46,8 +46,8 @@ export class InterviewsController {
   recording(@Param('interviewId', EntityId) interviewId: string, @UploadedFile() audio: UploadedAudio | undefined,
     @Body() body: Record<string, unknown>, @Headers('idempotency-key') key: string | undefined, @Req() request: RoleRequest): Promise<InterviewDto> {
     const audioDigest = audio ? createHash('sha256').update(audio.buffer).digest('hex') : null;
-    return this.idempotency.execute(key, { operation: 'interview.recording', interviewId, audioDigest },
-      () => this.interviews.recording(interviewId, audio, body?.consent, request.apiRole), 202);
+    return this.idempotency.execute(key, { operation: 'interview.recording', interviewId, audioDigest, sample: body?.sample === 'true' },
+      () => this.interviews.recording(interviewId, audio, body?.consent, request.apiRole, body?.sample === 'true'), 202);
   }
 
   @Get(':interviewId')

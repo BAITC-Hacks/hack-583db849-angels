@@ -81,7 +81,7 @@ export class InterviewsService {
    * The recording made on the interviewer's screen. It answers at once with
    * `transcribing`; the audio is transcribed, stored as text and deleted.
    */
-  async recording(interviewId: string, upload: UploadedAudio | undefined, consent: unknown, role: ApiRole): Promise<InterviewDto> {
+  async recording(interviewId: string, upload: UploadedAudio | undefined, consent: unknown, role: ApiRole, sample = false): Promise<InterviewDto> {
     if (consent !== 'true') {
       throw new BadRequestException({ code: 'CONSENT_REQUIRED', message: 'The candidate must consent to the recording.' });
     }
@@ -108,7 +108,7 @@ export class InterviewsService {
     }
 
     await this.audit.record({ action: 'recording.uploaded', targetType: 'interview', targetId: interviewId, candidateId: row.candidateId, actorRole: role });
-    void this.transcribe(interviewId, row.candidateId, audioRef);
+    void this.transcribe(interviewId, row.candidateId, audioRef, sample);
     return this.toDto({ ...row, transcriptStatus: 'transcribing', transcriptSource: 'recording' });
   }
 
@@ -170,9 +170,9 @@ export class InterviewsService {
     return { interviewId, createdAt: draft.createdAt.toISOString(), scores: (draft.result as unknown as DraftResult).scores as AssessmentDraftDto['scores'] };
   }
 
-  private async transcribe(interviewId: string, candidateId: string, audioRef: string): Promise<void> {
+  private async transcribe(interviewId: string, candidateId: string, audioRef: string, sample: boolean): Promise<void> {
     try {
-      const transcript = await this.seededTranscript(candidateId) ??
+      const transcript = (sample ? await this.seededTranscript(candidateId) : null) ??
         this.withIds((await this.gateway.transcribeInterview(audioRef)).turns.filter((turn) => turn.text.trim()));
       // Nothing recognised is nothing to read: the recording failed, and a new one may be sent.
       if (transcript.length === 0) throw new Error('No speech was recognised in the recording');
@@ -236,9 +236,10 @@ export class InterviewsService {
   }
 
   /**
-   * In `DEMO_MODE`, A, B and C's interview is the seed's, whatever was
-   * recorded: the pitch does not depend on a microphone or on a recorded
-   * answer for that audio. Anyone else is transcribed by ML as usual.
+   * In `DEMO_MODE`, the demo recording of A, B or C (`sample=true`) stands
+   * for the seed's interview: the pitch does not depend on a microphone or on
+   * a recorded answer for that audio. A real recording is always transcribed
+   * by ML, whoever the candidate.
    */
   private async seededTranscript(candidateId: string): Promise<InterviewTurnDto[] | null> {
     if (this.config.get<string>('DEMO_MODE') !== 'true') return null;

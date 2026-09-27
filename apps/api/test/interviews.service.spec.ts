@@ -206,11 +206,11 @@ describe('InterviewsService', () => {
     expect(draft.scores).toHaveLength(5);
   });
 
-  it('in DEMO_MODE gives a seed candidate the seed interview and the seed draft, with no model call', async () => {
+  it('in DEMO_MODE gives the demo recording of a seed candidate the seed interview and draft, with no model call', async () => {
     const seed = (name: string) => JSON.parse(readFileSync(resolve(__dirname, '../../../seed/candidates/a', name), 'utf8'));
     const { service, gateway, audio, current } = harness({ demo: true });
     await service.create({ candidateId, heldAt: '2026-09-26T09:30:00Z', notes: ['Asked about the Thursday run.'] }, 'interviewer');
-    await service.recording('interview-1', upload, 'true', 'interviewer');
+    await service.recording('interview-1', upload, 'true', 'interviewer', true);
     await until(() => current().transcriptStatus === 'ready');
 
     expect(gateway.transcribeInterview).not.toHaveBeenCalled();
@@ -223,6 +223,14 @@ describe('InterviewsService', () => {
     expect(gateway.interviewDraft).not.toHaveBeenCalled();
     const draft = await service.getDraft('interview-1');
     expect(draft.scores).toEqual(seed('expected-interview-draft.json').scores);
+  });
+
+  it('in DEMO_MODE transcribes a real recording of a seed candidate, not the seed', async () => {
+    const { service, gateway } = harness({ demo: true });
+    await service.create({ candidateId, heldAt: '2026-09-26T09:30:00Z' }, 'interviewer');
+    await service.recording('interview-1', upload, 'true', 'interviewer');
+    await settle();
+    expect(gateway.transcribeInterview).toHaveBeenCalledTimes(1);
   });
 
   it('outside DEMO_MODE asks ML, even for a seed candidate', async () => {

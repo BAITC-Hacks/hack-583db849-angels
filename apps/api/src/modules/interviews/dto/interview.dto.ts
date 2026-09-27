@@ -37,6 +37,11 @@ export class SaveNotesDto {
 export class InterviewRecordingDto {
   @ApiProperty({ type: 'string', format: 'binary', description: 'webm, ogg or wav, up to 60 minutes' }) audio!: unknown;
   @ApiProperty({ enum: ['true'] }) consent!: 'true';
+  @ApiPropertyOptional({
+    enum: ['true'],
+    description: "The demo recording, not a real one. In DEMO_MODE, A, B and C's seed transcript stands in for it; a real recording is always transcribed.",
+  })
+  sample?: 'true';
 }
 
 export class InterviewTurnDto {
