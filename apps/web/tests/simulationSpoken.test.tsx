@@ -1,8 +1,10 @@
-import { act, fireEvent, renderHook, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import SimulationPage from '../app/(product)/simulation/[sessionId]/page';
+import { Transcript } from '../components/simulation/Transcript';
 import type { WireSimulation, WireTurnResult } from '../lib/api/contract';
 import { applyTurnResult } from '../lib/api/mappers/simulation';
+import { playCharacterLine } from '../lib/simulation/characterVoice';
 import type { SimulationTurn } from '../lib/simulation/types';
 import { useSpokenLines } from '../lib/simulation/useSpokenLines';
 import { example, json, mockApi, withQuery } from './apiHarness';
@@ -31,13 +33,17 @@ class FakeAudio {
   onended: (() => void) | null = null;
   onerror: (() => void) | null = null;
   duration = Number.NaN;
+  paused = true;
   constructor(readonly src: string) {
     voices.push(this);
   }
   play() {
+    this.paused = !playable;
     return playable ? Promise.resolve() : Promise.reject(new Error('blocked'));
   }
-  pause() {}
+  pause() {
+    this.paused = true;
+  }
 }
 const spokenByBrowser: string[] = [];
 
@@ -133,5 +139,43 @@ describe('the lines, one after another', () => {
     act(() => vi.advanceTimersByTime(5_000));
     expect(result.current.speaking).toBeNull();
     expect(result.current.visible).toEqual(first);
+  });
+});
+
+describe('one voice at a time', () => {
+  const lines = [
+    { turnId: 'turn_01', speaker: 'character' as const, text: 'Hello there.' },
+    { turnId: 'turn_02', speaker: 'candidate' as const, text: 'Hi.' },
+    { turnId: 'turn_03', speaker: 'character' as const, text: 'Where do we start?' },
+  ];
+
+  it('restarts a line played again instead of playing it twice over', () => {
+    playCharacterLine('/v1/one', 'Hello there.');
+    playCharacterLine('/v1/one', 'Hello there.');
+    playCharacterLine('/v1/two', 'Where do we start?');
+    expect(voices.map((voice) => voice.paused)).toEqual([true, true, false]);
+  });
+
+  it('stops a line played again when the next line starts to be said', () => {
+    playCharacterLine('/v1/one', 'Hello there.');
+    const { result } = renderHook(() => useSpokenLines(id, lines, false));
+    act(() => result.current.start());
+    expect(voices[0].paused).toBe(true);
+    expect(voices[1].paused).toBe(false);
+  });
+
+  it('keeps the speakers quiet while a line is being said', () => {
+    const onListen = vi.fn();
+    const { rerender } = render(
+      <Transcript turns={lines} characterName="Dana" replying={false} onListen={onListen} speaking={{ turnId: 'turn_03', words: 1 }} />,
+    );
+    const again = screen.getByRole('button', { name: 'Listen to Dana again' }) as HTMLButtonElement;
+    expect(again.disabled).toBe(true);
+
+    rerender(<Transcript turns={lines} characterName="Dana" replying={false} onListen={onListen} speaking={null} />);
+    const buttons = screen.getAllByRole('button', { name: 'Listen to Dana again' }) as HTMLButtonElement[];
+    expect(buttons.every((button) => !button.disabled)).toBe(true);
+    fireEvent.click(buttons[0]);
+    expect(onListen).toHaveBeenCalledWith('turn_01');
   });
 });

@@ -52,8 +52,10 @@ export function Transcript({
                 <button
                   type="button"
                   onClick={() => onListen(turn.turnId)}
+                  // While a line is being said, nothing else plays over it.
+                  disabled={speaking !== null}
                   aria-label={`Listen to ${characterName} again`}
-                  className="rounded-control p-0.5 text-text-muted hover:text-text-primary"
+                  className="rounded-control p-0.5 text-text-muted hover:text-text-primary disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   <SpeakerWaveIcon aria-hidden="true" className="h-3.5 w-3.5" />
                 </button>
