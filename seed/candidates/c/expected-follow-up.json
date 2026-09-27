@@ -1,0 +1,14 @@
+{
+  "suggestions": [
+    {
+      "question": "What changed between the application and this account of the project?",
+      "competency": "D",
+      "reason": "mismatch",
+      "why": "The answer describes a disrupted project, while the application says no important project went wrong.",
+      "evidence": [
+        {"source": "follow_up_answer", "sourceId": "fseg_01", "quote": "Our first project collapsed when we lost the venue"},
+        {"source": "application_field", "sourceId": "setback", "quote": "Nothing important has gone wrong in my projects."}
+      ]
+    }
+  ]
+}

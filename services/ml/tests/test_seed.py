@@ -7,6 +7,8 @@ from services.ml.app.schemas.contracts import (
     BriefResult,
     ConsistencyResult,
     DraftResult,
+    FollowUpResult,
+    FollowUpSegment,
     InterviewNote,
     InterviewTurn,
     ScoredInterview,
@@ -43,11 +45,18 @@ def test_every_candidate_has_the_complete_seed_layout_and_valid_shapes() -> None
             "interview-transcript.json",
             "expected-interview-draft.json",
             "expected-consistency-after.json",
+            "follow-up-answer.json",
+            "expected-follow-up.json",
         }
         assert {path.name for path in directory.iterdir()} == expected
         BriefResult.model_validate(load(directory / "expected-brief.json"))
         ConsistencyResult.model_validate(load(directory / "expected-consistency-after.json"))
         AssessmentResult.model_validate(load(directory / "expected-assessment.json"))
+        answer = load(directory / "follow-up-answer.json")
+        assert answer["question"]
+        for segment in answer["segments"]:
+            FollowUpSegment.model_validate(segment)
+        FollowUpResult.model_validate(load(directory / "expected-follow-up.json"))
         for item in load(directory / "transcript.json"):
             Turn.model_validate(item)
         for item in load(directory / "interview-notes.json"):

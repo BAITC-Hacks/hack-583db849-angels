@@ -153,6 +153,9 @@ export class InterviewSlotsService {
       ? { candidateJoinedAt: row.candidateJoinedAt ?? now, consentRecording: input.consentRecording === true }
       : { interviewerJoinedAt: row.interviewerJoinedAt ?? now };
     row = await this.prisma.interviewSlot.update({ where: { id: slotId }, data, select: slotSelect });
+    if (side === 'candidate' && !row.consentRecording && row.interviewId) {
+      await this.interviews.deleteFollowUps(row.interviewId);
+    }
     if (first) await this.audit.record({ action: 'call.joined', targetType: 'interview_slot', targetId: slotId, candidateId, actorRole: role });
 
     const room = `slot-${slotId}`;

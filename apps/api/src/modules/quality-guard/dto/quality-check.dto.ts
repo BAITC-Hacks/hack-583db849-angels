@@ -4,7 +4,7 @@ import { Type } from 'class-transformer';
 
 const competencies = ['D', 'R', 'I', 'V', 'E'] as const;
 const signalKinds = ['leading_question', 'off_limits_question', 'coverage_gap', 'scale_drift'] as const;
-const evidenceSources = ['application_field', 'test_item', 'simulation_turn', 'interview_turn', 'interview_note', 'surprise_answer'] as const;
+const evidenceSources = ['application_field', 'test_item', 'simulation_turn', 'interview_turn', 'interview_note', 'surprise_answer', 'presentation', 'follow_up_answer'] as const;
 const day = /^\d{4}-\d{2}-\d{2}$/;
 
 export class InterviewCheckDto {

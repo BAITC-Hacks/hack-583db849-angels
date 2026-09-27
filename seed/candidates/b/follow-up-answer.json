@@ -1,0 +1,6 @@
+{
+  "question": "Your application response says, \"Our first mentoring plan was rejected because it needed too many volunteers. I was disappointed and stopped working on it until another student restarted the discussion several weeks later.\" Describe a time you helped someone through a setback. What did you do?",
+  "segments": [
+    {"segmentId": "fseg_01", "text": "Eventually the project recovered and things went well.", "startSec": 0.4, "endSec": 4.3}
+  ]
+}

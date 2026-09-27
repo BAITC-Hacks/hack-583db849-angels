@@ -1,0 +1,12 @@
+{
+  "input_tokens": 0,
+  "model": "gpt-6-luna",
+  "output_tokens": 0,
+  "provider": "openai",
+  "recorded_at": "2026-09-27T18:07:45.211303Z",
+  "request_hash": "6622f301918afd7fb9f4c11baa464ff060f5c811a88fd9cda29f5ffb25bd4f62",
+  "request_id": "synthetic-follow-up",
+  "response": "{\"suggestions\": [{\"question\": \"Who helped restart the project, and what did you do next?\", \"competency\": \"D\", \"reason\": \"vague\", \"why\": \"The answer reports a recovery without saying who acted or what happened next.\", \"evidence\": [{\"source\": \"follow_up_answer\", \"sourceId\": \"fseg_01\", \"quote\": \"Eventually the project recovered and things went well.\"}]}]}",
+  "task": "interview_follow_up",
+  "version": 1
+}

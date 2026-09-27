@@ -126,11 +126,25 @@ model Interview {
   candidate        Candidate          @relation(fields: [candidateId], references: [id], onDelete: Cascade)
   interviewerScore InterviewerScore?
   drafts           InterviewDraft[]
+  followUps        InterviewFollowUp[]
   consistency      ConsistencyReport[]
   qualityChecks    QualityCheck[]
   slot             InterviewSlot?
 
   @@index([candidateId, createdAt])
+}
+
+/// L: a candidate's answer and the optional questions suggested during a consented call.
+model InterviewFollowUp {
+  id          String    @id @default(uuid()) @db.Uuid
+  interviewId String    @db.Uuid
+  question    String?
+  segments    Json
+  suggestions Json
+  createdAt   DateTime  @default(now())
+  interview   Interview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+
+  @@index([interviewId, createdAt])
 }
 
 /// M4: the AI draft, made by the API itself once the transcript exists and the interviewer's scores are

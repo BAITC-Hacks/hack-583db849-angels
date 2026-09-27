@@ -1,0 +1,6 @@
+{
+  "question": "Your application response says, \"Nothing important has gone wrong in my projects. Usually everything works as expected.\" Describe a time you helped someone through a setback. What did you do?",
+  "segments": [
+    {"segmentId": "fseg_01", "text": "Our first project collapsed when we lost the venue, and I had to change the plan.", "startSec": 0.3, "endSec": 7.1}
+  ]
+}

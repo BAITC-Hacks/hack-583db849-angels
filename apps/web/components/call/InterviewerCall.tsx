@@ -189,7 +189,8 @@ export function InterviewerCall({ slotId }: { slotId: string }) {
         </div>
         {currentInterview && data.candidateId ? (
           <div className="lg:sticky lg:top-6">
-            <CallSidebar interviewId={currentInterview} candidateId={data.candidateId} tab={tab} onTab={setPickedTab} />
+            <CallSidebar interviewId={currentInterview} candidateId={data.candidateId} candidateLabel={data.candidateLabel ?? ''}
+              room={room} candidateJoined={Boolean(data.candidateJoinedAt)} consent={data.consentRecording} tab={tab} onTab={setPickedTab} />
           </div>
         ) : null}
       </div>

@@ -50,6 +50,18 @@ export class MlHttpAdapter implements AiGateway {
     }));
   }
 
+  transcribeFollowUp(audioRef: string): Promise<components['schemas']['TranscribeResult']> {
+    return this.invoke('transcribe', () => this.client().POST('/internal/v1/transcribe', {
+      body: { purpose: 'follow_up', audioRef, language: 'en', speakers: 1 },
+    }));
+  }
+
+  followUp(request: components['schemas']['FollowUpRequest']): Promise<components['schemas']['FollowUpResult']> {
+    return this.invoke('interview/follow-up', () => this.client().POST('/internal/v1/interview/follow-up', {
+      body: request, signal: AbortSignal.timeout(15_000),
+    }));
+  }
+
   interviewDraft(request: components['schemas']['DraftRequest']): Promise<components['schemas']['DraftResult']> {
     return this.invoke('interview/draft', () => this.client().POST('/internal/v1/interview/draft', { body: request }));
   }

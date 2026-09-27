@@ -1,0 +1,11 @@
+{
+  "suggestions": [
+    {
+      "question": "Who helped restart the project, and what did you do next?",
+      "competency": "D",
+      "reason": "vague",
+      "why": "The answer reports a recovery without saying who acted or what happened next.",
+      "evidence": [{"source": "follow_up_answer", "sourceId": "fseg_01", "quote": "Eventually the project recovered and things went well."}]
+    }
+  ]
+}

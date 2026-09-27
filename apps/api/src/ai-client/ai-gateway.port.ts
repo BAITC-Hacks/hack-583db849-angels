@@ -14,6 +14,8 @@ export interface AiGateway {
   qualityCheck(request: components['schemas']['QualityCheckRequest']): Promise<components['schemas']['QualityCheckResult']>;
   /** An interview recording, two speakers. The audio only; it is deleted once the transcript is stored. */
   transcribeInterview(audioRef: string): Promise<components['schemas']['TranscribeResult']>;
+  transcribeFollowUp(audioRef: string): Promise<components['schemas']['TranscribeResult']>;
+  followUp(request: components['schemas']['FollowUpRequest']): Promise<components['schemas']['FollowUpResult']>;
   /** The draft reads the transcript and the notes, and never the interviewer's scores. */
   interviewDraft(request: components['schemas']['DraftRequest']): Promise<components['schemas']['DraftResult']>;
   /** C: claimed against measured. After the interview it reads the transcript, and never the interviewer's scores. */

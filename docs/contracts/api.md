@@ -58,6 +58,8 @@ The browser never holds an API key. The web calls a Next.js route on its own ser
 | M3 assessments — re-run | — | — | — | yes |
 | M3 candidate feedback | yes | yes | yes | yes |
 | M4 interviews, recording, interviewer scores, draft | — | yes | read | yes |
+| L follow-ups in the call — create, mark | — | yes | — | yes |
+| L follow-ups in the call — list | — | yes | yes | yes |
 | M5 quality checks | — | — | yes | yes |
 | S surprise question — create, start, answer, status | yes ² | read | read | yes |
 | S surprise answer — transcript and video | — | yes | yes | yes |
@@ -240,6 +242,22 @@ The live interview, held as a video call. An interviewer adds empty slots; the c
 - **No personal data goes to LiveKit.** The room is `slot-<slotId>`; the participants are `candidate` and `interviewer`.
 - **Without `LIVEKIT_URL`, `LIVEKIT_API_KEY` and `LIVEKIT_API_SECRET`,** join answers `503 VIDEO_UNAVAILABLE`. Everything else, including the slots, keeps working.
 
+### L — follow-ups in the call
+
+Only during a scheduled video call, the interviewer explicitly records **the candidate's audio track only**, then requests suggestions. This is not realtime: nothing listens or uploads on its own. Suggestions are for the interviewer to choose from, never scores, candidate feedback, or inputs to the M4 draft or consistency check.
+
+| Method | Path | Idem. | Success | Errors |
+| --- | --- | --- | --- | --- |
+| `POST` | `/v1/interviews/:interviewId/follow-ups` | ✱ | `201 FollowUp`; multipart `audio` (candidate track only, webm, ogg or wav, 3–120 s, up to 5 MB), optional `question` (up to 500 characters), or `sample=true` for the demo answer | `404`, `409 NOT_A_CALL`, `409 NO_RECORDING_CONSENT`, `409 SCORES_ALREADY_SAVED`, `422 VALIDATION_ERROR`, `422 SPEECH_NOT_RECOGNISED`, `429 FOLLOW_UP_LIMIT`, `413`, `502 AI_INVALID_OUTPUT`, `503 AI_UNAVAILABLE`, `503 AI_BUDGET_EXCEEDED` |
+| `GET` | `/v1/interviews/:interviewId/follow-ups` | | `200 { items: FollowUp[] }`, newest first | `404` |
+| `PUT` | `/v1/interviews/:interviewId/follow-ups/:followUpId/suggestions/:suggestionId` | | `200 FollowUp`; body `{ status: "asked" \| "dismissed" }` | `404`, `409 SCORES_ALREADY_SAVED` |
+
+- **Roles:** `interviewer` and `admin` create, list and mark; `commission` may list; `platform` gets `403` on all three.
+- **Preconditions, in order:** the interview has an `InterviewSlot` (`NOT_A_CALL` otherwise), the slot has `consentRecording: true` (`NO_RECORDING_CONSENT` otherwise), scores have not been saved (`SCORES_ALREADY_SAVED` otherwise), and fewer than 20 follow-ups exist for that interview (`429 FOLLOW_UP_LIMIT` otherwise). Marking is also closed after scores are saved.
+- **Clip lifecycle:** save under `UPLOADS_DIR`; measure with `audio-duration.ts` and reject outside 3–120 seconds with `422 VALIDATION_ERROR` and `details.seconds`; call ML `transcribe` with `purpose: "follow_up"`, `speakers: 1`; delete the clip on success **and error**; assign `fseg_01`, `fseg_02`, … to candidate-only segments. No speech is `422 SPEECH_NOT_RECOGNISED`.
+- **Suggestion request:** send `toLLMView()` of the candidate, saved brief questions as `{ focus, question }` (context, not evidence), the optional selected `question`, the numbered segments and this interview's earlier suggestions including status. The ML call times out after 15 seconds as `503 AI_UNAVAILABLE`. Assign `fs_01`, `fs_02` within each follow-up; each starts `open` with `markedAt: null`. A valid empty suggestion list stays empty.
+- **Demo and retention:** `sample=true` in `DEMO_MODE` for A, B and C reads seed segments without transcription; a real clip, including A's, always goes to transcription. Withdrawing recording consent deletes this interview's follow-ups. `demo/reset` deletes them with their interview. Audit `follow_up.suggested` and `follow_up.marked` with `interviewerRef`, never answer or question text.
+
 ### Admin and demo
 
 | Method | Path | Idem. | Success | Errors |
@@ -274,7 +292,7 @@ type Competency = 'D' | 'R' | 'I' | 'V' | 'E';
 type Score = 0 | 1 | 2 | 3 | 4 | null;           // null: not enough verified evidence
 
 interface Evidence {
-  source: 'application_field' | 'test_item' | 'simulation_turn' | 'interview_turn' | 'interview_note' | 'surprise_answer' | 'presentation';
+  source: 'application_field' | 'test_item' | 'simulation_turn' | 'interview_turn' | 'interview_note' | 'surprise_answer' | 'presentation' | 'follow_up_answer';
   sourceId: string;
   quote: string;                                  // verbatim; never translated
 }
@@ -476,6 +494,33 @@ interface AssessmentDraft {
   scores: DriveScore[];                           // evidence: the candidate's interview turns (and notes, if any)
 }
 
+interface FollowUp {
+  followUpId: string;
+  interviewId: string;
+  question: string | null;                         // the question the interviewer selected
+  answer: FollowUpSegment[];                       // verbatim candidate answer
+  suggestions: FollowUpSuggestion[];               // 0–2; empty means nothing to add
+  createdAt: string;
+}
+
+interface FollowUpSegment {
+  segmentId: string;                               // fseg_01, fseg_02, …
+  text: string;
+  startSec: number;
+  endSec: number;
+}
+
+interface FollowUpSuggestion {
+  suggestionId: string;                            // fs_01, fs_02 within this follow-up
+  question: string;
+  competency: Competency;
+  reason: 'mismatch' | 'vague' | 'no_evidence';
+  why: string;                                     // interviewer only; about the answer, not the person
+  evidence: Evidence[];                            // follow_up_answer first; mismatch also cites application or test
+  status: 'open' | 'asked' | 'dismissed';
+  markedAt: string | null;
+}
+
 type SurpriseStatus = 'ready' | 'started' | 'transcribing' | 'answered' | 'expired' | 'failed';
 
 interface Presentation {
@@ -532,7 +577,7 @@ type AuditAction =
   | 'assessment.ready' | 'interview.created' | 'recording.uploaded' | 'transcript.ready' | 'scores.saved'
   | 'draft.created' | 'surprise.started' | 'surprise.answered' | 'surprise.video.viewed' | 'surprise.video.deleted'
   | 'presentation.submitted' | 'presentation.video.viewed' | 'presentation.video.deleted'
-  | 'slot.created' | 'slot.booked' | 'call.joined' | 'demo.reset';
+  | 'slot.created' | 'slot.booked' | 'call.joined' | 'follow_up.suggested' | 'follow_up.marked' | 'demo.reset';
 
 interface AuditEvent {
   eventId: string;
@@ -617,7 +662,10 @@ interface QualitySignal {
 | `SIMULATION_NOT_FINISHED` | 409 | assessing an active simulation |
 | `NOTHING_TO_ASSESS` | 409 | assessing a simulation the candidate stopped before saying anything |
 | `TURN_IN_FLIGHT` | 409 | a turn while the previous one is still being answered |
-| `SCORES_ALREADY_SAVED` | 409 | new interviewer scores after the first save |
+| `SCORES_ALREADY_SAVED` | 409 | new interviewer scores after the first save or follow-up changes after scoring |
+| `NOT_A_CALL` | 409 | the interview is not linked to a video-call slot |
+| `NO_RECORDING_CONSENT` | 409 | the slot's candidate has not consented to audio recording |
+| `FOLLOW_UP_LIMIT` | 429 | this interview already has 20 follow-ups |
 | `DRAFT_LOCKED` | 409 | the draft requested before the interviewer's scores exist |
 | `TRANSCRIPT_MISSING` | 409 | a draft or an interview check before the transcript exists |
 | `TRANSCRIPT_EXISTS` | 409 | a second recording for an interview that already has a transcript |
@@ -667,6 +715,7 @@ interface QualitySignal {
 | `POST /v1/simulations/:id/turns` | `POST /internal/v1/transcribe` (one speaker), then `simulation/turn`, then `POST /internal/v1/speech` | the transcript as the turn text, the matched branch (audit), the character's audio |
 | interviewer's scores saved + transcript ready | `POST /internal/v1/consistency` with `stage: "after"` | the after report |
 | `POST /v1/interviews/:id/recording` | `POST /internal/v1/transcribe` (two speakers) | the transcript; **the audio is deleted** once it is stored |
+| `POST /v1/interviews/:id/follow-ups` | `POST /internal/v1/transcribe` (`purpose: "follow_up"`, one speaker), then `POST /internal/v1/interview/follow-up` with `toLLMView()`, brief questions, question, segments and earlier suggestions; `sample=true` skips transcription | segments and 0–2 suggestions with status; **the audio is deleted** on success and error |
 | `POST /v1/surprise-questions` | `POST /internal/v1/surprise-question` | the question, its competency and why |
 | `POST /v1/surprise-questions/:id/answer` | `POST /internal/v1/transcribe` (one speaker), with the audio only | the segments; the audio is deleted, the video kept for staff |
 | `GET /v1/admin/overview` | `GET /internal/v1/usage` | nothing |
@@ -712,3 +761,7 @@ These go in the same PR as the rule they test, as `AGENTS.md` requires:
 - an interview quality check without a transcript → `409 TRANSCRIPT_MISSING`, and a calibration over fewer than three interviews → `409 NOT_ENOUGH_HISTORY`;
 - no quality check, of either kind, contains a `candidateId` or a candidate label — a check is about the process;
 - the history sent for a calibration carries no candidate field at all — a spy on `ai-client`.
+- follow-ups reject a non-call, lack of recording consent and saved scores with their respective `409` codes, and the 21st request with `429 FOLLOW_UP_LIMIT`;
+- follow-up audio is gone on success and after an ML error; `platform` receives `403` on every follow-up endpoint;
+- `sample=true` uses seed segments without transcription, while a real clip from A is transcribed; withdrawing consent deletes stored follow-ups;
+- a draft request never contains any follow-up; audit events carry no answer or suggestion text.

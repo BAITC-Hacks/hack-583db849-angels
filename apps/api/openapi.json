@@ -891,6 +891,138 @@
         ]
       }
     },
+    "/v1/interviews/{interviewId}/follow-ups": {
+      "post": {
+        "operationId": "FollowUpsController_create",
+        "parameters": [
+          {
+            "name": "interviewId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/FollowUpUploadDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FollowUpDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "interviews"
+        ]
+      },
+      "get": {
+        "operationId": "FollowUpsController_list",
+        "parameters": [
+          {
+            "name": "interviewId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FollowUpListDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "interviews"
+        ]
+      }
+    },
+    "/v1/interviews/{interviewId}/follow-ups/{followUpId}/suggestions/{suggestionId}": {
+      "put": {
+        "operationId": "FollowUpsController_mark",
+        "parameters": [
+          {
+            "name": "interviewId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "followUpId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "suggestionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarkSuggestionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FollowUpDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "interviews"
+        ]
+      }
+    },
     "/v1/quality-checks/interview": {
       "post": {
         "operationId": "QualityGuardController_interview",
@@ -3677,6 +3809,209 @@
           "scores"
         ]
       },
+      "FollowUpUploadDto": {
+        "type": "object",
+        "properties": {
+          "audio": {
+            "type": "string",
+            "format": "binary",
+            "description": "Candidate audio only: webm, ogg or wav, 3-120 seconds, up to 5 MB."
+          },
+          "question": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "sample": {
+            "type": "string",
+            "enum": [
+              "true"
+            ]
+          }
+        }
+      },
+      "FollowUpSegmentDto": {
+        "type": "object",
+        "properties": {
+          "segmentId": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "startSec": {
+            "type": "number"
+          },
+          "endSec": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "segmentId",
+          "text",
+          "startSec",
+          "endSec"
+        ]
+      },
+      "FollowUpEvidenceDto": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string",
+            "enum": [
+              "follow_up_answer",
+              "application_field",
+              "test_item",
+              "simulation_turn",
+              "interview_turn",
+              "interview_note",
+              "surprise_answer",
+              "presentation"
+            ]
+          },
+          "sourceId": {
+            "type": "string"
+          },
+          "quote": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "source",
+          "sourceId",
+          "quote"
+        ]
+      },
+      "FollowUpSuggestionDto": {
+        "type": "object",
+        "properties": {
+          "suggestionId": {
+            "type": "string"
+          },
+          "question": {
+            "type": "string"
+          },
+          "competency": {
+            "type": "string",
+            "enum": [
+              "D",
+              "R",
+              "I",
+              "V",
+              "E"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "mismatch",
+              "vague",
+              "no_evidence"
+            ]
+          },
+          "why": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FollowUpEvidenceDto"
+            }
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "asked",
+              "dismissed"
+            ]
+          },
+          "markedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "required": [
+          "suggestionId",
+          "question",
+          "competency",
+          "reason",
+          "why",
+          "evidence",
+          "status",
+          "markedAt"
+        ]
+      },
+      "FollowUpDto": {
+        "type": "object",
+        "properties": {
+          "followUpId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "interviewId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "question": {
+            "type": "string",
+            "nullable": true
+          },
+          "answer": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FollowUpSegmentDto"
+            }
+          },
+          "suggestions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FollowUpSuggestionDto"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "followUpId",
+          "interviewId",
+          "question",
+          "answer",
+          "suggestions",
+          "createdAt"
+        ]
+      },
+      "FollowUpListDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FollowUpDto"
+            }
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "MarkSuggestionDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "asked",
+              "dismissed"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
       "InterviewCheckDto": {
         "type": "object",
         "properties": {
@@ -3745,7 +4080,9 @@
               "simulation_turn",
               "interview_turn",
               "interview_note",
-              "surprise_answer"
+              "surprise_answer",
+              "presentation",
+              "follow_up_answer"
             ]
           },
           "sourceId": {

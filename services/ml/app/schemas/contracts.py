@@ -21,6 +21,8 @@ SourceKind = Literal[
     "interview_turn",
     "interview_note",
     "surprise_answer",
+    "presentation",
+    "follow_up_answer",
 ]
 TurnId = Annotated[str, Field(pattern=r"^turn_\d{2,}$")]
 
@@ -373,7 +375,7 @@ class TranscribedTurn(Strict):
 
 
 class TranscribeRequest(Strict):
-    purpose: Literal["interview", "surprise", "turn"]
+    purpose: Literal["interview", "surprise", "turn", "presentation", "follow_up"]
     audioRef: str
     language: Literal["en"] = "en"
     speakers: Literal[1, 2] = 2
@@ -430,6 +432,47 @@ class SpeechRequest(Strict):
         if (self.scenarioId is None) == (self.voice is None):
             raise ValueError("send scenarioId or voice, exactly one")
         return self
+
+
+class FollowUpSegment(Strict):
+    segmentId: Annotated[str, Field(pattern=r"^fseg_\d{2,}$")]
+    text: str
+    startSec: float
+    endSec: float
+
+
+class PlannedQuestion(Strict):
+    focus: str
+    question: str
+
+
+class EarlierSuggestion(Strict):
+    question: str
+    competency: Competency
+    status: Literal["open", "asked", "dismissed"]
+
+
+class FollowUpRequest(Strict):
+    candidate: CandidateView
+    plannedQuestions: list[PlannedQuestion] = []
+    question: str | None = None
+    answer: Annotated[list[FollowUpSegment], Field(min_length=1)]
+    earlier: list[EarlierSuggestion] = []
+
+
+FollowUpReason = Literal["mismatch", "vague", "no_evidence"]
+
+
+class FollowUpSuggestion(Strict):
+    question: str
+    competency: Competency
+    reason: FollowUpReason
+    why: str
+    evidence: Annotated[list[Evidence], Field(min_length=1)]
+
+
+class FollowUpResult(Strict):
+    suggestions: Annotated[list[FollowUpSuggestion], Field(max_length=2)]
 
 
 class SurpriseRequest(Strict):
