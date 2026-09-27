@@ -8,6 +8,10 @@ import { silentWav } from '../../lib/media/silentWav';
 const copy = {
   en: {
     consent: 'The candidate agreed to this interview being recorded and transcribed.',
+    check: 'Check the microphone',
+    checking: 'Asking the browser for the microphone…',
+    ready: 'The microphone is ready. Say a few words: the bar should move.',
+    denied: 'The browser blocked the microphone. Allow it for this site — the lock icon in the address bar — and check again.',
     record: 'Record the interview',
     stop: 'Stop and transcribe',
     recording: 'Recording',
@@ -17,6 +21,10 @@ const copy = {
   },
   ru: {
     consent: 'Кандидат согласился на запись и расшифровку интервью.',
+    check: 'Проверить микрофон',
+    checking: 'Запрашиваем доступ к микрофону…',
+    ready: 'Микрофон готов. Скажите пару слов — полоска должна двигаться.',
+    denied: 'Браузер запретил доступ к микрофону. Разрешите его для этого сайта (значок замка в адресной строке) и проверьте ещё раз.',
     record: 'Записать интервью',
     stop: 'Остановить и расшифровать',
     recording: 'Идёт запись',
@@ -26,6 +34,8 @@ const copy = {
   },
 };
 
+type Microphone = 'unchecked' | 'checking' | 'ready' | 'denied' | 'unavailable';
+
 /** webm where the browser has it, ogg elsewhere; the API takes both, and wav. */
 function audioType(): string | undefined {
   if (typeof MediaRecorder === 'undefined') return undefined;
@@ -34,17 +44,18 @@ function audioType(): string | undefined {
 
 /**
  * Records the live interview on the interviewer's device, with the
- * candidate's consent, and hands the audio over for transcription. Nothing is
- * recorded before the consent box is ticked; the demo recording needs it too,
- * because it goes through the same upload.
+ * candidate's consent, and hands the audio over for transcription. The
+ * microphone is asked for and checked first, with its level on screen, and
+ * nothing is recorded before the consent box is ticked; the demo recording
+ * needs the consent too, because it goes through the same upload.
  */
 export function InterviewRecorder({ onRecorded, disabled = false }: { onRecorded: (audio: Blob) => void; disabled?: boolean }) {
   const text = useCopy(copy);
   const [consent, setConsent] = useState(false);
+  const [microphone, setMicrophone] = useState<Microphone>('unchecked');
   const [recording, setRecording] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const [level, setLevel] = useState(0);
-  const [micError, setMicError] = useState(false);
   const stream = useRef<MediaStream | null>(null);
   const audio = useRef<AudioContext | null>(null);
   const recorder = useRef<MediaRecorder | null>(null);
@@ -62,6 +73,20 @@ export function InterviewRecorder({ onRecorded, disabled = false }: { onRecorded
 
   useEffect(() => release, []);
 
+  // A microphone the browser has already refused is said so before anyone asks.
+  useEffect(() => {
+    let cancelled = false;
+    navigator.permissions
+      ?.query({ name: 'microphone' as PermissionName })
+      .then((status) => {
+        if (!cancelled && status.state === 'denied') setMicrophone('denied');
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   useEffect(() => {
     if (!recording) return;
     const started = Date.now();
@@ -69,26 +94,25 @@ export function InterviewRecorder({ onRecorded, disabled = false }: { onRecorded
     return () => clearInterval(timer);
   }, [recording]);
 
-  async function start() {
-    setMicError(false);
+  /**
+   * Asks for the microphone before anything is recorded, and shows its level,
+   * so a refused or silent microphone is found out now — not an hour into
+   * the interview.
+   */
+  async function check() {
     if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') {
-      setMicError(true);
+      setMicrophone('unavailable');
       return;
     }
+    release();
+    setMicrophone('checking');
     try {
       stream.current = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const type = audioType();
-      recorder.current = new MediaRecorder(stream.current, type ? { mimeType: type } : undefined);
-      chunks.current = [];
-      recorder.current.ondataavailable = (event) => {
-        if (event.data.size > 0) chunks.current.push(event.data);
-      };
-      recorder.current.onstop = () => {
-        const media = recorder.current;
-        onRecorded(new Blob(chunks.current, { type: media?.mimeType || type || 'audio/webm' }));
-        release();
-      };
-
+    } catch (error) {
+      setMicrophone(error instanceof DOMException && error.name === 'NotAllowedError' ? 'denied' : 'unavailable');
+      return;
+    }
+    if (typeof AudioContext !== 'undefined') {
       audio.current = new AudioContext();
       const analyser = audio.current.createAnalyser();
       analyser.fftSize = 512;
@@ -102,13 +126,27 @@ export function InterviewRecorder({ onRecorded, disabled = false }: { onRecorded
         frame.current = requestAnimationFrame(tick);
       };
       tick();
-      recorder.current.start(1000);
-      setSeconds(0);
-      setRecording(true);
-    } catch {
-      release();
-      setMicError(true);
     }
+    setMicrophone('ready');
+  }
+
+  function start() {
+    if (!stream.current) return;
+    const type = audioType();
+    recorder.current = new MediaRecorder(stream.current, type ? { mimeType: type } : undefined);
+    chunks.current = [];
+    recorder.current.ondataavailable = (event) => {
+      if (event.data.size > 0) chunks.current.push(event.data);
+    };
+    recorder.current.onstop = () => {
+      const media = recorder.current;
+      onRecorded(new Blob(chunks.current, { type: media?.mimeType || type || 'audio/webm' }));
+      release();
+      setMicrophone('unchecked');
+    };
+    recorder.current.start(1000);
+    setSeconds(0);
+    setRecording(true);
   }
 
   function stop() {
@@ -118,6 +156,11 @@ export function InterviewRecorder({ onRecorded, disabled = false }: { onRecorded
 
   const mm = String(Math.floor(seconds / 60)).padStart(2, '0');
   const ss = String(seconds % 60).padStart(2, '0');
+  const meter = (
+    <div className="h-1.5 overflow-hidden rounded-full bg-border-subtle" aria-hidden="true">
+      <div className="h-full rounded-full bg-brand-green transition-[width] duration-75" style={{ width: `${Math.round(level * 100)}%` }} />
+    </div>
+  );
 
   return (
     <div className="flex flex-col gap-3 p-5">
@@ -132,9 +175,7 @@ export function InterviewRecorder({ onRecorded, disabled = false }: { onRecorded
               {mm}:{ss}
             </time>
           </div>
-          <div className="h-1.5 overflow-hidden rounded-full bg-border-subtle" aria-hidden="true">
-            <div className="h-full rounded-full bg-brand-green transition-[width] duration-75" style={{ width: `${Math.round(level * 100)}%` }} />
-          </div>
+          {meter}
           <button
             type="button"
             onClick={stop}
@@ -155,16 +196,37 @@ export function InterviewRecorder({ onRecorded, disabled = false }: { onRecorded
             />
             {text.consent}
           </label>
-          <button
-            type="button"
-            onClick={() => void start()}
-            disabled={!consent || disabled}
-            className="inline-flex items-center justify-center gap-2 rounded-control bg-brand-green px-4 py-2.5 text-sm font-semibold text-on-brand transition-colors hover:bg-brand-dim disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <MicrophoneIcon aria-hidden="true" className="h-4 w-4" />
-            {text.record}
-          </button>
-          {micError ? <p className="text-[0.8rem] text-status-low">{text.noMic}</p> : null}
+
+          {microphone === 'ready' ? (
+            <>
+              <p role="status" className="text-[0.8rem] text-text-secondary">
+                {text.ready}
+              </p>
+              {meter}
+              <button
+                type="button"
+                onClick={start}
+                disabled={!consent || disabled}
+                className="inline-flex items-center justify-center gap-2 rounded-control bg-brand-green px-4 py-2.5 text-sm font-semibold text-on-brand transition-colors hover:bg-brand-dim disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <MicrophoneIcon aria-hidden="true" className="h-4 w-4" />
+                {text.record}
+              </button>
+            </>
+          ) : (
+            <button
+              type="button"
+              onClick={() => void check()}
+              disabled={disabled || microphone === 'checking'}
+              className="inline-flex items-center justify-center gap-2 rounded-control border border-border-strong px-4 py-2.5 text-sm font-semibold text-text-primary transition-colors hover:bg-bg-elevated disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <MicrophoneIcon aria-hidden="true" className="h-4 w-4" />
+              {microphone === 'checking' ? text.checking : text.check}
+            </button>
+          )}
+          {microphone === 'denied' ? <p role="alert" className="text-[0.8rem] text-status-low">{text.denied}</p> : null}
+          {microphone === 'unavailable' ? <p role="alert" className="text-[0.8rem] text-status-low">{text.noMic}</p> : null}
+
           <button
             type="button"
             onClick={() => onRecorded(silentWav())}
