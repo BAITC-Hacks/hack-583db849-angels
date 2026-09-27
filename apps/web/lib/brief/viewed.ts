@@ -4,9 +4,9 @@ import { useSyncExternalStore } from 'react';
 
 /**
  * Which briefs were opened in this tab. The server deliberately keeps no
- * "read" mark (`docs/INTEGRATION.md`, G13): the interviewer's home only
- * moves on to the interview once the brief has been opened here. It is
- * never written to browser storage, so a reload forgets it.
+ * "read" mark: the interviewer's home only moves on to the interview once the
+ * brief has been opened here. It is never written to browser storage, so a
+ * reload forgets it.
  */
 let viewed: ReadonlySet<string> = new Set();
 const listeners = new Set<() => void>();

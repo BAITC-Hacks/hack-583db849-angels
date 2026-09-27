@@ -14,7 +14,7 @@ export interface CandidateProgress {
   hasData: boolean;
   /** Where the brief is. */
   brief?: 'pending' | 'ready' | 'failed' | null;
-  /** Opened in this tab. The server keeps no "read" mark (`docs/INTEGRATION.md`, G13). */
+  /** Opened in this tab. The server keeps no "read" mark. */
   briefViewed: boolean;
   simulation: SimulationStatus;
   assessmentReady: boolean;

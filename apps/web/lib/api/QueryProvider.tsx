@@ -5,8 +5,7 @@ import { useState, type ReactNode } from 'react';
 import { isRetryable } from './errors';
 
 /**
- * One cache for every product screen, with the rules from
- * `docs/INTEGRATION.md`, section 2: short freshness because the demo moves
+ * One cache for every product screen: short freshness because the demo moves
  * fast, two retries on a network failure or a 5xx, and never a retry on a 4xx —
  * a `409 DRAFT_LOCKED` is an answer, not a hiccup.
  *

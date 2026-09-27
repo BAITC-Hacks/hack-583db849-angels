@@ -27,7 +27,7 @@ These are the exact endpoints the web screens call. They are derived from the sc
 8. **M5 quality checks.** `POST /v1/quality-checks/interview`, `POST /v1/quality-checks/calibration`, `GET /v1/quality-checks` and `GET /v1/quality-checks/:id`.
 9. **The scenario pool (M2b), consistency (C) and the surprise question (S).**
 
-The step-by-step plan with owners and dates is `docs/INTEGRATION.md`.
+Who builds what, and in which order, is in the issues and `CONTRIBUTING.md`.
 
 The contract PR for each group is small and Aibek's alone: DTOs, the regenerated `openapi.json`, and the example as the answer until the implementation lands. No Pydantic, no web code. Merge it first; the implementation follows in a second PR.
 
@@ -184,7 +184,7 @@ A separate layer across all data about the candidate — application, test, cert
 
 ### S — the surprise question (video and voice)
 
-One question about the candidate's own application, one attempt, 90 seconds, on camera. See `docs/INTEGRATION.md`, section 10.
+One question about the candidate's own application, one attempt, 90 seconds, on camera. See `docs/PLAN.md`, section 4.
 
 | Method | Path | Idem. | Success | Errors |
 | --- | --- | --- | --- | --- |
