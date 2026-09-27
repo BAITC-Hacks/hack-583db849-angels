@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { characterAudioSrc, speakAloud, turnAudioUrl } from './characterVoice';
+import { characterAudioSrc, claimVoice, releaseVoice, speakAloud, turnAudioUrl } from './characterVoice';
 import type { SimulationTurn } from './types';
 
 /** About 155 words a minute: the pace words appear at until the voice's own length is known. */
@@ -80,6 +80,7 @@ export function useSpokenLines(simulationId: string, turns: SimulationTurn[], un
     if (!audio) {
       withBrowserVoice();
     } else {
+      claimVoice(audio);
       audio.onloadedmetadata = () => {
         if (Number.isFinite(audio.duration) && audio.duration > 0) reveal(Math.min(700, Math.max(150, (audio.duration * 1000) / Math.max(total, 1))));
       };
@@ -91,7 +92,7 @@ export function useSpokenLines(simulationId: string, turns: SimulationTurn[], un
       done = true;
       clearInterval(ticker);
       clearTimeout(safety);
-      audio?.pause();
+      if (audio) releaseVoice(audio);
       if (fellBack && typeof window !== 'undefined' && 'speechSynthesis' in window) window.speechSynthesis.cancel();
     };
   }, [nextId, nextText, simulationId]);
