@@ -89,15 +89,19 @@ export function useCreateInterview() {
   });
 }
 
-/** The recording, with the candidate's consent, as multipart. The server answers at once with `transcribing`. */
+/**
+ * The recording, with the candidate's consent, as multipart. The server answers at once with `transcribing`.
+ * `sample` marks the demo recording: only that one is answered with A, B or C's seed transcript.
+ */
 export function useUploadRecording(interviewId: string) {
   const client = useQueryClient();
   const attempt = useAttemptKey();
   return useMutation({
-    mutationFn: async ({ audio, consent }: { audio: Blob; consent: boolean }): Promise<InterviewRecord> => {
+    mutationFn: async ({ audio, consent, sample = false }: { audio: Blob; consent: boolean; sample?: boolean }): Promise<InterviewRecord> => {
       const form = new FormData();
       form.append('audio', audio, audio.type.includes('wav') ? 'interview.wav' : audio.type.includes('ogg') ? 'interview.ogg' : 'interview.webm');
       form.append('consent', String(consent));
+      if (sample) form.append('sample', 'true');
       const response = await fetch(`/api/v1/interviews/${encodeURIComponent(interviewId)}/recording`, {
         method: 'POST',
         headers: { 'Idempotency-Key': attempt.get() },

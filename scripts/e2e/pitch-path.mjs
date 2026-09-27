@@ -169,6 +169,8 @@ for (const letter of ['a', 'b', 'c']) {
     interviewId = (await call('interviewer', 'POST', '/interviews', { candidateId: id, heldAt: new Date().toISOString(), interviewerRef: 'synthetic-interviewer-a' }, { expect: [201] })).data.interviewId;
     const form = new FormData();
     form.append('consent', 'true');
+    // The demo recording: in DEMO_MODE it stands for the seed's interview.
+    form.append('sample', 'true');
     form.append('audio', silence(), 'interview.wav');
     await call('interviewer', 'POST', `/interviews/${interviewId}/recording`, undefined, { form, expect: [202] });
     const interview = await until('interview transcript', async () => {
