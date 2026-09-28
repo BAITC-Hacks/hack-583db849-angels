@@ -1,0 +1,15 @@
+# Apply after the base and server files, only during a scheduled demo check.
+# Restore the normal server files afterwards. The live usage volume is retained.
+services:
+  ml:
+    environment:
+      GATEWAY_MODE: replay
+      MEDIA_GATEWAY_MODE: replay
+      OPENAI_API_KEY: ""
+      DEEPGRAM_API_KEY: ""
+      USAGE_LOG_PATH: /data/replay-usage/gateway-usage.jsonl
+    volumes:
+      - replay-usage-data:/data/replay-usage
+
+volumes:
+  replay-usage-data:

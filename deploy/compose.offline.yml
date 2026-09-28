@@ -1,0 +1,20 @@
+# Build and pull images before applying this file. The internal network keeps
+# service-to-service traffic but prevents containers from reaching the internet.
+# Synthetic LiveKit settings allow local token signing in the pitch-path test;
+# they cannot connect a real call and never use project credentials.
+services:
+  ml:
+    environment:
+      GATEWAY_MODE: replay
+      MEDIA_GATEWAY_MODE: replay
+      OPENAI_API_KEY: ""
+      DEEPGRAM_API_KEY: ""
+  api:
+    environment:
+      LIVEKIT_URL: wss://synthetic.invalid
+      LIVEKIT_API_KEY: APIsynthetic
+      LIVEKIT_API_SECRET: synthetic-secret
+
+networks:
+  default:
+    internal: true

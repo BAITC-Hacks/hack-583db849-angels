@@ -75,16 +75,61 @@ curl -s https://$DOMAIN/api/v1/health        # живость API через в�
 
 ### 3.1. Путь питча — скриптом
 
-API снаружи недоступен, поэтому скрипт запускается внутри сети compose, с теми же четырьмя ключами, что в `API_KEYS`:
+Скрипт рассчитан на `replay` и сбрасывает демо в начале и конце: созданные
+кандидаты, сессии и медиа удаляются. Запускайте его в согласованное окно, сохранив
+результаты предыдущих проверок. Это проверка серверного API внутри сети Compose.
+Она не доказывает работу живой расшифровки или камеры в браузере.
+
+После live-вызовов обычного переключения в replay недостаточно: скрипт проверяет
+`usage.liveCalls` за весь журнал, а «Сбросить демо» этот журнал не очищает.
+`deploy/compose.replay.yml` выбирает отдельный журнал для replay и отключает
+живые модели и медиа. Исходный журнал расходов сохраняется в `usage-data`.
+Не удаляйте его, чтобы пройти проверку или получить новый бюджет.
+
+Перед началом убедитесь, что обычные серверные Compose-файлы и настройки
+оператора соответствуют текущему деплою: именно их восстановит команда ниже.
+Скрипт-обёртка читает ключи из окружения контейнера API и передаёт их дочернему
+процессу; ключи не нужно вставлять в командную строку. На сервере не выводите
+`docker compose config`, `env` или полный `docker inspect`: там могут быть секреты.
+
+Из корня репозитория запустите отдельный Bash-процесс:
 
 ```bash
-$C run --rm --no-deps -v "$PWD:/repo" -w /repo \
-  -e API=http://api:3001/v1 \
-  -e E2E_KEY_PLATFORM=… -e E2E_KEY_INTERVIEWER=… -e E2E_KEY_COMMISSION=… -e E2E_KEY_ADMIN=… \
-  api node scripts/e2e/pitch-path.mjs
+bash <<'CHECK'
+set -euo pipefail
+server=(docker compose -f docker-compose.yml -f docker-compose.server.yml)
+replay=("${server[@]}" -f deploy/compose.replay.yml)
+restore() {
+  result=$?
+  trap - EXIT
+  if ! "${server[@]}" up -d --no-deps --wait ml; then
+    echo 'Failed to restore ML; restore its normal configuration before the demo.' >&2
+    exit 1
+  fi
+  exit "$result"
+}
+trap restore EXIT
+"${replay[@]}" up -d --no-deps --wait ml
+"${replay[@]}" run --rm --no-deps \
+  -v "$PWD/deploy:/checks/deploy:ro" \
+  -v "$PWD/scripts/e2e:/checks/scripts/e2e:ro" \
+  -v "$PWD/seed:/checks/seed:ro" \
+  api node /checks/deploy/run-pitch-path.mjs
+CHECK
 ```
 
-Он должен закончиться строкой `All steps passed.` Скрипт сам сбрасывает демо в начале и в конце. Для A, B и C он проходит бриф, симуляцию из записи и отчёт, отзыв без баллов, сюрпризный вопрос, интервью с черновиком, закрытым до слепых баллов, сверку «после», проверку качества и калибровку. Потом — передачу анкеты со стенда и сброс демо.
+Успех — код выхода 0, `All steps passed.`, затем healthy ML в исходном режиме.
+Обработчик `EXIT` восстанавливает обычный ML и при ошибке проверки; после
+аварийного завершения процесса восстановите его вручную обычным серверным
+`up -d --no-deps --wait ml`. Не оставляйте сервер на временном replay-override.
+
+Для A, B и C скрипт проходит бриф, симуляцию из записи и отчёт, отзыв без баллов,
+сюрпризный вопрос, интервью с черновиком, закрытым до слепых баллов, сверку
+«после», проверку качества и калибровку. Затем — передачу анкеты и сброс демо.
+Свежий бриф нового кандидата в replay не обязан стать `ready`.
+Медиа S/P проверяются скриптом только при заданном `E2E_MEDIA_DIR` с совместимыми
+синтетическими записями; без него эти проверки пропущены. Демо-интервью использует
+seed-расшифровку. Свежие расшифровки проверяйте вручную в live.
 
 ### 3.2. Путь питча — в браузере
 
@@ -124,12 +169,15 @@ $C run --rm --no-deps -v "$PWD:/repo" -w /repo \
 GATEWAY_MODE=live
 OPENAI_API_KEY=…
 DEEPGRAM_API_KEY=…
-BUDGET_USD_CAP=20
+BUDGET_USD_CAP=10
 
 $C up -d ml                                  # пересоздать ml с новыми настройками
 ```
 
-Расход виден у админа в плитке «Бюджет ИИ». Когда он дойдёт до лимита, ML отвечает `AI_BUDGET_EXCEEDED`. На питче рекомендуется `replay`.
+Расход виден у админа в плитке «Бюджет ИИ». Когда он дойдёт до лимита, ML отвечает
+`AI_BUDGET_EXCEEDED`. Для #23 лимит live-демо — $10; проверьте также баланс и лимит
+проектного ключа. Расход накопительный: новый запуск контейнера не даёт новые $10.
+Режим основного показа выбирает Мейірбек; офлайн-резерв всегда работает на replay.
 
 **Только голос и расшифровка вживую.** `MEDIA_GATEWAY_MODE=live` при `GATEWAY_MODE=replay`: Deepgram работает по-настоящему (записанный на сцене сюрпризный ответ, видеопрезентация и запись интервью расшифровываются), а ответы моделей идут из записей. Нужен только `DEEPGRAM_API_KEY`. Пусто — голос следует за `GATEWAY_MODE`.
 
@@ -187,17 +235,163 @@ $C exec -T postgres psql -U invision invision < backup.sql     # восстан�
 
 ## 8. Ноутбук — запасной путь без сети
 
-```bash
-cp .env.example .env
-docker compose up --build                    # без файла сервера
-```
-
-Адрес — `http://localhost:3000`. Браузер считает `localhost` безопасным, поэтому камера и микрофон работают и без HTTPS. Файл compose для ноутбука сам ставит `GATEWAY_MODE=replay` и `DEMO_MODE=true`, так что сеть не нужна; из `.env` он читает только `LIVEKIT_*` и `INTERVIEW_TIME_ZONE`.
-
-Проверка — как в разделе 3, но проще: API опубликован на порту 3001, а ключи — локальные ключи по умолчанию.
+Сначала, пока сеть доступна, подготовьте образы и проверьте стек. Копирование
+`.env.example` нужно только при первом запуске, когда своего `.env` ещё нет.
 
 ```bash
-API=http://localhost:3001/v1 node scripts/e2e/pitch-path.mjs     # All steps passed.
+docker compose up --build -d                 # без файла сервера
+docker compose ps
+curl --fail --show-error http://localhost:3000/health
+curl --fail --show-error http://localhost:3001/v1/health
+# Use synthetic LiveKit token-signing settings for e2e, as in CI.
+# These do not connect to LiveKit; verify real video separately on the server.
+LIVEKIT_URL=wss://synthetic.invalid LIVEKIT_API_KEY=APIsynthetic LIVEKIT_API_SECRET=synthetic-secret \
+  docker compose up -d --no-build --no-deps --wait api
+API=http://localhost:3001/v1 node scripts/e2e/pitch-path.mjs
+docker compose down
 ```
 
-Затем путь из раздела 3.2 в браузере — ещё раз с выключенным Wi‑Fi.
+LanguageTool, embedding-модель, зависимости и базовые образы должны уже быть
+загружены: сборка без сети не является частью резервного запуска. Адрес —
+`http://localhost:3000`. Браузер считает localhost безопасным для камеры и микрофона.
+Основной Compose задаёт `GATEWAY_MODE=replay` и `DEMO_MODE=true`.
+
+Для автоматической API-проверки запрета внешних соединений используйте offline-override:
+он оставляет связь контейнеров друг с другом и закрывает их выход в интернет.
+Публикация портов с internal-сети на этой версии Docker недоступна, поэтому
+e2e запускается внутри контейнера. Браузерный резерв проверяется на обычной сети
+Compose при выключенной внешней сети ноутбука.
+Он также заменяет настройки внешнего LiveKit синтетическими для локальной подписи
+токенов в e2e. Это не работающий видеозвонок. Отключение сети ноутбука нужно
+дополнительно проверить вручную: Docker-сеть не ограничивает запросы браузера.
+
+```bash
+docker compose -f docker-compose.yml -f deploy/compose.offline.yml up -d --no-build --pull never --wait
+docker compose -f docker-compose.yml -f deploy/compose.offline.yml run --rm --no-deps \
+  -v "$PWD/deploy:/checks/deploy:ro" \
+  -v "$PWD/scripts/e2e:/checks/scripts/e2e:ro" \
+  -v "$PWD/seed:/checks/seed:ro" \
+  api node /checks/deploy/run-pitch-path.mjs
+docker compose -f docker-compose.yml -f deploy/compose.offline.yml down
+# Restore the normal Compose network, then disconnect the laptop from the internet.
+docker compose up -d --no-build --pull never --wait
+curl --fail --show-error http://localhost:3000/health
+curl --fail --show-error http://localhost:3001/v1/health
+# Walk section 3.2 in the browser with the laptop disconnected from the internet.
+docker compose down
+```
+
+Успех — `All steps passed.` и браузерный путь 3.2 без сети. Внешний видеозвонок,
+новая live-симуляция и свежая расшифровка не входят в офлайн-путь: показываются
+записанные A/B/C. Проверочный стек всегда останавливайте после проверки, включая
+неудачный прогон; тома сохраняйте. Перед питчем запустите подготовленный стек снова.
+
+## 9. Приёмка #23 и протокол репетиции
+
+Демо уже развёрнуто на `https://staging-invision.byapex.dev`, по сообщению Айбека
+от 27.09 в #23. Повторный деплой с нуля не требуется. Его комментарий обозначает
+live-AI как непроверенный. Ссылка issue на `docs/INTEGRATION.md` устарела:
+этого файла нет в текущем `main`; ниже явно перечислены проверки из issue
+и этого документа. Окончательную полноту приёмки подтверждает Мейірбек.
+
+| Проверка | Критерий | Подтверждение |
+| --- | --- | --- |
+| HTTPS и health | Действительный сертификат; веб и API отвечают успешно | 29.09: оба публичных health вернули `{"status":"ok"}`; камера ещё не проверена |
+| ML и режим | Админ: ML «Работает», согласованный режим, демо включено | Не проверено; нужен доступ к серверу |
+| Серверный replay | Раздел 3.1: код 0, `All steps passed.`, исходный режим восстановлен | Не выполнен |
+| Новая анкета | Кандидат виден интервьюеру; в live бриф `ready` | Не выполнено |
+| Живой голос и M3 | Свежая расшифровка, ответ персонажа, отчёт с цитатами | Не выполнено |
+| Свежие S/P-медиа | Расшифровки соответствуют новой синтетической записи | Не выполнено |
+| Видеозвонок | Два браузера: звук, видео, согласие, запись, свежая расшифровка | Не выполнено |
+| M4 и сверка | Черновик закрыт до слепых баллов; после них доступны M4 и сверка | Не выполнено вручную |
+| Отказ ML | Раздел 3.4: понятная ошибка, ввод сохранён, повтор без дубля | Не выполнено |
+| Ноутбук | Раздел 8: API и браузерный путь A/B/C без сети | Не выполнено |
+| Репетиция | Сервер ×3, ноутбук ×3, ещё ноутбук офлайн ×1; каждый < 5 минут | Не выполнена |
+| Результаты в issue | Комментарий: дата, времена всех прогонов, проблемы | Не опубликован |
+
+До начала live-проверок зафиксируйте согласованный режим и бюджет; используйте
+только синтетические данные. Не коммитьте настоящие голоса, ключи или `.env`.
+Health подтверждает доступность сервиса, а не работу моделей, медиа или UI.
+
+Перед каждым прогоном — «Сбросить демо». После исправления ошибки начните
+соответствующую серию из трёх прогонов заново. В протоколе укажите SHA кода,
+дату и время, оба режима (`gateway`/`media`), длительность и фактический результат.
+
+| Прогон | Дата / SHA | Окружение / сеть | Gateway / media | Длительность | Результат |
+| --- | --- | --- | --- | --- | --- |
+| S1 | — | Сервер / онлайн | — | — | Не выполнен |
+| S2 | — | Сервер / онлайн | — | — | Не выполнен |
+| S3 | — | Сервер / онлайн | — | — | Не выполнен |
+| L1 | — | Ноутбук / онлайн | replay / replay | — | Не выполнен |
+| L2 | — | Ноутбук / онлайн | replay / replay | — | Не выполнен |
+| L3 | — | Ноутбук / онлайн | replay / replay | — | Не выполнен |
+| L4 | — | Ноутбук / офлайн | replay / replay | — | Не выполнен |
+
+В результатах проверки перечислите точные команды без секретов, коды выхода,
+успешные проверки, ошибки и пропуски. PR готовится после локального Docker-прогона
+и согласования результатов; до этого issue не считается выполненным.
+
+
+### 9.1. Локальная Docker-проверка от 29.09.2026
+
+Основа — `7ad160ba9d6b15eb295699254d74a80b1f007cf0`; Docker 29.7.2,
+Compose 5.5.1. Это проверка локальных deploy-изменений, не серверная приёмка #23.
+Настоящие provider-ключи не использовались; `.env` не читался.
+
+Выполнены команды:
+
+```bash
+docker compose --env-file /dev/null up --build -d
+docker compose --env-file /dev/null ps
+curl --fail --show-error http://localhost:3000/health
+curl --fail --show-error http://localhost:3001/v1/health
+curl --fail --show-error http://localhost:3000/api/v1/health
+LIVEKIT_URL=wss://synthetic.invalid LIVEKIT_API_KEY=APIsynthetic LIVEKIT_API_SECRET=synthetic-secret \
+  docker compose --env-file /dev/null up -d --no-build --no-deps --wait api
+API=http://localhost:3001/v1 node scripts/e2e/pitch-path.mjs
+docker compose --env-file /dev/null -f docker-compose.yml -f deploy/compose.replay.yml up -d --no-build --no-deps --wait ml
+docker compose --env-file /dev/null -f docker-compose.yml -f deploy/compose.replay.yml run --rm --no-deps \
+  -v "$PWD/deploy:/checks/deploy:ro" -v "$PWD/scripts/e2e:/checks/scripts/e2e:ro" -v "$PWD/seed:/checks/seed:ro" \
+  api node /checks/deploy/run-pitch-path.mjs
+docker compose --env-file /dev/null up -d --no-build --no-deps --wait ml
+docker compose --env-file /dev/null down
+docker compose --env-file /dev/null -f docker-compose.yml -f deploy/compose.offline.yml up -d --no-build --pull never --wait
+docker compose --env-file /dev/null -f docker-compose.yml -f deploy/compose.offline.yml run --rm --no-deps \
+  -v "$PWD/deploy:/checks/deploy:ro" -v "$PWD/scripts/e2e:/checks/scripts/e2e:ro" -v "$PWD/seed:/checks/seed:ro" \
+  api node /checks/deploy/run-pitch-path.mjs
+docker compose --env-file /dev/null -f docker-compose.yml -f deploy/compose.offline.yml down
+```
+
+Результат: все образы собраны, четыре сервиса healthy, health веба/API/прокси
+вернул `status: ok`; три успешных e2e-прогона закончились `All steps passed.`
+(host, обёртка с отдельным replay-журналом, обёртка на internal-сети).
+Во всех трёх — `liveCalls: 0`, `spentUsd: 0`. S/P-медиа в этих прогонах пропущены.
+
+Дополнительные проверки:
+
+- SHA-256 исходного журнала до и после временного replay совпал:
+  `398a76f31a3b758721ba4f66eae314a351df79d7f847b9955a8457660e892068`.
+  Отдельный replay-журнал создан; нормальная конфигурация ML восстановлена.
+- `docker compose --env-file /dev/null stop ml`, запрос `/api/v1/scenarios`
+  с ролью admin через веб: `503 AI_UNAVAILABLE` с traceId. После
+  `up -d --no-build --no-deps --wait ml` тот же запрос вернул `200`.
+- На internal-сети ML достиг внутреннего `http://api:3001/v1/health` (`200`),
+  а попытка TCP-соединения с `1.1.1.1:443` завершилась сетевой ошибкой.
+- Синтаксис Node/Bash и объединённые Compose-конфигурации проверены;
+  gitleaks по изменённым файлам без `.env` не нашёл секретов.
+
+Найденные проблемы: первоначальный host-e2e без LiveKit-настроек завершился
+`503 VIDEO_UNAVAILABLE` в follow-up. Добавлены синтетические настройки подписи,
+как в CI. Host-e2e на internal-сети получил `ECONNREFUSED`; для этой проверки
+инструкция теперь запускает обёртку внутри Compose. Кратковременный `500` health
+прокси во время пересоздания API исчез после готовности API.
+
+Эти прогоны не заменяют браузерную репетицию, отключение сети ноутбука,
+свежую live-расшифровку или звонок между двумя браузерами. Доступ к серверу
+и результаты этих проверок ещё требуются для закрытия #23.
+
+Повторный локальный запуск `docker compose --env-file /dev/null up -d --no-build --pull never --wait`
+также прошёл: HTTP-проверки `/health`, `/api/v1/health`, `/admin`, `/interviewer`,
+`/commission`, `/candidate` вернули `200`. Это проверка HTTP-ответов, не взаимодействия
+в браузере. После неё `docker compose --env-file /dev/null down` завершился успешно;
+`docker compose --env-file /dev/null ps` показал пустой список сервисов.
