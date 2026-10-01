@@ -5,6 +5,8 @@
 <p><b>An AI layer around the admissions interview at <a href="https://invisionu.education">inVision U</a>.<br/>
 It helps people see a candidate's leadership — with evidence — and never decides for them.</b></p>
 
+**[▶ Live demo — staging-invision.byapex.dev](https://staging-invision.byapex.dev)**
+
 [![CI](https://github.com/mmeirbek/invisionu-new-chapter/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/mmeirbek/invisionu-new-chapter/actions/workflows/ci.yml)
 [![Last commit](https://img.shields.io/github/last-commit/mmeirbek/invisionu-new-chapter)](https://github.com/mmeirbek/invisionu-new-chapter/commits/main)
 [![Commits](https://img.shields.io/github/commit-activity/t/mmeirbek/invisionu-new-chapter?label=commits)](https://github.com/mmeirbek/invisionu-new-chapter/commits/main)
